@@ -9,9 +9,14 @@ import css from "../css/app.scss"
 //
 // Import dependencies
 //
-import "phoenix_html"
+//import "phoenix_html"
+import "jquery/dist/jquery"
+import "popper.js"
 
+import "bootstrap/dist/js/bootstrap"
 // Import local files
+
+
 //
 // Local files can be imported directly using relative paths, for example:
 // import socket from "./socket"
