@@ -45,11 +45,6 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
   color: #007bff;
 }
 
-.sidebar-heading {
-  font-size: .75rem;
-  text-transform: uppercase;
-}
-
 /*
  * Content
  */
