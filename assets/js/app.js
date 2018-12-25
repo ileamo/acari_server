@@ -14,6 +14,9 @@ import "jquery/dist/jquery"
 import "popper.js"
 
 import "bootstrap/dist/js/bootstrap"
+
+import "chart.js"
+
 // Import local files
 
 
