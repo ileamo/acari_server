@@ -6,6 +6,7 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.6.3",
     "bootstrap": "^4.2.1",
     "chart.js": "^2.7.3",
     "jquery": "^3.3.1",

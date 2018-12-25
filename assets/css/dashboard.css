@@ -1,7 +1,7 @@
 body {
   font-size: .875rem;
 }
-
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 /*
  * Sidebar
  */
