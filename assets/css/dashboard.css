@@ -78,3 +78,138 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 }
 
 */
+
+
+/* ----- Statistic ----- */
+.statistic {
+    padding-top: 57px;
+}
+
+.statistic__item {
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    padding: 20px 30px;
+    position: relative;
+    min-height: 150px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .statistic__item {
+        padding: 20px 10px;
+    }
+}
+
+.statistic__item h2 {
+    font-size: 36px;
+    font-weight: 300;
+    color: #4272d7;
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .statistic__item h2 {
+        font-size: 22px;
+    }
+}
+
+.statistic__item .desc {
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 300;
+    color: rgba(128, 128, 128, 0.6);
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .statistic__item .desc {
+        font-size: 13px;
+    }
+}
+
+.statistic__item--green {
+    background: #00b26f;
+}
+
+.statistic__item--orange {
+    background: #ff8300;
+}
+
+.statistic__item--blue {
+    background: #00b5e9;
+}
+
+.statistic__item--red {
+    background: #fa4251;
+}
+
+.task-progress {
+    border: 1px solid  #e5e5e5;
+    background: #fff;
+    padding: 40px;
+    padding-top: 42px;
+    padding-right: 55px;
+    padding-bottom: 74px;
+    margin-bottom: 40px;
+}
+
+.task-progress .title-3 {
+    margin-bottom: 32px;
+}
+
+.task-progress .au-progress {
+    padding: 11px 0;
+}
+
+.recent-report2 {
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    padding: 40px;
+    padding-top: 42px;
+    padding-right: 55px;
+    padding-bottom: 51px;
+    margin-bottom: 40px;
+}
+
+section {
+    position: relative;
+}
+
+.section__content {
+    position: relative;
+    margin: 0 auto;
+    z-index: 1;
+}
+
+.section__content--w1830 {
+    max-width: 1830px;
+}
+
+.section__content--p30 {
+    padding: 0 30px;
+}
+
+@media (max-width: 991px) {
+    .section__content--p30 {
+        padding: 0;
+    }
+}
+
+.section__content--p35 {
+    padding: 0 35px;
+}
+
+.title-3 {
+    text-transform: capitalize;
+    font-weight: 400;
+    font-size: 24px;
+    color: #333;
+}
+
+.title-3 i {
+    margin-right: 13px;
+    vertical-align: baseline;
+}
+
+.task-progress .title-3 {
+    margin-bottom: 32px;
+}
