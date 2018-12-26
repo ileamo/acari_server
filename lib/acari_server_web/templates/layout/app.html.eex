@@ -12,16 +12,15 @@
   <body>
     <nav class="navbar navbar-expand navbar-dark flex-md-nowrap p-0 shadow justify-content-between"
           style="background-color: #305478;">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">NSG</a>
+      <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
       <div class="navbar-nav px-3">
+        <a class="nav-link ml-3" href="#">Сообщения<span class="badge badge-warning mr-2 ml-1">7</span></a>
         <span class="navbar-text">Admin</span>
-        <a class="nav-link ml-3" href="#">Выход</a>
+        <a class="nav-link" href="#">Выход</a>
       </div>
-
-
     </nav>
 
-    <nav class = "navbar d-block d-md-none navbar-light bg-light">
+    <nav class = "navbar d-block d-md-none navbar-light">
       <span class="navbar-text font-weight-bold">Меnu</span>
       <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
@@ -35,13 +34,13 @@
     <div class="container-fluid">
 
       <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <nav class="col-md-2 d-none d-md-block sidebar">
           <div class="sidebar-sticky">
             <%= render "menu.html", assigns %>
           </div>
         </nav>
 
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <main role="main" class="col-md-10 ml-sm-auto px-4 bg-light pt-3">
           <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
           <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
           <%= render @view_module, @view_template, assigns %>

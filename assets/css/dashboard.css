@@ -3,8 +3,9 @@
 body {
   font-size: .875rem;
 }
+/*
 $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
-
+*/
 
 /*
  * Sidebar
@@ -16,7 +17,6 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
   bottom: 0;
   left: 0;
   z-index: 100; /* Behind the navbar */
-  padding: 48px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
 
@@ -47,20 +47,6 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 
 .sidebar .nav-link:hover {
   color: #333;
-}
-
-/*
- * Content
- */
-
-[role="main"] {
-  padding-top: 133px; /* Space for fixed navbar */
-}
-
-@media (min-width: 768px) {
-  [role="main"] {
-    padding-top: 48px; /* Space for fixed navbar */
-  }
 }
 
 /*
