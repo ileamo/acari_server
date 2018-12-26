@@ -10,10 +10,10 @@
 
 
   <body>
-    <nav class="navbar navbar-expand navbar-dark flex-md-nowrap p-0 shadow justify-content-between"
+    <nav class="navbar navbar-expand navbar-dark flex-sm-nowrap p-0 shadow justify-content-between"
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
-      <div class="navbar-nav px-3">
+      <div class="navbar-nav px-3 d-flex flex-wrap">
         <a class="nav-link ml-3" href="#">Сообщения<span class="badge badge-warning mr-2 ml-1">7</span></a>
         <span class="navbar-text">Admin</span>
         <a class="nav-link" href="#">Выход</a>
