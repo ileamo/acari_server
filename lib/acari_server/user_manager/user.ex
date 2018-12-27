@@ -14,8 +14,8 @@ defmodule AcariServer.UserManager.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :password_hash, :is_admin])
-    |> validate_required([:username, :password_hash, :is_admin])
+    |> cast(attrs, [:username, :password, :is_admin])
+    |> validate_required([:username, :password, :is_admin])
     |> validate_length(:username, min: 3, max: 32)
     |> validate_length(:password, min: 5, max: 32)
     |> unique_constraint(:username)
