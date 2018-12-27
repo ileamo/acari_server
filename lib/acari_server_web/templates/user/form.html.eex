@@ -9,9 +9,9 @@
   <%= text_input f, :username %>
   <%= error_tag f, :username %>
 
-  <%= label f, :password_hash %>
-  <%= text_input f, :password_hash %>
-  <%= error_tag f, :password_hash %>
+  <%= label f, :password %>
+  <%= password_input f, :password %>
+  <%= error_tag f, :password %>
 
   <%= label f, :is_admin %>
   <%= checkbox f, :is_admin %>

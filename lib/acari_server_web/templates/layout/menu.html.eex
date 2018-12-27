@@ -1,8 +1,6 @@
 <ul class="navbar-nav flex-column">
   <li class="nav-item">
-    <a class="nav-link" href="#">
-      Панель
-    </a>
+    <%= link "Панель", to: Routes.page_path(@conn, :index) %>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="#">
@@ -18,9 +16,7 @@
 </h6>
 <ul class="navbar-nav flex-column mb-2">
   <li class="nav-item">
-    <a class="nav-link" href="#">
-      Пользователи
-    </a>
+    <%= link "Пользователи", to: Routes.user_path(@conn, :index) %>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="#">
