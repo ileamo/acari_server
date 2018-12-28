@@ -14,7 +14,7 @@
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
       <div class="navbar-nav px-3 d-flex flex-wrap">
-        <a class="nav-link ml-3" href="#">Сообщения<span class="badge badge-warning mr-2 ml-1">7</span></a>
+        <a class="nav-link ml-3" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Сообщения<span class="badge badge-warning mr-2 ml-1">7</span></a>
         <span class="navbar-text">Admin</span>
         <a class="nav-link" href="#">Выход</a>
       </div>
@@ -40,11 +40,21 @@
           </div>
         </nav>
 
-        <main role="main" class="col-md-10 ml-sm-auto px-4 bg-light pt-3 flex-grow-1">
-          <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-          <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-          <%= render @view_module, @view_template, assigns %>
-        </main>
+        <div class="col-md-10 ml-sm-auto px-4 bg-light pt-3 flex-grow-1">
+          <div class="row d-flex flex-wrap-reverse">
+            <main role="main" class="col">
+              <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+              <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+              <%= render @view_module, @view_template, assigns %>
+            </main>
+
+            <div class="col-md-2 collapse" id="collapseExample">
+              <h5>сообщения</h5>
+            </div>
+          </div>
+        </div>
+
+
       </div>
     </div>
 

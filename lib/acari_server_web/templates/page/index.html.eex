@@ -1,91 +1,93 @@
+<div class="container">
 
 
-<!-- STATISTIC-->
-<section class="statistic">
-    <div class="section__content section__content--p30">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6 col-lg-3">
-                    <div class="statistic__item">
-                        <h2 class="number">127</h2>
-                        <span class="desc">узлов</span>
+    <!-- STATISTIC-->
+    <section class="statistic">
+        <div class="section__content section__content--p30">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="statistic__item">
+                            <h2 class="number">127</h2>
+                            <span class="desc">узлов</span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="statistic__item">
-                        <h2 class="number">125</h2>
-                        <span class="desc">в работе</span>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="statistic__item">
+                            <h2 class="number">125</h2>
+                            <span class="desc">в работе</span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="statistic__item">
-                        <h2 class="number">5</h2>
-                        <span class="desc">сбоев за неделю</span>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="statistic__item">
+                            <h2 class="number">5</h2>
+                            <span class="desc">сбоев за неделю</span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="statistic__item">
-                        <h2 class="number">13</h2>
-                        <span class="desc">модулей не работает</span>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="statistic__item">
+                            <h2 class="number">13</h2>
+                            <span class="desc">модулей не работает</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section>
-    <div class="section__content section__content--p30">
-        <div class="container-fluid">
-            <div class="row d-flex align-items-strech">
-                <div class="col-lg-7">
-                    <!-- RECENT REPORT 2-->
-                    <div class="recent-report2">
-                        <h3 class="title-3">График</h3>
-                        <div class="recent-report__chart">
-                            <canvas id="myChart"></canvas>
+    <section>
+        <div class="section__content section__content--p30">
+            <div class="container-fluid">
+                <div class="row d-flex align-items-strech">
+                    <div class="col-lg-7">
+                        <!-- RECENT REPORT 2-->
+                        <div class="recent-report2">
+                            <h3 class="title-3">График</h3>
+                            <div class="recent-report__chart">
+                                <canvas id="myChart"></canvas>
+                            </div>
                         </div>
+                        <!-- END RECENT REPORT 2             -->
                     </div>
-                    <!-- END RECENT REPORT 2             -->
-                </div>
-                <div class="col-lg-5">
-                    <!-- TASK PROGRESS-->
-                    <div class="task-progress">
-                        <h3 class="title-3">Индикаторы</h3>
-                        <div class="au-skill-container">
-                            <div class="au-progress">
-                                <span class="au-progress__title">Узлы в работе</span>
+                    <div class="col-lg-5">
+                        <!-- TASK PROGRESS-->
+                        <div class="task-progress">
+                            <h3 class="title-3">Индикаторы</h3>
+                            <div class="au-skill-container">
+                                <div class="au-progress">
+                                    <span class="au-progress__title">Узлы в работе</span>
 
-                                <div class="progress">
-                                  <div class="progress-bar bg-success" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress">
+                                      <div class="progress-bar bg-success" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="au-progress">
-                                <span class="au-progress__title">Распределения по серверам</span>
+                                <div class="au-progress">
+                                    <span class="au-progress__title">Распределения по серверам</span>
 
-                                <div class="progress">
-                                  <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                                  <div class="progress-bar bg-info" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress">
+                                      <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                      <div class="progress-bar bg-info" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+                                </div>
+                                <div class="au-progress">
+                                    <span class="au-progress__title">Операторы связи</span>
+
+                                    <div class="progress">
+                                      <div class="progress-bar bg-danger" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                      <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                                      <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+
                                 </div>
 
                             </div>
-                            <div class="au-progress">
-                                <span class="au-progress__title">Операторы связи</span>
-
-                                <div class="progress">
-                                  <div class="progress-bar bg-danger" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                  <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-                                  <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-
-
-                            </div>
-
                         </div>
+                        <!-- END TASK PROGRESS-->
                     </div>
-                    <!-- END TASK PROGRESS-->
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+</div>
