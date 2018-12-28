@@ -51,31 +51,31 @@
             <div class="col-xl-2 col-lg-3 col-12 collapse show p-0" id="collapseExample">
               <h5>Сообщения:</h5>
                     <ul class="list-group p-0" id="event-log">
-                      <li class="list-group-item list-group-item-danger p-0 ">
+                      <li class="list-group-item list-group-item-danger p-1">
                         <p>
                           <strong>12:34 Вольная, 35</br></strong>
                           Отключено
                       </p>
                       </li>
-                      <li class="list-group-item list-group-item-danger p-0">
+                      <li class="list-group-item list-group-item-danger p-1">
                         <p>
                           <strong>11:22 Ленина, 1</strong></br>
                           Отключено
                         </p>
                       </li>
-                      <li class="list-group-item list-group-item-danger p-0">
+                      <li class="list-group-item list-group-item-danger p-1">
                         <p>
                           <strong>09:15 Перекреcток, Щербвковская</br></strong>
                           Отключено
                         </p>
                       </li>
-                      <li class="list-group-item list-group-item-warning p-0">
+                      <li class="list-group-item list-group-item-warning p-1">
                         <p>
                           <strong>12:37 Урюпинск, Дикси</br></strong>
                           Модуль BEELINE: нет связи
                         </p>
                       </li>
-                      <li class="list-group-item list-group-item-warning p-0">
+                      <li class="list-group-item list-group-item-warning p-1">
                         <p>
                           <strong>07:34 Сколково</br></strong>
                           Модуль MEGAFON: нет связи
