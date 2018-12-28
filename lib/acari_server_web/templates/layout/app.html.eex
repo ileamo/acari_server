@@ -48,32 +48,38 @@
               <%= render @view_module, @view_template, assigns %>
             </main>
 
-            <div class="col-xl-2 col-lg-3 col-12 collapse show px-0" id="collapseExample">
+            <div class="col-xl-2 col-lg-3 col-12 collapse show p-0" id="collapseExample">
               <h5>Сообщения:</h5>
-                    <ul class="list-group " id="event-log">
-                      <li class="list-group-item list-group-item-danger">
-                        <h6>12:34 ATM00234545</h6>
-                        <p>Отключено<p>
-                        <p>Вольная, 35<p>
+                    <ul class="list-group p-0" id="event-log">
+                      <li class="list-group-item list-group-item-danger p-0 ">
+                        <p>
+                          <strong>12:34 Вольная, 35</br></strong>
+                          Отключено
+                      </p>
                       </li>
-                      <li class="list-group-item list-group-item-danger">
-                        <h6>11:22 ATM00234777</h6>
-                        <p>Отключено<p>
-                          <p>Ленина, 1<p>
+                      <li class="list-group-item list-group-item-danger p-0">
+                        <p>
+                          <strong>11:22 Ленина, 1</strong></br>
+                          Отключено
+                        </p>
                       </li>
-                      <li class="list-group-item list-group-item-danger">
-                        <h6>09:15 ATM00212345</h6>
-                        <p>Отключено<p>
-                        <p>Перекреток, Щербвковская<p>
+                      <li class="list-group-item list-group-item-danger p-0">
+                        <p>
+                          <strong>09:15 Перекреcток, Щербвковская</br></strong>
+                          Отключено
+                        </p>
                       </li>
-                      <li class="list-group-item list-group-item-warning">
-                        <h6>12:37 ATM00234111</h6>
-                        <p>Модуль BEELINE: нет связи<p>
-                        <p>Урюпинск, Дикси<p>
+                      <li class="list-group-item list-group-item-warning p-0">
+                        <p>
+                          <strong>12:37 Урюпинск, Дикси</br></strong>
+                          Модуль BEELINE: нет связи
+                        </p>
                       </li>
-                      <li class="list-group-item list-group-item-warning">
-                        <h6>07:34 ATM00234222</h6>
-                        <p>Сколково<p>
+                      <li class="list-group-item list-group-item-warning p-0">
+                        <p>
+                          <strong>07:34 Сколково</br></strong>
+                          Модуль MEGAFON: нет связи
+                        </p>
                       </li>
                     </ul>
 
