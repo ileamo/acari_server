@@ -25,6 +25,10 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :acari_server, AcariServer.UserManager.Guardian,
+  issuer: "acari_server",
+  secret_key: "QnnO7bOCfdYvMULODFxFzDJ+75h5Y7t/CV8d36zYSUncM/0oQtib3DejlUgSONb7"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
