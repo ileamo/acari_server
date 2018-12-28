@@ -25,4 +25,10 @@ import "chart.js"
 // import socket from "./socket"
 
 
-import "./dashboard.js"
+import "./dashboard.js";
+
+import "datatables.net";
+import dt from 'datatables.net-bs4';
+dt(window, $);
+
+import "./tables.js";
