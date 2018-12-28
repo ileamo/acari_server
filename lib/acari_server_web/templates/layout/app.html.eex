@@ -48,7 +48,7 @@
               <%= render @view_module, @view_template, assigns %>
             </main>
 
-            <div class="col-lg-2 col-sm-10 collapse" id="collapseExample">
+            <div class="col-lg-2 col-sm-10 collapse show" id="collapseExample">
               <h5>сообщения</h5>
                     <ul class="list-group " id="event-log">
                       <li class="list-group-item list-group-item-danger mx-0">werwef</li>
