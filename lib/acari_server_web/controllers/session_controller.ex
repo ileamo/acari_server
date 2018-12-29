@@ -43,9 +43,9 @@ defmodule AcariServerWeb.SessionController do
     |> redirect(to: prev_path)
   end
 
-  defp login_reply({:error, reason}, conn, _prev_path) do
+  defp login_reply({:error, _reason}, conn, _prev_path) do
     conn
-    |> put_flash(:error, to_string(reason))
+    |> put_flash(:error, "Неверный пароль")
     |> new(%{})
   end
 end

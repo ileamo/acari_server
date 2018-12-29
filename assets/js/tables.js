@@ -32,7 +32,6 @@ $.extend($.fn.dataTable.defaults, {
 //    $('#datatable').DataTable();
 //} );
 
-console.error("DATA_TABLES")
 $("#datatable").DataTable();
 
 

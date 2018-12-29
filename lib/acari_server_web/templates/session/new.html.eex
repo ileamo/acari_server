@@ -10,8 +10,6 @@
 
 
   <body class="text-center">
-    <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-    <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 
     <dev class="signin">
       <% prev_path = assigns[:prev_path] || "/" %>
@@ -38,7 +36,9 @@
         <div class="form-group">
           <%= submit "Войти", class: "btn btn-primary btn-lg btn-block" %>
         </div>
-        <p class="mt-5 mb-3 text-muted">&copy; 2018-2019</p>
+        <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+        <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+        <p class="mt-5 mb-3 text-muted">&copy; NSG 2018-2019</p>
 
       <% end %>
     </dev>
