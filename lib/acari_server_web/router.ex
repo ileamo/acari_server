@@ -29,14 +29,14 @@ defmodule AcariServerWeb.Router do
     get "/login", SessionController, :new
     post "/login", SessionController, :login
     post "/logout", SessionController, :logout
-
-    get "/", PageController, :index
-    resources "/users", UserController
   end
 
   # Definitely logged in scope
   scope "/", AcariServerWeb do
     pipe_through [:browser, :auth, :ensure_auth]
+
+    get "/", PageController, :index
+    resources "/users", UserController
 
     get "/secret", PageController, :secret
   end

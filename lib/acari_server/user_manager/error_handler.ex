@@ -1,11 +1,11 @@
 defmodule AcariServer.UserManager.ErrorHandler do
   import Plug.Conn
+  alias AcariServerWeb.Router.Helpers, as: Routes
 
-  def auth_error(conn, {type, _reason}, _opts) do
-    body = to_string(type)
-
+  def auth_error(conn, {_type, _reason}, _opts) do
     conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(401, body)
+    |> Phoenix.Controller.redirect(
+      to: Routes.session_path(conn, :new, prev_path: "#{conn.request_path}?#{conn.query_string}")
+    )
   end
 end

@@ -1,6 +1,10 @@
 <h2>Login Page</h2>
 
+<% prev_path = assigns[:prev_path] || "/" %>
+
 <%= form_for @changeset, @action, fn f -> %>
+
+  <%= hidden_input f, :prev_path, value: prev_path %>
 
   <div class="form-group">
     <%= label f, :username, class: "control-label" %>

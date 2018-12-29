@@ -15,8 +15,11 @@
       <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
       <div class="navbar-nav px-3 d-flex flex-wrap">
         <a class="nav-link ml-3" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Сообщения<span class="badge badge-warning mr-2 ml-1">5</span></a>
-        <span class="navbar-text">Admin</span>
-        <a class="nav-link" href="#">Выход</a>
+        <span class="navbar-text"><%= username(@conn) %></span>
+        <%= link to: Routes.session_path(@conn, :logout),class: "nav-link", method: :logout, data: [confirm: "Вы уверены?"] do %>
+            <i class="fa fa-sign-out"></i> Выйти
+        <% end %>
+
       </div>
     </nav>
 
