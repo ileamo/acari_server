@@ -51,7 +51,7 @@
               <%= render @view_module, @view_template, assigns %>
             </main>
 
-            <div class="col-xl-2 col-lg-3 col-12 collapse show p-0" id="collapseExample">
+            <div class="col-lg-3 col-12 collapse show p-0" id="collapseExample">
               <h5>Сообщения:</h5>
                     <ul class="list-group p-0" id="event-log">
                       <li class="list-group-item list-group-item-danger p-1">

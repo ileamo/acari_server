@@ -132,7 +132,7 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 
 /* ----- Statistic ----- */
 .statistic {
-    padding-top: 25px;
+    padding-top: 0px;
 }
 
 .statistic__item {
@@ -142,7 +142,7 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
     position: relative;
     min-height: 150px;
     overflow: hidden;
-    margin-bottom: 20px;
+/*    margin-bottom: 20px; */
 }
 
 @media (min-width: 992px) and (max-width: 1199px) {
@@ -195,11 +195,13 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 .task-progress {
     border: 1px solid  #e5e5e5;
     background: #fff;
-    padding: 40px;
+    padding: 10px;
+/*
     padding-top: 42px;
     padding-right: 55px;
     padding-bottom: 74px;
     margin-bottom: 40px;
+    */
 }
 
 .task-progress .title-3 {
@@ -213,11 +215,13 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 .recent-report2 {
     border: 1px solid #e5e5e5;
     background: #fff;
-    padding: 40px;
+    padding: 10px;
+/*
     padding-top: 42px;
     padding-right: 55px;
     padding-bottom: 51px;
     margin-bottom: 40px;
+    */
 }
 
 section {
