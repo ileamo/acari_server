@@ -1,30 +1,30 @@
-<div class="container">
+<div class="container-fluid px-0 px-lg-5 ">
 
 
     <!-- STATISTIC-->
     <section class="statistic">
-        <div class="section__content section__content--p30">
+        <div class="section__content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">
                         <div class="statistic__item">
                             <h2 class="number">127</h2>
                             <span class="desc">узлов</span>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-3 px-0 pl-md-1 px-lg-1">
                         <div class="statistic__item">
                             <h2 class="number">125</h2>
                             <span class="desc">в работе</span>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">
                         <div class="statistic__item">
                             <h2 class="number">5</h2>
                             <span class="desc">сбоев за неделю</span>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-3 px-0 pl-md-1 px-lg-1">
                         <div class="statistic__item">
                             <h2 class="number">13</h2>
                             <span class="desc">модулей не работает</span>
@@ -36,10 +36,10 @@
     </section>
 
     <section>
-        <div class="section__content section__content--p30">
+        <div class="section__content">
             <div class="container-fluid">
                 <div class="row d-flex align-items-strech">
-                    <div class="col-lg-7">
+                    <div class="col-lg-7 px-0 px-lg-1">
                         <!-- RECENT REPORT 2-->
                         <div class="recent-report2">
                             <h3 class="title-3">График</h3>
@@ -49,7 +49,7 @@
                         </div>
                         <!-- END RECENT REPORT 2             -->
                     </div>
-                    <div class="col-lg-5">
+                    <div class="col-lg-5 px-0 px-lg-1">
                         <!-- TASK PROGRESS-->
                         <div class="task-progress">
                             <h3 class="title-3">Индикаторы</h3>

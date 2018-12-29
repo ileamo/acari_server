@@ -45,7 +45,7 @@
 
         <div class="col-md-10 ml-sm-auto px-4 bg-light pt-3 flex-grow-1">
           <div class="row d-flex flex-wrap-reverse">
-            <main role="main" class="col">
+            <main role="main" class="col px-0 px-lg-4">
               <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
               <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
               <%= render @view_module, @view_template, assigns %>
