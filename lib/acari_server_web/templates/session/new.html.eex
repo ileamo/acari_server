@@ -1,24 +1,48 @@
-<h2>Login Page</h2>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AcariServer · Phoenix Framework</title>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+  </head>
 
-<% prev_path = assigns[:prev_path] || "/" %>
 
-<%= form_for @changeset, @action, fn f -> %>
+  <body class="text-center">
+    <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+    <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 
-  <%= hidden_input f, :prev_path, value: prev_path %>
+    <dev class="signin">
+      <% prev_path = assigns[:prev_path] || "/" %>
 
-  <div class="form-group">
-    <%= label f, :username, class: "control-label" %>
-    <%= text_input f, :username, class: "form-control" %>
-    <%= error_tag f, :username %>
-  </div>
+      <%= form_for @changeset, @action, [class: "form-signin"], fn f -> %>
+<!--        <img class="mb-4" src="<%= Routes.static_path(@conn, "/images/nsg_logo.svg") %>" alt="" width="72" height="72">
+-->
+        <h1 class="h3 mb-3 font-weight-normal">NSG</h1>
 
-  <div class="form-group">
-    <%= label f, :password, class: "control-label" %>
-    <%= password_input f, :password, class: "form-control" %>
-    <%= error_tag f, :password %>
-  </div>
+        <%= hidden_input f, :prev_path, value: prev_path %>
 
-  <div class="form-group">
-    <%= submit "Submit", class: "btn btn-primary" %>
-  </div>
-<% end %>
+        <div class="form-group">
+          <%= label f, :username, class: "control-label sr-only" %>
+          <%= text_input f, :username, class: "form-control", placeholder: "Имя" %>
+          <%= error_tag f, :username %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :password, class: "control-label sr-only" %>
+          <%= password_input f, :password, class: "form-control", placeholder: "Пароль" %>
+          <%= error_tag f, :password %>
+        </div>
+
+        <div class="form-group">
+          <%= submit "Войти", class: "btn btn-primary btn-lg btn-block" %>
+        </div>
+        <p class="mt-5 mb-3 text-muted">&copy; 2018-2019</p>
+
+      <% end %>
+    </dev>
+    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  </body>
+
+</html>

@@ -7,6 +7,7 @@ defmodule AcariServer.UserManager do
   alias AcariServer.Repo
 
   alias AcariServer.UserManager.User
+  alias Plug.Conn
 
   @doc """
   Returns the list of users.
@@ -119,5 +120,10 @@ defmodule AcariServer.UserManager do
           {:error, :invalid_credentials}
         end
     end
+  end
+
+  def load_current_user(conn, _) do
+    conn
+    |> Conn.assign(:current_user, Guardian.Plug.current_resource(conn))
   end
 end

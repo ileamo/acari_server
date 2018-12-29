@@ -1,5 +1,6 @@
 defmodule AcariServerWeb.Router do
   use AcariServerWeb, :router
+  import AcariServer.UserManager, only: [load_current_user: 2]
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -16,6 +17,7 @@ defmodule AcariServerWeb.Router do
   # Our pipeline implements "maybe" authenticated. We'll use the `:ensure_auth` below for when we need to make sure someone is logged in.
   pipeline :auth do
     plug AcariServer.UserManager.Pipeline
+    plug :load_current_user
   end
 
   # We use ensure_auth to fail if there is no one logged in

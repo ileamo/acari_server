@@ -13,7 +13,9 @@ defmodule AcariServerWeb.SessionController do
     if maybe_user do
       redirect(conn, to: prev_path)
     else
-      render(conn, "new.html",
+      conn
+      |> put_layout(false)
+      |> render("new.html",
         changeset: changeset,
         action: Routes.session_path(conn, :login),
         prev_path: prev_path
@@ -41,7 +43,7 @@ defmodule AcariServerWeb.SessionController do
     |> redirect(to: prev_path)
   end
 
-  defp login_reply({:error, reason}, conn) do
+  defp login_reply({:error, reason}, conn, _prev_path) do
     conn
     |> put_flash(:error, to_string(reason))
     |> new(%{})
