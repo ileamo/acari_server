@@ -8,7 +8,7 @@ defmodule AcariServer.UserManager.Guardian do
   end
 
   def resource_from_claims(%{"sub" => id}) do
-    case UserManager.get_user!(id) do
+    case UserManager.get_user(id) do
       nil -> {:error, :resource_not_found}
       user -> {:ok, user}
     end
