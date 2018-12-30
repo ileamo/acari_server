@@ -3,17 +3,17 @@
 <ul>
 
   <li>
-    <strong>Username:</strong>
+    <strong>Имя:</strong>
     <%= @user.username %>
   </li>
 
   <li>
-    <strong>Password hash:</strong>
+    <strong>Хэш пароля:</strong>
     <%= @user.password_hash %>
   </li>
 
   <li>
-    <strong>Is admin:</strong>
+    <strong>Админ:</strong>
     <%= @user.is_admin %>
   </li>
 

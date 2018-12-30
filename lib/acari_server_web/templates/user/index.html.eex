@@ -2,8 +2,8 @@
 <table id="datatable" class="table display table-striped table-bordered table-sm">
   <thead>
     <tr>
-      <th>Имя</th>
-      <th>Админ</th>
+      <th scope="col">Имя</th>
+      <th scope="col">Админ</th>
 
       <th scope="col"></th>
     </tr>
@@ -11,11 +11,12 @@
   <tbody>
 <%= for user <- @users do %>
     <tr>
-      <td><%= user.username %></td>
+      <td>
+        <%= link user.username, to: Routes.user_path(@conn, :show, user) %>
+      </td>
       <td><%= if user.is_admin, do: "Да", else: "Нет" %></td>
 
       <td>
-        <%= link "Показать", to: Routes.user_path(@conn, :show, user) %>
         <%= link "Редактировать", to: Routes.user_path(@conn, :edit, user) %>
         <%= link "Удалить", to: Routes.user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"] %>
       </td>

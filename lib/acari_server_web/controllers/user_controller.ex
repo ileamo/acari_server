@@ -18,7 +18,7 @@ defmodule AcariServerWeb.UserController do
     case UserManager.create_user(user_params) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "User created successfully.")
+        |> put_flash(:info, "Пользователь успешно создан.")
         |> redirect(to: Routes.user_path(conn, :show, user))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -43,7 +43,7 @@ defmodule AcariServerWeb.UserController do
     case UserManager.update_user(user, user_params) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "User updated successfully.")
+        |> put_flash(:info, "Пользователь отредактирован.")
         |> redirect(to: Routes.user_path(conn, :show, user))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -56,7 +56,7 @@ defmodule AcariServerWeb.UserController do
     {:ok, _user} = UserManager.delete_user(user)
 
     conn
-    |> put_flash(:info, "User deleted successfully.")
+    |> put_flash(:info, "Пользователь удален.")
     |> redirect(to: Routes.user_path(conn, :index))
   end
 end

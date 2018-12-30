@@ -18,7 +18,7 @@ defmodule AcariServerWeb.GroupController do
     case GroupManager.create_group(group_params) do
       {:ok, group} ->
         conn
-        |> put_flash(:info, "Group created successfully.")
+        |> put_flash(:info, "Группа успешно создана.")
         |> redirect(to: Routes.group_path(conn, :show, group))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -43,7 +43,7 @@ defmodule AcariServerWeb.GroupController do
     case GroupManager.update_group(group, group_params) do
       {:ok, group} ->
         conn
-        |> put_flash(:info, "Group updated successfully.")
+        |> put_flash(:info, "Группа отредактирована.")
         |> redirect(to: Routes.group_path(conn, :show, group))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -56,7 +56,7 @@ defmodule AcariServerWeb.GroupController do
     {:ok, _group} = GroupManager.delete_group(group)
 
     conn
-    |> put_flash(:info, "Group deleted successfully.")
+    |> put_flash(:info, "Группа удалена.")
     |> redirect(to: Routes.group_path(conn, :index))
   end
 end

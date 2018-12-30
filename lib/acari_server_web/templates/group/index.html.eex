@@ -1,28 +1,29 @@
-<h1>Listing Groups</h1>
+<h1>Список Групп</h1>
 
-<table>
+<table id="datatable" class="table display table-striped table-bordered table-sm">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Description</th>
+      <th scope="col">Имя</th>
+      <th scope="col">Описание</th>
 
-      <th></th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
 <%= for group <- @groups do %>
     <tr>
-      <td><%= group.name %></td>
+      <td>
+        <%= link group.name, to: Routes.group_path(@conn, :show, group) %>
+      </td>
       <td><%= group.description %></td>
 
       <td>
-        <%= link "Show", to: Routes.group_path(@conn, :show, group) %>
-        <%= link "Edit", to: Routes.group_path(@conn, :edit, group) %>
-        <%= link "Delete", to: Routes.group_path(@conn, :delete, group), method: :delete, data: [confirm: "Are you sure?"] %>
+        <%= link "Редактировать", to: Routes.group_path(@conn, :edit, group) %>
+        <%= link "Удалить", to: Routes.group_path(@conn, :delete, group), method: :delete, data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New Group", to: Routes.group_path(@conn, :new) %></span>
+<span><%= link "Новая группа", to: Routes.group_path(@conn, :new) %></span>
