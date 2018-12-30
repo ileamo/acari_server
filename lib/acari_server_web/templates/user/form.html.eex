@@ -1,23 +1,37 @@
 <%= form_for @changeset, @action, fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
+      <p>Упс, что-то пошло не так! См. сообщения под формами ввода.</p>
     </div>
   <% end %>
 
-  <%= label f, :username %>
-  <%= text_input f, :username %>
-  <%= error_tag f, :username %>
+  <div class="form-group row">
+    <%= label f, "Имя", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <%= text_input f, :username, class: "form-control" %>
+      <%= error_tag f, :username %>
+    </div>
+  </div>
 
-  <%= label f, :password %>
-  <%= password_input f, :password %>
-  <%= error_tag f, :password %>
+  <div class="form-group row">
+    <%= label f, "Пароль", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <%= password_input f, :password, class: "form-control" %>
+      <%= error_tag f, :password %>
+    </div>
+  </div>
 
-  <%= label f, :is_admin %>
-  <%= checkbox f, :is_admin %>
-  <%= error_tag f, :is_admin %>
+  <div class="form-group row">
+    <%= label f, "Админ", class: "col-2 form-check-label" %>
+    <div class="col10">
+      <div class="form-check">
+        <%= checkbox f, :is_admin, class: "form-check-input" %>
+        <%= error_tag f, :is_admin %>
+      </div>
+    </div>
+  </div>
 
-  <div>
-    <%= submit "Save" %>
+  <div class="form-group">
+    <%= submit "Сохранить" %>
   </div>
 <% end %>

@@ -1,4 +1,4 @@
-<h1>Listing Users</h1>
+<h1>Список Пользователей</h1>
 <table id="datatable" class="table display table-striped table-bordered table-sm">
   <thead>
     <tr>
@@ -15,13 +15,13 @@
       <td><%= user.is_admin %></td>
 
       <td>
-        <%= link "Show", to: Routes.user_path(@conn, :show, user) %>
-        <%= link "Edit", to: Routes.user_path(@conn, :edit, user) %>
-        <%= link "Delete", to: Routes.user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"] %>
+        <%= link "Показать", to: Routes.user_path(@conn, :show, user) %>
+        <%= link "Редактировать", to: Routes.user_path(@conn, :edit, user) %>
+        <%= link "Удалить", to: Routes.user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"] %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New User", to: Routes.user_path(@conn, :new) %></span>
+<span><%= link "Новый пользователь", to: Routes.user_path(@conn, :new) %></span>
