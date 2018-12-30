@@ -1,0 +1,36 @@
+<h1>Listing Nodes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Sn</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Groups</th>
+      <th>Templates</th>
+      <th>Params</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for node <- @nodes do %>
+    <tr>
+      <td><%= node.sn %></td>
+      <td><%= node.name %></td>
+      <td><%= node.description %></td>
+      <td><%= node.groups %></td>
+      <td><%= node.templates %></td>
+      <td><%= node.params %></td>
+
+      <td>
+        <%= link "Show", to: Routes.node_path(@conn, :show, node) %>
+        <%= link "Edit", to: Routes.node_path(@conn, :edit, node) %>
+        <%= link "Delete", to: Routes.node_path(@conn, :delete, node), method: :delete, data: [confirm: "Are you sure?"] %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Node", to: Routes.node_path(@conn, :new) %></span>
