@@ -6,8 +6,6 @@
       <th>Sn</th>
       <th>Name</th>
       <th>Description</th>
-      <th>Groups</th>
-      <th>Templates</th>
       <th>Params</th>
 
       <th></th>
@@ -19,8 +17,6 @@
       <td><%= node.sn %></td>
       <td><%= node.name %></td>
       <td><%= node.description %></td>
-      <td><%= node.groups %></td>
-      <td><%= node.templates %></td>
       <td><%= node.params %></td>
 
       <td>

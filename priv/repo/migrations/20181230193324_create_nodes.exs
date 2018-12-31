@@ -6,8 +6,6 @@ defmodule AcariServer.Repo.Migrations.CreateNodes do
       add :sn, :string
       add :name, :string
       add :description, :string
-      add :groups, {:array, :string}
-      add :templates, {:array, :string}
       add :params, :map
 
       timestamps()

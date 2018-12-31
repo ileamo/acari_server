@@ -3,9 +3,14 @@ defmodule AcariServerWeb.NodeControllerTest do
 
   alias AcariServer.NodeManager
 
-  @create_attrs %{description: "some description", groups: [], name: "some name", params: %{}, sn: "some sn", templates: []}
-  @update_attrs %{description: "some updated description", groups: [], name: "some updated name", params: %{}, sn: "some updated sn", templates: []}
-  @invalid_attrs %{description: nil, groups: nil, name: nil, params: nil, sn: nil, templates: nil}
+  @create_attrs %{description: "some description", name: "some name", params: %{}, sn: "some sn"}
+  @update_attrs %{
+    description: "some updated description",
+    name: "some updated name",
+    params: %{},
+    sn: "some updated sn"
+  }
+  @invalid_attrs %{description: nil, name: nil, params: nil, sn: nil}
 
   def fixture(:node) do
     {:ok, node} = NodeManager.create_node(@create_attrs)
@@ -75,6 +80,7 @@ defmodule AcariServerWeb.NodeControllerTest do
     test "deletes chosen node", %{conn: conn, node: node} do
       conn = delete(conn, Routes.node_path(conn, :delete, node))
       assert redirected_to(conn) == Routes.node_path(conn, :index)
+
       assert_error_sent 404, fn ->
         get(conn, Routes.node_path(conn, :show, node))
       end

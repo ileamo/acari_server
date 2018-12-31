@@ -6,9 +6,14 @@ defmodule AcariServer.NodeManagerTest do
   describe "nodes" do
     alias AcariServer.NodeManager.Node
 
-    @valid_attrs %{description: "some description", groups: [], name: "some name", params: %{}, sn: "some sn", templates: []}
-    @update_attrs %{description: "some updated description", groups: [], name: "some updated name", params: %{}, sn: "some updated sn", templates: []}
-    @invalid_attrs %{description: nil, groups: nil, name: nil, params: nil, sn: nil, templates: nil}
+    @valid_attrs %{description: "some description", name: "some name", params: %{}, sn: "some sn"}
+    @update_attrs %{
+      description: "some updated description",
+      name: "some updated name",
+      params: %{},
+      sn: "some updated sn"
+    }
+    @invalid_attrs %{description: nil, name: nil, params: nil, sn: nil}
 
     def node_fixture(attrs \\ %{}) do
       {:ok, node} =
@@ -32,11 +37,9 @@ defmodule AcariServer.NodeManagerTest do
     test "create_node/1 with valid data creates a node" do
       assert {:ok, %Node{} = node} = NodeManager.create_node(@valid_attrs)
       assert node.description == "some description"
-      assert node.groups == []
       assert node.name == "some name"
       assert node.params == %{}
       assert node.sn == "some sn"
-      assert node.templates == []
     end
 
     test "create_node/1 with invalid data returns error changeset" do
@@ -47,11 +50,9 @@ defmodule AcariServer.NodeManagerTest do
       node = node_fixture()
       assert {:ok, %Node{} = node} = NodeManager.update_node(node, @update_attrs)
       assert node.description == "some updated description"
-      assert node.groups == []
       assert node.name == "some updated name"
       assert node.params == %{}
       assert node.sn == "some updated sn"
-      assert node.templates == []
     end
 
     test "update_node/2 with invalid data returns error changeset" do

@@ -17,14 +17,6 @@
   <%= text_input f, :description %>
   <%= error_tag f, :description %>
 
-  <%= label f, :groups %>
-  <%= multiple_select f, :groups, ["Option 1": "option1", "Option 2": "option2"] %>
-  <%= error_tag f, :groups %>
-
-  <%= label f, :templates %>
-  <%= multiple_select f, :templates, ["Option 1": "option1", "Option 2": "option2"] %>
-  <%= error_tag f, :templates %>
-
   <%= label f, :params %>
   <%= text_input f, :params %>
   <%= error_tag f, :params %>
