@@ -1,6 +1,6 @@
 <ul class="navbar-nav flex-column">
   <li class="nav-item">
-    <%= link "Панель", to: Routes.page_path(@conn, :index) %>
+    <%= link "Панель", to: Routes.page_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="#">
@@ -16,12 +16,10 @@
 </h6>
 <ul class="navbar-nav flex-column mb-2">
   <li class="nav-item">
-    <%= link "Пользователи", to: Routes.user_path(@conn, :index) %>
+    <%= link "Пользователи", to: Routes.user_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#">
-      Устройства
-    </a>
+    <%= link "Устройства", to: Routes.node_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="#">
@@ -29,6 +27,6 @@
     </a>
   </li>
   <li class="nav-item">
-    <%= link "Группы", to: Routes.group_path(@conn, :index) %>
+    <%= link "Группы", to: Routes.group_path(@conn, :index), class: "nav-link" %>
   </li>
 </ul>

@@ -8,6 +8,9 @@ defmodule AcariServer.NodeManager.Node do
     field :description, :string
     field :params, :map
 
+    many_to_many :groups, AcariServer.GroupManager.Group,
+      join_through: AcariServer.GroupNodeAssociation.GroupNode
+
     timestamps()
   end
 

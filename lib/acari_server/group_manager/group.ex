@@ -2,10 +2,12 @@ defmodule AcariServer.GroupManager.Group do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "groups" do
-    field :description, :string
     field :name, :string
+    field :description, :string
+
+    many_to_many :nodes, AcariServer.NodeManager.Node,
+      join_through: AcariServer.GroupNodeAssociation.GroupNode
 
     timestamps()
   end
