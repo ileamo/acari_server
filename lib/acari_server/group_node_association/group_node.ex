@@ -13,5 +13,8 @@ defmodule AcariServer.GroupNodeAssociation.GroupNode do
     group_node
     |> Ecto.Changeset.cast(attrs, [:group_id, :node_id])
     |> Ecto.Changeset.validate_required([:group_id, :node_id])
+    |> Ecto.Changeset.foreign_key_constraint(:group_id)
+    |> Ecto.Changeset.foreign_key_constraint(:node_id)
+    |> Ecto.Changeset.unique_constraint(:group_id, name: :group_id_node_id_index)
   end
 end
