@@ -1,33 +1,33 @@
-<h1>Show Node</h1>
+<h1>Параметры Узла</h1>
 
 <ul>
 
   <li>
-    <strong>Sn:</strong>
+    <strong>Серийный номер:</strong>
     <%= @node.sn %>
   </li>
 
   <li>
-    <strong>Name:</strong>
+    <strong>Имя:</strong>
     <%= @node.name %>
   </li>
 
   <li>
-    <strong>Description:</strong>
+    <strong>Описание:</strong>
     <%= @node.description %>
   </li>
 
   <li>
-    <strong>Params:</strong>
+    <strong>Параметры:</strong>
     <%= @node.params %>
   </li>
 
   <li>
-    <strong>Groups:</strong>
-    <%= @node.groups |> Enum.map(fn %{name: name} -> name end) |> Enum.join(",") %>
+    <strong>Группы:</strong>
+    <%= groups_list(@node) %>
   </li>
 
 </ul>
 
-<span><%= link "Edit", to: Routes.node_path(@conn, :edit, @node) %></span>
-<span><%= link "Back", to: Routes.node_path(@conn, :index) %></span>
+<span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node) %></span>
+<span><%= link "Назад", to: Routes.node_path(@conn, :index) %></span>

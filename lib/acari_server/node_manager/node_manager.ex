@@ -18,7 +18,9 @@ defmodule AcariServer.NodeManager do
 
   """
   def list_nodes do
-    Repo.all(Node)
+    Node
+    |> Repo.all()
+    |> Repo.preload(:groups)
   end
 
   @doc """
