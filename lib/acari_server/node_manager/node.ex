@@ -7,6 +7,7 @@ defmodule AcariServer.NodeManager.Node do
     field :name, :string
     field :description, :string
     field :params, :map
+    field :groups_list, {:array, :integer}, virtual: true
 
     many_to_many :groups, AcariServer.GroupManager.Group,
       join_through: AcariServer.GroupNodeAssociation.GroupNode
