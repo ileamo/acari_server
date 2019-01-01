@@ -22,6 +22,11 @@
     <%= @node.params %>
   </li>
 
+  <li>
+    <strong>Groups:</strong>
+    <%= @node.groups |> Enum.map(fn %{name: name} -> name end) |> Enum.join(",") %>
+  </li>
+
 </ul>
 
 <span><%= link "Edit", to: Routes.node_path(@conn, :edit, @node) %></span>

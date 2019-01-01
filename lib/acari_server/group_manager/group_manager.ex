@@ -35,7 +35,11 @@ defmodule AcariServer.GroupManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_group!(id), do: Repo.get!(Group, id)
+  def get_group!(id) do
+    Group
+    |> Repo.get!(id)
+    |> Repo.preload(:nodes)
+  end
 
   @doc """
   Creates a group.

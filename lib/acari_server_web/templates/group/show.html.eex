@@ -12,6 +12,11 @@
     <%= @group.description %>
   </li>
 
+  <li>
+    <strong>Узлы:</strong>
+    <%= @group.nodes |> Enum.map(fn %{name: name} -> name end) |> Enum.join(",") %>
+  </li>
+
 </ul>
 
 <span><%= link "Редактироать", to: Routes.group_path(@conn, :edit, @group) %></span>

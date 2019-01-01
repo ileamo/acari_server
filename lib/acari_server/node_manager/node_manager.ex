@@ -35,7 +35,11 @@ defmodule AcariServer.NodeManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_node!(id), do: Repo.get!(Node, id)
+  def get_node!(id) do
+    Node
+    |> Repo.get!(id)
+    |> Repo.preload(:groups)
+  end
 
   @doc """
   Creates a node.
