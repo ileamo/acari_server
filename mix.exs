@@ -46,7 +46,8 @@ defmodule AcariServer.MixProject do
       {:guardian, "~> 1.0"},
       {:comeonin, "~> 4.0"},
       {:bcrypt_elixir, "~> 0.12"},
-      {:acari, git: "https://github.com/ileamo/acari.git"}
+      # {:acari, git: "https://github.com/ileamo/acari.git"}
+      {:tunctl, git: "https://github.com/msantos/tunctl.git"}
     ]
   end
 

@@ -18,7 +18,7 @@ defmodule AcariServer.Master do
 
   @impl true
   def handle_cast({:tun_started, {tun_name, _ifname}}, state) do
-    Acari.send_json_request(tun_name, %{
+    Acari.send_master_mes(tun_name, %{
       method: "ip_address_add",
       params: %{prefix: "192.168.10.1/24", peer: "192.168.1.1"}
     })
