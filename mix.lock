@@ -1,5 +1,5 @@
 %{
-  "acari": {:git, "https://github.com/ileamo/acari.git", "92c111d2b5ee1dafd59bf2c53521e7ce1d22d1e6", []},
+  "acari": {:git, "https://github.com/ileamo/acari.git", "cd34591eaca844fcab8b54f563383c974150fc7f", []},
   "artificery": {:hex, :artificery, "0.2.6", "f602909757263f7897130cbd006b0e40514a541b148d366ad65b89236b93497a", [:mix], [], "hexpm"},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], [], "hexpm"},
   "bcrypt_elixir": {:hex, :bcrypt_elixir, "0.12.1", "41ff5a4739fcff365fe840637462dc9e22beac07a9dcf3cb5e79b127f5b3a099", [:make, :mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},

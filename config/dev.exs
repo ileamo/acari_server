@@ -73,3 +73,7 @@ config :acari_server, AcariServer.Repo,
   database: "acari_server_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :acari_server, AcariServer.Listener,
+  keyfile: "priv/cert/selfsigned_key.pem",
+  certfile: "priv/cert/selfsigned.pem"

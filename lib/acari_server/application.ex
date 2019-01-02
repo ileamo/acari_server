@@ -14,7 +14,8 @@ defmodule AcariServer.Application do
       AcariServerWeb.Endpoint,
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},
-      Acari.Sup
+      Acari.Sup,
+      AcariServer.Sup
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
