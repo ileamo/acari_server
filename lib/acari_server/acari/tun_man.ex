@@ -67,6 +67,7 @@ defmodule Acari.TunMan do
 
     case state.current_link do
       {nil, _} ->
+        GenServer.cast(state.master_pid, {:tun_ready_to_send, state.tun_name})
         Iface.set_sslink_snd_pid(iface_pid, pid)
         {:noreply, %State{state | current_link: {name, pid}}}
 
@@ -91,16 +92,23 @@ defmodule Acari.TunMan do
   end
 
   def handle_cast({:send_tun_com, com, payload}, %{current_link: {_, sslink_snd_pid}} = state) do
+    Logger.debug("#{state.tun_name}: Send com #{com}: #{inspect(payload)}")
     Acari.SSLinkSnd.send(sslink_snd_pid, <<Const.tun_mask()::2, com::14>>, payload)
     {:noreply, state}
   end
 
   def handle_cast({:recv_tun_com, com, payload}, state) do
+    Logger.debug("#{state.tun_name}: Receive com #{com}: #{inspect(payload)}")
     {:noreply, exec_tun_com(state, com, payload)}
   end
 
   def handle_cast({:ip_address, com, ifaddr}, state) do
     ip_address_p(state, com, ifaddr)
+    {:noreply, state}
+  end
+
+  def handle_cast(mes, state) do
+    Logger.error(" Bad message: #{inspect(mes)} #{inspect(state)}")
     {:noreply, state}
   end
 
@@ -187,7 +195,7 @@ defmodule Acari.TunMan do
       {^prev_link_name, _} ->
         state
 
-      {link_name, snd_pid} = new_link ->
+      {_link_name, snd_pid} = new_link ->
         Iface.set_sslink_snd_pid(state.iface_pid, snd_pid)
         # Logger.debug("#{state.tun_name}: New current link: #{link_name}")
         %State{state | current_link: new_link}
@@ -257,6 +265,8 @@ defmodule Acari.TunMan do
       _ ->
         Logger.warn("#{state.tun_name}: Bad command: #{com}")
     end
+
+    state
   end
 
   defp exec_json_req(state, json) do

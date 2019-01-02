@@ -27,6 +27,10 @@ defmodule AcariClient.TunCreator do
     {:noreply, %State{state | tun_name: tun_name, ifname: ifname}}
   end
 
+  def handle_cast({:tun_ready_to_send, _}, state) do
+    {:noreply, state}
+  end
+
   def handle_cast({:tun_mes, tun_name, payload}, state) do
     Logger.warn("Unexpected message from #{tun_name}: #{inspect(payload)}")
     {:noreply, state}
