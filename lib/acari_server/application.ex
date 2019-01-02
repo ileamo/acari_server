@@ -11,9 +11,10 @@ defmodule AcariServer.Application do
       # Start the Ecto repository
       AcariServer.Repo,
       # Start the endpoint when the application starts
-      AcariServerWeb.Endpoint
+      AcariServerWeb.Endpoint,
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},
+      Acari.Sup
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

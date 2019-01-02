@@ -45,7 +45,8 @@ defmodule AcariServer.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:guardian, "~> 1.0"},
       {:comeonin, "~> 4.0"},
-      {:bcrypt_elixir, "~> 0.12"}
+      {:bcrypt_elixir, "~> 0.12"},
+      {:acari, git: "https://github.com/ileamo/acari.git"}
     ]
   end
 
