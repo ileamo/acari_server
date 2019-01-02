@@ -15,7 +15,8 @@ defmodule AcariServer.Application do
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},
       Acari.Sup,
-      AcariServer.Sup
+      AcariServer.Sup,
+      AcariClient.TunCreator
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
