@@ -31,9 +31,25 @@ defmodule AcariClient.TunCreator do
     {:noreply, state}
   end
 
-  def handle_cast({:tun_mes, tun_name, payload}, state) do
-    Logger.warn("Unexpected message from #{tun_name}: #{inspect(payload)}")
+  def handle_cast({:tun_mes, tun_name, json}, state) do
+    with {:ok, %{"method" => method, "params" => params}} <- Jason.decode(json) do
+      exec_client_method(state, method, params)
+    else
+      res ->
+        Logger.error("Bad tun_mes from #{tun_name}: #{inspect(res)}")
+    end
+
     {:noreply, state}
+  end
+
+  defp exec_client_method(state, "exec_sh", %{"script" => script}) do
+    Acari.exec_sh(script)
+    state
+  end
+
+  defp exec_client_method(state, method, _params) do
+    Logger.error("Bad message method: #{method}")
+    state
   end
 
   defp restart_tunnel() do

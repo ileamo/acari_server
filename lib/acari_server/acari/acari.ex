@@ -10,10 +10,12 @@ defmodule Acari do
   defdelegate send_json_request(tun_name, payload), to: Acari.TunMan
   defdelegate send_master_mes(tun_name, payload), to: Acari.TunMan
 
-  def exec_script(script, env \\ []) do
-    case System.cmd("sh", ["-c", script], stderr_to_stdout: true, env: env) do
-      {data, 0} -> data
-      {err, code} -> Logger.warn("Script `#{script}` exits with code #{code}, output: #{err}")
-    end
+  def exec_sh(script, env \\ []) do
+    Task.start(fn ->
+      case System.cmd("sh", ["-c", script], stderr_to_stdout: true, env: env) do
+        {data, 0} -> data
+        {err, code} -> Logger.warn("Script `#{script}` exits with code #{code}, output: #{err}")
+      end
+    end)
   end
 end

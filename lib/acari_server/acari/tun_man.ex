@@ -294,7 +294,7 @@ defmodule Acari.TunMan do
 
   defp ip_address_p(%{ifname: ifname} = state, com, ifaddr) when com in [:add, :del] do
     com = "#{mk_ifaddr("ip address #{com}", ifaddr)} dev #{ifname}"
-    Acari.exec_script(com)
+    Acari.exec_sh(com)
     state
   end
 
