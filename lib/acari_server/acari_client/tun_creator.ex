@@ -27,7 +27,7 @@ defmodule AcariClient.TunCreator do
     {:noreply, %State{state | tun_name: tun_name, ifname: ifname}}
   end
 
-  def handle_cast({:tun_ready_to_send, _}, state) do
+  def handle_cast({:peer_started, _}, state) do
     {:noreply, state}
   end
 
@@ -39,6 +39,11 @@ defmodule AcariClient.TunCreator do
         Logger.error("Bad tun_mes from #{tun_name}: #{inspect(res)}")
     end
 
+    {:noreply, state}
+  end
+
+  def handle_cast(mes, state) do
+    Logger.warn("Client get unknown message: #{inspect(mes)}")
     {:noreply, state}
   end
 

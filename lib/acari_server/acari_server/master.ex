@@ -20,19 +20,23 @@ defmodule AcariServer.Master do
 
   def handle_cast({:tun_started, {tun_name, _ifname}}, state) do
     Logger.debug("Master get :tun_started from #{tun_name}")
+    Acari.ip_address(:add, tun_name, %{"prefix" => "192.168.1.1/32", "peer" => "192.168.10.1"})
     {:noreply, state}
   end
 
-  def handle_cast({:tun_ready_to_send, tun_name}, state) do
-    Logger.debug("Master get :tun_ready_to_send from #{tun_name}")
+  def handle_cast({:peer_started, tun_name}, state) do
+    Logger.debug("Master get :peer_started from #{tun_name}")
 
-    Acari.send_master_mes(tun_name, %{
+    Acari.send_json_request(tun_name, %{
       method: "ip_address_add",
       params: %{prefix: "192.168.10.1/24", peer: "192.168.1.1"}
     })
 
-    Acari.ip_address(:add, tun_name, %{"prefix" => "192.168.1.1/32", "peer" => "192.168.10.1"})
+    {:noreply, state}
+  end
 
+  def handle_cast(mes, state) do
+    Logger.warn("Master get unknown message: #{inspect(mes)}")
     {:noreply, state}
   end
 end

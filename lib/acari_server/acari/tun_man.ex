@@ -67,8 +67,8 @@ defmodule Acari.TunMan do
 
     case state.current_link do
       {nil, _} ->
-        GenServer.cast(state.master_pid, {:tun_ready_to_send, state.tun_name})
         Iface.set_sslink_snd_pid(iface_pid, pid)
+        send_tun_com(self(), Const.peer_started(), "")
         {:noreply, %State{state | current_link: {name, pid}}}
 
       _ ->
@@ -92,7 +92,10 @@ defmodule Acari.TunMan do
   end
 
   def handle_cast({:send_tun_com, com, payload}, %{current_link: {_, sslink_snd_pid}} = state) do
-    Logger.debug("#{state.tun_name}: Send com #{com}: #{inspect(payload)}")
+    Logger.debug(
+      "#{state.tun_name}: Send com #{com}: #{inspect(payload)}, pid = #{inspect(sslink_snd_pid)}"
+    )
+
     Acari.SSLinkSnd.send(sslink_snd_pid, <<Const.tun_mask()::2, com::14>>, payload)
     {:noreply, state}
   end
@@ -259,6 +262,9 @@ defmodule Acari.TunMan do
       Const.master_mes() ->
         GenServer.cast(state.master_pid, {:tun_mes, state.tun_name, payload})
 
+      Const.peer_started() ->
+        GenServer.cast(state.master_pid, {:peer_started, state.tun_name})
+
       Const.json_req() ->
         exec_json_req(state, payload)
 
@@ -358,6 +364,10 @@ defmodule Acari.TunMan do
   def send_master_mes(tun_name, payload) do
     {:ok, json} = Jason.encode(payload)
     GenServer.cast(via(tun_name), {:send_tun_com, Const.master_mes(), json})
+  end
+
+  def send_tun_com(pid, com, payload) when is_pid(pid) do
+    GenServer.cast(pid, {:send_tun_com, com, payload})
   end
 
   def send_tun_com(tun_name, com, payload) do
