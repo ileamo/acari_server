@@ -98,6 +98,10 @@ defmodule Acari.Iface do
     {:noreply, state}
   end
 
+  def terminate(_reason, %{ifsocket: ifsocket}) do
+    :tuncer.destroy(ifsocket)
+  end
+
   # client
   def set_sslink_snd_pid(iface_pid, sslink_snd_pid) do
     GenServer.cast(iface_pid, {:set_sslink_snd_pid, sslink_snd_pid})
