@@ -98,6 +98,7 @@ defmodule Acari.Iface do
     {:noreply, state}
   end
 
+  @impl true
   def terminate(_reason, %{ifsocket: ifsocket}) do
     :tuncer.destroy(ifsocket)
   end
