@@ -172,6 +172,10 @@ defmodule Acari.TunMan do
         :ets.delete(sslinks, name)
 
       [[name, %{connector: connector, restart: timestamp}]] ->
+        # remove latency
+        elem = :ets.lookup_element(sslinks, name, 4)
+        true = :ets.update_element(sslinks, name, {4, elem |> Map.delete(:latency)})
+
         if((delta = :erlang.system_time(:second) - timestamp) >= 10) do
           update_sslink(state, name, connector)
         else
@@ -204,7 +208,8 @@ defmodule Acari.TunMan do
         %State{state | current_link: new_link}
 
       _ ->
-        state
+        # Logger.debug("#{state.tun_name}: New current link: <NO LINK>")
+        %State{state | current_link: {nil, nil}}
     end
   end
 
