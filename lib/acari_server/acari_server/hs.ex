@@ -39,6 +39,13 @@ defmodule AcariServer.Hs do
              :restart -> false
            end) do
       :ssl.controlling_process(sslsocket, pid)
+
+      # Re-send ssl messages
+      {:messages, list} = Process.info(self(), :messages)
+
+      for {:ssl, _sslsocket, _frame} = mes <- list do
+        send(pid, mes)
+      end
     else
       frame when is_binary(frame) ->
         Logger.warn("Bad handshake packet")
