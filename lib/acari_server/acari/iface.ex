@@ -55,7 +55,13 @@ defmodule Acari.Iface do
 
   @impl true
   def handle_cast({:set_sslink_snd_pid, sslink_snd_pid}, state) do
-    if !state.up, do: :ok = if_up(state.ifname)
+    state =
+      if !state.up do
+        :ok = if_up(state.ifname)
+        %State{state | up: true}
+      else
+        state
+      end
 
     {:noreply, %State{state | sslink_snd_pid: sslink_snd_pid}}
   end

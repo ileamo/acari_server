@@ -20,7 +20,7 @@ defmodule AcariServer.Master do
 
   def handle_cast({:tun_started, {tun_name, _ifname}}, state) do
     Logger.debug("Master get :tun_started from #{tun_name}")
-    Acari.ip_address(:add, tun_name, %{"prefix" => "192.168.1.1/32", "peer" => "192.168.10.1"})
+    Acari.ip_address(:add, tun_name, %{"prefix" => "192.168.1.1/32", "peer" => "192.168.1.2"})
     {:noreply, state}
   end
 
@@ -29,7 +29,7 @@ defmodule AcariServer.Master do
 
     Acari.send_json_request(tun_name, %{
       method: "ip_address_add",
-      params: %{prefix: "192.168.10.1/24", peer: "192.168.1.1"}
+      params: %{prefix: "192.168.10.1/24", peer: "192.168.10.2"}
     })
 
     {:noreply, state}

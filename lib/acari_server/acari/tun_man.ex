@@ -158,12 +158,12 @@ defmodule Acari.TunMan do
   end
 
   @impl true
-  def handle_info({:EXIT, pid, reason}, %State{iface_pid: pid} = state) do
-    {:stop, {:iface_exit, reason}, state}
+  def handle_info({:EXIT, pid, _reason}, %State{iface_pid: pid} = state) do
+    {:stop, :shutdown, state}
   end
 
-  def handle_info({:EXIT, pid, reason}, %State{sslink_sup_pid: pid} = state) do
-    {:stop, {:sslink_sup_exit, reason}, state}
+  def handle_info({:EXIT, pid, _reason}, %State{sslink_sup_pid: pid} = state) do
+    {:stop, :shutdown, state}
   end
 
   def handle_info({:EXIT, pid, _reason}, %State{sslinks: sslinks} = state) do
