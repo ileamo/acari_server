@@ -3,7 +3,9 @@ defmodule AcariServer.Master do
   require Logger
 
   defmodule State do
-    defstruct []
+    defstruct [
+      :tuns
+    ]
   end
 
   def start_link(params) do
@@ -13,13 +15,16 @@ defmodule AcariServer.Master do
   ## Callbacks
   @impl true
   def init(_params) do
-    {:ok, %State{}}
+    tuns = :ets.new(:tuns, [:set, :protected, :named_table])
+
+    {:ok, %State{tuns: tuns}}
   end
 
   @impl true
 
   def handle_cast({:tun_started, {tun_name, _ifname}}, state) do
     Logger.debug("Master get :tun_started from #{tun_name}")
+    :ets.insert(:tuns, {tun_name})
     Acari.ip_address(:add, tun_name, %{"prefix" => "192.168.1.1/32", "peer" => "192.168.1.2"})
     {:noreply, state}
   end
