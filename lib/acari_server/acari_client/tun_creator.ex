@@ -16,14 +16,17 @@ defmodule AcariClient.TunCreator do
   ## Callbacks
   @impl true
   def init(_params) do
-    :ok = Acari.start_tun("cl", self())
+    for i <- 1..3 do
+      :ok = Acari.start_tun("cl_#{:io_lib.format("~3..0B", [i])}", self())
+    end
+
     {:ok, %State{}}
   end
 
   @impl true
   def handle_cast({:tun_started, {tun_name, ifname}}, state) do
     Logger.debug("Acari client receive :tun_started from #{tun_name}:#{ifname}")
-    restart_tunnel()
+    restart_tunnel(tun_name)
     {:noreply, %State{state | tun_name: tun_name, ifname: ifname}}
   end
 
@@ -57,26 +60,18 @@ defmodule AcariClient.TunCreator do
     state
   end
 
-  defp restart_tunnel() do
+  defp restart_tunnel(tun_name) do
     # start link M1
-    link = "m1"
-    {:ok, request} = Jason.encode(%{id: "nsg1700_1812000999", link: link})
+    start_sslink(tun_name, "BEELINE")
+    start_sslink(tun_name, "MEGAFON")
+  end
+
+  defp start_sslink(tun, link) do
+    {:ok, request} =
+      Jason.encode(%{id: "nsg1700_1812000#{tun |> String.slice(-3, 3)}", link: link})
 
     {:ok, _pid} =
-      Acari.add_link("cl", link, fn
-        :connect ->
-          connect(%{host: "localhost", port: 7000}, request)
-
-        :restart ->
-          true
-      end)
-
-    # start link M1
-    link = "m2"
-    {:ok, request} = Jason.encode(%{id: "nsg1700_1812000999", link: link})
-
-    {:ok, _pid} =
-      Acari.add_link("cl", link, fn
+      Acari.add_link(tun, link, fn
         :connect ->
           connect(%{host: "localhost", port: 7000}, request)
 
