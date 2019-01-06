@@ -64,6 +64,7 @@ defmodule Acari.TunMan do
         %State{sslinks: sslinks, iface_pid: iface_pid} = state
       ) do
     true = :ets.update_element(sslinks, name, {3, pid})
+    Acari.LinkEventAgent.event(:open, state.tun_name, name)
 
     case state.current_link do
       {nil, _} ->
@@ -167,25 +168,30 @@ defmodule Acari.TunMan do
   end
 
   def handle_info({:EXIT, pid, _reason}, %State{sslinks: sslinks} = state) do
-    case :ets.match(sslinks, {:"$1", pid, :_, :"$2"}) do
-      [[name, %{restart: restart}]] when restart == 0 ->
-        :ets.delete(sslinks, name)
+    name =
+      case :ets.match(sslinks, {:"$1", pid, :_, :"$2"}) do
+        [[name, %{restart: restart}]] when restart == 0 ->
+          :ets.delete(sslinks, name)
+          name
 
-      [[name, %{connector: connector, restart: timestamp}]] ->
-        # remove latency
-        elem = :ets.lookup_element(sslinks, name, 4)
-        true = :ets.update_element(sslinks, name, {4, elem |> Map.delete(:latency)})
+        [[name, %{connector: connector, restart: timestamp}]] ->
+          # remove latency
+          elem = :ets.lookup_element(sslinks, name, 4)
+          true = :ets.update_element(sslinks, name, {4, elem |> Map.delete(:latency)})
 
-        if((delta = :erlang.system_time(:second) - timestamp) >= 10) do
-          update_sslink(state, name, connector)
-        else
-          Process.send_after(self(), {:EXIT, pid, :restart}, (10 - delta) * 1000)
-        end
+          if((delta = :erlang.system_time(:second) - timestamp) >= 10) do
+            update_sslink(state, name, connector)
+          else
+            Process.send_after(self(), {:EXIT, pid, :restart}, (10 - delta) * 1000)
+          end
 
-      [] ->
-        nil
-    end
+          name
 
+        [] ->
+          nil
+      end
+
+    Acari.LinkEventAgent.event(:close, state.tun_name, name, 1)
     {:noreply, update_best_link(state)}
   end
 
