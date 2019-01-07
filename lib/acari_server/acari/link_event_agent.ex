@@ -1,5 +1,6 @@
 defmodule Acari.LinkEventAgent do
   use Agent
+  alias AcariServerWeb.Endpoint
 
   @max_items 50
 
@@ -45,6 +46,8 @@ defmodule Acari.LinkEventAgent do
     if num == 0 do
       put({tun, nil, timestamp})
     end
+
+    Endpoint.broadcast!("room:lobby", "num_of_mes", %{num_of_mes: get_length()})
   end
 
   def get() do

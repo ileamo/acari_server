@@ -2,7 +2,7 @@ defmodule AcariServerWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", AcariServerWeb.RoomChannel
+  channel "room:*", AcariServerWeb.RoomChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

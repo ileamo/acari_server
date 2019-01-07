@@ -16,7 +16,7 @@
       <div class="navbar-nav px-3 d-flex flex-wrap">
         <a class="nav-link ml-3" data-toggle="collapse" href="#collapseExample" role="button"   aria-expanded="false" aria-controls="collapseExample">
           Сообщения
-          <span class="badge badge-warning mr-2  ml-1 pt-1"><%= num_of_mes() %></span>
+          <span class="badge badge-warning mr-2  ml-1 pt-1" id="num-of-mes"><%= num_of_mes() %></span>
         </a>
         <span class="navbar-text"><%= username(@conn) %></span>
         <%= link to: Routes.session_path(@conn, :logout),class: "nav-link", method: :logout, data: [confirm: "Вы уверены?"] do %>
@@ -62,7 +62,7 @@
                         <p>
                           <strong><%= timestamp%> <%= tun %></br></strong>
                           <%= link %>: нет связи
-                      </p>
+                        </p>
                       </li>
                       <% end %>
                     </ul>
