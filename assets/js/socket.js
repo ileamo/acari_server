@@ -60,8 +60,9 @@ let channel = socket.channel("room:lobby", {})
 let messagesBadge = document.querySelector("#num-of-mes")
 let messagesContainer = document.querySelector("#event-log")
 
-channel.on("num_of_mes", payload => {
+channel.on("link_event", payload => {
   messagesBadge.innerText = `${payload.num_of_mes}`
+  messagesContainer.innerHTML = `${payload.messages}`
 })
 
 

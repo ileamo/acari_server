@@ -57,14 +57,7 @@
             <div class="col-lg-3 col-12 collapse show p-0" id="collapseExample">
               <h5>Сообщения:</h5>
                     <ul class="list-group p-0" id="event-log">
-                      <%= for {tun, link, timestamp} <- get_mes() do %>
-                      <li class="list-group-item list-group-item-warning p-1">
-                        <p>
-                          <strong><%= timestamp%> <%= tun %></br></strong>
-                          <%= link %>: нет связи
-                        </p>
-                      </li>
-                      <% end %>
+                      <%= render "messages.html", assigns %>
                     </ul>
 
             </div>

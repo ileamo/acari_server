@@ -34,9 +34,11 @@ defmodule Acari.LinkEventAgent do
 
   def event(:open, tun, link) do
     remove(tun, link)
+    broadcast_link_event()
   end
 
   def event(:close, _, nil, _) do
+    broadcast_link_event()
   end
 
   def event(:close, tun, link, num) do
@@ -47,7 +49,7 @@ defmodule Acari.LinkEventAgent do
       put({tun, nil, timestamp})
     end
 
-    Endpoint.broadcast!("room:lobby", "num_of_mes", %{num_of_mes: get_length()})
+    broadcast_link_event()
   end
 
   def get() do
@@ -61,5 +63,14 @@ defmodule Acari.LinkEventAgent do
   defp get_local_time() do
     {_, {h, m, s}} = :calendar.local_time()
     :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s])
+  end
+
+  defp broadcast_link_event() do
+    mes_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", [])
+
+    Endpoint.broadcast!("room:lobby", "link_event", %{
+      num_of_mes: get_length(),
+      messages: mes_html
+    })
   end
 end
