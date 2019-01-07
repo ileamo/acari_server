@@ -32,16 +32,12 @@ defmodule Acari.LinkEventAgent do
     )
   end
 
-  def event(:open, tun, link) do
+  def event(:open, tun, link) when binary_part(tun, 0, 2) != "cl" do
     remove(tun, link)
     broadcast_link_event()
   end
 
-  def event(:close, _, nil, _) do
-    broadcast_link_event()
-  end
-
-  def event(:close, tun, link, num) do
+  def event(:close, tun, link, num) when binary_part(tun, 0, 2) != "cl" do
     timestamp = get_local_time()
     put({tun, link, timestamp})
 
@@ -50,6 +46,9 @@ defmodule Acari.LinkEventAgent do
     end
 
     broadcast_link_event()
+  end
+
+  def event(_, _, _, _ \\ nil) do
   end
 
   def get() do
