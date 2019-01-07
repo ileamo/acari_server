@@ -6,5 +6,15 @@ defmodule AcariServerWeb.LayoutView do
   end
 
   defdelegate num_of_mes(), to: Acari.LinkEventAgent, as: :get_length
-  defdelegate get_mes(), to: Acari.LinkEventAgent, as: :get
+
+  def get_mes() do
+    Acari.LinkEventAgent.get()
+    |> Enum.map(fn
+      {tun, link, ts} when is_binary(link) ->
+        {"warning", "#{ts} #{tun}", "#{link}: нет связи"}
+
+      {tun, _, ts} ->
+        {"danger", "#{ts} #{tun}", "Не доступно"}
+    end)
+  end
 end

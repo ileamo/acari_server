@@ -191,7 +191,7 @@ defmodule Acari.TunMan do
           nil
       end
 
-    Acari.LinkEventAgent.event(:close, state.tun_name, name, 1)
+    Acari.LinkEventAgent.event(:close, state.tun_name, name, :ets.info(sslinks, :size))
     {:noreply, update_best_link(state)}
   end
 

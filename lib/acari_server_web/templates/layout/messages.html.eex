@@ -1,8 +1,8 @@
-<%= for {tun, link, timestamp} <- get_mes() do %>
-<li class="list-group-item list-group-item-warning p-1">
-  <p>
-    <strong><%= timestamp%> <%= tun %></br></strong>
-    <%= link %>: нет связи
-  </p>
-</li>
+<%= for {alert, header, body} <- get_mes() do %>
+  <li class="list-group-item list-group-item-<%= alert %> p-1">
+    <p>
+      <strong><%= header %></br></strong>
+      <%= body %>
+    </p>
+  </li>
 <% end %>
