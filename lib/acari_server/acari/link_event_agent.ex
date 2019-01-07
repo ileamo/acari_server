@@ -51,6 +51,10 @@ defmodule Acari.LinkEventAgent do
     Agent.get(__MODULE__, fn state -> state end)
   end
 
+  def get_length() do
+    Agent.get(__MODULE__, fn state -> length(state) end)
+  end
+
   defp get_local_time() do
     {_, {h, m, s}} = :calendar.local_time()
     :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s])

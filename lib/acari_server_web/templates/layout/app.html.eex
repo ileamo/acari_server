@@ -14,7 +14,10 @@
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
       <div class="navbar-nav px-3 d-flex flex-wrap">
-        <a class="nav-link ml-3" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Сообщения<span class="badge badge-warning mr-2 ml-1">5</span></a>
+        <a class="nav-link ml-3" data-toggle="collapse" href="#collapseExample" role="button"   aria-expanded="false" aria-controls="collapseExample">
+          Сообщения
+          <span class="badge badge-warning mr-2  ml-1 pt-1"><%= num_of_mes() %></span>
+        </a>
         <span class="navbar-text"><%= username(@conn) %></span>
         <%= link to: Routes.session_path(@conn, :logout),class: "nav-link", method: :logout, data: [confirm: "Вы уверены?"] do %>
             <i class="fa fa-sign-out"></i> Выйти
@@ -44,8 +47,8 @@
         </nav>
 
         <div class="col-md-10 ml-sm-auto px-4 bg-light pt-3 flex-grow-1">
-          <div class="row d-flex flex-wrap-reverse">
-            <main role="main" class="col-12 col-lg-9 px-0 px-lg-4">
+          <div class="row d-flex flex-wrap-reverse flex-lg-nowrap">
+            <main role="main" class="col-12 col-lg px-0 px-lg-4">
               <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
               <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
               <%= render @view_module, @view_template, assigns %>
@@ -54,36 +57,14 @@
             <div class="col-lg-3 col-12 collapse show p-0" id="collapseExample">
               <h5>Сообщения:</h5>
                     <ul class="list-group p-0" id="event-log">
-                      <li class="list-group-item list-group-item-danger p-1">
+                      <%= for {tun, link, timestamp} <- get_mes() do %>
+                      <li class="list-group-item list-group-item-warning p-1">
                         <p>
-                          <strong>12:34 Вольная, 35</br></strong>
-                          Отключено
+                          <strong><%= timestamp%> <%= tun %></br></strong>
+                          <%= link %>: нет связи
                       </p>
                       </li>
-                      <li class="list-group-item list-group-item-danger p-1">
-                        <p>
-                          <strong>11:22 Ленина, 1</strong></br>
-                          Отключено
-                        </p>
-                      </li>
-                      <li class="list-group-item list-group-item-danger p-1">
-                        <p>
-                          <strong>09:15 Перекреcток, Щербвковская</br></strong>
-                          Отключено
-                        </p>
-                      </li>
-                      <li class="list-group-item list-group-item-warning p-1">
-                        <p>
-                          <strong>12:37 Урюпинск, Дикси</br></strong>
-                          Модуль BEELINE: нет связи
-                        </p>
-                      </li>
-                      <li class="list-group-item list-group-item-warning p-1">
-                        <p>
-                          <strong>07:34 Сколково</br></strong>
-                          Модуль MEGAFON: нет связи
-                        </p>
-                      </li>
+                      <% end %>
                     </ul>
 
             </div>
