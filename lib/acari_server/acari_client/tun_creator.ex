@@ -2,6 +2,9 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
+  @test_tuns_num 99
+  @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
+
   defmodule State do
     defstruct [
       :tun_name,
@@ -16,9 +19,11 @@ defmodule AcariClient.TunCreator do
   ## Callbacks
   @impl true
   def init(_params) do
-    for i <- 1..3 do
-      :ok = Acari.start_tun("cl_#{:io_lib.format("~3..0B", [i])}", self())
+    for i <- 1..@test_tuns_num do
+      :ok = Acari.start_tun(cl_name(i), self())
     end
+
+    Task.start_link(__MODULE__, :test, [])
 
     {:ok, %State{}}
   end
@@ -61,9 +66,10 @@ defmodule AcariClient.TunCreator do
   end
 
   defp restart_tunnel(tun_name) do
-    # start link M1
-    start_sslink(tun_name, "BEELINE")
-    start_sslink(tun_name, "MEGAFON")
+    m1 = Enum.random(@links)
+    m2 = Enum.random(@links |> Enum.reject(fn x -> x == m1 end))
+    start_sslink(tun_name, m1)
+    start_sslink(tun_name, m2)
   end
 
   defp start_sslink(tun, link) do
@@ -90,6 +96,64 @@ defmodule AcariClient.TunCreator do
         Logger.warn("Can't connect #{host}:#{port}: #{inspect(reason)}")
         Process.sleep(10_000)
         connect(params, request)
+    end
+  end
+
+  defp cl_name(i) do
+    "cl_#{:io_lib.format("~3..0B", [i])}"
+  end
+
+  @impl true
+  def handle_call({:start_tun, name}, _from, state) do
+    res = Acari.start_tun(name, self())
+    {:reply, res, state}
+  end
+
+  # API
+  def start_tun(name) do
+    GenServer.call(__MODULE__, {:start_tun, name})
+  end
+
+  # TEST
+  def test() do
+    Process.sleep(Enum.random(5..10) * 1000)
+    tun_name = cl_name(Enum.random(1..@test_tuns_num))
+
+    case Enum.random(0..9) do
+      0 ->
+        for link_name <- @links do
+          Task.start_link(__MODULE__, :stop_start_link, [tun_name, link_name])
+        end
+
+      _ ->
+        link_name = Enum.random(@links)
+        Task.start_link(__MODULE__, :stop_start_link, [tun_name, link_name])
+    end
+
+    test()
+  end
+
+  def stop_start_tun() do
+    tun_name = cl_name(Enum.random(1..@test_tuns_num))
+
+    case Acari.stop_tun(tun_name) do
+      :ok ->
+        Process.sleep(Enum.random(10..120) * 1000)
+        start_tun(tun_name)
+
+      _ ->
+        nil
+    end
+  end
+
+  def stop_start_link(tun_name, link_name) do
+    case Acari.del_link(tun_name, link_name) do
+      :ok ->
+        Process.sleep(Enum.random(20..120) * 1000)
+        start_sslink(tun_name, link_name)
+
+      _ ->
+        nil
     end
   end
 end
