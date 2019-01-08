@@ -12,9 +12,17 @@ msgstr ""
 "Plural-Forms: nplurals=3\n"
 
 #, elixir-format
-#: lib/acari_server_web/templates/page/index.html.eex:12
+#: lib/acari_server_web/templates/page/statistics.html.eex:6
 msgid "node"
 msgid_plural "nodes"
 msgstr[0] "узел"
 msgstr[1] "узла"
 msgstr[2] "узлов"
+
+#, elixir-format
+#: lib/acari_server_web/templates/page/statistics.html.eex:24
+msgid "module does not operate"
+msgid_plural "modules do not operate"
+msgstr[0] "модуль не работает"
+msgstr[1] "модуля не работают"
+msgstr[2] "модулей не работают"

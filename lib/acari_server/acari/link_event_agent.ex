@@ -59,6 +59,18 @@ defmodule Acari.LinkEventAgent do
     Agent.get(__MODULE__, fn state -> length(state) end)
   end
 
+  def get_failures() do
+    Agent.get(__MODULE__, fn state ->
+      state
+      |> Enum.reduce({0, 0}, fn
+        {_, nil, _}, {tuns_fail, links_fail} -> {tuns_fail + 1, links_fail}
+        {_, _, _}, {tuns_fail, links_fail} -> {tuns_fail, links_fail + 1}
+      end)
+    end)
+  end
+
+  # Private
+
   defp get_local_time() do
     {_, {h, m, s}} = :calendar.local_time()
     :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s])
@@ -67,9 +79,13 @@ defmodule Acari.LinkEventAgent do
   defp broadcast_link_event() do
     mes_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", [])
 
+    statistics_html =
+      Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
+
     Endpoint.broadcast!("room:lobby", "link_event", %{
       num_of_mes: get_length(),
-      messages: mes_html
+      messages: mes_html,
+      statistics: statistics_html
     })
   end
 end

@@ -11,9 +11,16 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2\n"
 
-#, elixir-format, fuzzy
-#: lib/acari_server_web/templates/page/index.html.eex:12
+#, elixir-format
+#: lib/acari_server_web/templates/page/statistics.html.eex:6
 msgid "node"
 msgid_plural "nodes"
+msgstr[0] ""
+msgstr[1] ""
+
+#, elixir-format
+#: lib/acari_server_web/templates/page/statistics.html.eex:24
+msgid "module does not operate"
+msgid_plural "modules do not operate"
 msgstr[0] ""
 msgstr[1] ""

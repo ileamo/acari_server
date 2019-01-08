@@ -5,32 +5,8 @@
     <section class="statistic">
         <div class="section__content">
             <div class="container-fluid d-none d-md-block">
-                <div class="row mb-4 mt-md-4">
-                    <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">
-                        <div class="statistic__item">
-                            <% nodes_num = :ets.info :tuns, :size %>
-                            <h2 class="number"><%= nodes_num %></h2>
-                            <span class="desc"><%= ngettext "node", "nodes", nodes_num %></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 px-0 pl-md-1 px-lg-1">
-                        <div class="statistic__item">
-                            <h2 class="number">125</h2>
-                            <span class="desc">в работе</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">
-                        <div class="statistic__item">
-                            <h2 class="number">5</h2>
-                            <span class="desc">сбоев за неделю</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 px-0 pl-md-1 px-lg-1">
-                        <div class="statistic__item">
-                            <h2 class="number">13</h2>
-                            <span class="desc">модулей не работает</span>
-                        </div>
-                    </div>
+                <div class="row mb-4 mt-md-4" id="statistics">
+                  <%= render "statistics.html", assigns %>
                 </div>
             </div>
         </div>
