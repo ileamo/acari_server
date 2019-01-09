@@ -14,7 +14,7 @@
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
       <div class="navbar-nav px-3 d-flex flex-wrap">
-        <a class="nav-link ml-3" data-toggle="collapse" href="#collapseExample" role="button"   aria-expanded="false" aria-controls="collapseExample">
+        <a class="nav-link ml-3" data-toggle="collapse" href="#collapseMesages" role="button"   aria-expanded="false" aria-controls="collapseMesages">
           Сообщения
           <span class="badge badge-warning mr-2  ml-1 pt-1" id="num-of-mes"><%= num_of_mes() %></span>
         </a>
@@ -54,7 +54,7 @@
               <%= render @view_module, @view_template, assigns %>
             </main>
 
-            <div class="col-lg-3 col-12 collapse show p-0" id="collapseExample">
+            <div class="col-lg-3 col-12 collapse show p-0" id="collapseMesages">
               <h5>Сообщения:</h5>
                     <ul class="list-group p-0" id="event-log">
                       <%= render "messages.html", assigns %>

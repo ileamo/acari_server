@@ -53,3 +53,17 @@
   })
 }
 }())
+
+
+$('#collapseMesages').on('hide.bs.collapse', function () {
+  console.log("hide.bs.collapse")
+  sessionStorage.showMessages = 'hide'
+})
+
+$('#collapseMesages').on('show.bs.collapse', function () {
+  console.log("show.bs.collapse")
+  sessionStorage.showMessages = 'show'
+})
+
+console.log("set collapse", sessionStorage.showMessages)
+$('#collapseMesages').collapse(sessionStorage.showMessages)
