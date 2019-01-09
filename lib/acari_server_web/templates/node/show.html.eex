@@ -3,11 +3,6 @@
 <ul>
 
   <li>
-    <strong>Серийный номер:</strong>
-    <%= @node.sn %>
-  </li>
-
-  <li>
     <strong>Имя:</strong>
     <%= @node.name %>
   </li>

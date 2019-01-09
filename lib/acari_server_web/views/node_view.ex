@@ -7,6 +7,10 @@ defmodule AcariServerWeb.NodeView do
     |> Enum.join(",")
   end
 
+  def group_id_list(nil) do
+    []
+  end
+
   def group_id_list(node) do
     node.groups
     |> Enum.map(fn %{id: id} -> id end)

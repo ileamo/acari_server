@@ -3,7 +3,6 @@
 <table id="datatable" class="table display table-striped table-bordered table-sm">
   <thead>
     <tr>
-      <th scope="col">Серийный номер</th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Группы</th>
@@ -16,9 +15,8 @@
 <%= for node <- @nodes do %>
     <tr>
       <td>
-      <%= link node.sn, to: Routes.node_path(@conn, :show, node) %>
+      <%= link node.name, to: Routes.node_path(@conn, :show, node) %>
       </td>
-      <td><%= node.name %></td>
       <td><%= node.description %></td>
       <td><%= groups_list(node) %></td>
       <td><%= node.params %></td>
