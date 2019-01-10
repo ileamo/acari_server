@@ -22,17 +22,13 @@ defmodule AcariServer.Hs do
   @impl true
   def handle_info({:ssl, sslsocket, frame}, state) do
     with <<1::1, _val::15, json::binary>> <- :erlang.list_to_binary(frame),
-         {:ok, %{"id" => id, "link" => link}} when is_binary(id) and is_binary(link) <-
+         {:ok, %{"id" => id, "link" => link} = request} when is_binary(id) and is_binary(link) <-
            Jason.decode(json),
          {:ok, {ipaddr, port}} = :ssl.peername(sslsocket),
          Logger.info(
            "Listener: accept connection from #{:inet.ntoa(ipaddr)}:#{port}, id:#{id}, link:#{link}"
          ),
-         :ok <-
-           (case Acari.start_tun(id, AcariServer.Master) do
-              :ok -> :ok
-              {:error, {:already_started, _}} -> :ok
-            end),
+         :ok <- start_tun(request),
          {:ok, pid} <-
            Acari.add_link(id, link, fn
              :connect -> sslsocket
@@ -47,11 +43,19 @@ defmodule AcariServer.Hs do
         send(pid, mes)
       end
     else
-      frame when is_binary(frame) ->
-        Logger.warn("Bad handshake packet")
-
       res ->
-        Logger.error("Can't accept connection #{inspect(res)}")
+        case res do
+          frame when is_binary(frame) ->
+            Logger.warn("Bad handshake packet")
+
+          {:error, :not_configured} ->
+            :ok
+
+          res ->
+            Logger.error("Can't accept connection #{inspect(res)}")
+        end
+
+        Process.sleep(1 * 60 * 1000)
     end
 
     {:stop, :shutdown, state}
@@ -68,6 +72,31 @@ defmodule AcariServer.Hs do
   def handle_info(msg, state) do
     Logger.warn("SSL: unknown message: #{inspect(msg)}")
     {:noreply, state}
+  end
+
+  # Private
+  defp start_tun(%{"id" => id} = request) do
+    case Acari.tun_exist?(id) do
+      true ->
+        :ok
+
+      false ->
+        case AcariServer.NodeManager.get_node_by_name(id) do
+          nil ->
+            new_node(request)
+            {:error, :not_configured}
+
+          _ ->
+            case Acari.start_tun(id, AcariServer.Master) do
+              :ok -> :ok
+              {:error, {:already_started, _}} -> :ok
+            end
+        end
+    end
+  end
+
+  defp new_node(request) do
+    Logger.warn("Connection from unknown node: #{inspect(request)}")
   end
 
   # Client

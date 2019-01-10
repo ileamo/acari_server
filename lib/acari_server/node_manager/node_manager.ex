@@ -6,7 +6,6 @@ defmodule AcariServer.NodeManager do
   import Ecto.Query, warn: false
   alias AcariServer.Repo
   alias AcariServer.NodeManager.Node
-  alias AcariServer.GroupNodeAssociation
 
   @doc """
   Returns the list of nodes.
@@ -41,6 +40,11 @@ defmodule AcariServer.NodeManager do
     Node
     |> Repo.get!(id)
     |> Repo.preload(:groups)
+  end
+
+  def get_node_by_name(name) do
+    Node
+    |> Repo.get_by(name: name)
   end
 
   @doc """

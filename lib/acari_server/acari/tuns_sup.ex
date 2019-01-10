@@ -31,4 +31,11 @@ defmodule Acari.TunsSup do
       _ -> {:error, "No tunnel '#{tun_name}'"}
     end
   end
+
+  def tun_exist?(tun_name) do
+    case Registry.lookup(Registry.TunSup, tun_name) do
+      [{_, _}] -> true
+      _ -> false
+    end
+  end
 end

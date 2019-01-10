@@ -2,7 +2,7 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
-  @test_tuns_num 1
+  @test_tuns_num 5
   @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
 
   defmodule State do
@@ -74,7 +74,7 @@ defmodule AcariClient.TunCreator do
 
   defp start_sslink(tun, link) do
     {:ok, request} =
-      Jason.encode(%{id: "nsg1700_1812000#{tun |> String.slice(-3, 3)}", link: link})
+      Jason.encode(%{id: "NSG1700_1812000#{tun |> String.slice(-3, 3)}", link: link})
 
     {:ok, _pid} =
       Acari.add_link(tun, link, fn
