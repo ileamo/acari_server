@@ -62,6 +62,7 @@ defmodule AcariServer.NodeManager do
   def create_node(attrs \\ %{}) do
     %Node{}
     |> Node.changeset(attrs)
+    |> Node.put_groups(attrs)
     |> Repo.insert()
   end
 

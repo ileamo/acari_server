@@ -17,6 +17,8 @@ defmodule AcariServerWeb.NodeController do
   def create(conn, %{"node" => node_params}) do
     case NodeManager.create_node(node_params) do
       {:ok, node} ->
+        IO.inspect(node)
+
         conn
         |> put_flash(:info, "Node created successfully.")
         |> redirect(to: Routes.node_path(conn, :show, node))
