@@ -33,8 +33,10 @@ defmodule AcariServerWeb.NewNodeController do
 
   def edit(conn, %{"id" => id}) do
     new_node = NewNodeDiscovery.get_new_node!(id)
-    changeset = NewNodeDiscovery.change_new_node(new_node)
-    render(conn, "edit.html", new_node: new_node, changeset: changeset)
+
+    redirect(conn,
+      to: Routes.node_path(conn, :new, name: new_node.name, template: new_node.template)
+    )
   end
 
   def update(conn, %{"id" => id, "new_node" => new_node_params}) do

@@ -34,5 +34,5 @@
 
 </ul>
 
-<span><%= link "Edit", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
+<span><%= link "Новый узел", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
 <span><%= link "Назад", to: Routes.new_node_path(@conn, :index) %></span>

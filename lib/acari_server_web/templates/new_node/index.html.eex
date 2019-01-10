@@ -22,7 +22,7 @@
       <td><%= new_node.template %></td>
 
       <td>
-        <%= link "Edit", to: Routes.new_node_path(@conn, :edit, new_node) %>
+        <%= link "Новый узел", to: Routes.new_node_path(@conn, :edit, new_node) %>
         <%= link "Удалить", to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>

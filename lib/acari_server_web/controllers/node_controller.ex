@@ -9,8 +9,8 @@ defmodule AcariServerWeb.NodeController do
     render(conn, "index.html", nodes: nodes)
   end
 
-  def new(conn, _params) do
-    changeset = NodeManager.change_node(%Node{})
+  def new(conn, params) do
+    changeset = NodeManager.change_node(%Node{name: params["name"]})
     render(conn, "new.html", changeset: changeset)
   end
 
