@@ -17,7 +17,7 @@ defmodule AcariServerWeb.NodeController do
   def create(conn, %{"node" => node_params}) do
     case NodeManager.create_node(node_params) do
       {:ok, node} ->
-        IO.inspect(node)
+        AcariServer.NewNodeDiscovery.delete_new_node_by_name(node.name)
 
         conn
         |> put_flash(:info, "Node created successfully.")

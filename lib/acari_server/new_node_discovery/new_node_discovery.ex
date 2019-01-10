@@ -98,6 +98,12 @@ defmodule AcariServer.NewNodeDiscovery do
     Repo.delete(new_node)
   end
 
+  def delete_new_node_by_name(name) do
+    NewNode
+    |> Repo.get_by(name: name)
+    |> Repo.delete()
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking new_node changes.
 
