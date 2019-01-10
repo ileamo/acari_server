@@ -2,7 +2,6 @@ defmodule AcariServer.NewNodeDiscovery.NewNode do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "newnodes" do
     field :ip_addr, :string
     field :name, :string
@@ -16,7 +15,7 @@ defmodule AcariServer.NewNodeDiscovery.NewNode do
   def changeset(new_node, attrs) do
     new_node
     |> cast(attrs, [:name, :ip_addr, :template, :params])
-    |> validate_required([:name, :ip_addr, :template, :params])
+    |> validate_required([:name])
     |> unique_constraint(:name)
   end
 end

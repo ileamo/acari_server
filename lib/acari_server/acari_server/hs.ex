@@ -28,7 +28,7 @@ defmodule AcariServer.Hs do
          Logger.info(
            "Listener: accept connection from #{:inet.ntoa(ipaddr)}:#{port}, id:#{id}, link:#{link}"
          ),
-         :ok <- start_tun(request),
+         :ok <- start_tun(request, ipaddr),
          {:ok, pid} <-
            Acari.add_link(id, link, fn
              :connect -> sslsocket
@@ -75,7 +75,7 @@ defmodule AcariServer.Hs do
   end
 
   # Private
-  defp start_tun(%{"id" => id} = request) do
+  defp start_tun(%{"id" => id} = request, ipaddr) do
     case Acari.tun_exist?(id) do
       true ->
         :ok
@@ -83,7 +83,7 @@ defmodule AcariServer.Hs do
       false ->
         case AcariServer.NodeManager.get_node_by_name(id) do
           nil ->
-            new_node(request)
+            new_node(request, ipaddr)
             {:error, :not_configured}
 
           _ ->
@@ -95,8 +95,14 @@ defmodule AcariServer.Hs do
     end
   end
 
-  defp new_node(request) do
+  defp new_node(%{"id" => id} = request, ipaddr) do
     Logger.warn("Connection from unknown node: #{inspect(request)}")
+
+    AcariServer.NewNodeDiscovery.insert_or_update_new_node(%{
+      name: id,
+      ip_addr: to_string(:inet.ntoa(ipaddr)),
+      params: request
+    })
   end
 
   # Client

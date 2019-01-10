@@ -55,6 +55,15 @@ defmodule AcariServer.NewNodeDiscovery do
     |> Repo.insert()
   end
 
+  def insert_or_update_new_node(attrs = %{name: name}) do
+    case NewNode |> Repo.get_by(name: name) do
+      nil -> %NewNode{}
+      newnode -> newnode
+    end
+    |> NewNode.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
   @doc """
   Updates a new_node.
 
