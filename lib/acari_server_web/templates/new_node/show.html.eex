@@ -1,0 +1,28 @@
+<h1>Show New node</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @new_node.name %>
+  </li>
+
+  <li>
+    <strong>Ip addr:</strong>
+    <%= @new_node.ip_addr %>
+  </li>
+
+  <li>
+    <strong>Template:</strong>
+    <%= @new_node.template %>
+  </li>
+
+  <li>
+    <strong>Params:</strong>
+    <%= @new_node.params %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
+<span><%= link "Back", to: Routes.new_node_path(@conn, :index) %></span>

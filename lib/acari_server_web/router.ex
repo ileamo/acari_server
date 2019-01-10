@@ -41,6 +41,7 @@ defmodule AcariServerWeb.Router do
     resources "/users", UserController
     resources "/groups", GroupController
     resources "/nodes", NodeController
+    resources "/newnodes", NewNodeController
 
     get "/secret", PageController, :secret
   end

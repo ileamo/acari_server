@@ -1,0 +1,32 @@
+<h1>Listing Newnodes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Ip addr</th>
+      <th>Template</th>
+      <th>Params</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for new_node <- @newnodes do %>
+    <tr>
+      <td><%= new_node.name %></td>
+      <td><%= new_node.ip_addr %></td>
+      <td><%= new_node.template %></td>
+      <td><%= new_node.params %></td>
+
+      <td>
+        <%= link "Show", to: Routes.new_node_path(@conn, :show, new_node) %>
+        <%= link "Edit", to: Routes.new_node_path(@conn, :edit, new_node) %>
+        <%= link "Delete", to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Are you sure?"] %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New New node", to: Routes.new_node_path(@conn, :new) %></span>
