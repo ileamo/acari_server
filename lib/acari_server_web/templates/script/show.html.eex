@@ -14,14 +14,14 @@
 
   <li>
     <strong>Локальный:</strong>
-    <pre><code>
+    <pre class="border rounded bg-white pl-2 pb-3"><code>
       <%= @script.local %>
     </code></pre>
   </li>
 
   <li>
     <strong>Удаленный:</strong>
-    <pre><code>
+    <pre class="border rounded bg-white pl-2 pb-3"><code>
       <%= @script.remote %>
     </code></pre>
   </li>
