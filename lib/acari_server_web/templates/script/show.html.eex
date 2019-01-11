@@ -1,0 +1,23 @@
+<h1>Show Script</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @script.name %>
+  </li>
+
+  <li>
+    <strong>Local:</strong>
+    <%= @script.local %>
+  </li>
+
+  <li>
+    <strong>Remote:</strong>
+    <%= @script.remote %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.script_path(@conn, :edit, @script) %></span>
+<span><%= link "Back", to: Routes.script_path(@conn, :index) %></span>

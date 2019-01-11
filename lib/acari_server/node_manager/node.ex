@@ -33,4 +33,8 @@ defmodule AcariServer.NodeManager.Node do
     |> Enum.map(&String.to_integer/1)
     |> Enum.map(&AcariServer.GroupManager.get_group_wo_nodes!/1)
   end
+
+  defp parse_groups(_) do
+    []
+  end
 end

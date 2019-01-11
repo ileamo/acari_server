@@ -1,0 +1,30 @@
+<h1>Listing Scripts</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Local</th>
+      <th>Remote</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for script <- @scripts do %>
+    <tr>
+      <td><%= script.name %></td>
+      <td><%= script.local %></td>
+      <td><%= script.remote %></td>
+
+      <td>
+        <%= link "Show", to: Routes.script_path(@conn, :show, script) %>
+        <%= link "Edit", to: Routes.script_path(@conn, :edit, script) %>
+        <%= link "Delete", to: Routes.script_path(@conn, :delete, script), method: :delete, data: [confirm: "Are you sure?"] %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Script", to: Routes.script_path(@conn, :new) %></span>
