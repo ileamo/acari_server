@@ -13,6 +13,13 @@
   </li>
 
   <li>
+    <strong>Определения:</strong>
+    <pre class="border rounded bg-white pl-2 pb-3"><code>
+      <%= @script.definition %>
+    </code></pre>
+  </li>
+
+  <li>
     <strong>Локальный:</strong>
     <pre class="border rounded bg-white pl-2 pb-3"><code>
       <%= @script.local %>

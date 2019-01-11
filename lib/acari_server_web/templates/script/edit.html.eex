@@ -1,4 +1,4 @@
-<h1>Редактировать Скрипт</h1>
+<h2>Редактировать Скрипт</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.script_path(@conn, :update, @script)) %>
 

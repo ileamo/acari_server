@@ -7,6 +7,7 @@ defmodule AcariServer.ScriptManager.Script do
     field :description, :string
     field :name, :string
     field :remote, :string
+    field :definition, :string
 
     has_many :nodes, AcariServer.NodeManager.Node
 
@@ -16,7 +17,7 @@ defmodule AcariServer.ScriptManager.Script do
   @doc false
   def changeset(script, attrs) do
     script
-    |> cast(attrs, [:name, :description, :local, :remote])
+    |> cast(attrs, [:name, :description, :local, :remote, :definition])
     |> validate_required([:name])
     |> unique_constraint(:name)
   end
