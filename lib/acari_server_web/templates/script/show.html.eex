@@ -1,23 +1,42 @@
-<h1>Show Script</h1>
+<h1>Скрипт</h1>
 
 <ul>
 
   <li>
-    <strong>Name:</strong>
+    <strong>Имя:</strong>
     <%= @script.name %>
   </li>
 
   <li>
-    <strong>Local:</strong>
-    <%= @script.local %>
+    <strong>Описание:</strong>
+    <%= @script.description %>
   </li>
 
   <li>
-    <strong>Remote:</strong>
-    <%= @script.remote %>
+    <strong>Локальный:</strong>
+    <pre><code>
+      <%= @script.local %>
+    </code></pre>
+  </li>
+
+  <li>
+    <strong>Удаленный:</strong>
+    <pre><code>
+      <%= @script.remote %>
+    </code></pre>
+  </li>
+  <li>
+
+  <strong>Создан:</strong>
+    <%= AcariServer.db_time_to_local(@script.inserted_at) %>
+  </li>
+
+  <li>
+    <strong>Обновлен:</strong>
+    <%= AcariServer.db_time_to_local(@script.updated_at) %>
   </li>
 
 </ul>
 
-<span><%= link "Edit", to: Routes.script_path(@conn, :edit, @script) %></span>
-<span><%= link "Back", to: Routes.script_path(@conn, :index) %></span>
+<span><%= link "Редактировать", to: Routes.script_path(@conn, :edit, @script) %></span>
+<span><%= link "Назад", to: Routes.script_path(@conn, :index) %></span>

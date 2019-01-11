@@ -2,9 +2,9 @@ defmodule AcariServer.ScriptManager.Script do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "scripts" do
     field :local, :string
+    field :description, :string
     field :name, :string
     field :remote, :string
 
@@ -14,8 +14,8 @@ defmodule AcariServer.ScriptManager.Script do
   @doc false
   def changeset(script, attrs) do
     script
-    |> cast(attrs, [:name, :local, :remote])
-    |> validate_required([:name, :local, :remote])
+    |> cast(attrs, [:name, :description, :local, :remote])
+    |> validate_required([:name])
     |> unique_constraint(:name)
   end
 end

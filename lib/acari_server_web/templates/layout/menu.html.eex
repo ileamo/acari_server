@@ -25,9 +25,7 @@
     <%= link "Устройства", to: Routes.node_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#">
-      Шаблоны
-    </a>
+      <%= link "Скрипты", to: Routes.script_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
     <%= link "Группы", to: Routes.group_path(@conn, :index), class: "nav-link" %>
