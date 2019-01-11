@@ -5,8 +5,9 @@
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Скрипт</th>
+      <th scope="col">Параметры</th>
       <th scope="col">Группы</th>
-      <th scope="col">параметры</th>
 
       <th scope="col"></th>
     </tr>
@@ -18,8 +19,9 @@
       <%= link node.name, to: Routes.node_path(@conn, :show, node) %>
       </td>
       <td><%= node.description %></td>
-      <td><%= groups_list(node) %></td>
+      <td><%= script_name(node) %></td>
       <td><%= node.params %></td>
+      <td><%= groups_list(node) %></td>
 
       <td>
         <%= link "Редактировать", to: Routes.node_path(@conn, :edit, node) %>

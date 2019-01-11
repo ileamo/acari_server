@@ -8,6 +8,8 @@ defmodule AcariServer.ScriptManager.Script do
     field :name, :string
     field :remote, :string
 
+    has_many :nodes, AcariServer.NodeManager.Node
+
     timestamps()
   end
 

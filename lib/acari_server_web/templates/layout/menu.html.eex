@@ -19,10 +19,10 @@
     <%= link "Пользователи", to: Routes.user_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Обнаруженные устройства", to: Routes.new_node_path(@conn, :index), class: "nav-link" %>
+    <%= link "Обнаруженные узлы", to: Routes.new_node_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Устройства", to: Routes.node_path(@conn, :index), class: "nav-link" %>
+    <%= link "Узлы", to: Routes.node_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
       <%= link "Скрипты", to: Routes.script_path(@conn, :index), class: "nav-link" %>

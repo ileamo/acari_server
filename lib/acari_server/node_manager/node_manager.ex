@@ -20,6 +20,7 @@ defmodule AcariServer.NodeManager do
     Node
     |> Repo.all()
     |> Repo.preload(:groups)
+    |> Repo.preload(:script)
   end
 
   @doc """
@@ -40,6 +41,7 @@ defmodule AcariServer.NodeManager do
     Node
     |> Repo.get!(id)
     |> Repo.preload(:groups)
+    |> Repo.preload(:script)
   end
 
   def get_node_by_name(name) do

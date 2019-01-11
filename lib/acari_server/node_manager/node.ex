@@ -7,6 +7,7 @@ defmodule AcariServer.NodeManager.Node do
     field :description, :string
     field :params, :map
     field :groups_list, {:array, :integer}, virtual: true
+    belongs_to :script, AcariServer.ScriptManager.Script
 
     many_to_many :groups, AcariServer.GroupManager.Group,
       join_through: AcariServer.GroupNodeAssociation.GroupNode,
@@ -18,8 +19,9 @@ defmodule AcariServer.NodeManager.Node do
   @doc false
   def changeset(node, attrs) do
     node
-    |> cast(attrs, [:name, :description, :params])
+    |> cast(attrs, [:name, :description, :params, :script_id])
     |> validate_required([:name])
+    |> foreign_key_constraint(:script_id)
     |> unique_constraint(:name)
   end
 
