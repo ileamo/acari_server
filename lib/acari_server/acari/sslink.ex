@@ -126,17 +126,7 @@ defmodule Acari.SSLink do
   end
 
   defp send_link_command(state, com, payload) do
-    case :ssl.send(state.sslsocket, <<Const.link_mask()::2, com::14>> <> payload) do
-      :ok ->
-        :ok
-
-      {:error, reason} = res ->
-        Logger.warn(
-          "#{state.tun_name}: #{state.name}: Can't send to SSL socket: #{inspect(reason)}"
-        )
-
-        res
-    end
+    Acari.SSLinkSnd.send(state.snd_pid, <<Const.link_mask()::2, com::14>>, payload)
   end
 
   defp exec_link_command(state, com, data) do
@@ -190,7 +180,10 @@ defmodule Acari.SSLinkSnd do
         {:noreply, state}
 
       {:error, reason} ->
-        Logger.warn("Can't send to SSL socket: #{inspect(reason)}")
+        Logger.warn(
+          "#{state.tun_name}: #{state.name}: Can't send to SSL socket: #{inspect(reason)}"
+        )
+
         {:stop, :shutdown}
     end
   end
