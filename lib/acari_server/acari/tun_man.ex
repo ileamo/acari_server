@@ -16,6 +16,7 @@ defmodule Acari.TunMan do
       :ifsnd_pid,
       :sslink_sup_pid,
       :sslinks,
+      :send_peer_started,
       current_link: {nil, nil}
     ]
   end
@@ -69,7 +70,17 @@ defmodule Acari.TunMan do
     case state.current_link do
       {nil, _} ->
         Iface.set_sslink_snd_pid(iface_pid, pid)
-        send_tun_com(self(), Const.peer_started(), "")
+
+        state =
+          case state.send_peer_started do
+            true ->
+              state
+
+            _ ->
+              send_tun_com(self(), Const.peer_started(), "")
+              %State{state | send_peer_started: true}
+          end
+
         {:noreply, %State{state | current_link: {name, pid}}}
 
       _ ->
