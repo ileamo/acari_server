@@ -23,7 +23,7 @@ defmodule AcariClient.TunCreator do
       :ok = Acari.start_tun(cl_name(i), self())
     end
 
-    Task.start_link(__MODULE__, :test, [])
+    # Task.start_link(__MODULE__, :test, [])
 
     {:ok, %State{}}
   end
