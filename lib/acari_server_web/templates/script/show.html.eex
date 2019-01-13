@@ -27,15 +27,23 @@
 
   </li>
 
+  <% {local, local_error} = test_ass && AcariServer.Template.eval(@script.local, test_ass) || {nil, nil}%>
+  <% {remote, remote_error} = test_ass && AcariServer.Template.eval(@script.remote, test_ass) || {nil, nil}%>
 
   <li>
     <strong>Локальный:</strong>
-    <pre class="border rounded bg-white pl-2 p-2"><code><%= @script.local %></code></pre>
+    <pre class="border rounded bg-white p-2 <%= local_error && "mb-0" || "" %>"><code><%= @script.local %></code></pre>
+    <%= if local_error do %>
+      <p class = "text-danger"><%= local_error %><p>
+    <% end %>
   </li>
 
   <li>
     <strong>Удаленный:</strong>
-    <pre class="border rounded bg-white pl-2 p-2"><code><%= @script.remote %></code></pre>
+    <pre class="border rounded bg-white p-2 <%= remote_error && "mb-0" || "" %>"><code><%= @script.remote %></code></pre>
+    <%= if remote_error do %>
+      <p class = "text-danger"><%= remote_error %><p>
+    <% end %>
   </li>
 
   <li>
@@ -56,17 +64,17 @@
 <%= if test_ass do %>
 <h3 class = "mt-3"> Результат тестирования </h3>
 <ul>
-  <li>
-    <strong>Локальный:</strong>
-    <pre class="border rounded bg-white pl-2 pb-3"><code>
-      <%= AcariServer.Template.eval(@script.local, test_ass) %>
-    </code></pre>
-  </li>
-  <li>
-    <strong>Удаленный:</strong>
-    <pre class="border rounded bg-white pl-2 pb-3"><code>
-      <%= AcariServer.Template.eval(@script.remote, test_ass) %>
-    </code></pre>
-  </li>
+  <%= if local do %>
+    <li>
+      <strong>Локальный:</strong>
+      <pre class="border rounded bg-white p-2"><code><%= local %></code></pre>
+    </li>
+  <% end %>
+  <%= if remote do %>
+    <li>
+      <strong>Удаленный:</strong>
+      <pre class="border rounded bg-white p-2"><code><%= remote %></code></pre>
+    </li>
+  <% end %>
 </ul>
 <% end %>

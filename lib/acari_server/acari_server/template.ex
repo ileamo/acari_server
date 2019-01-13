@@ -1,7 +1,7 @@
 defmodule AcariServer.Template do
   def eval(templ, assigns \\ %{}) do
     try do
-      EEx.eval_string(templ, assigns: assigns)
+      {EEx.eval_string(templ, assigns: assigns), nil}
     rescue
       x ->
         stack =
@@ -10,7 +10,7 @@ defmodule AcariServer.Template do
             _ -> ""
           end
 
-        {:error, "#{Exception.message(x)}#{stack}"}
+        {nil, "#{Exception.message(x)}#{stack}"}
     end
   end
 
