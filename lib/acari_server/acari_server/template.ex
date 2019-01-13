@@ -15,14 +15,25 @@ defmodule AcariServer.Template do
   end
 
   def test_assigns(json) do
+    # with json <- String.trim(json),
+    #     json <- (String.match?(json, ~r/^{.*}$/) && json) || "{" <> json <> "}",
     with {:ok, %{"test" => test_ass} = dfns} <- Jason.decode(json) do
       (dfns["var"] || %{})
       |> Map.merge(dfns["const"] || %{})
       |> Map.merge(test_ass)
       |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
       |> Enum.into(%{})
+      |> (fn m -> {m, nil} end).()
     else
-      _ -> nil
+      {:error, mes} -> {nil, mes}
+      res -> {nil, inspect(res)}
     end
+  end
+
+  def highlight_char(text, n) do
+    n = min(n, byte_size(text) - 1)
+    <<head::binary-size(n), tail::binary>> = text
+    {char, tail} = String.split_at(tail, 1)
+    {head, char, tail}
   end
 end
