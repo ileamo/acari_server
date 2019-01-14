@@ -1,5 +1,7 @@
 defmodule AcariServer.Template do
   def eval(templ, assigns \\ %{}) do
+    templ = templ || ""
+
     try do
       {EEx.eval_string(templ, assigns: assigns), nil}
     rescue
@@ -14,6 +16,8 @@ defmodule AcariServer.Template do
     end
   end
 
+  def test_assigns(nil), do: {nil, nil}
+
   def test_assigns(json) do
     # with json <- String.trim(json),
     #     json <- (String.match?(json, ~r/^{.*}$/) && json) || "{" <> json <> "}",
@@ -25,6 +29,8 @@ defmodule AcariServer.Template do
       |> Enum.into(%{})
       |> (fn m -> {m, nil} end).()
     else
+      # if decode :ok but no test key
+      {:ok, _} -> {nil, nil}
       {:error, mes} -> {nil, mes}
       res -> {nil, inspect(res)}
     end
