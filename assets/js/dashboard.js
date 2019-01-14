@@ -13,13 +13,13 @@
     type: 'line',
     data: {
       labels: [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday'
+        'пн',
+        'вт',
+        'ср',
+        'чт',
+        'пт',
+        'сб',
+        'вс'
       ],
       datasets: [{
         data: [

@@ -82,10 +82,13 @@ defmodule Acari.LinkEventAgent do
     statistics_html =
       Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
 
+    progress_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "progress.html", [])
+
     Endpoint.broadcast!("room:lobby", "link_event", %{
       num_of_mes: get_length(),
       messages: mes_html,
-      statistics: statistics_html
+      statistics: statistics_html,
+      progress: progress_html
     })
   end
 end
