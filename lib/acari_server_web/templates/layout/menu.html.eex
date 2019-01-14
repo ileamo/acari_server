@@ -19,15 +19,15 @@
     <%= link "Пользователи", to: Routes.user_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Обнаруженные узлы", to: Routes.new_node_path(@conn, :index), class: "nav-link" %>
+    <%= link "Группы", to: Routes.group_path(@conn, :index), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Скрипты", to: Routes.script_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
     <%= link "Узлы", to: Routes.node_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-      <%= link "Скрипты", to: Routes.script_path(@conn, :index), class: "nav-link" %>
-  </li>
-  <li class="nav-item">
-    <%= link "Группы", to: Routes.group_path(@conn, :index), class: "nav-link" %>
+    <%= link "Обнаруженные узлы", to: Routes.new_node_path(@conn, :index), class: "nav-link" %>
   </li>
 </ul>
