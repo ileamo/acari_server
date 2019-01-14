@@ -36,4 +36,12 @@ defmodule AcariServerWeb.NodeView do
     |> Enum.sort_by(&elem(&1, 0))
     |> List.insert_at(0, {@no_script, nil})
   end
+
+  def param_list(nil), do: ""
+
+  def param_list(param_map) do
+    param_map
+    |> Enum.map(fn {k, v} -> "#{k}=#{v}" end)
+    |> Enum.join(", ")
+  end
 end

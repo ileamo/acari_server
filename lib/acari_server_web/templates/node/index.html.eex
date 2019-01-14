@@ -20,7 +20,7 @@
       </td>
       <td><%= node.description %></td>
       <td><%= script_name(node) %></td>
-      <td><%= node.params %></td>
+      <td><%= param_list(node.params) %></td>
       <td><%= groups_list(node) %></td>
 
       <td>

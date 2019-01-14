@@ -13,18 +13,18 @@
   </li>
 
   <li>
-    <strong>Скрипт:</strong>
-    <%= script_name(@node) %>
-  </li>
-
-  <li>
     <strong>Группы:</strong>
     <%= groups_list(@node) %>
   </li>
 
   <li>
+    <strong>Скрипт:</strong>
+    <%= script_name(@node) %>
+  </li>
+
+  <li>
     <strong>Параметры:</strong>
-    <%= @node.params %>
+    <%= param_list(@node.params) %>
   </li>
 
 

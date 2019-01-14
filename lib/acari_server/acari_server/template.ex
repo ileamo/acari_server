@@ -22,7 +22,7 @@ defmodule AcariServer.Template do
     # with json <- String.trim(json),
     #     json <- (String.match?(json, ~r/^{.*}$/) && json) || "{" <> json <> "}",
     with {:ok, %{"test" => test_ass} = dfns} <- Jason.decode(json) do
-      (dfns["var"] || %{})
+      get_only_value(dfns["var"] || %{})
       |> Map.merge(dfns["const"] || %{})
       |> Map.merge(test_ass)
       |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
@@ -41,5 +41,41 @@ defmodule AcariServer.Template do
     <<head::binary-size(n), tail::binary>> = text
     {char, tail} = String.split_at(tail, 1)
     {head, char, tail}
+  end
+
+  def get_vars(nil), do: %{}
+
+  def get_vars(json) do
+    case Jason.decode(json) do
+      {:ok, %{"var" => var}} -> normalize_vars(var)
+      _ -> %{}
+    end
+  end
+
+  defp normalize_vars(var) do
+    var
+    |> Enum.map(&normalize_var/1)
+    |> Enum.reject(fn x -> x == nil end)
+    |> Enum.into(%{})
+  end
+
+  defp normalize_var({k, v}) when not is_list(v) do
+    normalize_var({k, [v]})
+  end
+
+  defp normalize_var({k, v}) when is_binary(k) and is_list(v) do
+    case Enum.all?(v, fn x -> is_binary(x) || is_number(x) || is_boolean(x) end) do
+      true -> {k, v}
+      _ -> nil
+    end
+  end
+
+  defp normalize_var(_), do: nil
+
+  defp get_only_value(var) do
+    var
+    |> normalize_vars()
+    |> Enum.map(fn {k, [v | _]} -> {k, v} end)
+    |> Enum.into(%{})
   end
 end

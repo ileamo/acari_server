@@ -39,7 +39,9 @@ defmodule AcariServerWeb.NodeController do
     render(conn, "edit.html", node: node, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "node" => node_params}) do
+  def update(conn, %{"id" => id, "node" => node_params} = attrs) do
+    node_params = Map.put(node_params, "params", attrs["params"] || %{})
+
     node = NodeManager.get_node!(id)
 
     case NodeManager.update_node(node, node_params) do
