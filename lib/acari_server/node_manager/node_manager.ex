@@ -49,6 +49,12 @@ defmodule AcariServer.NodeManager do
     |> Repo.get_by(name: name)
   end
 
+  def get_node_with_script(name) do
+    Node
+    |> Repo.get_by(name: name)
+    |> Repo.preload(:script)
+  end
+
   @doc """
   Creates a node.
 
