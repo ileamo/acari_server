@@ -73,7 +73,7 @@ defmodule AcariServer.Master do
   defp get_assigns(tun_name, params, peer_params, config_params) do
     peer_params
     |> Enum.map(fn {k, v} -> {"peer_" <> k, v} end)
-    |> Enum.concat(Map.to_list(Map.merge(config_params, params)))
+    |> Enum.concat(Map.to_list(Map.merge(config_params || %{}, params)))
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> List.insert_at(0, {:id, tun_name})
     |> Enum.into(%{})
