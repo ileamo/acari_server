@@ -8,7 +8,7 @@ defmodule AcariServer.Listener do
   def run(_arg) do
     {:ok, l} =
       :ssl.listen(
-        7000,
+        Application.get_env(:acari_server, AcariServer.Listener)[:port],
         certfile: Application.get_env(:acari_server, AcariServer.Listener)[:certfile],
         keyfile: Application.get_env(:acari_server, AcariServer.Listener)[:keyfile],
         reuseaddr: true,

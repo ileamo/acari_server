@@ -2,7 +2,7 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
-  @test_tuns_num 16
+  @test_tuns_num 20
   @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
 
   defmodule State do

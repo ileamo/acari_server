@@ -75,5 +75,6 @@ config :acari_server, AcariServer.Repo,
   pool_size: 10
 
 config :acari_server, AcariServer.Listener,
+  port: 7000,
   keyfile: "priv/cert/selfsigned_key.pem",
   certfile: "priv/cert/selfsigned.pem"

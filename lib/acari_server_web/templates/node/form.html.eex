@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <%= if @node.script do %>
+  <%= if assigns[:node] && @node.script do %>
     <% vars = AcariServer.Template.get_vars(@node.script.definition) %>
 
     <%= if map_size(vars) != 0 do %>
