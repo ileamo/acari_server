@@ -1,6 +1,7 @@
 defmodule AcariServer.Master do
   use GenServer
   require Logger
+  require Acari.Const, as: Const
 
   defmodule State do
     defstruct [
@@ -47,22 +48,34 @@ defmodule AcariServer.Master do
   end
 
   defp exec_local_script(tun_name, params, peer_params) do
-    with %{script: %{local: templ}} <- AcariServer.NodeManager.get_node_with_script(tun_name),
-         assigns <-
-           peer_params
-           |> Enum.map(fn {k, v} -> {"peer_" <> k, v} end)
-           |> Enum.concat(Map.to_list(params))
-           |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
-           |> List.insert_at(0, {:id, tun_name})
-           |> Enum.into(%{}),
+    with %{params: config_params, script: %{local: templ}} <-
+           AcariServer.NodeManager.get_node_with_script(tun_name),
+         assigns <- get_assigns(tun_name, params, peer_params, config_params),
          {script, nil} <- AcariServer.Template.eval(templ, assigns) do
       Acari.exec_sh(script)
     else
-      res -> Logger.error("Can't exec local script: #{inspect(res)}")
+      res -> Logger.error("Can't parse local script: #{inspect(res)}")
     end
   end
 
   defp exec_remote_script(tun_name, params, peer_params) do
-    IO.inspect({tun_name, params, peer_params}, label: "EXEC_REMOTE_SCRIPT")
+    with %{params: config_params, script: %{remote: templ}} <-
+           IO.inspect(AcariServer.NodeManager.get_node_with_script(tun_name)),
+         assigns <- get_assigns(tun_name, params, peer_params, config_params),
+         {script, nil} <- AcariServer.Template.eval(templ, assigns),
+         {:ok, json} <- Jason.encode(%{method: "exec_sh", params: %{script: script}}) do
+      Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
+    else
+      res -> Logger.error("Can't parse remote script: #{inspect(res)}")
+    end
+  end
+
+  defp get_assigns(tun_name, params, peer_params, config_params) do
+    peer_params
+    |> Enum.map(fn {k, v} -> {"peer_" <> k, v} end)
+    |> Enum.concat(Map.to_list(Map.merge(config_params, params)))
+    |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+    |> List.insert_at(0, {:id, tun_name})
+    |> Enum.into(%{})
   end
 end

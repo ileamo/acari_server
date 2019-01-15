@@ -13,7 +13,10 @@ defmodule Acari do
 
   def exec_sh(script, env \\ []) do
     Task.start(fn ->
-      case System.cmd("sh", ["-c", script], stderr_to_stdout: true, env: env) do
+      case System.cmd("sh", ["-c", script |> String.replace("\r\n", "\n")],
+             stderr_to_stdout: true,
+             env: env
+           ) do
         {data, 0} -> data
         {err, code} -> Logger.warn("Script `#{script}` exits with code #{code}, output: #{err}")
       end
