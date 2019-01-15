@@ -1,7 +1,7 @@
 defmodule Acari do
   require Logger
 
-  defdelegate start_tun(name, pid \\ nil), to: Acari.TunsSup
+  defdelegate start_tun(name, pid \\ nil, request \\ %{}), to: Acari.TunsSup
   defdelegate stop_tun(name), to: Acari.TunsSup
   defdelegate tun_exist?(name), to: Acari.TunsSup
   defdelegate add_link(tun_name, link_name, connector), to: Acari.TunMan

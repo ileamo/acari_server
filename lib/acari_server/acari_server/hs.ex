@@ -87,7 +87,7 @@ defmodule AcariServer.Hs do
             {:error, :not_configured}
 
           _ ->
-            case Acari.start_tun(id, AcariServer.Master) do
+            case Acari.start_tun(id, AcariServer.Master, request["params"]) do
               :ok -> :ok
               {:error, {:already_started, _}} -> :ok
             end

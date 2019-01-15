@@ -2,7 +2,7 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
-  @test_tuns_num 20
+  @test_tuns_num 1
   @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
 
   defmodule State do
@@ -19,20 +19,25 @@ defmodule AcariClient.TunCreator do
   ## Callbacks
   @impl true
   def init(_params) do
+    :ets.new(:cl_tuns, [:set, :protected, :named_table])
+
     for i <- 1..@test_tuns_num do
       :ok = Acari.start_tun(cl_name(i), self())
     end
 
-    Task.start_link(__MODULE__, :test, [])
+    # TEST CYCLE
+    # Task.start_link(__MODULE__, :test, [])
 
     {:ok, %State{}}
   end
 
   @impl true
-  def handle_cast({:tun_started, {tun_name, ifname}}, state) do
+  def handle_cast({:tun_started, %{tun_name: tun_name, ifname: ifname}}, state) do
     Logger.debug("Acari client receive :tun_started from #{tun_name}:#{ifname}")
+    :ets.insert(:cl_tuns, {tun_name, ifname})
+
     restart_tunnel(tun_name)
-    {:noreply, %State{state | tun_name: tun_name, ifname: ifname}}
+    {:noreply, state}
   end
 
   def handle_cast({:peer_started, _}, state) do
@@ -74,7 +79,11 @@ defmodule AcariClient.TunCreator do
 
   defp start_sslink(tun, link) do
     {:ok, request} =
-      Jason.encode(%{id: "NSG1700_1812000#{tun |> String.slice(-3, 3)}", link: link})
+      Jason.encode(%{
+        id: "NSG1700_1812000#{tun |> String.slice(-3, 3)}",
+        link: link,
+        params: %{ifname: get_ifname(tun)}
+      })
 
     {:ok, _pid} =
       Acari.add_link(tun, link, fn
@@ -90,6 +99,11 @@ defmodule AcariClient.TunCreator do
         :restart ->
           true
       end)
+  end
+
+  defp get_ifname(tun) do
+    [{_, ifname}] = :ets.lookup(:cl_tuns, tun)
+    ifname
   end
 
   defp connect(%{host: host, port: port} = params, request) do
