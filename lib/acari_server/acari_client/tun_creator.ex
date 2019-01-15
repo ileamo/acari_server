@@ -79,7 +79,13 @@ defmodule AcariClient.TunCreator do
     {:ok, _pid} =
       Acari.add_link(tun, link, fn
         :connect ->
-          connect(%{host: "localhost", port: 7000}, request)
+          connect(
+            %{
+              host: "localhost",
+              port: Application.get_env(:acari_server, AcariServer.Listener)[:port]
+            },
+            request
+          )
 
         :restart ->
           true
