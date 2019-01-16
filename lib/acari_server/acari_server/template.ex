@@ -23,7 +23,6 @@ defmodule AcariServer.Template do
     #     json <- (String.match?(json, ~r/^{.*}$/) && json) || "{" <> json <> "}",
     with {:ok, %{"test" => test_ass} = dfns} <- Jason.decode(json) do
       get_only_value(dfns["var"] || %{})
-      |> Map.merge(dfns["const"] || %{})
       |> Map.merge(test_ass)
       |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
       |> Enum.into(%{})

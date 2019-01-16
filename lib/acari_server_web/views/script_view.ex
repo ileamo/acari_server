@@ -4,7 +4,6 @@ defmodule AcariServerWeb.ScriptView do
   def dfn_placeholder() do
     """
     {   "var": {},
-        "const": {},
         "test": {}
     }
     """
