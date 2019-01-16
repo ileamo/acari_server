@@ -49,10 +49,10 @@
           <%= label f, k, k, class: "col-sm-2 col-form-label" %>
           <% value = @node.params && @node.params[k] %>
           <% opts = [class: "form-control", onfocus: "this.style.color='#000'"] ++
-          (value && [value: value] || [value: Enum.at(v, 0) || "", style: "color: #AAA"]) %>
+          (value && [value: value] || [value: is_binary(v) && v || Enum.at(v, 0), style: "color: #AAA"]) %>
 
           <div class="col-sm-10">
-            <%= if length(v) <= 1 do %>
+            <%= if is_binary(v) do %>
             <%= text_input :params, k, opts %>
             <% else %>
             <%= select :params, k, v, opts %>

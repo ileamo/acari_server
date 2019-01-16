@@ -54,28 +54,32 @@ defmodule AcariServer.Template do
 
   defp normalize_vars(var) do
     var
-    |> Enum.map(&normalize_var/1)
+    |> Enum.map(&check_var/1)
     |> Enum.reject(fn x -> x == nil end)
     |> Enum.into(%{})
   end
 
-  defp normalize_var({k, v}) when not is_list(v) do
-    normalize_var({k, [v]})
+  defp check_var({k, v})
+       when is_binary(k) and (is_binary(v) or is_number(v) or is_boolean(v)) do
+    {k, v}
   end
 
-  defp normalize_var({k, v}) when is_binary(k) and is_list(v) do
+  defp check_var({k, v}) when is_binary(k) and is_list(v) do
     case Enum.all?(v, fn x -> is_binary(x) || is_number(x) || is_boolean(x) end) do
       true -> {k, v}
       _ -> nil
     end
   end
 
-  defp normalize_var(_), do: nil
+  defp check_var(_), do: nil
 
   defp get_only_value(var) do
     var
     |> normalize_vars()
-    |> Enum.map(fn {k, [v | _]} -> {k, v} end)
+    |> Enum.map(fn
+      {k, [v | _]} -> {k, v}
+      {k, v} -> {k, v}
+    end)
     |> Enum.into(%{})
   end
 end
