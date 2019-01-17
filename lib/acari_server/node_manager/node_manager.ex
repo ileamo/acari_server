@@ -23,6 +23,11 @@ defmodule AcariServer.NodeManager do
     |> Repo.preload(:script)
   end
 
+  def list_nodes_wo_preload do
+    Node
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single node.
 

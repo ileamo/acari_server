@@ -3,6 +3,9 @@
     <%= link "Панель", to: Routes.page_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
+    <%= link "Туннели", to: Routes.tunnel_path(@conn, :index), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
     <a class="nav-link" href="#">
       Графики
     </a>
