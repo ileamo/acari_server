@@ -32,7 +32,7 @@ defmodule Acari.LinkEventAgent do
     )
   end
 
-  def event(:open, tun, link) when binary_part(tun, 0, 2) != "cl" do
+  def event(:open, tun, link, _num) when binary_part(tun, 0, 2) != "cl" do
     remove(tun, link)
     broadcast_link_event()
   end

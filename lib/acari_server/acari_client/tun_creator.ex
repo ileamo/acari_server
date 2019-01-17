@@ -2,7 +2,7 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
-  @test_tuns_num 20
+  @test_tuns_num 2
   @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
 
   defmodule State do
@@ -26,7 +26,7 @@ defmodule AcariClient.TunCreator do
     end
 
     # TEST CYCLE
-    Task.start_link(__MODULE__, :test, [])
+    # Task.start_link(__MODULE__, :test, [])
 
     {:ok, %State{}}
   end

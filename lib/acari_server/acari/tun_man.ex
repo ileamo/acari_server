@@ -67,7 +67,7 @@ defmodule Acari.TunMan do
         %State{sslinks: sslinks, iface_pid: iface_pid} = state
       ) do
     true = :ets.update_element(sslinks, name, {3, pid})
-    Acari.LinkEventAgent.event(:open, state.tun_name, name)
+    sslink_opened(state, name, :ets.info(sslinks, :size))
 
     case state.current_link do
       {nil, _} ->
@@ -163,7 +163,7 @@ defmodule Acari.TunMan do
   end
 
   def handle_call(:get_all_links, _from, %State{sslinks: sslinks} = state) do
-    res = :ets.match_object(sslinks, {:_, :_, :_, :_})
+    res = :ets.match(sslinks, {:"$1", :_, :_, :"$2"})
     {:reply, res, state}
   end
 
@@ -204,7 +204,8 @@ defmodule Acari.TunMan do
           nil
       end
 
-    Acari.LinkEventAgent.event(:close, state.tun_name, name, :ets.info(sslinks, :size))
+    sslink_closed(state, name, :ets.info(sslinks, :size))
+
     {:noreply, update_best_link(state)}
   end
 
@@ -349,6 +350,16 @@ defmodule Acari.TunMan do
 
   defp mk_ifaddr(com, _ifaddr) do
     com
+  end
+
+  defp sslink_opened(state, name, num) do
+    Acari.LinkEventAgent.event(:open, state.tun_name, name, num)
+    GenServer.cast(state.master_pid, {:sslink_opened, state.tun_name, name, num})
+  end
+
+  defp sslink_closed(state, name, num) do
+    Acari.LinkEventAgent.event(:close, state.tun_name, name, num)
+    GenServer.cast(state.master_pid, {:sslink_closed, state.tun_name, name, num})
   end
 
   # Client
