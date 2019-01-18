@@ -1,13 +1,18 @@
 defmodule AcariServerWeb.TunnelView do
   use AcariServerWeb, :view
 
-  def get_tunnel_list() do
+  def list_groups() do
+    AcariServer.GroupManager.list_groups()
+    |> Enum.sort_by(fn %{name: name} -> name end)
+  end
+
+  def get_tunnel_list(nodes) do
     tuns =
       :ets.tab2list(:tuns)
       |> Enum.map(fn {name, _, _, state} -> {name, state} end)
       |> Enum.into(%{})
 
-    AcariServer.NodeManager.list_nodes_wo_preload()
+    nodes
     |> Enum.map(fn %{name: n, description: d} -> %{name: n, description: d} end)
     |> Enum.map(fn %{name: name} = m -> Map.merge(m, get_sslinks(tuns[name])) end)
     |> Enum.map(fn

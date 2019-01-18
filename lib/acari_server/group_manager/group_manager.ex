@@ -21,6 +21,12 @@ defmodule AcariServer.GroupManager do
     Repo.all(Group)
   end
 
+  def group_name_id_pairs_list() do
+    list_groups()
+    |> Enum.map(fn %{name: name, id: id} -> {name, id} end)
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
   @doc """
   Gets a single group.
 

@@ -38,7 +38,10 @@ defmodule AcariServerWeb.Router do
     pipe_through [:browser, :auth, :ensure_auth]
 
     get "/", PageController, :index
+
     get "/tunnels", TunnelController, :index
+    get "/tunnels/:id", TunnelController, :show
+
     resources "/users", UserController
     resources "/groups", GroupController
     resources "/nodes", NodeController

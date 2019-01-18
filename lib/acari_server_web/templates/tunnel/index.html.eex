@@ -1,5 +1,36 @@
-<h1> Туннели </h1>
+<nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
 
+    <div class="navbar p-0">
+      <%= link "Туннели", to: Routes.tunnel_path(@conn, :index), class: "navbar-brand pr-5" %>
+      <span class="navbar-brand">Группа "<%= @group_name %>"</span>
+    </div>
+    <div class="navbar">
+
+      <ul class="navbar-nav mr-auto pr-3">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Группы
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <%= link "Все", to: Routes.tunnel_path(@conn, :index), class: "dropdown-item" %>
+            <div class="dropdown-divider"></div>
+            <% groups = list_groups() %>
+            <%= for %{name: name} = group <- groups do %>
+              <%= link name, to: Routes.tunnel_path(@conn, :show, group), class: "dropdown-item" %>
+            <% end %>
+          </div>
+        </li>
+      </ul>
+      <button type="button" class = "btn btn-outline-primary btn-sm">
+        <%= if assigns[:group_id] do %>
+          <%= link "Обновить", to: Routes.tunnel_path(@conn, :show, @group_id), class: "navbar-text py-0" %>
+        <% else %>
+        <%= link "Обновить", to: Routes.tunnel_path(@conn, :index), class: "navbar-text py-0" %>
+        <% end %>
+      </button>
+    </div>
+</nav>
+<hr/ class = "mt-0 mb-4">
 <table id="datatable" class="table display table-striped table-bordered table-sm">
   <thead>
     <tr>
@@ -12,7 +43,7 @@
     </tr>
   </thead>
   <tbody>
-<%= for tunnel <- get_tunnel_list() do %>
+<%= for tunnel <- get_tunnel_list(@nodes) do %>
 <% al = case tunnel[:alert] do
         1 -> "table-danger"
         2 -> "table-warning"
