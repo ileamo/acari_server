@@ -1,5 +1,5 @@
 <h1>Список Пользователей</h1>
-<table id="datatable" class="table display table-striped table-bordered table-sm">
+<table id="datatable" class="table display table-striped table-bordered table-sm" data-page-length="25">
   <thead>
     <tr>
       <th scope="col">Имя</th>
