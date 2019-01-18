@@ -4,13 +4,13 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>AcariServer · Phoenix Framework</title>
+    <title>Acari Server</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
   </head>
 
 
   <body>
-    <nav class="navbar navbar-expand navbar-dark flex-sm-nowrap p-0 shadow justify-content-between"
+    <nav class="navbar navbar-expand navbar-dark flex-sm-nowrap p-0 justify-content-between"
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
       <div class="navbar-nav px-3 d-flex flex-wrap">
