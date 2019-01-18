@@ -32,8 +32,9 @@ $.extend($.fn.dataTable.defaults, {
 //    $('#datatable').DataTable();
 //} );
 
-$("#datatable").DataTable({
-  stateSave: true
+var table = $("#datatable").DataTable({
+  stateSave: true,
+  responsive: true
 });
 
 
