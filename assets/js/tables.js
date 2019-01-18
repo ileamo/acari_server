@@ -32,13 +32,8 @@ $.extend($.fn.dataTable.defaults, {
 //    $('#datatable').DataTable();
 //} );
 
-$("#datatable").DataTable();
-
-
-$("#datatableJ").DataTable({
-  "order": [
-    [0, "desc"]
-  ]
+$("#datatable").DataTable({
+  stateSave: true
 });
 
 
