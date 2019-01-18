@@ -20,7 +20,7 @@ defmodule AcariServerWeb.NodeController do
         AcariServer.NewNodeDiscovery.delete_new_node_by_name(node.name)
 
         conn
-        |> put_flash(:info, "Node created successfully.")
+        |> put_flash(:info, "Узел успешно создан.")
         |> redirect(to: Routes.node_path(conn, :show, node))
 
       {:error, %Ecto.Changeset{} = changeset} ->

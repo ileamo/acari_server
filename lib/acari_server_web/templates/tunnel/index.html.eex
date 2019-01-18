@@ -34,11 +34,11 @@
 <table id="datatable" class="table display table-striped table-bordered table-sm" data-page-length="25">
   <thead>
     <tr>
-      <th scope="col"></th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Link UP</th>
       <th scope="col">Link DOWN</th>
+      <th scope="col"></th>
 
     </tr>
   </thead>
@@ -50,11 +50,11 @@
         _ -> ""
       end%>
     <tr class="<%=al%>">
-      <td><%= tunnel[:alert] %></td>
       <td><%= tunnel[:name] %></td>
       <td><%= tunnel[:description] %></td>
       <td><%= tunnel[:links_up] %></td>
       <td><%= tunnel[:links_down] %></td>
+      <td><%= tunnel[:alert] %></td>
 
     </tr>
 <% end %>

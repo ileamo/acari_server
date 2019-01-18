@@ -18,7 +18,7 @@ defmodule AcariServerWeb.ScriptController do
     case ScriptManager.create_script(script_params) do
       {:ok, script} ->
         conn
-        |> put_flash(:info, "Script created successfully.")
+        |> put_flash(:info, "Скрипт успешно создан.")
         |> redirect(to: Routes.script_path(conn, :show, script))
 
       {:error, %Ecto.Changeset{} = changeset} ->

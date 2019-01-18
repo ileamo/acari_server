@@ -18,7 +18,7 @@ defmodule AcariServerWeb.NewNodeController do
     case NewNodeDiscovery.create_new_node(new_node_params) do
       {:ok, new_node} ->
         conn
-        |> put_flash(:info, "New node created successfully.")
+        |> put_flash(:info, "Новый узел успешно создан.")
         |> redirect(to: Routes.new_node_path(conn, :show, new_node))
 
       {:error, %Ecto.Changeset{} = changeset} ->
