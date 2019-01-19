@@ -2,7 +2,7 @@ defmodule Acari.LinkEventAgent do
   use Agent
   alias AcariServerWeb.Endpoint
 
-  @max_items 50
+  @max_items 8192
 
   def start_link(_) do
     Agent.start_link(fn -> [] end, name: __MODULE__)
