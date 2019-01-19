@@ -1,7 +1,10 @@
 <%
 {bad_nodes, _} = Acari.LinkEventAgent.get_failures()
 nodes_num = :ets.info :tuns, :size
-percent = (nodes_num - bad_nodes) * 100 / nodes_num |> Float.round(1)
+percent = case nodes_num do
+  0 -> 0
+  _ -> (nodes_num - bad_nodes) * 100 / nodes_num |> Float.round(1)
+end
 %>
 
 
