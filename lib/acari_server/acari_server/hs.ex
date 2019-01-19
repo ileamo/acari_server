@@ -81,17 +81,25 @@ defmodule AcariServer.Hs do
         :ok
 
       false ->
-        case AcariServer.NodeManager.get_node_by_name(id) do
-          nil ->
-            new_node(request, ipaddr)
-            {:error, :not_configured}
+        if Application.get_env(:acari_server, AcariServer)[:allow_unconfigured] do
+          start_tun(id, request["params"])
+        else
+          case AcariServer.NodeManager.get_node_by_name(id) do
+            nil ->
+              new_node(request, ipaddr)
+              {:error, :not_configured}
 
-          _ ->
-            case Acari.start_tun(id, AcariServer.Master, request["params"]) do
-              :ok -> :ok
-              {:error, {:already_started, _}} -> :ok
-            end
+            _ ->
+              start_tun(id, request["params"])
+          end
         end
+    end
+  end
+
+  defp start_tun(id, params) do
+    case Acari.start_tun(id, AcariServer.Master, params) do
+      :ok -> :ok
+      {:error, {:already_started, _}} -> :ok
     end
   end
 

@@ -74,6 +74,8 @@ config :acari_server, AcariServer.Repo,
   hostname: "localhost",
   pool_size: 10
 
+config :acari_server, AcariServer, allow_unconfigured: true
+
 config :acari_server, AcariServer.Listener,
   port: 7000,
   keyfile: "priv/cert/selfsigned_key.pem",
