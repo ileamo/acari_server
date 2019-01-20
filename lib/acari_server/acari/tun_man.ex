@@ -94,6 +94,7 @@ defmodule Acari.TunMan do
         {:set_sslink_params, name, params},
         %State{sslinks: sslinks} = state
       ) do
+    # TODO if no element
     elem = :ets.lookup_element(sslinks, name, 4)
     true = :ets.update_element(sslinks, name, {4, elem |> Map.merge(params)})
 

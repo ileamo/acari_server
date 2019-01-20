@@ -2,7 +2,7 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
-  @test_tuns_num 102
+  @test_tuns_num 999
   @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
 
   defmodule State do
@@ -36,7 +36,7 @@ defmodule AcariClient.TunCreator do
     # end)
 
     # TEST CYCLE
-    Task.start(__MODULE__, :test, [])
+    Task.start(__MODULE__, :test, [60 * 1000])
 
     {:noreply, %State{}}
   end
@@ -145,6 +145,11 @@ defmodule AcariClient.TunCreator do
   end
 
   # TEST
+  def test(tmo) do
+    Process.sleep(tmo)
+    test()
+  end
+
   def test() do
     Process.sleep(Enum.random(5..10) * 1000)
     tun_name = cl_name(Enum.random(1..@test_tuns_num))
@@ -177,6 +182,7 @@ defmodule AcariClient.TunCreator do
   end
 
   def stop_start_link(tun_name, link_name) do
+    # TODO if no tun__name
     case Acari.del_link(tun_name, link_name) do
       :ok ->
         Process.sleep(Enum.random(20..120) * 1000)
