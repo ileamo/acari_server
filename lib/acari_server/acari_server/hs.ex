@@ -15,8 +15,13 @@ defmodule AcariServer.Hs do
 
   @impl true
   def handle_continue(:init, sock) do
-    {:ok, sslsock} = :ssl.handshake(sock)
-    {:noreply, %{sslsocket: sslsock}}
+    case :ssl.handshake(sock) do
+      {:ok, sslsock} ->
+        {:noreply, %{sslsocket: sslsock}}
+
+      {:error, :closed} ->
+        {:stop, :shutdown, %{}}
+    end
   end
 
   @impl true

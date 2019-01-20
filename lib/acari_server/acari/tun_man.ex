@@ -366,7 +366,7 @@ defmodule Acari.TunMan do
   def add_link(tun_name, link_name, connector) do
     case Registry.lookup(Registry.TunMan, tun_name) do
       [{pid, _}] ->
-        GenServer.call(pid, {:add_link, link_name, connector})
+        GenServer.call(pid, {:add_link, link_name, connector}, 60 * 1000)
 
       _ ->
         Logger.error("Add link: No such tunnel: #{tun_name}")

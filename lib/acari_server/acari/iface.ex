@@ -115,7 +115,7 @@ defmodule Acari.Iface do
   end
 
   def get_if_info(iface_pid) do
-    GenServer.call(iface_pid, :get_if_info)
+    GenServer.call(iface_pid, :get_if_info, 60 * 1000)
   end
 
   defp if_up(ifname), do: if_set_admstate(ifname, "up")
