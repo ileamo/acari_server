@@ -74,7 +74,7 @@ config :acari_server, AcariServer.Repo,
   hostname: "localhost",
   pool_size: 10
 
-config :acari_server, AcariServer, allow_unconfigured: true
+config :acari_server, AcariServer, allow_unconfigured: false
 
 config :acari_server, AcariServer.Listener,
   port: 7000,

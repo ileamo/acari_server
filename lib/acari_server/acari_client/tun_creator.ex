@@ -2,7 +2,7 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
-  @test_tuns_num 2
+  @test_tuns_num 102
   @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
 
   defmodule State do
@@ -18,17 +18,27 @@ defmodule AcariClient.TunCreator do
 
   ## Callbacks
   @impl true
-  def init(_params) do
+  def init(params) do
+    {:ok, params, {:continue, :init}}
+  end
+
+  @impl true
+  def handle_continue(:init, _params) do
     :ets.new(:cl_tuns, [:set, :protected, :named_table])
 
+    master_pid = self()
+
+    # Task.start(fn ->
     for i <- 1..@test_tuns_num do
-      :ok = Acari.start_tun(cl_name(i), self())
+      :ok = Acari.start_tun(cl_name(i), master_pid)
     end
 
-    # TEST CYCLE
-    # Task.start_link(__MODULE__, :test, [])
+    # end)
 
-    {:ok, %State{}}
+    # TEST CYCLE
+    Task.start(__MODULE__, :test, [])
+
+    {:noreply, %State{}}
   end
 
   @impl true
