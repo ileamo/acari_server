@@ -56,10 +56,12 @@
 
 
 $('#collapseMesages').on('hide.bs.collapse', function () {
+  document.getElementById("mainPage").classList.remove('col-lg-9');
   sessionStorage.showMessages = 'hide'
 })
 
 $('#collapseMesages').on('show.bs.collapse', function () {
+  document.getElementById("mainPage").classList.add('col-lg-9');
   sessionStorage.showMessages = 'show'
 })
 
