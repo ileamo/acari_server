@@ -12,7 +12,10 @@
     <%= @script.description %>
   </li>
 
-  <% {test_ass, error} = AcariServer.Template.test_assigns(@script.definition) %>
+  <% {var, error} = AcariServer.Template.get_json(@script.definition)
+     {tst, tst_error} = AcariServer.Template.get_json(@script.test)
+      test_ass = AcariServer.Template.test_assigns(var, tst)
+  %>
 
   <li>
     <strong>Определения:</strong>
@@ -31,6 +34,11 @@
   <% {remote, remote_error} = test_ass && AcariServer.Template.eval(@script.remote, test_ass) || {nil, nil}%>
 
   <li>
+    <strong>Префикс:</strong>
+    <pre class="border rounded bg-white p-2 <%= local_error && "mb-0" || "" %>"><code><%= @script.prefix %></code></pre>
+  </li>
+
+  <li>
     <strong>Локальный:</strong>
     <pre class="border rounded bg-white p-2 <%= local_error && "mb-0" || "" %>"><code><%= @script.local %></code></pre>
     <%= if local_error do %>
@@ -44,6 +52,17 @@
     <%= if remote_error do %>
       <p class = "text-danger"><%= remote_error %><p>
     <% end %>
+  </li>
+
+  <li>
+    <strong>Значения для тестирования:</strong>
+      <%= if tst_error do %>
+        <% {head, char, tail} = AcariServer.Template.highlight_char(@script.test, tst_error.position) %>
+        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"> <%= char %> </span><%= tail %></code></pre>
+        <p class = "text-danger">Ошибка декодирования JSON<p>
+      <% else %>
+        <pre class="border rounded bg-white pl-2 p-2"><code><%= @script.test %></code></pre>
+      <% end %>
   </li>
 
   <li>

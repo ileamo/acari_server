@@ -16,23 +16,14 @@ defmodule AcariServer.Template do
     end
   end
 
-  def test_assigns(nil), do: {nil, nil}
+  def test_assigns(var, tst) when not (is_map(var) and is_map(tst)), do: nil
 
-  def test_assigns(json) do
-    # with json <- String.trim(json),
-    #     json <- (String.match?(json, ~r/^{.*}$/) && json) || "{" <> json <> "}",
-    with {:ok, %{"test" => test_ass} = dfns} <- Jason.decode(json) do
-      get_only_value(dfns["var"] || %{})
-      |> Map.merge(test_ass)
-      |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
-      |> Enum.into(%{})
-      |> (fn m -> {m, nil} end).()
-    else
-      # if decode :ok but no test key
-      {:ok, _} -> {nil, nil}
-      {:error, mes} -> {nil, mes}
-      res -> {nil, inspect(res)}
-    end
+  def test_assigns(var, tst) do
+    var
+    |> Map.merge(tst)
+    |> get_only_value()
+    |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
+    |> Enum.into(%{})
   end
 
   def highlight_char(text, n) do
@@ -42,11 +33,20 @@ defmodule AcariServer.Template do
     {head, char, tail}
   end
 
+  def get_json(nil), do: {%{}, nil}
+
+  def get_json(json) do
+    case Jason.decode(json) do
+      {:ok, %{} = var} -> {var, nil}
+      {:error, err} -> {nil, err}
+    end
+  end
+
   def get_vars(nil), do: %{}
 
   def get_vars(json) do
     case Jason.decode(json) do
-      {:ok, %{"var" => var}} -> normalize_vars(var)
+      {:ok, %{} = var} -> normalize_vars(var)
       _ -> %{}
     end
   end

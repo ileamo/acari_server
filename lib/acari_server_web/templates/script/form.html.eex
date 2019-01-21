@@ -25,21 +25,34 @@
 
   <div class="form-group">
     <%= label f, "Определения", class: "control-label" %>
-    <%= textarea f, :definition, class: "form-control text-monospace", rows: "5", placeholder: dfn_placeholder %>
+    <%= textarea f, :definition, class: "form-control text-monospace", rows: "3", placeholder: dfn_placeholder %>
     <%= error_tag f, :definition %>
   </div>
 
   <div class="form-group">
+    <%= label f, "Префикс", class: "control-label" %>
+    <%= textarea f, :prefix, class: "form-control text-monospace", rows: "6" %>
+    <%= error_tag f, :local %>
+  </div>
+
+  <div class="form-group">
     <%= label f, "Локальный скрипт", class: "control-label" %>
-    <%= textarea f, :local, class: "form-control text-monospace", rows: "12" %>
+    <%= textarea f, :local, class: "form-control text-monospace", rows: "6" %>
     <%= error_tag f, :local %>
   </div>
 
   <div class="form-group">
     <%= label f, "Удаленный скрипт", class: "control-label" %>
-    <%= textarea f, :remote, class: "form-control text-monospace", rows: "12" %>
+    <%= textarea f, :remote, class: "form-control text-monospace", rows: "6" %>
     <%= error_tag f, :remote %>
   </div>
+
+  <div class="form-group">
+    <%= label f, "Значения для тестирования", class: "control-label" %>
+    <%= textarea f, :test, class: "form-control text-monospace", rows: "2"%>
+    <%= error_tag f, :test %>
+  </div>
+
 
   <div>
     <%= submit "Сохранить" %>
