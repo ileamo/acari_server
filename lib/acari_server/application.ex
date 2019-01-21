@@ -16,6 +16,7 @@ defmodule AcariServer.Application do
       # {AcariServer.Worker, arg},
       Acari.Sup,
       AcariServer.Sup,
+      {Task.Supervisor, name: AcariClient.TaskSup},
       AcariClient.TunCreator
     ]
 

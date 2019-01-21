@@ -2,7 +2,7 @@ defmodule AcariClient.TunCreator do
   use GenServer
   require Logger
 
-  @test_tuns_num 999
+  @test_tuns_num 25
   @links ["BEELINE", "MEGAFON", "MTS", "TELE2"]
 
   defmodule State do
@@ -36,7 +36,7 @@ defmodule AcariClient.TunCreator do
     # end)
 
     # TEST CYCLE
-    Task.start(__MODULE__, :test, [60 * 1000])
+    Task.Supervisor.start_child(AcariClient.TaskSup, __MODULE__, :test, [], restart: :permanent)
 
     {:noreply, %State{}}
   end
@@ -51,6 +51,14 @@ defmodule AcariClient.TunCreator do
   end
 
   def handle_cast({:peer_started, _}, state) do
+    {:noreply, state}
+  end
+
+  def handle_cast({:sslink_opened, _tun_name, _sslink_name, _num}, state) do
+    {:noreply, state}
+  end
+
+  def handle_cast({:sslink_closed, _tun_name, _sslink_name, _num}, state) do
     {:noreply, state}
   end
 
@@ -90,7 +98,7 @@ defmodule AcariClient.TunCreator do
   defp start_sslink(tun, link) do
     {:ok, request} =
       Jason.encode(%{
-        id: "NSG1700_1812000#{tun |> String.slice(-3, 3)}",
+        id: "NSG1700_1812#{tun |> String.slice(-6, 6)}",
         link: link,
         params: %{ifname: get_ifname(tun)}
       })
@@ -130,7 +138,7 @@ defmodule AcariClient.TunCreator do
   end
 
   defp cl_name(i) do
-    "cl_#{:io_lib.format("~3..0B", [i])}"
+    "cl_#{:io_lib.format("~6..0B", [i])}"
   end
 
   @impl true
@@ -145,13 +153,8 @@ defmodule AcariClient.TunCreator do
   end
 
   # TEST
-  def test(tmo) do
-    Process.sleep(tmo)
-    test()
-  end
-
   def test() do
-    Process.sleep(Enum.random(5..10) * 1000)
+    Process.sleep(Enum.random(1..20) * 1000)
     tun_name = cl_name(Enum.random(1..@test_tuns_num))
 
     case Enum.random(0..9) do

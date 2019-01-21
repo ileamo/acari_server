@@ -31,7 +31,7 @@
     </div>
 </nav>
 <hr/ class = "mt-0 mb-4">
-<table id="datatable" class="table display table-striped table-bordered table-sm" data-page-length="25">
+<table id="datatable" class="table display table-striped table-bordered table-sm">
   <thead>
     <tr>
       <th scope="col">Имя</th>
