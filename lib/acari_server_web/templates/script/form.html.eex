@@ -25,7 +25,7 @@
 
   <div class="form-group">
     <%= label f, "Определения", class: "control-label" %>
-    <%= textarea f, :definition, class: "form-control text-monospace", rows: "3", placeholder: dfn_placeholder %>
+    <%= textarea f, :definition, class: "form-control text-monospace", rows: "3" %>
     <%= error_tag f, :definition %>
   </div>
 

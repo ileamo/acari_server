@@ -104,7 +104,8 @@ defmodule AcariServer.Master do
     with [{_, params, peer_params, _}] <- :ets.lookup(:tuns, tun_name),
          %{params: config_params, script: %{} = script} <-
            AcariServer.NodeManager.get_node_with_script(tun_name),
-         templ when is_binary(templ) <- Map.get(script, templ_id),
+         templ when is_binary(templ) <-
+           AcariServer.Template.get_script_with_prefix(script, templ_id),
          assigns <- get_assigns(tun_name, params, peer_params, config_params),
          {script, nil} <- AcariServer.Template.eval(templ, assigns) do
       {:ok, script}

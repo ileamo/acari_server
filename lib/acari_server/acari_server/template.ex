@@ -51,6 +51,13 @@ defmodule AcariServer.Template do
     end
   end
 
+  def get_script_with_prefix(script, templ) do
+    case Map.get(script, templ) do
+      scr when is_binary(scr) -> (script.prefix || "") <> scr
+      _ -> ""
+    end
+  end
+
   defp normalize_vars(var) do
     var
     |> Enum.map(&check_var/1)

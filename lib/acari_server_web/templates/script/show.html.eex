@@ -30,17 +30,14 @@
 
   </li>
 
-  <% {local, local_error} = test_ass && AcariServer.Template.eval(@script.local, test_ass) || {nil, nil}%>
-  <% {remote, remote_error} = test_ass && AcariServer.Template.eval(@script.remote, test_ass) || {nil, nil}%>
-
-  <li>
-    <strong>Префикс:</strong>
-    <pre class="border rounded bg-white p-2 <%= local_error && "mb-0" || "" %>"><code><%= @script.prefix %></code></pre>
-  </li>
+  <% {local, local_error} = test_ass && eval_script(:local, @script, test_ass) || {nil, nil}%>
+  <% {remote, remote_error} = test_ass && eval_script(:remote, @script, test_ass) || {nil, nil}%>
 
   <li>
     <strong>Локальный:</strong>
-    <pre class="border rounded bg-white p-2 <%= local_error && "mb-0" || "" %>"><code><%= @script.local %></code></pre>
+    <pre class="border rounded bg-white p-2 <%= local_error && "mb-0" || "" %>"><code><%=
+      get_script_with_prefix(@script, :local)
+    %></code></pre>
     <%= if local_error do %>
       <p class = "text-danger"><%= local_error %><p>
     <% end %>
@@ -48,7 +45,9 @@
 
   <li>
     <strong>Удаленный:</strong>
-    <pre class="border rounded bg-white p-2 <%= remote_error && "mb-0" || "" %>"><code><%= @script.remote %></code></pre>
+    <pre class="border rounded bg-white p-2 <%= remote_error && "mb-0" || "" %>"><code><%=
+       get_script_with_prefix(@script, :remote)
+    %></code></pre>
     <%= if remote_error do %>
       <p class = "text-danger"><%= remote_error %><p>
     <% end %>
