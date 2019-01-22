@@ -31,4 +31,7 @@ import "datatables.net";
 import dt from 'datatables.net-bs4';
 dt(window, $);
 
+//import dtfc from "datatables.net-fixedcolumns";
+//dtfc( window, $ );
+
 import "./tables.js";

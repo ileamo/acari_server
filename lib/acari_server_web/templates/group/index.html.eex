@@ -1,6 +1,6 @@
 <h1>Список Групп</h1>
 
-<table id="datatable" class="table display table-striped table-bordered table-sm">
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
       <th scope="col">Имя</th>
