@@ -1,0 +1,23 @@
+<h1>Show Template</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @template.name %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @template.description %>
+  </li>
+
+  <li>
+    <strong>Template:</strong>
+    <%= @template.template %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.template_path(@conn, :edit, @template) %></span>
+<span><%= link "Back", to: Routes.template_path(@conn, :index) %></span>
