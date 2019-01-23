@@ -27,10 +27,7 @@ defmodule AcariServerWeb.NodeView do
   defdelegate group_name_id_pairs_list(), to: AcariServer.GroupManager
 
   def script_name_id_pairs_list() do
-    AcariServer.ScriptManager.list_scripts()
-    |> Enum.map(fn %{name: name, id: id} -> {name, id} end)
-    |> Enum.sort_by(&elem(&1, 0))
-    |> List.insert_at(0, {@no_script, nil})
+    AcariServer.ScriptManager.script_name_id_pairs_list(@no_script)
   end
 
   def param_list(nil), do: ""

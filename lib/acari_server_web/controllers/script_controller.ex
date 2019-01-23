@@ -18,7 +18,7 @@ defmodule AcariServerWeb.ScriptController do
     case ScriptManager.create_script(script_params) do
       {:ok, script} ->
         conn
-        |> put_flash(:info, "Скрипт успешно создан.")
+        |> put_flash(:info, "Скрипт создан.")
         |> redirect(to: Routes.script_path(conn, :show, script))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -43,7 +43,7 @@ defmodule AcariServerWeb.ScriptController do
     case ScriptManager.update_script(script, script_params) do
       {:ok, script} ->
         conn
-        |> put_flash(:info, "Script updated successfully.")
+        |> put_flash(:info, "Скрипт отредактирован.")
         |> redirect(to: Routes.script_path(conn, :show, script))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -56,7 +56,7 @@ defmodule AcariServerWeb.ScriptController do
     {:ok, _script} = ScriptManager.delete_script(script)
 
     conn
-    |> put_flash(:info, "Script deleted successfully.")
+    |> put_flash(:info, "Скрипт удален.")
     |> redirect(to: Routes.script_path(conn, :index))
   end
 end

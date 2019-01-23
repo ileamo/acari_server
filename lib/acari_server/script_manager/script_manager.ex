@@ -21,6 +21,13 @@ defmodule AcariServer.ScriptManager do
     Repo.all(Script)
   end
 
+  def script_name_id_pairs_list(no_script) do
+    list_scripts()
+    |> Enum.map(fn %{name: name, id: id} -> {name, id} end)
+    |> Enum.sort_by(&elem(&1, 0))
+    |> List.insert_at(0, {no_script, nil})
+  end
+
   @doc """
   Gets a single script.
 

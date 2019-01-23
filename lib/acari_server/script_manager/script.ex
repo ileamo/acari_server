@@ -12,6 +12,7 @@ defmodule AcariServer.ScriptManager.Script do
     field :test, :string
 
     has_many :nodes, AcariServer.NodeManager.Node
+    has_many :templates, AcariServer.TemplateManager.Template
 
     timestamps()
   end

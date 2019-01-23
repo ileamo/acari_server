@@ -18,7 +18,7 @@ defmodule AcariServerWeb.TemplateController do
     case TemplateManager.create_template(template_params) do
       {:ok, template} ->
         conn
-        |> put_flash(:info, "Template created successfully.")
+        |> put_flash(:info, "Шаблон создан.")
         |> redirect(to: Routes.template_path(conn, :show, template))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -43,7 +43,7 @@ defmodule AcariServerWeb.TemplateController do
     case TemplateManager.update_template(template, template_params) do
       {:ok, template} ->
         conn
-        |> put_flash(:info, "Template updated successfully.")
+        |> put_flash(:info, "Шаблон отредактирован.")
         |> redirect(to: Routes.template_path(conn, :show, template))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -56,7 +56,7 @@ defmodule AcariServerWeb.TemplateController do
     {:ok, _template} = TemplateManager.delete_template(template)
 
     conn
-    |> put_flash(:info, "Template deleted successfully.")
+    |> put_flash(:info, "Шаблон удален.")
     |> redirect(to: Routes.template_path(conn, :index))
   end
 end

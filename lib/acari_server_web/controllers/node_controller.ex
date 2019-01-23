@@ -20,7 +20,7 @@ defmodule AcariServerWeb.NodeController do
         AcariServer.NewNodeDiscovery.delete_new_node_by_name(node.name)
 
         conn
-        |> put_flash(:info, "Узел успешно создан.")
+        |> put_flash(:info, "Узел создан.")
         |> redirect(to: Routes.node_path(conn, :show, node))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -47,7 +47,7 @@ defmodule AcariServerWeb.NodeController do
     case NodeManager.update_node(node, node_params) do
       {:ok, node} ->
         conn
-        |> put_flash(:info, "Node updated successfully.")
+        |> put_flash(:info, "Узел отредактирован.")
         |> redirect(to: Routes.node_path(conn, :show, node))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -60,7 +60,7 @@ defmodule AcariServerWeb.NodeController do
     {:ok, _node} = NodeManager.delete_node(node)
 
     conn
-    |> put_flash(:info, "Node deleted successfully.")
+    |> put_flash(:info, "Узел удален.")
     |> redirect(to: Routes.node_path(conn, :index))
   end
 end

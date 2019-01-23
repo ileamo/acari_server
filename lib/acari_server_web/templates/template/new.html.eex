@@ -1,5 +1,5 @@
-<h1>New Template</h1>
+<h2>Новый Шаблон</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.template_path(@conn, :create)) %>
 
-<span><%= link "Back", to: Routes.template_path(@conn, :index) %></span>
+<span><%= link "Назад", to: Routes.template_path(@conn, :index) %></span>

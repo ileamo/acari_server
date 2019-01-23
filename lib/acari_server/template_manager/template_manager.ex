@@ -35,7 +35,10 @@ defmodule AcariServer.TemplateManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_template!(id), do: Repo.get!(Template, id)
+  def get_template!(id) do
+    Repo.get!(Template, id)
+    |> Repo.preload(:script)
+  end
 
   @doc """
   Creates a template.

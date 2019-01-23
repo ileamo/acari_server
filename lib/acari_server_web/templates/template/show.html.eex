@@ -1,4 +1,4 @@
-<h1>Show Template</h1>
+<h2>Шаблон</h2>
 
 <ul>
 
@@ -13,11 +13,27 @@
   </li>
 
   <li>
-    <strong>Template:</strong>
-    <%= @template.template %>
+    <strong>Скрипт:</strong>
+    <%= script_name(@template) %>
   </li>
 
+  <li>
+    <strong>Template:</strong>
+    <pre class="border rounded bg-white p-2 <%# local_error && "mb-0" || "" %>"><code><%=
+      @template.template
+    %></code></pre>
+  </li>
+
+  <li>
+    <strong>Создан:</strong>
+    <%= AcariServer.db_time_to_local(@template.inserted_at) %>
+  </li>
+
+  <li>
+    <strong>Обновлен:</strong>
+    <%= AcariServer.db_time_to_local(@template.updated_at) %>
+  </li>
 </ul>
 
-<span><%= link "Edit", to: Routes.template_path(@conn, :edit, @template) %></span>
-<span><%= link "Back", to: Routes.template_path(@conn, :index) %></span>
+<span><%= link "Редактировать", to: Routes.template_path(@conn, :edit, @template) %></span>
+<span><%= link "Назад", to: Routes.template_path(@conn, :index) %></span>

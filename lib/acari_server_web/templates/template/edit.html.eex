@@ -1,5 +1,5 @@
-<h1>Edit Template</h1>
+<h2>Редактировать Шаблон</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.template_path(@conn, :update, @template)) %>
 
-<span><%= link "Back", to: Routes.template_path(@conn, :index) %></span>
+<span><%= link "Назад", to: Routes.template_path(@conn, :index) %></span>
