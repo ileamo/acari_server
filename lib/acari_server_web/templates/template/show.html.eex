@@ -1,14 +1,16 @@
 <h2>Шаблон</h2>
+<span><%= link "Редактировать", to: Routes.template_path(@conn, :edit, @template) %></span>
+<span><%= link "Назад", to: Routes.template_path(@conn, :index) %></span>
 
 <ul>
 
   <li>
-    <strong>Name:</strong>
+    <strong>Имя:</strong>
     <%= @template.name %>
   </li>
 
   <li>
-    <strong>Description:</strong>
+    <strong>Описание:</strong>
     <%= @template.description %>
   </li>
 
@@ -17,10 +19,24 @@
     <%= script_name(@template) %>
   </li>
 
+  <% {template, template_error} = with %{} = script <- @template.script,
+          {var, nil} <- AcariServer.Template.get_json(script.definition),
+          {tst, nil} <- AcariServer.Template.get_json(script.test),
+          test_ass = %{} <- AcariServer.Template.test_assigns(var, tst) do
+        test_ass && eval_template(script.prefix, @template.template, test_ass) || {nil, nil}
+      else
+        _ -> {nil, nil}
+      end
+
+  %>
+
   <li>
-    <strong>Template:</strong>
-    <pre class="border rounded bg-white p-2 <%# local_error && "mb-0" || "" %>"><code><%=
-      @template.template
+    <strong>Шаблон:</strong>
+    <%= if template_error do %>
+      <p class = "text-danger mt-2"><%= template_error %><p>
+    <% end %>
+    <pre class="border rounded bg-white p-2"><code><%=
+      (@template.script && @template.script.prefix || "")<>@template.template
     %></code></pre>
   </li>
 
@@ -35,5 +51,12 @@
   </li>
 </ul>
 
-<span><%= link "Редактировать", to: Routes.template_path(@conn, :edit, @template) %></span>
-<span><%= link "Назад", to: Routes.template_path(@conn, :index) %></span>
+<%= if template do %>
+<h3 class = "mt-3"> Результат тестирования </h3>
+<ul>
+    <li>
+      <strong>Параметры для тестирования взяты из скрипта <%=@template.script.name%></strong>
+      <pre class="border rounded bg-white p-2"><code><%= template %></code></pre>
+    </li>
+</ul>
+<% end %>

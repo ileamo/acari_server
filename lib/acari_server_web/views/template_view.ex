@@ -12,4 +12,9 @@ defmodule AcariServerWeb.TemplateView do
       scr -> scr.name
     end
   end
+
+  def eval_template(prefix, templ, test_ass) do
+    templ = (prefix || "") <> templ
+    AcariServer.Template.eval(templ, test_ass)
+  end
 end
