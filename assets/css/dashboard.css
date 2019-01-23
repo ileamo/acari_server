@@ -1,10 +1,10 @@
 .alert:empty { display: none; }
 
-/*
+
 body {
-  font-size: .875rem;
+  overflow-y: overlay;
 }
-*/
+
 /*
 $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 */
