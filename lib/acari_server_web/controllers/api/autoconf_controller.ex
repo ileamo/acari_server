@@ -73,18 +73,31 @@ defmodule AcariServerWeb.Api.AutoconfController do
 
   """
 
-  def index(conn = %{assigns: %{configuration: conf}, params: %{"id" => id}}, _) do
+  def index(conn = %{assigns: %{configuration: conf}}, _) do
     request_log(conn, "OK")
-    render(conn, "result.json", %{id: id, result: %{configuration: conf}})
+    send_sh_file(conn, conf)
+    # render(conn, "result.json", %{id: id, result: %{configuration: conf}})
   end
 
   def index(conn = %{params: %{"id" => id}}, _) do
     render_and_log_error(conn, id, "No configuration")
   end
 
-  defp render_and_log_error(conn, id, mes) do
+  defp send_sh_file(conn, content) do
+    conn
+    |> put_resp_content_type("application/x-sh")
+    |> put_resp_header(
+      "content-disposition",
+      "attachment; filename=\"setup.sh\""
+    )
+    |> send_resp(200, content)
+  end
+
+  defp render_and_log_error(conn, _id, mes) do
     request_log(conn, "ERR: #{mes}")
-    render(conn, "error.json", %{id: id, error: mes})
+    send_sh_file(conn, "echo #{inspect(mes)}")
+
+    # render(conn, "error.json", %{id: id, error: mes})
   end
 
   #  defp request_log(%{remote_ip: ip, params: %{"params" => params}}, mes) do
