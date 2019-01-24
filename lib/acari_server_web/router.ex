@@ -31,6 +31,7 @@ defmodule AcariServerWeb.Router do
     get "/login", SessionController, :new
     post "/login", SessionController, :login
     post "/logout", SessionController, :logout
+    get "/test", PageController, :test
   end
 
   # Definitely logged in scope

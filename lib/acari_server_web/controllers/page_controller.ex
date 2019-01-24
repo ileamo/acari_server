@@ -9,4 +9,14 @@ defmodule AcariServerWeb.PageController do
     user = Guardian.Plug.current_resource(conn)
     render(conn, "secret.html", current_user: user)
   end
+
+  def test(conn, _params) do
+    conn
+    |> put_resp_content_type("application/x-sh")
+    |> put_resp_header(
+      "content-disposition",
+      "attachment; filename=\"setup.sh\""
+    )
+    |> send_resp(200, "echo OK\n")
+  end
 end
