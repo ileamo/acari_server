@@ -25,6 +25,10 @@ defmodule AcariServerWeb.Router do
     plug Guardian.Plug.EnsureAuthenticated
   end
 
+  pipeline :api do
+    plug(:accepts, ["json"])
+  end
+
   scope "/", AcariServerWeb do
     pipe_through [:browser, :auth]
 
@@ -53,8 +57,8 @@ defmodule AcariServerWeb.Router do
     get "/secret", PageController, :secret
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", AcariServerWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", AcariServerWeb.Api, as: :api do
+    pipe_through(:api)
+    post("/", AutoconfController, :index)
+  end
 end
