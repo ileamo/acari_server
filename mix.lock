@@ -32,5 +32,6 @@
   "procket": {:git, "git://github.com/msantos/procket.git", "fd2c23f07e6950f3019bfafa28d15e66b310f402", [branch: "master"]},
   "ranch": {:hex, :ranch, "1.7.1", "6b1fab51b49196860b733a49c07604465a47bdb78aa10c1c16a3d199f7f8c881", [:rebar3], [], "hexpm"},
   "telemetry": {:hex, :telemetry, "0.2.0", "5b40caa3efe4deb30fb12d7cd8ed4f556f6d6bd15c374c2366772161311ce377", [:mix], [], "hexpm"},
+  "temp": {:hex, :temp, "0.4.7", "2c78482cc2294020a4bc0c95950b907ff386523367d4e63308a252feffbea9f2", [:mix], [], "hexpm"},
   "tunctl": {:git, "https://github.com/msantos/tunctl.git", "8e8eb631ece264d3ca16334d45ffa5c72ce9dcda", []},
 }
