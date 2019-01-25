@@ -40,6 +40,11 @@ defmodule AcariServer.TemplateManager do
     |> Repo.preload(:script)
   end
 
+  def get_template_by_name(name) do
+    Template
+    |> Repo.get_by(name: name)
+  end
+
   @doc """
   Creates a template.
 

@@ -15,6 +15,7 @@ defmodule AcariServer.Application do
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},
       Acari.Sup,
+      AcariServer.TemplateAgent,
       AcariServer.Sup,
       {Task.Supervisor, name: AcariClient.TaskSup},
       AcariClient.TunCreator

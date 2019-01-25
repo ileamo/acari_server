@@ -36,15 +36,15 @@ defmodule AcariServerWeb.Api.AutoconfController do
            params: %{
              "id" => id,
              "method" => "get.conf",
-             "params" => %{"id" => node_name}
+             "params" => %{"id" => node_name} = params
            }
          },
          _
        ) do
     case AcariServer.NodeManager.get_node_with_script(node_name) do
-      %{} = _node ->
+      %{} = node ->
         conn
-        |> assign(:configuration, "# Содержимое саморазархивируещегося скрипта")
+        |> assign(:configuration, AcariServer.SFX.create_sfx(:remote, node, params) |> inspect)
 
       _ ->
         conn
