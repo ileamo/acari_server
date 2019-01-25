@@ -44,7 +44,7 @@ defmodule AcariServerWeb.Api.AutoconfController do
     case AcariServer.NodeManager.get_node_with_script(node_name) do
       %{} = node ->
         conn
-        |> assign(:configuration, AcariServer.SFX.create_sfx(:remote, node, params) |> inspect)
+        |> assign(:sfx, AcariServer.SFX.create_sfx(:remote, node, params))
 
       _ ->
         conn
@@ -73,10 +73,10 @@ defmodule AcariServerWeb.Api.AutoconfController do
 
   """
 
-  def index(conn = %{assigns: %{configuration: conf}}, _) do
+  def index(conn = %{assigns: %{sfx: conf}}, _) do
     request_log(conn, "OK")
     send_sh_file(conn, conf)
-    # render(conn, "result.json", %{id: id, result: %{configuration: conf}})
+    # render(conn, "result.json", %{id: id, result: %{sfx: conf}})
   end
 
   def index(conn = %{params: %{"id" => id}}, _) do
