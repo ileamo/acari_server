@@ -12,7 +12,6 @@ import css from "../css/app.scss"
 import "phoenix_html"
 import "jquery/dist/jquery"
 import "popper.js"
-
 import "bootstrap/dist/js/bootstrap"
 
 import "chart.js"

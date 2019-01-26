@@ -59,19 +59,30 @@
                     <ul class="list-group p-0" id="event-log">
                       <%= render "messages.html", assigns %>
                     </ul>
-
             </div>
           </div>
         </div>
-
-
       </div>
     </div>
 
-
-
+    <!-- Modal -->
+    <div class="modal fade" id="About" tabindex="-1" role="dialog" aria-labelledby="AboutTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="AboutTitle">КЛЕЩ</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Группа сетевые системы - NSG</p>
+            <p>Версия 0.0.1</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
-
 </html>

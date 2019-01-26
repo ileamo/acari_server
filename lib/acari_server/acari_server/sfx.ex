@@ -10,7 +10,7 @@ defmodule AcariServer.SFX do
            prefix <- script.prefix || "",
            assigns <-
              req_params
-             |> Map.merge(config_params)
+             |> Map.merge(config_params || %{})
              |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end),
            :ok <- TemplateAgent.init_templ_map(self(), assigns, prefix),
            :ok <- TemplateAgent.add_templ(self(), @setup),
