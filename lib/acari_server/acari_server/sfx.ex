@@ -31,6 +31,7 @@ defmodule AcariServer.SFX do
   defp create_setup(text) do
     """
     #!/bin/sh
+    #ERROR
     #
     # #{text}
     #
@@ -53,30 +54,36 @@ defmodule AcariServer.SFX do
   end
 
   def do_makeself(templ_map) do
-    IO.inspect(templ_map)
-    {:ok, dir_path} = Temp.mkdir("acari")
+    with {:ok, dir_path} <- Temp.mkdir("acari"),
+         :ok <-
+           templ_map
+           |> Enum.each(fn
+             {file_name, content} when is_binary(file_name) ->
+               File.write(Path.join(dir_path, file_name), content |> String.replace("\r\n", "\n"))
 
-    templ_map
-    |> Enum.each(fn
-      {file_name, content} when is_binary(file_name) ->
-        File.write(Path.join(dir_path, file_name), content |> String.replace("\r\n", "\n"))
-
-      _ ->
-        nil
-    end)
-
-    File.chmod(Path.join(dir_path, @setup), 0o755)
-
-    {:ok, sfx_filename} = Temp.path()
-
-    System.cmd(System.cwd() <> "/priv/usr/makeself.sh", [
-      dir_path,
-      sfx_filename,
-      "acari",
-      "./" <> @setup
-    ])
-
-    {:ok, content} = File.read(sfx_filename)
-    content
+             _ ->
+               nil
+           end),
+         :ok <- File.chmod(Path.join(dir_path, @setup), 0o755),
+         {:ok, sfx_filename} <- Temp.path(),
+         makeself_sh = System.cwd() <> "/priv/usr/makeself.sh",
+         :ok <-
+           if(File.exists?(makeself_sh), do: :ok, else: {:error, "No such file #{makeself_sh}"}),
+         {_, 0} <-
+           System.cmd(
+             makeself_sh,
+             [
+               dir_path,
+               sfx_filename,
+               "acari",
+               "./" <> @setup
+             ],
+             stderr_to_stdout: true
+           ),
+         {:ok, content} <- File.read(sfx_filename) do
+      content
+    else
+      res -> create_setup("Ошибка при создании SFX: #{inspect(res)}")
+    end
   end
 end
