@@ -2,10 +2,14 @@ import {
   Terminal
 } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
+import socket from './socket'
 
 Terminal.applyAddon(fit);
 
-var term = new Terminal();
+let channel = socket.channel("terminal:1", {})
+channel.join()
+channel.on('output', ({output}) => term.write(output)) // From the Channel
+
+let term = new Terminal();
 term.open(document.getElementById('terminal'));
-term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
-term.on('data', (data) => console.log(data))
+term.on('data', (data) => channel.push('input', {input: data})) // To the Channel
