@@ -1,10 +1,10 @@
 import {
   Terminal
 } from 'xterm';
-import * as fit from 'xterm/lib/addons/fit/fit';
+//import * as fit from 'xterm/lib/addons/fit/fit';
 import socket from './socket'
 
-Terminal.applyAddon(fit);
+//Terminal.applyAddon(fit);
 
 let channel = socket.channel("terminal:1", {})
 channel.join()
@@ -13,10 +13,12 @@ channel.on('output', ({
 }) => term.write(output)) // From the Channel
 
 let term = new Terminal({
+  cols: 80,
+  rows: 25,
   theme: {
     background: '#073642',
     //background: '#002B36',
-    foreground: 'eee8d5',
+    foreground: '#d2d2d2',
     black: '#222222',
     brightBlack: '#454545',
     red: '#9E5641',
@@ -40,6 +42,8 @@ let term = new Terminal({
   }
 });
 term.open(document.getElementById('terminal'));
+//term.fit();
+
 term.on('data', (data) => channel.push('input', {
   input: data
 })) // To the Channel
