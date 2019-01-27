@@ -15,27 +15,27 @@ channel.on('output', ({
 let term = new Terminal({
   theme: {
     background: '#073642',
-    foreground: '#eee8d5'
+    //background: '#002B36',
+    foreground: 'eee8d5',
+    black: '#222222',
+    brightBlack: '#454545',
+    red: '#9E5641',
+    brightRed: '#CC896D',
+    green: '#6C7E55',
+    brightGreen: '#C4DF90',
+    yellow: '#CAAF2B',
+    brightYellow: '#FFE080',
+    blue: '#7FB8D8',
+    brightBlue: '#B8DDEA',
+    magenta: '#956D9D',
+    brightMagenta: '#C18FCB',
+    cyan: '#4c8ea1',
+    brightCyan: '#6bc1d0',
+    white: '#808080',
+    brightWhite: '#cdcdcd',
+    cursor: '#eee8d5'
     /*
-            background: '#000',
-            cursor: '#ffffff',
             selection: 'rgba(255, 255, 255, 0.3)',
-            black: '#000000',
-            red: '#e06c75',
-            brightRed: '#e06c75',
-            green: '#A4EFA1',
-            brightGreen: '#A4EFA1',
-            brightYellow: '#EDDC96',
-            yellow: '#EDDC96',
-            magenta: '#e39ef7',
-            brightMagenta: '#e39ef7',
-            cyan: '#5fcbd8',
-            brightBlue: '#5fcbd8',
-            brightCyan: '#5fcbd8',
-            blue: '#5fcbd8',
-            white: '#d0d0d0',
-            brightBlack: '#808080',
-            brightWhite: '#ffffff'
     */
   }
 });
