@@ -34,3 +34,5 @@ dt(window, $);
 //dtfc( window, $ );
 
 import "./tables.js";
+
+import "./xterm.js"
