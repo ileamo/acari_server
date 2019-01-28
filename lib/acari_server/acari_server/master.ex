@@ -2,6 +2,8 @@ defmodule AcariServer.Master do
   use GenServer
   require Logger
   require Acari.Const, as: Const
+  alias AcariServerWeb.Endpoint
+
 
   defmodule State do
     defstruct [
@@ -52,11 +54,13 @@ defmodule AcariServer.Master do
 
   def handle_cast({:sslink_opened, tun_name, sslink_name, _num}, state) do
     set_sslink_up(tun_name, sslink_name, true)
+    broadcast_link_event()
     {:noreply, state}
   end
 
   def handle_cast({:sslink_closed, tun_name, sslink_name, _num}, state) do
     set_sslink_up(tun_name, sslink_name, false)
+    broadcast_link_event()
     {:noreply, state}
   end
 
@@ -133,4 +137,21 @@ defmodule AcariServer.Master do
   def get_tuns_state() do
     :ets.tab2list(:tuns)
   end
+
+    defp broadcast_link_event() do
+    mes_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", [])
+
+    statistics_html =
+      Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
+
+    progress_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "progress.html", [])
+
+    Endpoint.broadcast!("room:lobby", "link_event", %{
+      num_of_mes: Acari.LinkEventAgent.get_length(),
+      messages: mes_html,
+      statistics: statistics_html,
+      progress: progress_html
+    })
+  end
+
 end

@@ -1,6 +1,5 @@
 defmodule Acari.LinkEventAgent do
   use Agent
-  alias AcariServerWeb.Endpoint
 
   @max_items 8192
 
@@ -34,7 +33,6 @@ defmodule Acari.LinkEventAgent do
 
   def event(:open, tun, link, _num) when binary_part(tun, 0, 2) != "cl" do
     remove(tun, link)
-    broadcast_link_event()
   end
 
   def event(:close, tun, link, num) when binary_part(tun, 0, 2) != "cl" do
@@ -45,7 +43,6 @@ defmodule Acari.LinkEventAgent do
       put({tun, nil, timestamp})
     end
 
-    broadcast_link_event()
   end
 
   def event(_, _, _, _ \\ nil) do
@@ -76,19 +73,4 @@ defmodule Acari.LinkEventAgent do
     :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s])
   end
 
-  defp broadcast_link_event() do
-    mes_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", [])
-
-    statistics_html =
-      Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
-
-    progress_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "progress.html", [])
-
-    Endpoint.broadcast!("room:lobby", "link_event", %{
-      num_of_mes: get_length(),
-      messages: mes_html,
-      statistics: statistics_html,
-      progress: progress_html
-    })
-  end
 end
