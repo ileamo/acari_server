@@ -1,4 +1,4 @@
-<h1>Список Узлов</h1>
+<h2>Список Узлов</h2>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
@@ -25,6 +25,7 @@
 
       <td>
         <%= link "Редактировать", to: Routes.node_path(@conn, :edit, node) %>
+        |
         <%= link "Удалить", to: Routes.node_path(@conn, :delete, node), method: :delete, data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>

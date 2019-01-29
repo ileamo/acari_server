@@ -31,4 +31,5 @@
 </ul>
 
 <span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node) %></span>
+|
 <span><%= link "Назад", to: Routes.node_path(@conn, :index) %></span>

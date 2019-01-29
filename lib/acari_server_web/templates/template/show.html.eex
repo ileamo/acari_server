@@ -50,6 +50,7 @@
 </ul>
 
 <span><%= link "Редактировать", to: Routes.template_path(@conn, :edit, @template) %></span>
+|
 <span><%= link "Назад", to: Routes.template_path(@conn, :index) %></span>
 
 <%= if template do %>

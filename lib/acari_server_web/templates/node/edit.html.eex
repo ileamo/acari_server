@@ -1,4 +1,4 @@
-<h1>Редактировать Узел</h1>
+<h2>Редактировать Узел</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.node_path(@conn, :update, @node)) %>
 

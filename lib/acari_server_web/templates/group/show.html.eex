@@ -1,4 +1,4 @@
-<h1>Параметры Группы</h1>
+<h2>Параметры Группы</h2>
 
 <ul>
 
@@ -20,4 +20,5 @@
 </ul>
 
 <span><%= link "Редактироать", to: Routes.group_path(@conn, :edit, @group) %></span>
+|
 <span><%= link "Назад", to: Routes.group_path(@conn, :index) %></span>

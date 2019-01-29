@@ -76,6 +76,7 @@
 </ul>
 
 <span><%= link "Редактировать", to: Routes.script_path(@conn, :edit, @script) %></span>
+|
 <span><%= link "Назад", to: Routes.script_path(@conn, :index) %></span>
 
 
