@@ -1,4 +1,4 @@
-<h1>Список Пользователей</h1>
+<h2>Список Пользователей</h2>
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
@@ -18,6 +18,7 @@
 
       <td>
         <%= link "Редактировать", to: Routes.user_path(@conn, :edit, user) %>
+        |
         <%= link "Удалить", to: Routes.user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"] %>
       </td>
     </tr>

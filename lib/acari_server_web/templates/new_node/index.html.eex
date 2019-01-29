@@ -22,7 +22,8 @@
       <td><%= new_node.source %></td>
 
       <td>
-        <%= link "Новый узел", to: Routes.new_node_path(@conn, :edit, new_node) %>
+        <%= link "Зарегистрировать", to: Routes.new_node_path(@conn, :edit, new_node) %>
+        |
         <%= link "Удалить", to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>

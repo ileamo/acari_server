@@ -24,7 +24,9 @@ defmodule AcariServerWeb.NewNodeController do
         {:error, message} -> {nil, message}
       end
 
-    render(conn, "show.html", new_node: new_node, params: params, res: res)
+    conn
+    |> put_layout("qr_layout.html")
+    |> render("show.html", new_node: new_node, params: params, res: res)
   end
 
   defp get_env(%{"text" => text}) when is_binary(text) do
