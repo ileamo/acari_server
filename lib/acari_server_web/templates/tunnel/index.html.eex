@@ -16,14 +16,14 @@
             <div class="dropdown-divider"></div>
             <% groups = list_groups() %>
             <%= for %{name: name} = group <- groups do %>
-              <%= link name, to: Routes.tunnel_path(@conn, :show, group), class: "dropdown-item" %>
+              <%= link name, to: Routes.tunnel_path(@conn, :grp, group), class: "dropdown-item" %>
             <% end %>
           </div>
         </li>
       </ul>
       <button type="button" class = "btn btn-outline-primary btn-sm">
         <%= if assigns[:group_id] do %>
-          <%= link "Обновить", to: Routes.tunnel_path(@conn, :show, @group_id), class: "navbar-text py-0" %>
+          <%= link "Обновить", to: Routes.tunnel_path(@conn, :grp, @group_id), class: "navbar-text py-0" %>
         <% else %>
         <%= link "Обновить", to: Routes.tunnel_path(@conn, :index), class: "navbar-text py-0" %>
         <% end %>
@@ -51,7 +51,9 @@
       end%>
     <tr class="<%=al%>">
       <td><%= tunnel[:alert] %></td>
-      <td><%= tunnel[:name] %></td>
+      <td>
+        <%= link tunnel[:name], to: Routes.tunnel_path(@conn, :show, tunnel[:name]) %>
+      </td>
       <td><%= tunnel[:description] %></td>
       <td><%= tunnel[:links_up] %></td>
       <td><%= tunnel[:links_down] %></td>

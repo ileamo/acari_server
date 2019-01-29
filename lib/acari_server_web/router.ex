@@ -25,10 +25,6 @@ defmodule AcariServerWeb.Router do
     plug Guardian.Plug.EnsureAuthenticated
   end
 
-  pipeline :api do
-    plug(:accepts, ["json"])
-  end
-
   scope "/", AcariServerWeb do
     pipe_through [:browser, :auth]
 
@@ -45,7 +41,8 @@ defmodule AcariServerWeb.Router do
     get "/", PageController, :index
 
     get "/tunnels", TunnelController, :index
-    get "/tunnels/:id", TunnelController, :show
+    get "/tunnels/:id", TunnelController, :grp
+    get "/tunnel/:name", TunnelController, :show
 
     resources "/users", UserController
     resources "/groups", GroupController
