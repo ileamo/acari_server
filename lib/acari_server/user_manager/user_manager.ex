@@ -114,6 +114,9 @@ defmodule AcariServer.UserManager do
         Bcrypt.dummy_checkpw()
         {:error, :invalid_credentials}
 
+      %{password_hash: nil} ->
+        {:error, :invalid_credentials}
+
       user ->
         if Bcrypt.checkpw(plain_text_password, user.password_hash) do
           {:ok, user}

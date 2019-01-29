@@ -8,6 +8,7 @@ defmodule AcariServer.UserManager.User do
     field :password_hash, :string
     field :username, :string
     field :password, :string, virtual: true
+    field :rpt_psw, :string, virtual: true
 
     timestamps()
   end
@@ -15,13 +16,25 @@ defmodule AcariServer.UserManager.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :password, :is_admin])
-    |> validate_required([:username, :password, :is_admin])
+    |> cast(attrs, [:username, :password, :rpt_psw, :is_admin])
+    |> validate_required([:username])
     |> validate_length(:username, min: 3, max: 32)
     |> validate_length(:password, min: 5, max: 32)
     |> unique_constraint(:username)
+    |> validate_rpt_psw()
     |> put_password_hash()
   end
+
+  defp validate_rpt_psw(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
+    rpt_psw = get_field(changeset, :rpt_psw)
+
+    case password == rpt_psw do
+      true -> changeset
+      _ -> add_error(changeset, :rpt_psw, "Пароли не совпадают")
+    end
+  end
+
+  defp validate_rpt_psw(changeset), do: changeset
 
   defp put_password_hash(
          %Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset
