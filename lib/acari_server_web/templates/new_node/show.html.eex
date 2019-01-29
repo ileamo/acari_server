@@ -1,5 +1,44 @@
-<h1>Обнаруженный узел</h1>
 
+<h2>Регистрация нового узла</h2>
+<%= if assigns[:params] do %>
+<h4> Параметры запроса: </h4>
+  <ul>
+
+
+    <%= for {k, v} <- @params do %>
+    <li>
+      <strong><%= k %>:</strong>
+      <%= v %>
+    </li>
+    <% end %>
+
+  </ul>
+<% end %>
+
+
+<%= if assigns[:res] do %>
+  <h4> <%= @res %> </h4>
+<% end %>
+
+
+<%= if assigns[:env] do %>
+  <ul>
+    <%= for {k, v} <- @env do %>
+    <li>
+      <strong><%= k %>:</strong>
+      <%= v %>
+    </li>
+    <% end %>
+  </ul>
+<% end %>
+
+
+
+
+
+
+
+<%= if assigns[:new_node] do %>
 <ul>
 
   <li>
@@ -13,8 +52,8 @@
   </li>
 
   <li>
-    <strong>Шаблон:</strong>
-    <%= @new_node.template %>
+    <strong>Источник обнаружения:</strong>
+    <%= @new_node.source %>
   </li>
 
   <li>
@@ -34,5 +73,8 @@
 
 </ul>
 
-<span><%= link "Новый узел", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
-<span><%= link "Назад", to: Routes.new_node_path(@conn, :index) %></span>
+<span><%= link "Зарегистрировать", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
+|
+<span><%= link "К списку обнаруженных", to: Routes.new_node_path(@conn, :index) %></span>
+
+<% end %>

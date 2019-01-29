@@ -6,7 +6,7 @@ defmodule AcariServer.NewNodeDiscovery.NewNode do
     field :ip_addr, :string
     field :name, :string
     field :params, :map
-    field :template, :string
+    field :source, :string
 
     timestamps()
   end
@@ -14,7 +14,7 @@ defmodule AcariServer.NewNodeDiscovery.NewNode do
   @doc false
   def changeset(new_node, attrs) do
     new_node
-    |> cast(attrs, [:name, :ip_addr, :template, :params])
+    |> cast(attrs, [:name, :ip_addr, :source, :params])
     |> validate_required([:name])
     |> unique_constraint(:name)
   end

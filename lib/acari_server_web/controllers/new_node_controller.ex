@@ -1,17 +1,52 @@
 defmodule AcariServerWeb.NewNodeController do
   use AcariServerWeb, :controller
-
   alias AcariServer.NewNodeDiscovery
-  alias AcariServer.NewNodeDiscovery.NewNode
 
   def index(conn, _params) do
     newnodes = NewNodeDiscovery.list_newnodes()
     render(conn, "index.html", newnodes: newnodes)
   end
 
-  def new(conn, _params) do
-    changeset = NewNodeDiscovery.change_new_node(%NewNode{})
-    render(conn, "new.html", changeset: changeset)
+  def new(conn, params) do
+    {new_node, res} =
+      with {:ok, env = %{id: id}} <- get_env(params),
+           :ok <- new_dev?(id),
+           {:ok, nn} <-
+             AcariServer.NewNodeDiscovery.insert_or_update_new_node(%{
+               name: id,
+               ip_addr: conn.remote_ip |> :inet.ntoa() |> to_string(),
+               params: env,
+               source: "QR"
+             }) do
+        {nn, "Узел добавлен в таблицу обнаруженных:"}
+      else
+        {:error, %{errors: err}} -> {nil, "Ошибка БД: #{inspect(err)}"}
+        {:error, message} -> {nil, message}
+      end
+
+    render(conn, "show.html", new_node: new_node, params: params, res: res)
+  end
+
+  defp get_env(%{"text" => text}) when is_binary(text) do
+    ~r/([^\s=,;]+)\s*=\s*([^\s=,;]+)/
+    |> Regex.scan(text)
+    |> Enum.map(fn [_, k, v] -> {k, v} end)
+    |> Enum.into(%{})
+    |> find_id()
+  end
+
+  defp get_env(_), do: {:error, "Содержимое QR кода должно быть передано в параметре text"}
+
+  defp find_id(parms = %{"id" => id}), do: {:ok, parms |> Map.put(:id, id)}
+
+  defp find_id(parms = %{"dev" => dev, "sn" => sn}),
+    do: {:ok, parms |> Map.put(:id, "#{dev}_#{sn}")}
+
+  defp find_id(_), do: {:error, "Не удалось найти значение идентификатора"}
+
+  defp new_dev?(id) do
+    (AcariServer.NodeManager.get_node_by_name(id) && {:error, "Устройство уже зарегистрировано"}) ||
+      :ok
   end
 
   def create(conn, %{"new_node" => new_node_params}) do
@@ -35,7 +70,7 @@ defmodule AcariServerWeb.NewNodeController do
     new_node = NewNodeDiscovery.get_new_node!(id)
 
     redirect(conn,
-      to: Routes.node_path(conn, :new, name: new_node.name, template: new_node.template)
+      to: Routes.node_path(conn, :new, name: new_node.name)
     )
   end
 

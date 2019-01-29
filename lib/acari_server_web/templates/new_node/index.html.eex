@@ -6,7 +6,7 @@
       <th scope="col">Дата</th>
       <th scope="col">Идентификатор</th>
       <th scope="col">IP адрес</th>
-      <th scope="col">Шаблон</th>
+      <th scope="col">Источник</th>
 
       <th scope="col"></th>
     </tr>
@@ -19,7 +19,7 @@
         <%= link new_node.name, to: Routes.new_node_path(@conn, :show, new_node) %>
       </td>
       <td><%= new_node.ip_addr %></td>
-      <td><%= new_node.template %></td>
+      <td><%= new_node.source %></td>
 
       <td>
         <%= link "Новый узел", to: Routes.new_node_path(@conn, :edit, new_node) %>

@@ -123,7 +123,8 @@ defmodule AcariServerWeb.Api.AutoconfController do
     AcariServer.NewNodeDiscovery.insert_or_update_new_node(%{
       name: node_name,
       ip_addr: ip |> :inet.ntoa() |> to_string(),
-      params: node_params
+      params: node_params,
+      source: "POST"
     })
 
     conn

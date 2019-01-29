@@ -114,7 +114,8 @@ defmodule AcariServer.Hs do
     AcariServer.NewNodeDiscovery.insert_or_update_new_node(%{
       name: id,
       ip_addr: to_string(:inet.ntoa(ipaddr)),
-      params: request
+      params: request,
+      source: "Acari"
     })
   end
 
