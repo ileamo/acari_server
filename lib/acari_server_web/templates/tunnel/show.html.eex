@@ -16,6 +16,10 @@
 <hr/ class = "mt-0 mb-4">
 <%= if links_state do %>
 
+  <h5>Инвентарные данные</h5>
+  <pre><code><%= tun.inventory %></code></pre>
+  <hr/>
+
   <%= for {name, state} <- links_state do %>
     <h5>Соединение <%= name %></h5>
     <ul>

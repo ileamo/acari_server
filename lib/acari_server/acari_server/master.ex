@@ -13,6 +13,7 @@ defmodule AcariServer.Master do
   defmodule TunState do
     defstruct [
       :node,
+      inventory: "Нет данных",
       sslinks: %{}
     ]
   end
@@ -63,9 +64,31 @@ defmodule AcariServer.Master do
     {:noreply, state}
   end
 
+  def handle_cast({:tun_mes, tun_name, json}, state) do
+    with {:ok, %{"method" => method, "params" => params}} <- Jason.decode(json) do
+      exec_client_method(state, tun_name, method, params)
+    else
+      res ->
+        Logger.error("Bad tun_mes from #{tun_name}: #{inspect(res)}")
+    end
+
+    {:noreply, state}
+  end
+
   def handle_cast(mes, state) do
     Logger.warn("Master get unknown message: #{inspect(mes)}")
     {:noreply, state}
+  end
+
+  defp exec_client_method(state, tun_name, "inventory", %{"data" => data}) do
+    Logger.info("Get inventory data #{data}")
+    set_inventory(tun_name, data)
+    state
+  end
+
+  defp exec_client_method(state, _tun_name, method, _params) do
+    Logger.error("Bad message method: #{method}")
+    state
   end
 
   defp set_sslink_up(tun_name, sslink_name, link_state) do
@@ -75,6 +98,22 @@ defmodule AcariServer.Master do
          new_tun_state <- %TunState{
            tun_state
            | sslinks: sslinks |> Map.put(sslink_name, %SSlinkState{sslink_state | up: link_state})
+         } do
+      :ets.update_element(
+        :tuns,
+        tun_name,
+        {4, new_tun_state}
+      )
+    else
+      res -> Logger.error("Can't set sslink state: #{inspect(res)}")
+    end
+  end
+
+  defp set_inventory(tun_name, inventory) do
+    with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
+         new_tun_state <- %TunState{
+           tun_state
+           | inventory: inventory
          } do
       :ets.update_element(
         :tuns,
