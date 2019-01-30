@@ -22,6 +22,37 @@ defmodule AcariServerWeb.TunnelView do
     end)
   end
 
+  def get_tunnel(name) do
+    node = AcariServer.NodeManager.get_node_by_name(name)
+
+    links_state =
+      case :ets.lookup(:tuns, name) do
+        [{_, _, _, state}] ->
+          links =
+            Acari.get_all_links(name)
+            |> Enum.map(fn [k, v] -> {k, v} end)
+            |> Enum.into(%{})
+
+            state.sslinks
+            |> Enum.map(fn {link_name, %{up: up}} ->
+              {link_name,
+               %{adm_state: (up && "UP") || "DOWN"}
+               |> Map.merge(get_link_params(links[link_name]))}
+            end)
+
+
+        _ ->
+          nil
+      end
+
+    %{links_state: links_state, description: node.description}
+  end
+
+  defp get_link_params(nil), do: %{}
+  defp get_link_params(link) do
+    %{latency: link.latency}
+  end
+
   defp get_sslinks(nil), do: %{links_up: nil, links_down: nil}
 
   defp get_sslinks(tun_state) do

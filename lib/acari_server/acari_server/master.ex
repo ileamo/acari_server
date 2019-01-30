@@ -4,7 +4,6 @@ defmodule AcariServer.Master do
   require Acari.Const, as: Const
   alias AcariServerWeb.Endpoint
 
-
   defmodule State do
     defstruct [
       :tuns
@@ -138,7 +137,7 @@ defmodule AcariServer.Master do
     :ets.tab2list(:tuns)
   end
 
-    defp broadcast_link_event() do
+  defp broadcast_link_event() do
     mes_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", [])
 
     statistics_html =
@@ -153,5 +152,4 @@ defmodule AcariServer.Master do
       progress: progress_html
     })
   end
-
 end

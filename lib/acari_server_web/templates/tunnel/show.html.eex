@@ -1,1 +1,42 @@
-<h2>Туннель <%= @name %></h2>
+<nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
+
+    <div class="navbar p-0">
+      <span class="navbar-brand">Туннель <%= @name %></span>
+    </div>
+    <div class="navbar">
+      <button type="button" class = "btn btn-outline-primary btn-sm">
+        <%= link "Обновить", to: Routes.tunnel_path(@conn, :show, @name), class: "navbar-text py-0" %>
+      </button>
+    </div>
+</nav>
+<% tun = get_tunnel(@name)
+   links_state = tun[:links_state]
+%>
+<%= tun.description %>
+<hr/ class = "mt-0 mb-4">
+<%= if links_state do %>
+
+  <%= for {name, state} <- links_state do %>
+    <h5>Соединение <%= name %></h5>
+    <ul>
+      <li>
+        <strong>Состояние:</strong>
+        <%= state.adm_state %>
+      </li>
+      <li>
+        <strong>Задержка:</strong>
+        <%= state[:latency] %>
+      </li>
+    </ul>
+  <% end %>
+
+
+    <hr/>
+    <h5>Терминал:</h5>
+  <div id="acari-xterm"></div>
+
+  <% inspect(tun) %>
+  
+<% else %>
+ <h5 class="text-danger">Это устройство не подключено</h5>
+<% end %>

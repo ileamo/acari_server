@@ -5,7 +5,9 @@ import socket from './socket'
 
 let acari_xterm = document.getElementById('acari-xterm');
 if (acari_xterm) {
-  let channel = socket.channel("terminal:1", {})
+  console.log(window.location.href)
+  console.log(window.location.pathname)
+  let channel = socket.channel("terminal:1", {pathname: window.location.pathname})
   channel.join()
   channel.on('output', ({
     output
@@ -14,10 +16,11 @@ if (acari_xterm) {
   let term = new Terminal({
     cols: 80,
     rows: 25,
+    fontSize: 17,
     theme: {
       //background: '#002B36',
       background: '#073642',
-      foreground: '#d2d2d2',
+      foreground: '#eee8d5',
       black: '#222222',
       brightBlack: '#454545',
       red: '#9E5641',

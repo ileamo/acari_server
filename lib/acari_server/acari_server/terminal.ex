@@ -1,13 +1,15 @@
 defmodule AcariServer.Terminal do
   use GenServer
 
-  def start_link(output_pid) do
-    GenServer.start_link(__MODULE__, output_pid)
+  def start_link(params) do
+    GenServer.start_link(__MODULE__, params)
   end
 
   @impl true
-  def init(output_pid) do
-    {:ok, shell, _os_pid} = :exec.run('$SHELL', [:stdin, :stdout, :stderr, :pty])
+  def init(%{output_pid: output_pid, pathname: pathname} = _params) do
+    [_, name] = Regex.run(~r|/([^/]+)$|, pathname)
+    send(output_pid, {:output, "Подключение к узлу #{name} \r\n"})
+    {:ok, shell, _os_pid} = :exec.run(' ssh root@10.0.10.180', [:stdin, :stdout, :stderr, :pty])
     :exec.send(shell, "stty echo\n")
 
     {:ok,
