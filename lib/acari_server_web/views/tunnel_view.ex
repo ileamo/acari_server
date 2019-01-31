@@ -53,7 +53,7 @@ defmodule AcariServerWeb.TunnelView do
   defp get_link_params(nil), do: %{}
 
   defp get_link_params(link) do
-    %{latency: link.latency}
+    %{latency: link[:latency]}
   end
 
   defp get_sslinks(nil), do: %{links_up: nil, links_down: nil}

@@ -19,13 +19,12 @@ defmodule AcariServer.NodeMonitor do
   @impl true
   def handle_cast({:input, input}, %{tun_name: tun_name} = state) do
     IO.inspect({tun_name, input}, label: "*** NodeMonitor ***")
+    AcariServer.Master.get_inventory(tun_name)
     {:noreply, state}
   end
 
   # API
   def send_input(node_monitor, input) do
-    IO.inspect({node_monitor, input}, label: "*** NodeMonitor send_input ***")
-
     GenServer.cast(node_monitor, {:input, input})
   end
 end

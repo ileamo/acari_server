@@ -47,7 +47,7 @@ defmodule AcariServer.Master do
 
   def handle_cast({:peer_started, tun_name}, state) do
     Logger.debug("Master get :peer_started from #{tun_name}")
-    exec_remote_script(tun_name)
+    get_inventory(tun_name)
 
     {:noreply, state}
   end
@@ -80,7 +80,7 @@ defmodule AcariServer.Master do
     {:noreply, state}
   end
 
-  defp exec_client_method(state, tun_name, "inventory", %{"data" => data}) do
+  defp exec_client_method(state, tun_name, "put_data", %{"id" => "inventory", "data" => data}) do
     Logger.info("Get inventory data #{data}")
     set_inventory(tun_name, data)
     state
@@ -140,6 +140,25 @@ defmodule AcariServer.Master do
     else
       res -> Logger.error("Can't parse remote script: #{inspect(res)}")
     end
+  end
+
+  def get_inventory(tun_name) do
+    {:ok, json} =
+      Jason.encode(%{
+        method: "get_exec_sh",
+        params: %{
+          id: "inventory",
+          script: """
+          echo Здесь содержится статическая информация об узле.
+          echo Посылается один раз при старте устройства.
+          echo Тип: NSG-1700
+          echo Серийный номер: 1812#{tun_name |> String.slice(-6, 6)}
+          echo итд.
+          """
+        }
+      })
+
+    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
   end
 
   defp get_script(tun_name, templ_id) do
