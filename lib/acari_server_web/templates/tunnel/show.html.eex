@@ -1,5 +1,4 @@
 <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
-
     <div class="navbar p-0">
       <span class="navbar-brand">Туннель <%= @name %></span>
     </div>
@@ -13,34 +12,44 @@
    links_state = tun[:links_state]
 %>
 <%= tun.description %>
-<hr/ class = "mt-0 mb-4">
+<hr/>
 <%= if links_state do %>
+  <div id="node-monitor">
+    <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
+        <div class="navbar p-0">
+          <span class="navbar-brand">Инвентарные данные</span>
+        </div>
+        <div class="navbar">
+          <button id = "nm-get-inventory" type="button" class = "btn btn-outline-primary btn-sm">
+            <%= link "Обновить", to: "#", class: "navbar-text py-0" %>
+          </button>
+        </div>
+    </nav>
 
-  <h5>Инвентарные данные</h5>
-  <pre><code><%= tun.inventory %></code></pre>
-  <hr/>
+      <pre><code><%= tun.inventory %></code></pre>
+      <hr/>
 
-  <%= for {name, state} <- links_state do %>
-    <h5>Соединение <%= name %></h5>
-    <ul>
-      <li>
-        <strong>Состояние:</strong>
-        <%= state.adm_state %>
-      </li>
-      <li>
-        <strong>Задержка:</strong>
-        <%= state[:latency] %>
-      </li>
-    </ul>
-  <% end %>
+      <%= for {name, state} <- links_state do %>
+        <h5>Соединение <%= name %></h5>
+        <ul>
+          <li>
+            <strong>Состояние:</strong>
+            <%= state.adm_state %>
+          </li>
+          <li>
+            <strong>Задержка:</strong>
+            <%= state[:latency] %>
+          </li>
+        </ul>
+      <% end %>
 
 
-    <hr/>
-    <button id="start_xterm">Подключиться к узлу</button>
-  <div id="acari-xterm"></div>
+        <hr/>
+        <button id="start_xterm">Подключиться к узлу</button>
+      <div id="acari-xterm"></div>
 
-  <% inspect(tun) %>
-
+      <% inspect(tun) %>
+  </div>
 <% else %>
  <h5 class="text-danger">Это устройство не подключено</h5>
 <% end %>

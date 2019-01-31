@@ -2,7 +2,7 @@ defmodule AcariServerWeb.TerminalChannel do
   use AcariServerWeb, :channel
   alias AcariServer.Terminal
 
-  def join("terminal:" <> id, payload, socket) do
+  def join("terminal:" <> _id, payload, socket) do
     {:ok, terminal} = Terminal.start_link(%{output_pid: self(), pathname: payload["pathname"]})
     {:ok, assign(socket, :terminal, terminal)}
   end

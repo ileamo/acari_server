@@ -3,7 +3,11 @@ import {
 } from 'xterm';
 import socket from './socket'
 
-document.getElementById("start_xterm").addEventListener("click", startXterm, false);
+let start_xterm = document.getElementById("start_xterm")
+
+if (start_xterm) {
+  start_xterm.addEventListener("click", startXterm, false);
+}
 
 function startXterm() {
   document.getElementById("start_xterm").remove();
