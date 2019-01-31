@@ -21,13 +21,11 @@
           </div>
         </li>
       </ul>
-      <button type="button" class = "btn btn-outline-primary btn-sm">
         <%= if assigns[:group_id] do %>
-          <%= link "Обновить", to: Routes.tunnel_path(@conn, :grp, @group_id), class: "navbar-text py-0" %>
+          <%= link "Обновить", to: Routes.tunnel_path(@conn, :grp, @group_id), class: "btn btn-outline-primary btn-sm navbar-text py-0" %>
         <% else %>
-        <%= link "Обновить", to: Routes.tunnel_path(@conn, :index), class: "navbar-text py-0" %>
+          <%= link "Обновить", to: Routes.tunnel_path(@conn, :index), class: "btn btn-outline-primary btn-sm navbar-text py-0" %>
         <% end %>
-      </button>
     </div>
 </nav>
 <hr/ class = "mt-0 mb-4">

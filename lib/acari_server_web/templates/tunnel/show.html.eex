@@ -3,9 +3,6 @@
       <span class="navbar-brand">Туннель <%= @name %></span>
     </div>
     <div class="navbar">
-      <button type="button" class = "btn btn-outline-primary btn-sm">
-        <%= link "Обновить", to: Routes.tunnel_path(@conn, :show, @name), class: "navbar-text py-0" %>
-      </button>
     </div>
 </nav>
 <% tun = get_tunnel(@name)
