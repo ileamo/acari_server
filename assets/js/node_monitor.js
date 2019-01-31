@@ -8,6 +8,11 @@ if (node_monitor) {
   })
   channel.join()
 
+  channel.on('output', payload => {
+    console.log("node moniotor get:", payload);
+    document.querySelector("#nm-inventory").innerText = `${payload.data}`
+  }) // From the Channel
+
   document.getElementById("nm-get-inventory").addEventListener("click", getInventory, false);
 
   function getInventory() {

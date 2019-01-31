@@ -10,13 +10,13 @@ defmodule AcariServerWeb.NodeMonitorChannel do
   end
 
   def handle_in("input", %{"input" => input}, socket) do
-    NodeMonitor.send_input(socket.assigns[:node_monitor], input)
+    NodeMonitor.get_input(socket.assigns[:node_monitor], input)
 
     {:noreply, socket}
   end
 
-  #  def handle_info({:output, output}, socket) do
-  #    push(socket, "output", %{output: output})
-  #    {:noreply, socket}
-  #  end
+  def handle_info({:output, id, data}, socket) do
+    push(socket, "output", %{id: id, data: data})
+    {:noreply, socket}
+  end
 end

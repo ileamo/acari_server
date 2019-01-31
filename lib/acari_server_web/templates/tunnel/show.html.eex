@@ -26,7 +26,7 @@
         </div>
     </nav>
 
-      <pre><code><%= tun.inventory %></code></pre>
+      <pre><code id = "nm-inventory"><%= tun.inventory %></code></pre>
       <hr/>
 
       <%= for {name, state} <- links_state do %>
