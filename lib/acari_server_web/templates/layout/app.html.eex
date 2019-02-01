@@ -18,7 +18,7 @@
           Сообщения <i class="fas fa-bell"></i>
           <span class="badge badge-warning mr-2  ml-1 pt-1" id="num-of-mes"><%= num_of_mes() %></span>
         </a>
-        <span class="navbar-text"><%= username(@conn) %> <i class="fas fa-user-alt"></i></span>
+        <span class="navbar-text pr-2"><%= username(@conn) %> <i class="fas fa-user-alt"></i></span>
         <%= link to: Routes.session_path(@conn, :logout),class: "nav-link", method: :logout, data: [confirm: "Вы уверены?"] do %>
              Выйти <i class="fas fa-sign-out-alt"></i>
         <% end %>

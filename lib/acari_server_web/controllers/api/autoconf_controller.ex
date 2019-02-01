@@ -69,7 +69,11 @@ defmodule AcariServerWeb.Api.AutoconfController do
   @doc """
        For testing use curl:
 
-       curl -H "Content-Type: application/json" -X POST -d '{"id":1,"method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api
+       curl -H "Content-Type: application/json" -X POST -d '{method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -so setup.sh
+
+       or
+
+       wget --header "Content-Type: application/json"  --post-data '{method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -O setup.sh -q
 
   """
 
