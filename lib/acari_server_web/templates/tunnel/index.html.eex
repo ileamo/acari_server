@@ -22,9 +22,9 @@
         </li>
       </ul>
         <%= if assigns[:group_id] do %>
-          <%= link "Обновить", to: Routes.tunnel_path(@conn, :grp, @group_id), class: "btn btn-outline-primary btn-sm navbar-text py-0" %>
+          <%= link "Обновить", to: Routes.tunnel_path(@conn, :grp, @group_id), class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
         <% else %>
-          <%= link "Обновить", to: Routes.tunnel_path(@conn, :index), class: "btn btn-outline-primary btn-sm navbar-text py-0" %>
+          <%= link "Обновить", to: Routes.tunnel_path(@conn, :index), class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
         <% end %>
     </div>
 </nav>
