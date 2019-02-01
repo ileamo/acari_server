@@ -9,7 +9,6 @@ defmodule AcariServerWeb.Api.AutoconfController do
   defp validate_params(
          conn = %{
            params: %{
-             "id" => _id,
              "method" => _method,
              "params" => %{}
            }
@@ -69,7 +68,8 @@ defmodule AcariServerWeb.Api.AutoconfController do
   @doc """
        For testing use curl:
 
-       curl -H "Content-Type: application/json" -X POST -d '{method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -so setup.sh
+
+       curl -H "Content-Type: application/json" -X POST -d '{"id":1,"method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -so setup.sh
 
        or
 
