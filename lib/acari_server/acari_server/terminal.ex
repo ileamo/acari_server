@@ -9,7 +9,7 @@ defmodule AcariServer.Terminal do
   def init(%{output_pid: output_pid, pathname: pathname} = _params) do
     [_, name] = Regex.run(~r|/([^/]+)$|, pathname)
     send(output_pid, {:output, "Подключение к узлу #{name} \r\n"})
-    {:ok, shell, _os_pid} = :exec.run('ssh root@10.0.10.180', [:stdin, :stdout, :stderr, :pty])
+    {:ok, shell, _os_pid} = :exec.run('ssh root@10.0.10.102', [:stdin, :stdout, :stderr, :pty])
     :exec.send(shell, "stty echo\n")
 
     {:ok,
