@@ -18,22 +18,15 @@ defmodule AcariServerWeb.Api.AutoconfController do
     conn
   end
 
-  defp validate_params(conn = %{params: %{"id" => id}}, _) do
-    conn
-    |> render_and_log_error(id, "No method or params field")
-    |> halt()
-  end
-
   defp validate_params(conn, _) do
     conn
-    |> render_and_log_error(0, "No request id")
+    |> render_and_log_error("No method or params field")
     |> halt()
   end
 
   defp get_res(
          conn = %{
            params: %{
-             "id" => id,
              "method" => "get.conf",
              "params" => %{"id" => node_name} = params
            }
@@ -48,20 +41,20 @@ defmodule AcariServerWeb.Api.AutoconfController do
       _ ->
         conn
         |> add_discovery(node_name)
-        |> render_and_log_error(id, "no configuration for #{node_name}")
+        |> render_and_log_error("No configuration for #{node_name}")
         |> halt()
     end
   end
 
-  defp get_res(conn = %{params: %{"id" => id, "method" => "get.conf"}}, _) do
+  defp get_res(conn = %{params: %{"method" => "get.conf"}}, _) do
     conn
-    |> render_and_log_error(id, "No device id")
+    |> render_and_log_error("No device id in request params")
     |> halt()
   end
 
-  defp get_res(conn = %{params: %{"id" => id}}, _) do
+  defp get_res(conn, _) do
     conn
-    |> render_and_log_error(id, "Unknown method")
+    |> render_and_log_error("Unknown method")
     |> halt()
   end
 
@@ -69,11 +62,11 @@ defmodule AcariServerWeb.Api.AutoconfController do
        For testing use curl:
 
 
-       curl -H "Content-Type: application/json" -X POST -d '{"id":1,"method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -so setup.sh
+       curl -H "Content-Type: application/json" -X POST -d '{"method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -so setup.sh
 
        or
 
-       wget --header "Content-Type: application/json"  --post-data '{method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -O setup.sh -q
+       wget --header "Content-Type: application/json"  --post-data '{"method":"get.conf","params":{"id":"NSG1700_1812000001"}}' http://localhost:4000/api -qO setup.sh
 
   """
 
@@ -83,8 +76,8 @@ defmodule AcariServerWeb.Api.AutoconfController do
     # render(conn, "result.json", %{id: id, result: %{sfx: conf}})
   end
 
-  def index(conn = %{params: %{"id" => id}}, _) do
-    render_and_log_error(conn, id, "No configuration")
+  def index(conn, _) do
+    render_and_log_error(conn, "No configuration")
   end
 
   defp send_sh_file(conn, content) do
@@ -97,9 +90,9 @@ defmodule AcariServerWeb.Api.AutoconfController do
     |> send_resp(200, content)
   end
 
-  defp render_and_log_error(conn, _id, mes) do
+  defp render_and_log_error(conn, mes) do
     request_log(conn, "ERR: #{mes}")
-    send_sh_file(conn, "echo #{inspect(mes)}")
+    send_sh_file(conn, "#!/bin/sh\necho #{inspect(mes)}\n")
 
     # render(conn, "error.json", %{id: id, error: mes})
   end
