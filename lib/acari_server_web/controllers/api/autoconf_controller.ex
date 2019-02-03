@@ -1,5 +1,6 @@
 defmodule AcariServerWeb.Api.AutoconfController do
   use AcariServerWeb, :controller
+  alias AcariServer.SFX
 
   action_fallback(AcariWeb.FallbackController)
 
@@ -36,7 +37,7 @@ defmodule AcariServerWeb.Api.AutoconfController do
     case AcariServer.NodeManager.get_node_with_script(node_name) do
       %{} = node ->
         conn
-        |> assign(:sfx, AcariServer.SFX.create_sfx(:remote, node, params))
+        |> assign(:sfx, SFX.create_sfx(:remote, node, params))
 
       _ ->
         conn
@@ -92,7 +93,7 @@ defmodule AcariServerWeb.Api.AutoconfController do
 
   defp render_and_log_error(conn, mes) do
     request_log(conn, "ERR: #{mes}")
-    send_sh_file(conn, "#!/bin/sh\necho #{inspect(mes)}\n")
+    send_sh_file(conn, SFX.create_setup(mes))
 
     # render(conn, "error.json", %{id: id, error: mes})
   end
