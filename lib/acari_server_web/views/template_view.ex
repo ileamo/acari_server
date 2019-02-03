@@ -1,6 +1,6 @@
 defmodule AcariServerWeb.TemplateView do
   use AcariServerWeb, :view
-  @no_script "<NO_SCRIPT>"
+  @no_script "<NO_CLASS>"
 
   def script_name_id_pairs_list() do
     AcariServer.ScriptManager.script_name_id_pairs_list(@no_script)

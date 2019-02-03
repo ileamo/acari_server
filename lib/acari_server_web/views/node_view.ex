@@ -1,6 +1,6 @@
 defmodule AcariServerWeb.NodeView do
   use AcariServerWeb, :view
-  @no_script "<NO_SCRIPT>"
+  @no_script "<NO_CLASS>"
 
   def groups_list(node) do
     node.groups

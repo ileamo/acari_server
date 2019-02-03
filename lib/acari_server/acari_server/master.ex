@@ -174,7 +174,7 @@ defmodule AcariServer.Master do
          {script, nil} <- AcariServer.Template.eval(templ, assigns) do
       {:ok, script}
     else
-      %AcariServer.NodeManager.Node{script: nil} -> {:error, "<NO_SCRIPT>"}
+      %AcariServer.NodeManager.Node{script: nil} -> {:error, "<NO_CLASS>"}
       res -> res
     end
   end

@@ -15,7 +15,11 @@ defmodule AcariServer.SFX do
         templ_map = TemplateAgent.get_templ_map(self())
         makeself(templ_map, setup_file_name)
       else
-        res -> create_setup("Ошибка при создании SFX: #{inspect(res)}")
+        %AcariServer.NodeManager.Node{script: nil, name: name} ->
+          create_setup("Узлу #{name} не назначен класс")
+
+        res ->
+          create_setup("Ошибка при создании SFX: #{inspect(res)}")
       end
 
     # TemplateAgent.remove_templ_map(self())
@@ -41,10 +45,28 @@ defmodule AcariServer.SFX do
            _, acc -> acc
          end) do
       [] ->
-        do_makeself(templ_map, setup_file_name)
+        do_makeself_or_script(templ_map, setup_file_name)
 
       list ->
         create_setup("Нет шаблонов или ошибка в шаблоне для файлов #{list |> Enum.join(", ")}")
+    end
+  end
+
+  def do_makeself_or_script(templ_map, setup_file_name) do
+    case templ_map
+         |> Enum.reduce_while(nil, fn
+           {name, content}, acc when is_binary(name) and is_binary(content) and is_nil(acc) ->
+             {:cont, content}
+
+           {name, content}, acc when is_binary(name) and is_binary(content) and is_binary(acc) ->
+             {:halt, :many}
+
+           _, acc ->
+             {:cont, acc}
+         end) do
+      nil -> create_setup("Нет шаблонов для создания скрипта")
+      :many -> do_makeself(templ_map, setup_file_name)
+      content -> content
     end
   end
 
