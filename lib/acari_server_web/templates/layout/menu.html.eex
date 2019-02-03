@@ -30,7 +30,7 @@
     <%= link "Группы", to: Routes.group_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Скрипты", to: Routes.script_path(@conn, :index), class: "nav-link" %>
+    <%= link "Классы", to: Routes.script_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
     <%= link "Шаблоны", to: Routes.template_path(@conn, :index), class: "nav-link" %>

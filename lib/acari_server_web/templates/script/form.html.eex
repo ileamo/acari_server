@@ -23,9 +23,25 @@
     </div>
   </div>
 
+  <div class="form-group row">
+    <%= label f, "Шаблон конфигурации клиента", class: "col-sm-4 col-form-label" %>
+    <div class="col-sm-8">
+      <%= text_input f, :remote, class: "form-control" %>
+      <%= error_tag f, :remote %>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <%= label f, "Шаблон конфигурации сервера", class: "col-sm-4 col-form-label" %>
+    <div class="col-sm-8">
+      <%= text_input f, :local, class: "form-control" %>
+      <%= error_tag f, :local %>
+    </div>
+  </div>
+
   <div class="form-group">
-    <%= label f, "Определения", class: "control-label" %>
-    <%= textarea f, :definition, class: "form-control text-monospace", rows: "3" %>
+    <%= label f, "Определения параметров", class: "control-label" %>
+    <%= textarea f, :definition, class: "form-control text-monospace", rows: "6" %>
     <%= error_tag f, :definition %>
   </div>
 
@@ -36,23 +52,10 @@
   </div>
 
   <div class="form-group">
-    <%= label f, "Локальный скрипт", class: "control-label" %>
-    <%= textarea f, :local, class: "form-control text-monospace", rows: "6" %>
-    <%= error_tag f, :local %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, "Удаленный скрипт", class: "control-label" %>
-    <%= textarea f, :remote, class: "form-control text-monospace", rows: "6" %>
-    <%= error_tag f, :remote %>
-  </div>
-
-  <div class="form-group">
     <%= label f, "Значения для тестирования", class: "control-label" %>
-    <%= textarea f, :test, class: "form-control text-monospace", rows: "2"%>
+    <%= textarea f, :test, class: "form-control text-monospace", rows: "3"%>
     <%= error_tag f, :test %>
   </div>
-
 
   <div>
     <%= submit "Сохранить" %>

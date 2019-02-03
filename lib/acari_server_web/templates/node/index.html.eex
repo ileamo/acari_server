@@ -5,7 +5,7 @@
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
-      <th scope="col">Скрипт</th>
+      <th scope="col">Класс</th>
       <th scope="col">Параметры</th>
       <th scope="col">Группы</th>
 

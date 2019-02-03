@@ -28,7 +28,7 @@
   </div>
 
   <div class="form-group row">
-    <%= label f, "Параметры для тестирования брать из скрипта", class: "col-sm-6 col-form-label" %>
+    <%= label f, "Параметры для тестирования брать из класса", class: "col-sm-6 col-form-label" %>
     <div class="col-sm-6">
       <% scripts_list = script_name_id_pairs_list() %>
       <%= select f, :script_id, scripts_list, class: "form-control" %>

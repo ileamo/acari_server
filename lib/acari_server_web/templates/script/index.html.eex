@@ -1,4 +1,4 @@
-<h2>Список Скриптов</h2>
+<h2>Список Классов</h2>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
@@ -27,4 +27,4 @@
   </tbody>
 </table>
 
-<span><%= link "Новый скрипт", to: Routes.script_path(@conn, :new) %></span>
+<span><%= link "Новый класс", to: Routes.script_path(@conn, :new) %></span>

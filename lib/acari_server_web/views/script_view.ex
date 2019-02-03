@@ -3,8 +3,7 @@ defmodule AcariServerWeb.ScriptView do
 
   defdelegate get_script_with_prefix(script, templ), to: AcariServer.Template
 
-  def eval_script(templ, script, test_ass) do
-    templ = get_script_with_prefix(script, templ)
-    AcariServer.Template.eval(templ, test_ass)
+  def eval_prefix(script, test_ass) do
+    AcariServer.Template.eval(script.prefix, test_ass)
   end
 end
