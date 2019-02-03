@@ -67,12 +67,12 @@ defmodule AcariServer.Template do
 
   defp check_var({k, v})
        when is_binary(k) and (is_binary(v) or is_number(v) or is_boolean(v)) do
-    {k, v}
+    {k, to_string(v)}
   end
 
   defp check_var({k, v}) when is_binary(k) and is_list(v) do
     case Enum.all?(v, fn x -> is_binary(x) || is_number(x) || is_boolean(x) end) do
-      true -> {k, v}
+      true -> {k, v |> Enum.map(&Kernel.to_string/1)}
       _ -> nil
     end
   end
