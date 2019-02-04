@@ -12,23 +12,24 @@
     <%= @script.description %>
   </li>
 
+  <h5 class="mb-0 mt-2">Шаблоны:</h5>
   <li>
-    <strong>Шаблон конфигурации клиента:</strong>
+    <strong>Конфигурация клиента:</strong>
     <%= @script.remote %>
   </li>
 
   <li>
-    <strong>Шаблон конфигурации сервера:</strong>
+    <strong>Конфигурация сервера:</strong>
     <%= @script.local %>
   </li>
 
   <li>
-    <strong>Шаблон получения инвентарных данных:</strong>
+    <strong>Инвентарные данные:</strong>
     <%= @script.inventory %>
   </li>
 
   <li>
-    <strong>Шаблон получения телеметрии:</strong>
+    <strong>Телеметрия:</strong>
     <%= @script.telemetry %>
   </li>
 

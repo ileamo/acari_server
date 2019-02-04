@@ -41,7 +41,7 @@ defmodule AcariServerWeb.TunnelView do
                |> Map.merge(get_link_params(links[link_name]))}
             end)
 
-          %{links_state: links_state, inventory: state.inventory}
+          %{links_state: links_state, inventory: state.inventory, telemetry: state.telemetry}
 
         _ ->
           %{}

@@ -22,9 +22,9 @@
       <%= error_tag f, :description %>
     </div>
   </div>
-
+  <h5>Шаблоны:</h5>
   <div class="form-group row">
-    <%= label f, "Шаблон конфигурации клиента", class: "col-sm-4 col-form-label" %>
+    <%= label f, "Конфигурация клиента", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
       <%= text_input f, :remote, class: "form-control" %>
       <%= error_tag f, :remote %>
@@ -32,7 +32,7 @@
   </div>
 
   <div class="form-group row">
-    <%= label f, "Шаблон конфигурации сервера", class: "col-sm-4 col-form-label" %>
+    <%= label f, "Конфигурация сервера", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
       <%= text_input f, :local, class: "form-control" %>
       <%= error_tag f, :local %>
@@ -40,7 +40,7 @@
   </div>
 
   <div class="form-group row">
-    <%= label f, "Шаблон получения инвентарных данных", class: "col-sm-4 col-form-label" %>
+    <%= label f, "Инвентарные данные", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
       <%= text_input f, :inventory, class: "form-control" %>
       <%= error_tag f, :inventory %>
@@ -48,7 +48,7 @@
   </div>
 
   <div class="form-group row">
-    <%= label f, "Шаблон получения телеметрии", class: "col-sm-4 col-form-label" %>
+    <%= label f, "Телеметрия", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
       <%= text_input f, :telemetry, class: "form-control" %>
       <%= error_tag f, :telemetry %>
