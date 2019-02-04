@@ -9,8 +9,17 @@ if (node_monitor) {
   channel.join()
 
   channel.on('output', payload => {
-    console.log("node moniotor get:", payload);
-    document.querySelector("#nm-inventory").innerText = `${payload.data}`
+    console.log("node moniotor get:", payload, payload.id);
+    switch (payload.id) {
+      case "inventory":
+        document.querySelector("#nm-inventory").innerText = `${payload.data}`
+        break;
+      case "telemetry":
+        document.querySelector("#nm-telemetry").innerText = `${payload.data}`
+        break;
+      default:
+
+    }
   }) // From the Channel
 
   document.getElementById("nm-get-inventory").addEventListener("click", getInventory, false);
@@ -18,6 +27,14 @@ if (node_monitor) {
   function getInventory() {
     channel.push('input', {
       input: "inventory"
+    })
+  }
+
+  document.getElementById("nm-get-telemetry").addEventListener("click", getTelemetry, false);
+
+  function getTelemetry() {
+    channel.push('input', {
+      input: "telemetry"
     })
   }
 }

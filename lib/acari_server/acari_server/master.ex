@@ -14,6 +14,7 @@ defmodule AcariServer.Master do
     defstruct [
       :node,
       inventory: "Нет данных",
+      telemetry: "Нет данных",
       sslinks: %{}
     ]
   end
@@ -86,6 +87,12 @@ defmodule AcariServer.Master do
     state
   end
 
+  defp exec_client_method(state, tun_name, "put_data", %{"id" => "telemetry", "data" => data}) do
+    Logger.info("Get telemetry data #{data}")
+    set_telemetry(tun_name, data)
+    state
+  end
+
   defp exec_client_method(state, _tun_name, method, _params) do
     Logger.error("Bad message method: #{method}")
     state
@@ -129,6 +136,26 @@ defmodule AcariServer.Master do
     end
   end
 
+  defp set_telemetry(tun_name, telemetry) do
+    telemetry = "#{AcariServer.get_local_time()}\n#{telemetry}"
+
+    with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
+         new_tun_state <- %TunState{
+           tun_state
+           | telemetry: telemetry
+         } do
+      :ets.update_element(
+        :tuns,
+        tun_name,
+        {4, new_tun_state}
+      )
+
+      AcariServer.NodeMonitorAgent.event(tun_name, "telemetry", telemetry)
+    else
+      res -> Logger.error("Can't set sslink state: #{inspect(res)}")
+    end
+  end
+
   defp exec_local_script(tun_name) do
     with {:ok, script} <- get_script(tun_name, :local) do
       Acari.exec_sh(script)
@@ -152,7 +179,20 @@ defmodule AcariServer.Master do
         method: "get_exec_sh",
         params: %{
           id: "inventory",
-          script: AcariServer.SFX.get_inventory_script(tun_name)
+          script: AcariServer.SFX.get_script(tun_name, :inventory)
+        }
+      })
+
+    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
+  end
+
+  def get_telemetry(tun_name) do
+    {:ok, json} =
+      Jason.encode(%{
+        method: "get_exec_sh",
+        params: %{
+          id: "telemetry",
+          script: AcariServer.SFX.get_script(tun_name, :telemetry)
         }
       })
 

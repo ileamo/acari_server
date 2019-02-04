@@ -18,7 +18,17 @@ defmodule AcariServer.NodeMonitor do
 
   @impl true
   def handle_cast({:input, id}, %{tun_name: tun_name} = state) do
-    AcariServer.Master.get_inventory(tun_name)
+    case id do
+      "inventory" ->
+        AcariServer.Master.get_inventory(tun_name)
+
+      "telemetry" ->
+        AcariServer.Master.get_telemetry(tun_name)
+
+      _ ->
+        nil
+    end
+
     AcariServer.NodeMonitorAgent.callback(self(), tun_name, id)
     {:noreply, state}
   end

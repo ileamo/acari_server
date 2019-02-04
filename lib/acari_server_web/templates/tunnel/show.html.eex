@@ -29,10 +29,10 @@
           <span class="navbar-brand">Текущие показатели</span>
         </div>
         <div class="navbar">
-            <%= link "Обновить", to: "#", id: "nm-get-status", class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
+            <%= link "Обновить", to: "#", id: "nm-get-telemetry", class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
         </div>
     </nav>
-    <pre><code id = "nm-status"><%%= tun.status %></code></pre>
+    <pre><code id = "nm-telemetry"><%%= tun.telemetry %></code></pre>
     <hr/>
 
     <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
