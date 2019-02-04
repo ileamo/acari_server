@@ -111,6 +111,7 @@ defmodule AcariServer.Master do
 
   defp set_inventory(tun_name, inventory) do
     inventory = "#{AcariServer.get_local_time()}\n#{inventory}"
+
     with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
          new_tun_state <- %TunState{
            tun_state
@@ -151,13 +152,7 @@ defmodule AcariServer.Master do
         method: "get_exec_sh",
         params: %{
           id: "inventory",
-          script: """
-          echo Здесь содержится статическая информация об узле.
-          echo Посылается один раз при старте устройства и при нажатии кнопки Обновить.
-          echo Тип: NSG-1700
-          echo Серийный номер: 1812#{tun_name |> String.slice(-6, 6)}
-          echo итд.
-          """
+          script: AcariServer.SFX.get_inventory_script(tun_name)
         }
       })
 

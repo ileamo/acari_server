@@ -1,6 +1,13 @@
 defmodule AcariServer.SFX do
   alias AcariServer.TemplateAgent
 
+  def get_inventory_script(node_name) do
+    case AcariServer.NodeManager.get_node_with_script(node_name) do
+      %{} = node -> create_sfx(:inventory, node, %{"id" => node_name})
+      _ -> create_setup("No node #{node_name}")
+    end
+  end
+
   def create_sfx(templ_id, node, req_params) do
     res =
       with %{params: config_params, script: %{} = script} <- node,
@@ -22,7 +29,7 @@ defmodule AcariServer.SFX do
           create_setup("Ошибка при создании SFX: #{inspect(res)}")
       end
 
-    # TemplateAgent.remove_templ_map(self())
+    TemplateAgent.remove_templ_map(self())
     TemplateAgent.gc()
     res
   end
