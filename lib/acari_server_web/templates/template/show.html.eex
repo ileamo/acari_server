@@ -13,6 +13,11 @@
   </li>
 
   <li>
+    <strong>Исполняемый:</strong>
+    <%= @template.executable && "Да" || "Нет" %>
+  </li>
+
+  <li>
     <strong>Класс:</strong>
     <%= script_name(@template) %>
   </li>

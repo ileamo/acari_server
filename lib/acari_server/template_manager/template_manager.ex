@@ -23,10 +23,12 @@ defmodule AcariServer.TemplateManager do
 
   def templ_name_id_pairs_list(no_templ \\ "<NO_TEMPL>") do
     list_templates()
+    |> Enum.filter(fn %{executable: ex} -> ex end)
     |> Enum.map(fn %{name: name} -> name end)
     |> Enum.sort()
     |> List.insert_at(0, {no_templ, nil})
   end
+
   @doc """
   Gets a single template.
 

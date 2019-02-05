@@ -21,6 +21,16 @@
     </div>
   </div>
 
+  <div class="form-group row">
+    <%= label f, "Исполняемый", class: "col-2 form-check-label" %>
+    <div class="col10">
+      <div class="form-check">
+        <%= checkbox f, :executable, class: "form-check-input" %>
+        <%= error_tag f, :executable %>
+      </div>
+    </div>
+  </div>
+
   <div class="form-group">
     <%= label f, "Шаблон", class: "control-label" %>
     <%= textarea f, :template, class: "form-control text-monospace", rows: "24" %>
