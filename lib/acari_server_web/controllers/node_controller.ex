@@ -19,9 +19,15 @@ defmodule AcariServerWeb.NodeController do
       {:ok, node} ->
         AcariServer.NewNodeDiscovery.delete_new_node_by_name(node.name)
 
-        conn
-        |> put_flash(:info, "Узел создан.")
-        |> redirect(to: Routes.node_path(conn, :show, node))
+        if node.script_id == nil do
+          conn
+          |> put_flash(:info, "Узел создан.")
+          |> redirect(to: Routes.node_path(conn, :show, node))
+        else
+          conn
+          |> put_flash(:error, "Изменен параметр Класс. Проверьте параметры.")
+          |> edit(%{"id" => node.id})
+        end
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -42,16 +48,22 @@ defmodule AcariServerWeb.NodeController do
   def update(conn, %{"id" => id, "node" => node_params} = attrs) do
     node_params = Map.put(node_params, "params", attrs["params"] || %{})
 
-    node = NodeManager.get_node!(id)
+    old_node = NodeManager.get_node!(id)
 
-    case NodeManager.update_node(node, node_params) do
+    case NodeManager.update_node(old_node, node_params) do
       {:ok, node} ->
-        conn
-        |> put_flash(:info, "Узел отредактирован.")
-        |> redirect(to: Routes.node_path(conn, :show, node))
+        if old_node.script_id == node.script_id or node.script_id == nil do
+          conn
+          |> put_flash(:info, "Узел отредактирован.")
+          |> redirect(to: Routes.node_path(conn, :show, node))
+        else
+          conn
+          |> put_flash(:error, "Изменен параметр Класс. Проверьте параметры.")
+          |> edit(%{"id" => node.id})
+        end
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", node: node, changeset: changeset)
+        render(conn, "edit.html", node: old_node, changeset: changeset)
     end
   end
 
