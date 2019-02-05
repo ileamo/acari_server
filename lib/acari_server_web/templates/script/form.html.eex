@@ -22,11 +22,13 @@
       <%= error_tag f, :description %>
     </div>
   </div>
+
+  <% templ_list = AcariServer.TemplateManager.templ_name_id_pairs_list() %>
   <h5>Шаблоны:</h5>
   <div class="form-group row">
     <%= label f, "Конфигурация клиента", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= text_input f, :remote, class: "form-control" %>
+      <%= select f, :remote, templ_list, class: "form-control" %>
       <%= error_tag f, :remote %>
     </div>
   </div>
@@ -34,7 +36,7 @@
   <div class="form-group row">
     <%= label f, "Конфигурация сервера", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= text_input f, :local, class: "form-control" %>
+      <%= select f, :local, templ_list, class: "form-control" %>
       <%= error_tag f, :local %>
     </div>
   </div>
@@ -42,7 +44,7 @@
   <div class="form-group row">
     <%= label f, "Инвентарные данные", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= text_input f, :inventory, class: "form-control" %>
+      <%= select f, :inventory, templ_list, class: "form-control" %>
       <%= error_tag f, :inventory %>
     </div>
   </div>
@@ -50,7 +52,7 @@
   <div class="form-group row">
     <%= label f, "Телеметрия", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= text_input f, :telemetry, class: "form-control" %>
+      <%= select f, :telemetry, templ_list, class: "form-control" %>
       <%= error_tag f, :telemetry %>
     </div>
   </div>
