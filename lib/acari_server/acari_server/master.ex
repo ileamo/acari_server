@@ -48,6 +48,7 @@ defmodule AcariServer.Master do
 
   def handle_cast({:peer_started, tun_name}, state) do
     Logger.debug("Master get :peer_started from #{tun_name}")
+    send_config(tun_name)
     get_inventory(tun_name)
 
     {:noreply, state}
@@ -159,6 +160,18 @@ defmodule AcariServer.Master do
   defp exec_local_script(tun_name) do
     script = AcariServer.SFX.get_script(tun_name, :local, get_tun_params(tun_name))
     Acari.exec_sh(script)
+  end
+
+  def send_config(tun_name) do
+    {:ok, json} =
+      Jason.encode(%{
+        method: "exec_sh",
+        params: %{
+          script: AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name))
+        }
+      })
+
+    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
   end
 
   def get_inventory(tun_name) do
