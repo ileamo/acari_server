@@ -7,8 +7,6 @@
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Исп.</th>
-      <th scope="col">Шаблон</th>
-
       <th scope="col"></th>
     </tr>
   </thead>
@@ -19,9 +17,7 @@
         <%= link template.name, to: Routes.template_path(@conn, :show, template) %>
       </td>
       <td><%= template.description %></td>
-      <td><% v = template.executable && "check" || "minus" %><i class="fas fa-<%=v%> ml-3"></i></td>
-      <td><%= template.template |> String.slice(0, 32) %></td>
-
+      <td><%= template.executable && "Да" || "Нет" %></td>
       <td>
         <%= link "Редактировать", to: Routes.template_path(@conn, :edit, template) %>
         |

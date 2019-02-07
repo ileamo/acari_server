@@ -1,9 +1,9 @@
 defmodule AcariServer.SFX do
   alias AcariServer.TemplateAgent
 
-  def get_script(node_name, templ_id) do
+  def get_script(node_name, templ_id, params \\ %{}) do
     case AcariServer.NodeManager.get_node_with_script(node_name) do
-      %{} = node -> create_sfx(templ_id, node, %{"id" => node_name})
+      %{} = node -> create_sfx(templ_id, node, Map.put(params, "id", node_name))
       _ -> create_setup("No node #{node_name}")
     end
   end

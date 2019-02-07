@@ -157,20 +157,8 @@ defmodule AcariServer.Master do
   end
 
   defp exec_local_script(tun_name) do
-    with {:ok, script} <- get_script(tun_name, :local) do
-      Acari.exec_sh(script)
-    else
-      res -> Logger.error("Can't parse local script: #{inspect(res)}")
-    end
-  end
-
-  defp exec_remote_script(tun_name) do
-    with {:ok, script} <- get_script(tun_name, :remote),
-         {:ok, json} <- Jason.encode(%{method: "exec_sh", params: %{script: script}}) do
-      Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
-    else
-      res -> Logger.error("Can't parse remote script: #{inspect(res)}")
-    end
+    script = AcariServer.SFX.get_script(tun_name, :local, get_tun_params(tun_name))
+    Acari.exec_sh(script)
   end
 
   def get_inventory(tun_name) do
@@ -179,7 +167,7 @@ defmodule AcariServer.Master do
         method: "get_exec_sh",
         params: %{
           id: "inventory",
-          script: AcariServer.SFX.get_script(tun_name, :inventory)
+          script: AcariServer.SFX.get_script(tun_name, :inventory, get_tun_params(tun_name))
         }
       })
 
@@ -192,35 +180,21 @@ defmodule AcariServer.Master do
         method: "get_exec_sh",
         params: %{
           id: "telemetry",
-          script: AcariServer.SFX.get_script(tun_name, :telemetry)
+          script: AcariServer.SFX.get_script(tun_name, :telemetry, get_tun_params(tun_name))
         }
       })
 
     Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
   end
 
-  defp get_script(tun_name, templ_id) do
-    with [{_, params, peer_params, _}] <- :ets.lookup(:tuns, tun_name),
-         %{params: config_params, script: %{} = script} <-
-           AcariServer.NodeManager.get_node_with_script(tun_name),
-         templ when is_binary(templ) <-
-           AcariServer.Template.get_script_with_prefix(script, templ_id),
-         assigns <- get_assigns(tun_name, params, peer_params, config_params),
-         {script, nil} <- AcariServer.Template.eval(templ, assigns) do
-      {:ok, script}
-    else
-      %AcariServer.NodeManager.Node{script: nil} -> {:error, "<NO_CLASS>"}
-      res -> res
+  defp get_tun_params(tun_name) do
+    with [{_, params, peer_params, _}] <- :ets.lookup(:tuns, tun_name) do
+      peer_params
+      |> Enum.map(fn {k, v} -> {"peer_" <> k, v} end)
+      |> Enum.concat(Map.to_list(params))
+      |> List.insert_at(0, {"id", tun_name})
+      |> Enum.into(%{})
     end
-  end
-
-  defp get_assigns(tun_name, params, peer_params, config_params) do
-    peer_params
-    |> Enum.map(fn {k, v} -> {"peer_" <> k, v} end)
-    |> Enum.concat(Map.to_list(Map.merge(config_params || %{}, params)))
-    |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
-    |> List.insert_at(0, {:id, tun_name})
-    |> Enum.into(%{})
   end
 
   # API
