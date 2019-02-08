@@ -8,18 +8,40 @@ defmodule AcariServer.Terminal do
   @impl true
   def init(%{output_pid: output_pid, pathname: pathname} = _params) do
     [_, name] = Regex.run(~r|/([^/]+)$|, pathname)
-    send(output_pid, {:output, "Подключение к узлу #{name} \r\n"})
-    {:ok, shell, _os_pid} = :exec.run('ssh root@10.0.10.102', [:stdin, :stdout, :stderr, :pty])
-    :exec.send(shell, "stty echo\n")
 
-    {:ok,
-     %{
-       output_pid: output_pid,
-       shell: shell
-     }}
+    with dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(name),
+         send(output_pid, {:output, "Подключение к узлу #{name} \r\n"}),
+         {:ok, shell, _os_pid} <-
+           :exec.run('ssh root@#{dstaddr} -o StrictHostKeyChecking=no', [
+             :stdin,
+             :stdout,
+             :stderr,
+             :pty
+           ]),
+         :exec.send(shell, "stty echo\n") do
+      {:ok,
+       %{
+         output_pid: output_pid,
+         shell: shell
+       }}
+    else
+      _ ->
+        send(output_pid, {:output, "Не могу подключиться к узлу #{name} \r\n"})
+
+        {:ok,
+         %{
+           output_pid: output_pid,
+           shell: nil
+         }}
+    end
   end
 
   @impl true
+  def handle_cast({:input, input}, %{shell: nil, output_pid: output_pid} = state) do
+    send(output_pid, {:output, input})
+    {:noreply, state}
+  end
+
   def handle_cast({:input, input}, %{shell: shell} = state) do
     :exec.send(shell, input)
     {:noreply, state}
