@@ -62,12 +62,12 @@ defmodule AcariClient.TunCreator do
     {:noreply, state}
   end
 
-  def handle_cast({:tun_mes, tun_name, json}, state) do
+  def handle_cast({:master_mes, tun_name, json}, state) do
     with {:ok, %{"method" => method, "params" => params}} <- Jason.decode(json) do
       exec_client_method(state, method, params)
     else
       res ->
-        Logger.error("Bad tun_mes from #{tun_name}: #{inspect(res)}")
+        Logger.error("Bad master_mes from #{tun_name}: #{inspect(res)}")
     end
 
     {:noreply, state}

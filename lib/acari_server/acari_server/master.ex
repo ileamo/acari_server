@@ -66,12 +66,12 @@ defmodule AcariServer.Master do
     {:noreply, state}
   end
 
-  def handle_cast({:tun_mes, tun_name, json}, state) do
+  def handle_cast({:master_mes, tun_name, json}, state) do
     with {:ok, %{"method" => method, "params" => params}} <- Jason.decode(json) do
       exec_client_method(state, tun_name, method, params)
     else
       res ->
-        Logger.error("Bad tun_mes from #{tun_name}: #{inspect(res)}")
+        Logger.error("Bad master_mes from #{tun_name}: #{inspect(res)}")
     end
 
     {:noreply, state}
@@ -163,15 +163,15 @@ defmodule AcariServer.Master do
   end
 
   def send_config(tun_name) do
-    {:ok, json} =
-      Jason.encode(%{
-        method: "exec_sh",
-        params: %{
-          script: AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name))
-        }
-      })
+    request = %{
+      method: "sfx",
+      params: %{
+        script: 0
+      }
+    }
 
-    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
+    script = AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name))
+    Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 
   def get_inventory(tun_name) do

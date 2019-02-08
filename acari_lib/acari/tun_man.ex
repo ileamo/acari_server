@@ -289,7 +289,7 @@ defmodule Acari.TunMan do
   defp exec_tun_com(state, com, payload) do
     case com do
       Const.master_mes() ->
-        GenServer.cast(state.master_pid, {:tun_mes, state.tun_name, payload})
+        GenServer.cast(state.master_pid, {:master_mes, state.tun_name, payload})
 
       Const.peer_started() ->
         GenServer.cast(state.master_pid, {:peer_started, state.tun_name})
