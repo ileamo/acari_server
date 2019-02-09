@@ -1,4 +1,4 @@
-defmodule ScriptFunc do
+defmodule TemplFunc do
   alias AcariServer.TemplateAgent
 
   def path_to(name) do
@@ -20,4 +20,13 @@ defmodule ScriptFunc do
 
     "./#{name}"
   end
+
+  def read_file(path) do
+    case File.read(path) do
+      {:ok, content} -> content
+      {:error, reason} -> "Error reading file #{path}: #{inspect(reason)}"
+    end
+  end
+
+  def home_dir(), do: System.user_home()
 end

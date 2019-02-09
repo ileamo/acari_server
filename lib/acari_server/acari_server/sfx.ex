@@ -18,7 +18,7 @@ defmodule AcariServer.SFX do
              |> Map.merge(config_params || %{})
              |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end),
            :ok <- TemplateAgent.init_templ_map(self(), assigns, prefix),
-           setup_file_name <- ScriptFunc.path_to(main_templ_name) do
+           setup_file_name <- TemplFunc.path_to(main_templ_name) do
         templ_map = TemplateAgent.get_templ_map(self())
         makeself(templ_map, setup_file_name)
       else
