@@ -29,6 +29,17 @@ defmodule AcariServer.TemplateManager do
     |> List.insert_at(0, {no_templ, nil})
   end
 
+  def get_templ_names_ex_noex() do
+    list_templates()
+    |> Enum.reduce([[], []], fn %{name: name, executable: ex}, [ex_list, list] ->
+      case ex do
+        true -> [[name | ex_list], list]
+        _ -> [ex_list, [name | list]]
+      end
+    end)
+    |> Enum.map(fn list -> Enum.sort(list) end)
+  end
+
   @doc """
   Gets a single template.
 

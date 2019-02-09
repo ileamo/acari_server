@@ -32,7 +32,11 @@
   </div>
 
   <div class="form-group">
-    <%= label f, "Шаблон", class: "control-label" %>
+    <div class="d-flex flex-row align-items-center">
+    <%= label f, "Шаблон", class: "col-sm-6 col-form-label pl-0" %>
+    <a class="col-sm-6 pr-0  text-right" href="#" data-toggle="modal" data-target="#AllTemplates">Все имена шаблонов</a>
+    </div>
+
     <%= textarea f, :template, class: "form-control text-monospace", rows: "24" %>
     <%= error_tag f, :template %>
   </div>
@@ -50,3 +54,37 @@
     <%= submit "Сохранить" %>
   </div>
 <% end %>
+
+
+    <!-- Modal -->
+    <% [ex, text] = AcariServer.TemplateManager.get_templ_names_ex_noex() %>
+    <div class="modal fade" id="AllTemplates" tabindex="-1" role="dialog" aria-labelledby="AllTemplatesTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header text-center">
+            <h5 class="modal-title w-100" id="AllTemplatesTitle">Все шаблоны</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-6">
+                  <h6>Исполняемые</h6><hr/>
+                    <%= for i <- ex do %>
+                    <%=i%></br>
+                    <%end%>
+                </div>
+                <div class="col-6">
+                  <h6>Обычные</h6><hr/>
+                    <%= for i <- text do %>
+                    <%=i%></br>
+                    <%end%>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
