@@ -13,4 +13,27 @@ defmodule AcariServer.UserManager.Guardian do
       user -> {:ok, user}
     end
   end
+
+  """
+  # Callbacks
+  def after_encode_and_sign(resource, claims, token, _options) do
+    IO.inspect({claims, token, resource}, label: "SIGN")
+    {:ok, token}
+  end
+
+  def on_verify(claims, token, _options) do
+    IO.inspect({claims, token}, label: "ON_VERIFY")
+    {:ok, claims}
+  end
+
+  def on_refresh({old_token, old_claims}, {new_token, new_claims}, _options) do
+    IO.inspect({old_claims, new_claims}, label: "ON_REFRESH")
+    {:ok, {old_token, old_claims}, {new_token, new_claims}}
+  end
+
+  def on_revoke(claims, token, _options) do
+    IO.inspect({claims, token}, label: "ON_REVOKE")
+    {:ok, claims}
+  end
+  """
 end

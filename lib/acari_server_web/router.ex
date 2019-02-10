@@ -26,10 +26,15 @@ defmodule AcariServerWeb.Router do
   end
 
   scope "/", AcariServerWeb do
-    pipe_through [:browser, :auth]
+    pipe_through [:browser]
 
     get "/login", SessionController, :new
     post "/login", SessionController, :login
+  end
+
+  scope "/", AcariServerWeb do
+    pipe_through [:browser, :auth]
+
     post "/logout", SessionController, :logout
     get "/test", PageController, :test
   end
