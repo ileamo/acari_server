@@ -30,12 +30,12 @@ defmodule AcariServerWeb.Router do
 
     get "/login", SessionController, :new
     post "/login", SessionController, :login
+    post "/logout", SessionController, :logout
   end
 
   scope "/", AcariServerWeb do
     pipe_through [:browser, :auth]
 
-    post "/logout", SessionController, :logout
     get "/test", PageController, :test
   end
 
