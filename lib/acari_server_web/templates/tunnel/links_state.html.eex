@@ -1,0 +1,15 @@
+<% IO.inspect assigns %>
+
+<%= for {name, state} <- @links_state do %>
+  <h6>Соединение <%= name %></h6>
+  <ul>
+    <li>
+      <strong>Состояние:</strong>
+      <%= state.adm_state %>
+    </li>
+    <li>
+      <strong>Задержка:</strong>
+      <%= state[:latency] %>
+    </li>
+  </ul>
+<% end %>

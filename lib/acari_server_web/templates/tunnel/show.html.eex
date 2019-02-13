@@ -18,7 +18,9 @@
           <span class="navbar-brand">Инвентарные данные</span>
         </div>
         <div class="navbar">
-            <%= link "Обновить", to: "#", id: "nm-get-inventory", class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
+            <button id="nm-get-inventory" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+              Обновить
+            </button>
         </div>
     </nav>
     <pre><code id = "nm-inventory"><%= tun.inventory %></code></pre>
@@ -29,7 +31,9 @@
           <span class="navbar-brand">Текущие показатели</span>
         </div>
         <div class="navbar">
-            <%= link "Обновить", to: "#", id: "nm-get-telemetry", class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
+          <button id="nm-get-telemetry" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+            Обновить
+          </button>
         </div>
     </nav>
     <pre><code id = "nm-telemetry"><%= tun.telemetry %></code></pre>
@@ -40,29 +44,21 @@
           <span class="navbar-brand">Состояние каналов</span>
         </div>
         <div class="navbar">
-            <%= link "Обновить", to: Routes.tunnel_path(@conn, :show, @name), class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
+            <button id="nm-get-links-state" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
+              Обновить
+            </button>
         </div>
     </nav>
-      <%= for {name, state} <- links_state do %>
-        <h6>Соединение <%= name %></h6>
-        <ul>
-          <li>
-            <strong>Состояние:</strong>
-            <%= state.adm_state %>
-          </li>
-          <li>
-            <strong>Задержка:</strong>
-            <%= state[:latency] %>
-          </li>
-        </ul>
-      <% end %>
 
+    <div id="nm-links-state">
+      <%= render "links_state.html", links_state: links_state  %>
+    </div>
 
-        <hr/>
-        <button id="start_xterm">Подключиться к узлу</button>
-      <div id="acari-xterm"></div>
+    <hr/>
+    <button id="start_xterm">Подключиться к узлу</button>
+    <div id="acari-xterm"></div>
 
-      <% inspect(tun) %>
+    <% inspect(tun) %>
   </div>
 <% else %>
  <h5 class="text-danger">Это устройство не подключено</h5>

@@ -17,6 +17,9 @@ if (node_monitor) {
       case "telemetry":
         document.querySelector("#nm-telemetry").innerText = `${payload.data}`
         break;
+      case "links_state":
+        document.querySelector("#nm-links-state").innerHTML = `${payload.data}`
+        break;
       default:
 
     }
@@ -35,6 +38,14 @@ if (node_monitor) {
   function getTelemetry() {
     channel.push('input', {
       input: "telemetry"
+    })
+  }
+
+  document.getElementById("nm-get-links-state").addEventListener("click", getLinksState, false);
+
+  function getLinksState() {
+    channel.push('input', {
+      input: "links_state"
     })
   }
 }

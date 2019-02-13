@@ -25,6 +25,17 @@ defmodule AcariServer.NodeMonitor do
       "telemetry" ->
         AcariServer.Master.get_telemetry(tun_name)
 
+      "links_state" ->
+        tun = AcariServerWeb.TunnelView.get_tunnel(tun_name)
+        links_state = tun[:links_state]
+
+        ls_html =
+          Phoenix.View.render_to_string(AcariServerWeb.TunnelView, "links_state.html",
+            links_state: links_state
+          )
+
+        put_data(self(), "links_state", ls_html)
+
       _ ->
         nil
     end
