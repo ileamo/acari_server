@@ -8,6 +8,7 @@ defmodule AcariServer.Zabbix.Sup do
   @impl true
   def init(_arg) do
     children = [
+      AcariServer.Zabbix.LastDataAgent,
       AcariServer.Zabbix.SerSup,
       AcariServer.Zabbix.Listener
     ]
