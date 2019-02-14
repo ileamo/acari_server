@@ -14,6 +14,7 @@ defmodule AcariServer.Application do
       AcariServerWeb.Endpoint,
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},
+      AcariServer.Zabbix.Sup,
       Acari.Sup,
       AcariServer.TemplateAgent,
       AcariServer.NodeMonitorAgent,
