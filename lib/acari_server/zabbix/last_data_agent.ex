@@ -19,7 +19,7 @@ defmodule AcariServer.Zabbix.LastDataAgent do
     )
   end
 
-  def clear() do
+  def clean() do
     Agent.update(
       __MODULE__,
       fn _state ->
@@ -28,7 +28,7 @@ defmodule AcariServer.Zabbix.LastDataAgent do
     )
   end
 
-  def clear(host) do
+  def clean(host) do
     Agent.update(
       __MODULE__,
       fn state ->

@@ -7,7 +7,7 @@ defmodule AcariServer.Zabbix.Listener do
   end
 
   def run(_arg) do
-    {:ok, l} = :gen_tcp.listen(7777, [:binary, active: true, packet: 0, reuseaddr: true])
+    {:ok, l} = :gen_tcp.listen(50051, [:binary, active: true, packet: 0, reuseaddr: true])
     accept_loop(l)
   end
 
