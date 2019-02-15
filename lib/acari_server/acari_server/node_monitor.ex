@@ -36,6 +36,9 @@ defmodule AcariServer.NodeMonitor do
 
         put_data(self(), "links_state", ls_html)
 
+      "sensors" ->
+        put_data(self(), "sensors", AcariServerWeb.TunnelView.get_sensors(tun_name))
+
       _ ->
         nil
     end

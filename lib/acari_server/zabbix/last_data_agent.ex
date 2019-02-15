@@ -44,7 +44,7 @@ defmodule AcariServer.Zabbix.LastDataAgent do
   defp put_aux(state, host, key, value) do
     case state[host] do
       nil -> state |> Map.put(host, %{}) |> put_aux(host, key, value)
-      _ -> put_in(state, [host, key], value)
+      _ -> put_in(state, [host, key], {value, :erlang.system_time(:second)})
     end
   end
 end

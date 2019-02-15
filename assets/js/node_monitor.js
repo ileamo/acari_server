@@ -20,6 +20,9 @@ if (node_monitor) {
       case "links_state":
         document.querySelector("#nm-links-state").innerHTML = `${payload.data}`
         break;
+      case "sensors":
+        document.querySelector("#nm-sensors").innerHTML = `${payload.data}`
+        break;
       default:
 
     }
@@ -46,6 +49,14 @@ if (node_monitor) {
   function getLinksState() {
     channel.push('input', {
       input: "links_state"
+    })
+  }
+
+  document.getElementById("nm-get-sensors").addEventListener("click", getSensors, false);
+
+  function getSensors() {
+    channel.push('input', {
+      input: "sensors"
     })
   }
 }
