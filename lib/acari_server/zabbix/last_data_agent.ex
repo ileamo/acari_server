@@ -14,6 +14,10 @@ defmodule AcariServer.Zabbix.LastDataAgent do
     Agent.get(__MODULE__, fn state -> state[host] end)
   end
 
+  def get(host, sensor) do
+    Agent.get(__MODULE__, fn state -> state[host][sensor] end)
+  end
+
   def put(host, key, value) do
     Agent.update(
       __MODULE__,

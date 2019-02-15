@@ -35,10 +35,11 @@ defmodule AcariServerWeb.TunnelView do
 
           links_state =
             state.sslinks
-            |> Enum.map(fn {link_name, %{up: up}} ->
+            |> Enum.map(fn {link_name, %{up: up, down_count: dc}} ->
               {link_name,
-               %{adm_state: (up && "UP") || "DOWN"}
-               |> Map.merge(get_link_params(links[link_name]))}
+               %{down_count: dc, adm_state: (up && "UP") || "DOWN"}
+               |> Map.merge(get_link_params(links[link_name]))
+               |> Map.put(:csq, AcariServer.Zabbix.LastDataAgent.get(name, "csq[#{link_name}]") |> elem(0) )}
             end)
 
           %{

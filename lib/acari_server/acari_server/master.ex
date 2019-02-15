@@ -20,7 +20,8 @@ defmodule AcariServer.Master do
   end
 
   defmodule SSlinkState do
-    defstruct up: false
+    defstruct up: false,
+              down_count: 0
   end
 
   def start_link(params) do
@@ -105,7 +106,15 @@ defmodule AcariServer.Master do
          sslink_state = %SSlinkState{} <- sslinks[sslink_name] || %SSlinkState{},
          new_tun_state <- %TunState{
            tun_state
-           | sslinks: sslinks |> Map.put(sslink_name, %SSlinkState{sslink_state | up: link_state})
+           | sslinks:
+               sslinks
+               |> Map.put(
+                 sslink_name,
+                 %SSlinkState{sslink_state | up: link_state}
+                 |> (fn sss ->
+                       if link_state, do: sss, else: sss |> Map.update(:down_count, 0, &(&1 + 1))
+                     end).()
+               )
          } do
       :ets.update_element(
         :tuns,

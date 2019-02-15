@@ -3,6 +3,8 @@
     <tr>
         <th scope="col">Соединение</th>
         <th scope="col">Состояние</th>
+        <th scope="col">Число падений</th>
+        <th scope="col">Уровень сигнала</th>
         <th scope="col">Задержка</th>
     </tr>
     <tbody>
@@ -11,7 +13,13 @@
           <th  scope="row"><%= name %></th>
           <% color = if state.adm_state == "UP", do: "text-success", else: "text-danger" %>
           <td class="<%=color%>"><%= state.adm_state %></td>
-          <td><%= state[:latency]/1000 |> round() %> ms</td>
+          <td><%= state[:down_count] %></td>
+          <td><%= state[:csq] %></td>
+          <td><%= case state[:latency] do
+                    n when is_number(n) -> "#{n/1000 |> round()} ms"
+                    _ -> nil
+                  end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
