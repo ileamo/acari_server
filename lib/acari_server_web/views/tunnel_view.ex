@@ -54,8 +54,17 @@ defmodule AcariServerWeb.TunnelView do
     %{description: node.description} |> Map.merge(state)
   end
 
-  def get_sensors(name) do
-    inspect(AcariServer.Zabbix.LastDataAgent.get(name), pretty: true)
+  def get_sensors_html(name) do
+    render(__MODULE__, "sensors.html", sensors: AcariServer.Zabbix.LastDataAgent.get(name))
+  end
+
+  def get_sensors_html(:string, name) do
+    render_to_string(__MODULE__, "sensors.html", sensors: get_sensors(name))
+  end
+
+  defp get_sensors(name) do
+    (AcariServer.Zabbix.LastDataAgent.get(name) || [])
+    |> Enum.sort_by(&elem(&1, 0))
   end
 
   defp get_link_params(nil), do: %{}

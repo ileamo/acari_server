@@ -11,7 +11,7 @@
           <th  scope="row"><%= name %></th>
           <% color = if state.adm_state == "UP", do: "text-success", else: "text-danger" %>
           <td class="<%=color%>"><%= state.adm_state %></td>
-          <td><%= state[:latency] %></td>
+          <td><%= state[:latency]/1000 |> round() %> ms</td>
         </tr>
       <% end %>
     </tbody>

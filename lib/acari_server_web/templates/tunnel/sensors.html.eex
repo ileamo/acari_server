@@ -1,0 +1,19 @@
+<% st = :erlang.system_time(:second) %>
+<div class="table-responsive">
+  <table class="table table-sm table-borderless">
+    <tr>
+        <th scope="col">Датчик</th>
+        <th scope="col">Значение</th>
+        <th scope="col">Получено</th>
+    </tr>
+    <tbody>
+      <%= for {sensor, {value, tm}} <- @sensors || [] do %>
+        <tr>
+          <th  scope="row"><%= sensor %></th>
+          <td><%= value |> String.slice(0,64) %></td>
+          <td><%= st-tm %> сек. назад</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

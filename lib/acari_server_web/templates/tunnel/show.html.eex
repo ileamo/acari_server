@@ -81,7 +81,7 @@
           </button>
         </div>
     </nav>
-    <pre><code class="collapse" id="nm-sensors"><%=get_sensors(@name)%></code></pre>
+    <div class="collapse" id="nm-sensors"><%=get_sensors_html(@name)%></div>
     <hr/>
 
     <button id="start_xterm">Подключиться к узлу</button>
