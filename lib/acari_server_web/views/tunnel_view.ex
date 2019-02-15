@@ -41,7 +41,12 @@ defmodule AcariServerWeb.TunnelView do
                |> Map.merge(get_link_params(links[link_name]))}
             end)
 
-          %{links_state: links_state, inventory: state.inventory, telemetry: state.telemetry}
+          %{
+            links_state: links_state,
+            inventory: state.inventory,
+            telemetry: state.telemetry,
+            sensors: inspect(AcariServer.Zabbix.LastDataAgent.get(name), pretty: true)
+          }
 
         _ ->
           %{}

@@ -81,7 +81,7 @@
           </button>
         </div>
     </nav>
-    <div class="collapse" id="nm-sensors">Значения датчиков</div>
+    <pre><code class="collapse" id="nm-sensors"><%= tun.sensors %></code></pre>
     <hr/>
 
     <button id="start_xterm">Подключиться к узлу</button>
