@@ -15,15 +15,39 @@
 
     <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
         <div class="navbar p-0">
+          <span class="navbar-brand">Состояние каналов</span>
+        </div>
+        <div class="navbar">
+            <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+              href="#nm-links-state" role="button" aria-expanded="true" aria-controls="nm-links-state">
+              Скрыть/Показать
+            </button>
+            <button id="nm-get-links-state" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+              Обновить
+            </button>
+        </div>
+    </nav>
+    <div class="collapse show" id="nm-links-state">
+      <%= render "links_state.html", links_state: links_state  %>
+    </div>
+
+    <hr/>
+
+    <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
+        <div class="navbar p-0">
           <span class="navbar-brand">Инвентарные данные</span>
         </div>
         <div class="navbar">
+          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+            href="#nm-inventory" role="button" aria-expanded="false" aria-controls="nm-inventory">
+            Скрыть/Показать
+          </button>
             <button id="nm-get-inventory" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
               Обновить
             </button>
         </div>
     </nav>
-    <pre><code id = "nm-inventory"><%= tun.inventory %></code></pre>
+    <pre><code class="collapse" id="nm-inventory"><%= tun.inventory %></code></pre>
     <hr/>
 
     <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
@@ -31,34 +55,38 @@
           <span class="navbar-brand">Текущие показатели</span>
         </div>
         <div class="navbar">
+          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+            href="#nm-telemetry" role="button" aria-expanded="false" aria-controls="nm-telemetry">
+            Скрыть/Показать
+          </button>
           <button id="nm-get-telemetry" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
             Обновить
           </button>
         </div>
     </nav>
-    <pre><code id = "nm-telemetry"><%= tun.telemetry %></code></pre>
+    <pre><code class="collapse" id="nm-telemetry"><%= tun.telemetry %></code></pre>
     <hr/>
 
     <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
         <div class="navbar p-0">
-          <span class="navbar-brand">Состояние каналов</span>
+          <span class="navbar-brand">Датчики</span>
         </div>
         <div class="navbar">
-            <button id="nm-get-links-state" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
-              Обновить
-            </button>
+          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+            href="#nm-sensors" role="button" aria-expanded="false" aria-controls="nm-sensors">
+            Скрыть/Показать
+          </button>
+          <button id="nm-get-sensors" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+            Обновить
+          </button>
         </div>
     </nav>
-
-    <div id="nm-links-state">
-      <%= render "links_state.html", links_state: links_state  %>
-    </div>
-
+    <div class="collapse" id="nm-sensors">Значения датчиков</div>
     <hr/>
+
     <button id="start_xterm">Подключиться к узлу</button>
     <div id="acari-xterm"></div>
 
-    <% inspect(tun) %>
   </div>
 <% else %>
  <h5 class="text-danger">Это устройство не подключено</h5>

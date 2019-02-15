@@ -1,15 +1,19 @@
-<% IO.inspect assigns %>
-
-<%= for {name, state} <- @links_state do %>
-  <h6>Соединение <%= name %></h6>
-  <ul>
-    <li>
-      <strong>Состояние:</strong>
-      <%= state.adm_state %>
-    </li>
-    <li>
-      <strong>Задержка:</strong>
-      <%= state[:latency] %>
-    </li>
-  </ul>
-<% end %>
+<div class="table-responsive">
+  <table class="table table-sm table-borderless">
+    <tr>
+        <th scope="col">Соединение</th>
+        <th scope="col">Состояние</th>
+        <th scope="col">Задержка</th>
+    </tr>
+    <tbody>
+      <%= for {name, state} <- @links_state do %>
+        <tr>
+          <th  scope="row"><%= name %></th>
+          <% color = if state.adm_state == "UP", do: "text-success", else: "text-danger" %>
+          <td class="<%=color%>"><%= state.adm_state %></td>
+          <td><%= state[:latency] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
