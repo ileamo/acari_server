@@ -14,7 +14,7 @@
     <dev class="signin">
       <% prev_path = assigns[:prev_path] || "/" %>
 
-      <%= form_for @changeset, @action, [class: "form-signin"], fn f -> %>
+      <%= form_for @changeset, @action, [class: "form-signin", autocomplete: false], fn f -> %>
 <!--        <img class="mb-4" src="<%= Routes.static_path(@conn, "/images/nsg_logo.svg") %>" alt="" width="72" height="72">
 -->
         <h1 class="h3 mb-3 font-weight-normal">NSG</h1>
@@ -23,13 +23,13 @@
 
         <div class="form-group">
           <%= label f, :username, class: "control-label sr-only" %>
-          <%= text_input f, :username, class: "form-control", placeholder: "Имя" %>
+          <%= text_input f, :username, class: "form-control", placeholder: "Имя", autocomplete: "nope" %>
           <%= error_tag f, :username %>
         </div>
 
         <div class="form-group">
           <%= label f, :password, class: "control-label sr-only" %>
-          <%= password_input f, :password, class: "form-control", placeholder: "Пароль" %>
+          <%= password_input f, :password, class: "form-control", placeholder: "Пароль", autocomplete: "new-password" %>
           <%= error_tag f, :password %>
         </div>
 
