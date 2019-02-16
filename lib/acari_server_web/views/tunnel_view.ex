@@ -35,6 +35,10 @@ defmodule AcariServerWeb.TunnelView do
 
           links_state =
             state.sslinks
+<<<<<<< HEAD
+=======
+            |> IO.inspect()
+>>>>>>> 745a1dc8745c22c56c98c39c496fef1b9576b79f
             |> Enum.map(fn {link_name, %{up: up, down_count: dc} = sslink_state} ->
               {link_name,
                %{
