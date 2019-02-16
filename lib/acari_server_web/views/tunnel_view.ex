@@ -39,7 +39,11 @@ defmodule AcariServerWeb.TunnelView do
               {link_name,
                %{down_count: dc, adm_state: (up && "UP") || "DOWN"}
                |> Map.merge(get_link_params(links[link_name]))
-               |> Map.put(:csq, AcariServer.Zabbix.LastDataAgent.get(name, "csq[#{link_name}]") |> elem(0) )}
+               |> Map.put(
+                 :csq,
+                 (AcariServer.Zabbix.LastDataAgent.get(name, "csq[#{link_name}]") || {nil})
+                 |> elem(0)
+               )}
             end)
 
           %{
@@ -61,6 +65,22 @@ defmodule AcariServerWeb.TunnelView do
 
   def get_sensors_html(:string, name) do
     render_to_string(__MODULE__, "sensors.html", sensors: get_sensors(name))
+  end
+
+  def pretty_time(mks) do
+    case mks do
+      n when is_number(n) ->
+        cond do
+          n > 2000 ->
+            "#{(n / 1000) |> round()} ms"
+
+          true ->
+            "#{n / 1000} ms"
+        end
+
+      _ ->
+        nil
+    end
   end
 
   defp get_sensors(name) do

@@ -15,10 +15,7 @@
           <td class="<%=color%>"><%= state.adm_state %></td>
           <td><%= state[:down_count] %></td>
           <td><%= state[:csq] %></td>
-          <td><%= case state[:latency] do
-                    n when is_number(n) -> "#{n/1000 |> round()} ms"
-                    _ -> nil
-                  end %>
+          <td><%= pretty_time(state[:latency]) %>
           </td>
         </tr>
       <% end %>
