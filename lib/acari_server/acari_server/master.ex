@@ -21,7 +21,10 @@ defmodule AcariServer.Master do
 
   defmodule SSlinkState do
     defstruct up: false,
-              down_count: 0
+              down_count: 0,
+              tm_start: 0,
+              tm_down: 0,
+              tm_down_start: 0
   end
 
   def start_link(params) do
@@ -106,14 +109,13 @@ defmodule AcariServer.Master do
            tun_state
            |> update_in([Access.key!(:sslinks), sslink_name], fn
              nil ->
-               %SSlinkState{up: link_state}
+               tm = :erlang.system_time(:second)
 
-             %{down_count: dc} = sslnk_state ->
-               %SSlinkState{
-                 sslnk_state
-                 | up: link_state,
-                   down_count: if(link_state, do: dc, else: dc + 1)
-               }
+               %SSlinkState{tm_start: tm, tm_down_start: tm, tm_down: 0}
+               |> update_link_state(link_state)
+
+             sslink_state ->
+               sslink_state |> update_link_state(link_state)
            end) do
       :ets.update_element(
         :tuns,
@@ -122,6 +124,26 @@ defmodule AcariServer.Master do
       )
     else
       res -> Logger.error("Can't set sslink state: #{inspect(res)}")
+    end
+  end
+
+  defp update_link_state(sslink_state, link_state) do
+    case link_state do
+      true ->
+        %SSlinkState{
+          sslink_state
+          | up: link_state,
+            tm_down:
+              sslink_state.tm_down + (:erlang.system_time(:second) - sslink_state.tm_down_start)
+        }
+
+      _ ->
+        %SSlinkState{
+          sslink_state
+          | up: link_state,
+            down_count: sslink_state.down_count + 1,
+            tm_down_start: :erlang.system_time(:second)
+        }
     end
   end
 
