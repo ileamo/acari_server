@@ -35,9 +35,14 @@ defmodule AcariServerWeb.TunnelView do
 
           links_state =
             state.sslinks
-            |> Enum.map(fn {link_name, %{up: up, down_count: dc}} ->
+            |> IO.inspect()
+            |> Enum.map(fn {link_name, %{up: up, down_count: dc} = sslink_state} ->
               {link_name,
-               %{down_count: dc, adm_state: (up && "UP") || "DOWN"}
+               %{
+                 down_pc: get_down_pc(sslink_state),
+                 down_count: dc,
+                 adm_state: (up && "UP") || "DOWN"
+               }
                |> Map.merge(get_link_params(links[link_name]))
                |> Map.put(
                  :csq,
@@ -57,6 +62,13 @@ defmodule AcariServerWeb.TunnelView do
       end
 
     %{description: node.description} |> Map.merge(state)
+  end
+
+  defp get_down_pc(sslink_state) do
+    tm = :erlang.system_time(:second)
+    total = tm - sslink_state.tm_start
+    down = sslink_state.tm_down + if sslink_state.up, do: 0, else: tm - sslink_state.tm_down_start
+    down * 100 / total
   end
 
   def get_sensors_html(name) do
