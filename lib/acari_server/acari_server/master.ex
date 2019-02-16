@@ -102,24 +102,23 @@ defmodule AcariServer.Master do
 
   defp set_sslink_up(tun_name, sslink_name, link_state) do
     with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
-         sslinks <- tun_state.sslinks,
-         sslink_state = %SSlinkState{} <- sslinks[sslink_name] || %SSlinkState{},
-         new_tun_state <- %TunState{
+         tun_state <-
            tun_state
-           | sslinks:
-               sslinks
-               |> Map.put(
-                 sslink_name,
-                 %SSlinkState{sslink_state | up: link_state}
-                 |> (fn sss ->
-                       if link_state, do: sss, else: sss |> Map.update(:down_count, 0, &(&1 + 1))
-                     end).()
-               )
-         } do
+           |> update_in([Access.key!(:sslinks), sslink_name], fn
+             nil ->
+               %SSlinkState{up: link_state}
+
+             %{down_count: dc} = sslnk_state ->
+               %SSlinkState{
+                 sslnk_state
+                 | up: link_state,
+                   down_count: if(link_state, do: dc, else: dc + 1)
+               }
+           end) do
       :ets.update_element(
         :tuns,
         tun_name,
-        {4, new_tun_state}
+        {4, tun_state}
       )
     else
       res -> Logger.error("Can't set sslink state: #{inspect(res)}")
@@ -130,19 +129,19 @@ defmodule AcariServer.Master do
     inventory = "#{AcariServer.get_local_time()}\n#{inventory}"
 
     with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
-         new_tun_state <- %TunState{
+         tun_state <- %TunState{
            tun_state
            | inventory: inventory
          } do
       :ets.update_element(
         :tuns,
         tun_name,
-        {4, new_tun_state}
+        {4, tun_state}
       )
 
       AcariServer.NodeMonitorAgent.event(tun_name, "inventory", inventory)
     else
-      res -> Logger.error("Can't set sslink state: #{inspect(res)}")
+      res -> Logger.error("Can't set inventory: #{inspect(res)}")
     end
   end
 
@@ -150,14 +149,14 @@ defmodule AcariServer.Master do
     telemetry = "#{AcariServer.get_local_time()}\n#{telemetry}"
 
     with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
-         new_tun_state <- %TunState{
+         tun_state <- %TunState{
            tun_state
            | telemetry: telemetry
          } do
       :ets.update_element(
         :tuns,
         tun_name,
-        {4, new_tun_state}
+        {4, tun_state}
       )
 
       AcariServer.NodeMonitorAgent.event(tun_name, "telemetry", telemetry)
