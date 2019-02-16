@@ -12,8 +12,7 @@ defmodule AcariServer.Zabbix.Listener do
   end
 
   defp accept_loop(l) do
-    {:ok, sock} = :gen_tcp.accept(l)
-    {:ok, _pid} = AcariServer.Zabbix.Server.start(sock)
+    {:ok, _pid} = AcariServer.Zabbix.Server.start(l)
     accept_loop(l)
   end
 end

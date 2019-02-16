@@ -9,13 +9,14 @@ defmodule AcariServer.Zabbix.Server do
     ]
   end
 
-  def start_link(sock) do
-    GenServer.start_link(__MODULE__, sock)
+  def start_link(listen_sock) do
+    GenServer.start_link(__MODULE__, listen_sock)
   end
 
   ## Callbacks
   @impl true
-  def init(sock) do
+  def init(listen_sock) do
+    {:ok, sock} = :gen_tcp.accept(listen_sock)
     {:ok, %State{socket: sock, rest: ""}}
   end
 
@@ -78,14 +79,10 @@ defmodule AcariServer.Zabbix.Server do
   end
 
   # Client
-  def start(sock) do
-    {:ok, pid} =
-      DynamicSupervisor.start_child(
-        AcariServer.HsSup,
-        child_spec(sock)
-      )
-
-    :ok = :gen_tcp.controlling_process(sock, pid)
-    {:ok, pid}
+  def start(listen_sock) do
+    DynamicSupervisor.start_child(
+      AcariServer.Zabbix.SerSup,
+      child_spec(listen_sock)
+    )
   end
 end
