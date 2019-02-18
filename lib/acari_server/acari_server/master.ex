@@ -247,10 +247,10 @@ defmodule AcariServer.Master do
   #  end
 
   def get_dstaddr(tun_name) do
-    with %{"peer_ifname" => peer_ifname} <- get_tun_params(tun_name),
+    with %{"ifname" => ifname} <- get_tun_params(tun_name),
          {:ok, list} <- :inet.getifaddrs(),
          {_, addr_list} <-
-           list |> Enum.find(fn {name, _} -> name == to_charlist(peer_ifname) end),
+           list |> Enum.find(fn {name, _} -> name == to_charlist(ifname) end),
          {:ok, dstaddr} <- addr_list |> Keyword.fetch(:dstaddr),
          dstaddr when is_list(dstaddr) <- :inet.ntoa(dstaddr) do
       to_string(dstaddr)

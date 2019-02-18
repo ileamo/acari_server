@@ -73,7 +73,7 @@ defmodule AcariServer.SFX do
          end) do
       nil -> create_setup("Нет шаблонов для создания скрипта")
       :many -> do_makeself(templ_map, setup_file_name)
-      content -> content
+      content -> content |> String.replace("\r\n", "\n")
     end
   end
 
