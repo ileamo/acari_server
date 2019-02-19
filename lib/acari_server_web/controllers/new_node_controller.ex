@@ -2,6 +2,9 @@ defmodule AcariServerWeb.NewNodeController do
   use AcariServerWeb, :controller
   alias AcariServer.NewNodeDiscovery
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:edit, :delete, :new]
+
   def index(conn, _params) do
     newnodes = NewNodeDiscovery.list_newnodes()
     render(conn, "index.html", newnodes: newnodes)

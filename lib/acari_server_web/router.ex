@@ -35,7 +35,7 @@ defmodule AcariServerWeb.Router do
 
   scope "/", AcariServerWeb do
     pipe_through [:browser, :auth]
-
+    get "/noauth", PageController, :noauth
     get "/test", PageController, :test
   end
 

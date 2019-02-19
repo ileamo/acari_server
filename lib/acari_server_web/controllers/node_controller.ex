@@ -4,6 +4,9 @@ defmodule AcariServerWeb.NodeController do
   alias AcariServer.NodeManager
   alias AcariServer.NodeManager.Node
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:edit, :delete, :new]
+
   def index(conn, _params) do
     nodes = NodeManager.list_nodes()
     render(conn, "index.html", nodes: nodes)

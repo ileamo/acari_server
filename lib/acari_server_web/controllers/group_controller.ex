@@ -4,6 +4,9 @@ defmodule AcariServerWeb.GroupController do
   alias AcariServer.GroupManager
   alias AcariServer.GroupManager.Group
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:edit, :delete, :new]
+
   def index(conn, _params) do
     groups = GroupManager.list_groups()
     render(conn, "index.html", groups: groups)

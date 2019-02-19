@@ -4,6 +4,9 @@ defmodule AcariServerWeb.ScriptController do
   alias AcariServer.ScriptManager
   alias AcariServer.ScriptManager.Script
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:edit, :delete, :new]
+
   def index(conn, _params) do
     scripts = ScriptManager.list_scripts()
     render(conn, "index.html", scripts: scripts)

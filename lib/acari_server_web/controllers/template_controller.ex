@@ -4,6 +4,9 @@ defmodule AcariServerWeb.TemplateController do
   alias AcariServer.TemplateManager
   alias AcariServer.TemplateManager.Template
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:edit, :delete, :new]
+
   def index(conn, _params) do
     templates = TemplateManager.list_templates()
     render(conn, "index.html", templates: templates)

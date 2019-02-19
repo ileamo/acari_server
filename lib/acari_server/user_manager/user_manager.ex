@@ -130,4 +130,14 @@ defmodule AcariServer.UserManager do
     conn
     |> Conn.assign(:current_user, Guardian.Plug.current_resource(conn))
   end
+
+  def is_admin(conn = %{assigns: %{current_user: %{is_admin: true}}}, _opts) do
+    conn
+  end
+
+  def is_admin(conn, _opts) do
+    conn
+    |> Phoenix.Controller.redirect(to:  AcariServerWeb.Router.Helpers.page_path(conn, :noauth))
+    |> Conn.halt()
+  end
 end

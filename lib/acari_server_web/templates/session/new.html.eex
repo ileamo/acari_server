@@ -14,7 +14,7 @@
     <dev class="signin">
       <% prev_path = assigns[:prev_path] || "/" %>
 
-      <%= form_for @changeset, @action, [class: "form-signin", autocomplete: false], fn f -> %>
+      <%= form_for @changeset, @action, [class: "form-signin", autocomplete: "off"], fn f -> %>
 <!--        <img class="mb-4" src="<%= Routes.static_path(@conn, "/images/nsg_logo.svg") %>" alt="" width="72" height="72">
 -->
         <h1 class="h3 mb-3 font-weight-normal">NSG</h1>

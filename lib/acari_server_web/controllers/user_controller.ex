@@ -1,8 +1,12 @@
 defmodule AcariServerWeb.UserController do
   use AcariServerWeb, :controller
+  require Logger
 
   alias AcariServer.UserManager
   alias AcariServer.UserManager.User
+
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin
 
   def index(conn, _params) do
     users = UserManager.list_users()
