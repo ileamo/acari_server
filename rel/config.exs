@@ -41,6 +41,15 @@ environment :prod do
   set(overlays: [{:copy, "priv/cert", "priv/cert"}])
 end
 
+environment :docker do
+  set(dev_mode: false)
+  set(include_erts: true)
+  set(include_src: false)
+  set(cookie: :"$Z:zZ$FZE5@$i;E2D497T5WOo9!aAxlj3h62/vGLFm0YWscY.{EieO2^q,~8J^6P")
+  set(vm_args: "rel/vm.args")
+  set(overlays: [{:copy, "priv/cert", "priv/cert"}])
+end
+
 # You may define one or more releases in this file.
 # If you have not set a default release, or selected one
 # when running `mix release`, the first release in the file
