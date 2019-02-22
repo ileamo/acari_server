@@ -5,7 +5,7 @@ WORKDIR /build
 
 COPY mix.exs .
 COPY mix.lock .
-COPY deps deps
+#COPY deps deps
 
 ARG MIX_ENV=docker
 ARG APP_VERSION=0.0.0
