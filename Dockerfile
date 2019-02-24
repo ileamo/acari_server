@@ -34,7 +34,7 @@ FROM alpine:3.8
 
 RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
-libcap iproute2
+libcap iproute2 openssh-client
 
 RUN adduser -D app
 
@@ -59,6 +59,8 @@ ENV RELEASE_MUTABLE_DIR /tmp/app
 ENV START_ERL_DATA /tmp/app/start_erl.data
 
 ENV SHELL /bin/bash
+
+RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa
 
 ENTRYPOINT ["/opt/app/bin/acari_server"]
 #CMD ["/opt/app/bin/acari_server", "console"]
