@@ -28,3 +28,7 @@ docker run --rm -it \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-client
+
+docker exec -it \
+--user root \
+acari-client /usr/sbin/sshd
