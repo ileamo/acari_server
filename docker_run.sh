@@ -16,7 +16,9 @@ docker run --rm -it \
 docker run --rm -it \
 --name acari-server \
 --network acari-network \
+-p 50019:50019 \
 -p 50020:50020 \
+-p 50051:50051 \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-server console
@@ -32,3 +34,8 @@ docker run --rm -it \
 docker exec -it \
 --user root \
 acari-client /usr/sbin/sshd
+
+
+# Подключение сервера к внешней сети
+# docker network create -d macvlan --subnet=10.0.0.0/8 --gateway=10.2.10.1 -o parent=eth0 acari-network-mac
+#docker network connect acari-network-mac acari-server --ip 10.2.10.10
