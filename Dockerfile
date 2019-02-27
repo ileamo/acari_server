@@ -27,6 +27,7 @@ COPY assets assets
 RUN cd assets && npm install &&  node node_modules/webpack/bin/webpack.js --mode production
 RUN mix phx.digest
 
+RUN rm priv/cert/* && mix phx.gen.cert
 RUN mix release --env=${MIX_ENV}
 
 ### Minimal run-time image
