@@ -52,7 +52,7 @@ defmodule AcariServer.Master do
 
   def handle_cast({:peer_started, tun_name}, state) do
     Logger.debug("Master get :peer_started from #{tun_name}")
-    send_config(tun_name)
+    #send_config(tun_name)
     get_inventory(tun_name)
 
     {:noreply, state}
@@ -72,7 +72,7 @@ defmodule AcariServer.Master do
 
   def handle_cast({:master_mes, tun_name, json}, state) do
     with {:ok, %{"method" => method, "params" => params}} <- Jason.decode(json) do
-      exec_client_method(state, tun_name, method, params)
+      exec_server_method(state, tun_name, method, params)
     else
       res ->
         Logger.error("Bad master_mes from #{tun_name}: #{inspect(res)}")
@@ -86,19 +86,25 @@ defmodule AcariServer.Master do
     {:noreply, state}
   end
 
-  defp exec_client_method(state, tun_name, "put_data", %{"id" => "inventory", "data" => data}) do
+  defp exec_server_method(state, tun_name, "put.data", %{"id" => "inventory", "data" => data}) do
     Logger.info("Get inventory data #{data}")
     set_inventory(tun_name, data)
     state
   end
 
-  defp exec_client_method(state, tun_name, "put_data", %{"id" => "telemetry", "data" => data}) do
+  defp exec_server_method(state, tun_name, "put.data", %{"id" => "telemetry", "data" => data}) do
     Logger.info("Get telemetry data #{data}")
     set_telemetry(tun_name, data)
     state
   end
 
-  defp exec_client_method(state, _tun_name, method, _params) do
+  defp exec_server_method(state, tun_name, "get.conf", %{"id" => id}) do
+    Logger.info("Get config request #{id}")
+    send_config(tun_name)
+    state
+  end
+
+  defp exec_server_method(state, _tun_name, method, _params) do
     Logger.error("Bad message method: #{method}")
     state
   end
@@ -194,7 +200,7 @@ defmodule AcariServer.Master do
 
   def send_config(tun_name) do
     request = %{
-      method: "sfx",
+      method: "put.conf",
       params: %{
         script: 0
       }

@@ -47,7 +47,7 @@ environment :docker do
   set(include_src: false)
   set(cookie: :"$Z:zZ$FZE5@$i;E2D497T5WOo9!aAxlj3h62/vGLFm0YWscY.{EieO2^q,~8J^6P")
   set(vm_args: "rel/vm.args")
-  set(overlays: [{:copy, "priv/cert", "priv/cert"}])
+  set(overlays: [{:copy, "priv/cert", "priv/cert"}, {:copy, "priv/usr", "priv/usr"}])
 end
 
 # You may define one or more releases in this file.

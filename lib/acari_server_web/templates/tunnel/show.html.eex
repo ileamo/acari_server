@@ -3,6 +3,11 @@
       <span class="navbar-brand">Туннель <%= @name %></span>
     </div>
     <div class="navbar">
+      <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2"
+              data-confirm="Вы действительно хотите изменить конфигурацию устройства?">
+        Послать конфиг
+      </button>
+
     </div>
 </nav>
 <% tun = get_tunnel(@name)
