@@ -29,6 +29,6 @@ docker run --rm -it \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-client
 
-docker exec -it \
---user root \
-acari-client /usr/sbin/sshd
+#docker exec -it \
+#--user root \
+#acari-client /usr/sbin/sshd
