@@ -5,6 +5,7 @@ defmodule AcariServerWeb.UserSocket do
   channel "room:*", AcariServerWeb.RoomChannel
   channel "terminal:*", AcariServerWeb.TerminalChannel
   channel "node_monitor:*", AcariServerWeb.NodeMonitorChannel
+  channel "node_config:*", AcariServerWeb.NodeConfigChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
