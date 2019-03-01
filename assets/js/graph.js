@@ -1,51 +1,60 @@
 'use strict'
 
-// Graphs
 var ctx = document.getElementById('myChart')
-// eslint-disable-next-line no-unused-vars
+
 if (ctx) {
+  var moment = require('moment');
+  moment().format();
+  moment.locale('ru');
+
+  var ts = [1551450692,
+    1551450792,
+    1551450892,
+    1551450992,
+    1551450999
+  ]
+
+  var node_num = [24, 23, 22, 23, 24]
+
+  var moment_ts = ts.map(function(ts) {
+    return moment.unix(ts);
+  });
+
   var myChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [
-        'пн',
-        'вт',
-        'ср',
-        'чт',
-        'пт',
-        'сб',
-        'вс'
-      ],
+      labels: moment_ts,
       datasets: [{
-        data: [
-          15339,
-          21345,
-          18483,
-          24003,
-          23489,
-          24092,
-          12034
-        ],
+        label: 'My Line',
+        data: node_num,
         lineTension: 0,
         backgroundColor: 'transparent',
         borderColor: '#007bff',
-        borderWidth: 4,
+        borderWidth: 2,
         pointBackgroundColor: '#007bff'
+
       }]
     },
     options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: false
-          }
-        }]
-      },
       legend: {
         display: false
+      },
+      title: {
+        display: true,
+        text: "Количество работающих узлов",
+      },
+      scales: {
+        xAxes: [{
+          type: 'time',
+          time: {
+            unit: 'minute',
+            displayFormats: {
+              minute: 'HH:mm',
+              second: 'HH:mm:ss'
+            },
+          }
+        }]
       }
     }
   })
-
-  
 }
