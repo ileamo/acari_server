@@ -90,7 +90,7 @@ defmodule AcariServer.SFX do
            end),
          :ok <- File.chmod(Path.join(dir_path, setup_file_name), 0o755),
          {:ok, sfx_filename} <- Temp.path(),
-         makeself_sh = System.cwd() <> "/priv/usr/makeself.sh",
+         makeself_sh = File.cwd() <> "/priv/usr/makeself.sh",
          :ok <-
            if(File.exists?(makeself_sh), do: :ok, else: {:error, "No such file #{makeself_sh}"}),
          {_, 0} <-

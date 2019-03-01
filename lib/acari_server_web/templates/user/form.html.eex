@@ -32,7 +32,7 @@
   <div class="form-group row">
     <%= label f, "Админ", class: "col-2 form-check-label" %>
     <div class="col10">
-      <div class="form-check">
+      <div class="form-check ml-3">
         <%= checkbox f, :is_admin, class: "form-check-input" %>
         <%= error_tag f, :is_admin %>
       </div>

@@ -24,7 +24,7 @@
   <div class="form-group row">
     <%= label f, "Исполняемый", class: "col-2 form-check-label" %>
     <div class="col10">
-      <div class="form-check">
+      <div class="form-check ml-3">
         <%= checkbox f, :executable, class: "form-check-input" %>
         <%= error_tag f, :executable %>
       </div>
