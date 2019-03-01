@@ -31,10 +31,9 @@ docker run --rm -it \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-client
 
-docker exec -it \
---user root \
-acari-client /usr/sbin/sshd
-
+#docker exec -it \
+#--user root \
+#acari-client /usr/sbin/sshd
 
 # Подключение сервера к внешней сети
 # docker network create -d macvlan --subnet=10.0.0.0/8 --gateway=10.2.10.1 -o parent=eth0 acari-network-mac
