@@ -53,6 +53,11 @@ if (ctx) {
               second: 'HH:mm:ss'
             },
           }
+        }],
+        yAxes: [{
+          ticks: {
+            precision: 0
+          }
         }]
       }
     }
