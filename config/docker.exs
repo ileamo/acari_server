@@ -19,6 +19,7 @@ config :acari_server, AcariServerWeb.Endpoint,
   ],
   # This is critical for ensuring web-sockets properly authorize.
   url: [host: "localhost", port: 50020],
+  check_origin: false,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   root: ".",

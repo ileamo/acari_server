@@ -12,12 +12,13 @@ use Mix.Config
 
 config :acari_server, AcariServerWeb.Endpoint,
   http: [port: 50020],
-  url: [host: "localhost", port: 50020], # This is critical for ensuring web-sockets properly authorize.
+  # This is critical for ensuring web-sockets properly authorize.
+  url: [host: "localhost", port: 50020],
+  check_origin: false,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   root: ".",
   version: Application.spec(:acari_server, :vsn)
-
 
 # Do not print debug messages in production
 config :logger, level: :info
