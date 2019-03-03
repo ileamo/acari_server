@@ -21,7 +21,7 @@ docker run --rm -it \
 -p 50051:50051 \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun:/dev/net/tun \
--d acari-server console
+-d acari-server foreground
 
 # Client
 docker run --rm -it \
