@@ -33,4 +33,4 @@ config :acari_server, AcariServer.Listener,
   keyfile: "priv/cert/selfsigned_key.pem",
   certfile: "priv/cert/selfsigned.pem"
 
-import_config "docker.secret.exs"
+#import_config "docker.secret.exs"

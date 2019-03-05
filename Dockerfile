@@ -64,4 +64,4 @@ ENV SHELL /bin/bash
 RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa
 
 ENTRYPOINT ["/opt/app/bin/acari_server"]
-#CMD ["/opt/app/bin/acari_server", "console"]
+#CMD ["/bin/sh"]

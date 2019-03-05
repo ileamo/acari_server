@@ -38,7 +38,13 @@ environment :prod do
   set(include_src: false)
   set(cookie: :"$Z:zZ$FZE5@$i;E2D497T5WOo9!aAxlj3h62/vGLFm0YWscY.{EieO2^q,~8J^6P")
   set(vm_args: "rel/vm.args")
-  set(overlays: [{:copy, "priv/cert", "priv/cert"}])
+
+  set(
+    overlays: [
+      {:copy, "priv/cert", "priv/cert"},
+      {:copy, "rel/runtime_config.exs", "etc/runtime_config.exs"}
+    ]
+  )
 end
 
 environment :docker do
@@ -47,7 +53,14 @@ environment :docker do
   set(include_src: false)
   set(cookie: :"$Z:zZ$FZE5@$i;E2D497T5WOo9!aAxlj3h62/vGLFm0YWscY.{EieO2^q,~8J^6P")
   set(vm_args: "rel/vm.args")
-  set(overlays: [{:copy, "priv/cert", "priv/cert"}, {:copy, "priv/usr", "priv/usr"}])
+
+  set(
+    overlays: [
+      {:copy, "priv/cert", "priv/cert"},
+      {:copy, "priv/usr", "priv/usr"},
+      {:copy, "rel/runtime_config.exs", "etc/runtime_config.exs"}
+    ]
+  )
 end
 
 # You may define one or more releases in this file.
@@ -57,6 +70,12 @@ end
 
 release :acari_server do
   set(version: current_version(:acari_server))
+
+  set(
+    config_providers: [
+      {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/runtime_config.exs"]}
+    ]
+  )
 
   set(
     applications: [

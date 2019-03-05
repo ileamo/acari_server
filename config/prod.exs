@@ -11,9 +11,9 @@ use Mix.Config
 # before starting your production server.
 
 config :acari_server, AcariServerWeb.Endpoint,
-  http: [port: 50020],
+  http: [port: {:system, "PORT"}],
   # This is critical for ensuring web-sockets properly authorize.
-  url: [host: "localhost", port: 50020],
+  url: [host: "localhost", port: {:system, "PORT"}],
   check_origin: false,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
@@ -74,4 +74,4 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which should be versioned
 # separately.
-import_config "prod.secret.exs"
+#import_config "prod.secret.exs"
