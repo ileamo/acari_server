@@ -19,7 +19,6 @@
                     <div class="col-lg-7 px-0 px-lg-1">
                         <!-- RECENT REPORT 2-->
                         <div class="recent-report2">
-                            <h3 class="title-3">График</h3>
                             <div class="recent-report__chart">
                                 <canvas id="myChart"></canvas>
                             </div>

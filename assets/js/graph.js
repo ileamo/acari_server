@@ -25,13 +25,14 @@ if (ctx) {
     data: {
       labels: moment_ts,
       datasets: [{
-        label: 'My Line',
+        label: 'Кол-во',
         data: node_num,
         lineTension: 0,
         backgroundColor: 'transparent',
         borderColor: '#007bff',
         borderWidth: 2,
-        pointBackgroundColor: '#007bff'
+        pointBackgroundColor: '#007bff',
+        pointRadius: 1,
 
       }]
     },
