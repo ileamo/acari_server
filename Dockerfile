@@ -56,6 +56,7 @@ USER app
 
 # Mutable Runtime Environment
 RUN mkdir /tmp/app
+RUN mkdir /tmp/app/log
 ENV RELEASE_MUTABLE_DIR /tmp/app
 ENV START_ERL_DATA /tmp/app/start_erl.data
 

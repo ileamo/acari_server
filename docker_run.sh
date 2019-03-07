@@ -19,7 +19,7 @@ docker run --rm -it \
 -e DB_HOST=acari-server-db \
 -p 50019:50019 \
 -p 50020:50020 \
--p 50051:50051 \
+-v /var/log/acari_server:/tmp/app/log \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-server foreground

@@ -1,5 +1,14 @@
 use Mix.Config
 
+# Logger configuration
+config :logger,
+  backends: [{LoggerFileBackend, :error_log}]
+
+config :logger, :error_log,
+  path: "/tmp/app/log/info.log",
+  format: "$date $time $metadata[$level] $message\n",
+  level: :info
+
 # Configure your database
 config :acari_server, AcariServer.Repo,
   adapter: Ecto.Adapters.Postgres,

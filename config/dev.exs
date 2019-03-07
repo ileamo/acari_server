@@ -63,7 +63,15 @@ config :acari_server, AcariServerWeb.Endpoint,
   ]
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :console, format: "$date $time [$level] $message\n"
+
+config :logger,
+  backends: [:console, {LoggerFileBackend, :error_log}]
+
+config :logger, :error_log,
+  path: "log/info.log",
+  level: :debug,
+  format: "$date $time [$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
