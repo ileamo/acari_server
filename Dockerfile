@@ -35,7 +35,7 @@ FROM alpine:3.8
 
 RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
-libcap iproute2 openssh-client
+libcap libcap-dev iproute2 openssh-client
 
 RUN adduser -D app
 
