@@ -2,7 +2,7 @@ defmodule AcariServer.Terminal do
   use GenServer
 
   def start_link(params) do
-    GenServer.start_link(__MODULE__, params)
+    GenServer.start_link(__MODULE__, params, timeout: 30_000)
   end
 
   @impl true
