@@ -1,8 +1,9 @@
 defmodule AcariServer.Terminal do
   use GenServer
+  require Logger
 
   def start_link(params) do
-    GenServer.start_link(__MODULE__, params, timeout: 30_000)
+    GenServer.start_link(__MODULE__, params, timeout: 40_000)
   end
 
   @impl true
@@ -12,7 +13,7 @@ defmodule AcariServer.Terminal do
     with dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(name),
          send(output_pid, {:output, "Подключение к узлу #{name} \r\n"}),
          {:ok, shell, _os_pid} <-
-           :exec.run('ssh root@#{dstaddr} -o StrictHostKeyChecking=no', [
+           :exec.run_link('ssh root@#{dstaddr} -o StrictHostKeyChecking=no', [
              :stdin,
              :stdout,
              :stderr,
@@ -22,16 +23,19 @@ defmodule AcariServer.Terminal do
       {:ok,
        %{
          output_pid: output_pid,
-         shell: shell
+         shell: shell,
+         name: name
        }}
     else
-      _ ->
+      res ->
+        Logger.error("Terminal #{pathname} #{inspect(res)}")
         send(output_pid, {:output, "Не могу подключиться к узлу #{name} \r\n"})
 
         {:ok,
          %{
            output_pid: output_pid,
-           shell: nil
+           shell: nil,
+           name: name
          }}
     end
   end
@@ -53,8 +57,13 @@ defmodule AcariServer.Terminal do
     {:noreply, state}
   end
 
-  def handle_info({:stderr, _os_pir, output}, %{output_pid: output_pid} = state) do
+  def handle_info({:stderr, _os_pid, output}, %{output_pid: output_pid} = state) do
     send(output_pid, {:output, output})
+    {:noreply, state}
+  end
+
+  def handle_info(message, state) do
+    Logger.warn("Terminal #{state[:name]}: Unknown message: #{inspect(message)}")
     {:noreply, state}
   end
 
