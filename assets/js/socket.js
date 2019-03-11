@@ -80,6 +80,7 @@ channel.on("link_event", payload => {
   }
   if (progressContainer) {
     progressContainer.innerHTML = `${payload.progress}`
+    make_chart()
   }
 })
 

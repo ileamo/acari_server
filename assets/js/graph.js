@@ -1,6 +1,6 @@
 'use strict'
 
-function make_chart() {
+window.make_chart = function() {
   var ctx = document.getElementById('myChart')
 
   if (ctx) {
