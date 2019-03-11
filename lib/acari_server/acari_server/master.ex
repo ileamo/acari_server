@@ -52,7 +52,7 @@ defmodule AcariServer.Master do
 
   def handle_cast({:peer_started, tun_name}, state) do
     Logger.debug("Master get :peer_started from #{tun_name}")
-    #send_config(tun_name)
+    # send_config(tun_name)
     get_inventory(tun_name)
 
     {:noreply, state}
@@ -270,6 +270,8 @@ defmodule AcariServer.Master do
   end
 
   defp broadcast_link_event() do
+    AcariServer.NodeNumbersAgent.update()
+
     mes_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", [])
 
     statistics_html =
@@ -283,5 +285,12 @@ defmodule AcariServer.Master do
       statistics: statistics_html,
       progress: progress_html
     })
+  end
+
+  def get_nodes_num() do
+    case :ets.info(:tuns, :size) do
+      n when is_number(n) -> n
+      _ -> 0
+    end
   end
 end

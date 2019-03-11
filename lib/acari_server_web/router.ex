@@ -62,5 +62,6 @@ defmodule AcariServerWeb.Router do
   scope "/api", AcariServerWeb.Api, as: :api do
     pipe_through(:api)
     post("/", AutoconfController, :index)
+    get "/nodes_num", AuxController, :nodes_num
   end
 end

@@ -18,6 +18,7 @@ defmodule AcariServer.Application do
       Acari.Sup,
       AcariServer.TemplateAgent,
       AcariServer.NodeMonitorAgent,
+      AcariServer.NodeNumbersAgent,
       AcariServer.Sup,
       {Task.Supervisor, name: AcariClient.TaskSup}
       #AcariClient.TunCreator
