@@ -3,12 +3,13 @@ defmodule AcariServer.Terminal do
   require Logger
 
   def start_link(params) do
-    GenServer.start_link(__MODULE__, params, timeout: 40_000)
+    GenServer.start_link(__MODULE__, params, timeout: 5_000)
   end
 
   @impl true
   def init(%{output_pid: output_pid, pathname: pathname} = _params) do
     [_, name] = Regex.run(~r|/([^/]+)$|, pathname)
+    Process.flag(:trap_exit, true)
 
     with dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(name),
          send(output_pid, {:output, "Подключение к узлу #{name} \r\n"}),
@@ -47,8 +48,10 @@ defmodule AcariServer.Terminal do
   end
 
   def handle_cast({:input, input}, %{shell: shell} = state) do
-    :exec.send(shell, input)
-    {:noreply, state}
+    case :exec.send(shell, input) do
+      :ok -> {:noreply, state}
+      _ -> {:noreply, %{state | shell: nil}}
+    end
   end
 
   @impl true
@@ -62,9 +65,13 @@ defmodule AcariServer.Terminal do
     {:noreply, state}
   end
 
+  def handle_info({:EXIT, _pid, :normal}, state) do
+    {:noreply, %{state | shell: nil}}
+  end
+
   def handle_info(message, state) do
     Logger.warn("Terminal #{state[:name]}: Unknown message: #{inspect(message)}")
-    {:noreply, state}
+    {:stop, :shutdown, state}
   end
 
   # API
