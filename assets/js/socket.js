@@ -76,8 +76,12 @@ channel.on("link_event", payload => {
   if (payload.redraw_chart) {
     make_chart()
   } else {
-    messagesBadge.innerText = `${payload.num_of_mes}`
-    messagesContainer.innerHTML = `${payload.messages}`
+    if (messagesBadge) {
+      messagesBadge.innerText = `${payload.num_of_mes}`
+    }
+    if (messagesContainer) {
+      messagesContainer.innerHTML = `${payload.messages}`
+    }
     if (statisticsContainer) {
       statisticsContainer.innerHTML = `${payload.statistics}`
     }
