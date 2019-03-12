@@ -1,5 +1,6 @@
 defmodule AcariServer.NodeNumbersAgent do
   use Agent
+  alias AcariServerWeb.Endpoint
 
   @max_items 25
 
@@ -26,6 +27,10 @@ defmodule AcariServer.NodeNumbersAgent do
             state
 
           _ ->
+            Endpoint.broadcast!("room:lobby", "link_event", %{
+              redraw_chart: true
+            })
+
             [
               [:os.system_time(:second) | ts_list] |> Enum.take(@max_items),
               [num | num_list] |> Enum.take(@max_items)

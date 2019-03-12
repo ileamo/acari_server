@@ -73,14 +73,17 @@ let statisticsContainer = document.querySelector("#statistics")
 let progressContainer = document.querySelector("#progress")
 
 channel.on("link_event", payload => {
-  messagesBadge.innerText = `${payload.num_of_mes}`
-  messagesContainer.innerHTML = `${payload.messages}`
-  if (statisticsContainer) {
-    statisticsContainer.innerHTML = `${payload.statistics}`
-  }
-  if (progressContainer) {
-    progressContainer.innerHTML = `${payload.progress}`
+  if (payload.redraw_chart) {
     make_chart()
+  } else {
+    messagesBadge.innerText = `${payload.num_of_mes}`
+    messagesContainer.innerHTML = `${payload.messages}`
+    if (statisticsContainer) {
+      statisticsContainer.innerHTML = `${payload.statistics}`
+    }
+    if (progressContainer) {
+      progressContainer.innerHTML = `${payload.progress}`
+    }
   }
 })
 
