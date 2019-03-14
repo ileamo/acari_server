@@ -28,6 +28,7 @@ docker run --rm -it \
 docker run --rm -it \
 --name acari-client \
 --network acari-network \
+-v /var/log/acari_client:/tmp/app/log \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-client

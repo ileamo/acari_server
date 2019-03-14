@@ -2,12 +2,20 @@ use Mix.Config
 
 # Logger configuration
 config :logger,
-  backends: [{LoggerFileBackend, :error_log}]
+  backends: [
+    {LoggerFileBackend, :info_log},
+    {LoggerFileBackend, :error_log}
+]
 
-config :logger, :error_log,
+config :logger, :info_log,
   path: "/tmp/app/log/info.log",
   format: "$date $time $metadata[$level] $message\n",
   level: :info
+
+config :logger, :error_log,
+  path: "/tmp/app/log/error.log",
+  format: "$date $time $metadata[$level] $message\n",
+  level: :error
 
 # Configure your database
 config :acari_server, AcariServer.Repo,
