@@ -24,6 +24,10 @@ window.make_chart = function() {
         return moment.unix(ts);
       });
 
+      // Add current moment
+      moment_ts.push(moment())
+      node_num.push(node_num[node_num.length - 1])
+      
       var myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -36,7 +40,7 @@ window.make_chart = function() {
             borderColor: '#007bff',
             borderWidth: 2,
             pointBackgroundColor: '#007bff',
-            pointRadius: 1,
+            pointRadius: 0,
             steppedLine: true
           }]
         },
@@ -60,11 +64,12 @@ window.make_chart = function() {
           },
           scales: {
             xAxes: [{
+              display: true,
               type: 'time',
               time: {
-                //min: moment().subtract(10, 'minutes'),
-                unit: 'minute',
+                //min: moment_ts[0].subtract(100, 'minutes'),
                 displayFormats: {
+                  hour: 'HH:mm',
                   minute: 'HH:mm',
                   second: 'HH:mm:ss'
                 },
