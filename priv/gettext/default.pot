@@ -11,15 +11,22 @@ msgid ""
 msgstr ""
 
 #, elixir-format
-#: lib/acari_server_web/templates/page/statistics.html.eex:6
+#: lib/acari_server_web/templates/page/statistics.html.eex:8
 msgid "node"
 msgid_plural "nodes"
 msgstr[0] ""
 msgstr[1] ""
 
 #, elixir-format
-#: lib/acari_server_web/templates/page/statistics.html.eex:24
+#: lib/acari_server_web/templates/page/statistics.html.eex:26
 msgid "module does not operate"
 msgid_plural "modules do not operate"
+msgstr[0] ""
+msgstr[1] ""
+
+#, elixir-format
+#: lib/acari_server_web/templates/page/statistics.html.eex:20
+msgid "down"
+msgid_plural "downs"
 msgstr[0] ""
 msgstr[1] ""

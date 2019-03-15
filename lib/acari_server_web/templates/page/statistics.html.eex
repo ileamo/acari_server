@@ -1,5 +1,6 @@
 <% {bad_nodes, bad_links} = Acari.LinkEventAgent.get_failures() %>
 <% nodes_num = AcariServer.Master.get_nodes_num()
+   down_count = AcariServer.NodeNumbersAgent.get_down_count()
 %>
 <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">
     <div class="statistic__item">
@@ -15,8 +16,8 @@
 </div>
 <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">
     <div class="statistic__item">
-        <h2 class="number">?</h2>
-        <span class="desc">сбоев за неделю</span>
+        <h2 class="number"><%= down_count %></h2>
+        <span class="desc"><%= ngettext "down", "downs", down_count %></span>
     </div>
 </div>
 <div class="col-md-6 col-lg-3 px-0 pl-md-1 px-lg-1">

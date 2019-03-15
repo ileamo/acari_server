@@ -11,7 +11,27 @@ defmodule AcariServer.NodeNumbersAgent do
   # API
 
   def get() do
-    Agent.get(__MODULE__, fn state -> state end)
+    Agent.get(__MODULE__, fn [ts_list, num_list] ->
+      [ts_list |> Enum.take(@max_items), num_list |> Enum.take(@max_items)]
+    end)
+  end
+
+  def get_down_count() do
+    Agent.get(__MODULE__, fn [_, num_list] ->
+      num_list
+      |> Enum.reduce(
+        {List.first(num_list), 0},
+        fn n, {prev, count} ->
+          {n,
+           count +
+             case n - prev do
+               i when i > 0 -> i
+               _ -> 0
+             end}
+        end
+      )
+      |> elem(1)
+    end)
   end
 
   def update() do
@@ -32,8 +52,8 @@ defmodule AcariServer.NodeNumbersAgent do
             })
 
             [
-              [:os.system_time(:second) | ts_list] |> Enum.take(@max_items),
-              [num | num_list] |> Enum.take(@max_items)
+              [:os.system_time(:second) | ts_list],
+              [num | num_list]
             ]
         end
       end
