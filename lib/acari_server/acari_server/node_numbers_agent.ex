@@ -5,44 +5,34 @@ defmodule AcariServer.NodeNumbersAgent do
   @max_items 25
 
   def start_link(_) do
-    Agent.start_link(fn -> [[], []] end, name: __MODULE__)
+    Agent.start_link(fn -> [[], [], []] end, name: __MODULE__)
   end
 
   # API
 
   def get() do
-    Agent.get(__MODULE__, fn [ts_list, num_list] ->
-      [ts_list |> Enum.take(@max_items), num_list |> Enum.take(@max_items)]
+    Agent.get(__MODULE__, fn [ts_list, num_list, _] ->
+      [ts_list, num_list]
     end)
   end
 
   def get_down_count() do
-    Agent.get(__MODULE__, fn [_, num_list] ->
-      num_list
-      |> Enum.reduce(
-        {List.first(num_list), 0},
-        fn n, {prev, count} ->
-          {n,
-           count +
-             case n - prev do
-               i when i > 0 -> i
-               _ -> 0
-             end}
-        end
-      )
-      |> elem(1)
+    Agent.get(__MODULE__, fn [_, _, down_list] ->
+      down_list
+      |> length()
     end)
   end
 
   def update() do
     Agent.update(
       __MODULE__,
-      fn [ts_list, num_list] = state ->
+      fn [ts_list, num_list, down_list] = state ->
         {bad_nodes, _bad_links} = Acari.LinkEventAgent.get_failures()
         nodes_num = AcariServer.Master.get_nodes_num()
         num = nodes_num - bad_nodes
+        prev = List.first(num_list)
 
-        case num == List.first(num_list) do
+        case num == prev do
           true ->
             state
 
@@ -51,9 +41,16 @@ defmodule AcariServer.NodeNumbersAgent do
               redraw_chart: true
             })
 
+            ts = :os.system_time(:second)
+
             [
-              [:os.system_time(:second) | ts_list],
-              [num | num_list]
+              [ts | ts_list] |> Enum.take(@max_items),
+              [num | num_list] |> Enum.take(@max_items),
+              case num < (prev || num) do
+                true -> [ts | down_list]
+                _ -> down_list
+              end
+              |>  Enum.take_while(fn x -> x > ts - 60*60*24 end)
             ]
         end
       end
