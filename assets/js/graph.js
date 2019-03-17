@@ -70,9 +70,10 @@ window.make_chart = function() {
               time: {
                 max: ts_last.add(ts_last.diff(moment_ts[0],'seconds') / 50, 'seconds'),
                 displayFormats: {
-                  hour: 'HH:mm',
+                  hour: 'HH',
                   minute: 'HH:mm',
-                  second: 'HH:mm:ss'
+                  second: 'HH:mm:ss',
+                  millisecond: 'HH:mm:ss.SSS'
                 },
               }
             }],
