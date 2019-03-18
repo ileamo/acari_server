@@ -9,7 +9,7 @@ defmodule AcariServer.Zabbix.Sender do
   end
 
   def start_link(params) do
-    GenServer.start_link(__MODULE__, params)
+    GenServer.start_link(__MODULE__, params, name: __MODULE__)
   end
 
   ## Callbacks
@@ -23,6 +23,16 @@ defmodule AcariServer.Zabbix.Sender do
       res ->
         Logger.error("Can't run uizbxd: #{inspect(res)}")
         {:ok, %State{port: nil}}
+    end
+  end
+
+  @impl true
+  def handle_cast({:send, sensor}, %{port: port} = state) do
+    IO.puts("CAST")
+
+    case :exec.send(port, sensor) do
+      :ok -> {:noreply, state}
+      _ -> {:noreply, %{state | port: nil}}
     end
   end
 
@@ -57,7 +67,7 @@ defmodule AcariServer.Zabbix.Sender do
 
   defp run_zbx_sender() do
     :exec.run_link(
-      'priv/usr/uizbxd.lua -zhttp://10.0.10.10:10080/ -uAdmin -pzabbix -gacari',
+      'priv/usr/uizbxd.lua -d -zhttp://10.0.10.10:10080/ -uAdmin -pzabbix -gacari',
       [
         :stdin,
         :stdout,
@@ -65,5 +75,10 @@ defmodule AcariServer.Zabbix.Sender do
         :pty
       ]
     )
+  end
+
+  # API
+  def zbx_send(sensor) do
+    GenServer.cast(__MODULE__, {:send, sensor})
   end
 end
