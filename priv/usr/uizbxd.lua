@@ -58,7 +58,7 @@ local function LOG(mes)
   print(mes)
 end
 
--- os.execute("stty -echo")
+os.execute("stty -echo")
 
 local HOST = {}
 
