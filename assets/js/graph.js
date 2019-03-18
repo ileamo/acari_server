@@ -27,7 +27,8 @@ window.make_chart = function() {
       // Add current moment
       moment_ts.push(moment())
       node_num.push(node_num[node_num.length - 1])
-      
+      var ts_last = moment_ts[moment_ts.length - 1]
+
       var myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -67,11 +68,12 @@ window.make_chart = function() {
               display: true,
               type: 'time',
               time: {
-                //min: moment_ts[0].subtract(100, 'minutes'),
+                max: ts_last.add(ts_last.diff(moment_ts[0],'seconds') / 50, 'seconds'),
                 displayFormats: {
-                  hour: 'HH:mm',
+                  hour: 'HH',
                   minute: 'HH:mm',
-                  second: 'HH:mm:ss'
+                  second: 'HH:mm:ss',
+                  millisecond: 'HH:mm:ss.SSS'
                 },
               }
             }],
