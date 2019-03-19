@@ -123,6 +123,7 @@ defmodule AcariServer.Master do
              sslink_state ->
                sslink_state |> update_link_state(link_state)
            end) do
+             AcariServer.Zabbix.Sender.zbx_send(tun_name, "alive[#{sslink_name}]", (if link_state, do: 1, else: 0))
       :ets.update_element(
         :tuns,
         tun_name,

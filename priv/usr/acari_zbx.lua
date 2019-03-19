@@ -53,7 +53,7 @@ for val in (arg.ignore or ""):gmatch"[^,]+" do
 end
 
 local dbg = arg.debug
-local logFile = "/var/log/uizbxd.log"
+local logFile = "/var/log/acari_zbx.log"
 local function LOG(mes)
   print(mes)
 end
@@ -574,15 +574,17 @@ end
 sendHostInfo()
 
 
-local sensorPattern = "([^%[%],%s]+)%[([^%[%],%s]+),?([^%[%]%s]*)%]"
+local sensorPattern = "([^%[%],%s]+)%[?"
 while true do
-  local event = assert(loadstring('return'..io.read'*l'))()
-  local sensor, host, args = event.sensor:match(sensorPattern)
-  if host and not ignore[host] then
+  local event = io.read'*l'
+  event = json.decode(event)
+  local host = event.host
+  local key = event.key
+  local value = event.value
+  if host and not ignore[host] and key and value then
     if zbxAddHostIfNotExist(host) then
-      local key = (args and args ~= '') and sensor..'['..args..']' or sensor
-      createItem(host, key, sensor)
-      zbxSend(host, key, event.state)
+      createItem(host, key, key:match(sensorPattern))
+      zbxSend(host, key, value)
     end
   end
   if dbg and host and ignore[host] then

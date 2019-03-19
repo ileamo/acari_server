@@ -21,15 +21,13 @@ defmodule AcariServer.Zabbix.Sender do
       {:ok, %State{port: port}}
     else
       res ->
-        Logger.error("Can't run uizbxd: #{inspect(res)}")
+        Logger.error("Can't run acari_zbx: #{inspect(res)}")
         {:ok, %State{port: nil}}
     end
   end
 
   @impl true
   def handle_cast({:send, sensor}, %{port: port} = state) do
-    IO.puts("CAST")
-
     case :exec.send(port, sensor) do
       :ok -> {:noreply, state}
       _ -> {:noreply, %{state | port: nil}}
@@ -55,7 +53,7 @@ defmodule AcariServer.Zabbix.Sender do
       {:noreply, %State{state | port: port}}
     else
       res ->
-        Logger.error("Can't run uizbxd: #{inspect(res)}")
+        Logger.error("Can't run acari_zbx: #{inspect(res)}")
         {:noreply, %State{state | port: nil}}
     end
   end
@@ -67,7 +65,7 @@ defmodule AcariServer.Zabbix.Sender do
 
   defp run_zbx_sender() do
     :exec.run_link(
-      'priv/usr/uizbxd.lua -d -zhttp://10.0.10.10:10080/ -uAdmin -pzabbix -gacari',
+      'priv/usr/acari_zbx.lua -d -zhttp://zabbix-web-nginx-pgsql/ -uAdmin -pzabbix -gacari_clients -tacari_client -macari_master',
       [
         :stdin,
         :stdout,
@@ -78,7 +76,25 @@ defmodule AcariServer.Zabbix.Sender do
   end
 
   # API
-  def zbx_send(sensor) do
-    GenServer.cast(__MODULE__, {:send, sensor})
+  def zbx_send(host, key, value) do
+    {:ok, json} = Jason.encode(%{host: host, key: key, value: value})
+    GenServer.cast(__MODULE__, {:send, json <> "\n"})
+  end
+
+  def zbx_send_master(key, value) do
+    Task.start(fn ->
+      case System.cmd("zabbix_sender", [
+             "-zzabbix-server-pgsql",
+             "-p50051",
+             "-sacari_master",
+             "-k",
+             key,
+             "-o",
+             value
+           ]) do
+        {res, 0} -> Logger.debug("zabbix_sender: #{res}")
+        {err, code} -> Logger.warn("zabbix_sender exits with code #{code}, output: #{err}")
+      end
+    end)
   end
 end

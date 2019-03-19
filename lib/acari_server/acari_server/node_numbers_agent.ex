@@ -41,6 +41,9 @@ defmodule AcariServer.NodeNumbersAgent do
               redraw_chart: true
             })
 
+            AcariServer.Zabbix.Sender.zbx_send_master("acari.clients.number", to_string(nodes_num))
+            AcariServer.Zabbix.Sender.zbx_send_master("acari.clients.active", to_string(num))
+
             ts = :os.system_time(:second)
 
             [
