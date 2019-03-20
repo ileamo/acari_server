@@ -10,6 +10,7 @@ docker run --rm -it \
 -e POSTGRES_PASSWORD=postgres \
 -e POSTGRES_DB=acari_server_prod \
 -e PGDATA=/var/lib/postgresql-a/data/pgdata \
+-v /etc/localtime:/etc/localtime:ro \
 -d ileamo/acari-server-db:init-25
 
 # Server
@@ -20,6 +21,7 @@ docker run --rm -it \
 -p 50019:50019 \
 -p 50020:50020 \
 -v /var/log/acari_server:/tmp/app/log \
+-v /etc/localtime:/etc/localtime:ro \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-server foreground
@@ -29,6 +31,7 @@ docker run --rm -it \
 --name acari-client \
 --network acari-network \
 -v /var/log/acari_client:/tmp/app/log \
+-v /etc/localtime:/etc/localtime:ro \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun:/dev/net/tun \
 -d acari-client

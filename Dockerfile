@@ -37,12 +37,6 @@ RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
 libcap libcap-dev iproute2 openssh-client
 
-# Setting the timezone
-RUN apk add tzdata
-RUN cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime
-RUN echo "Europe/Moscow" /etc/timezone
-RUN apk del tzdata
-
 RUN adduser -D app
 
 ARG MIX_ENV=docker
