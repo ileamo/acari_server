@@ -5,7 +5,7 @@ docker network create acari-network
 
 # ***** ZABBIX ******
 # Zabbix DB
-docker run -t \
+docker run -t --rm\
   --name zabbix-postgres-server \
   --network acari-network \
   -e POSTGRES_USER="zabbix" \
@@ -16,7 +16,7 @@ docker run -t \
   -d postgres:latest
 
 # Zabbix server
-docker run -t \
+docker run -t --rm\
   --name zabbix-server-pgsql \
   --network acari-network \
   -e DB_SERVER_HOST="zabbix-postgres-server" \
@@ -29,7 +29,7 @@ docker run -t \
   -d zabbix/zabbix-server-pgsql:latest
 
 # Zabbix WEB
-docker run -t \
+docker run -t --rm\
   --name zabbix-web-nginx-pgsql \
   --network acari-network \
   -e DB_SERVER_HOST="zabbix-postgres-server" \
@@ -40,6 +40,7 @@ docker run -t \
   --link zabbix-postgres-server:postgres \
   --link zabbix-server-pgsql:zabbix-server \
   -p 80:80 \
+  -p 10080:80 \
   -v /etc/ssl/nginx:/etc/ssl/nginx:ro \
   -v /etc/localtime:/etc/localtime:ro \
   -d zabbix/zabbix-web-nginx-pgsql:latest
@@ -62,7 +63,6 @@ docker run --rm -it \
   --name acari-server \
   --network acari-network \
   -e DB_HOST=acari-server-db \
-  -p 50019:50019 \
   -p 50020:50020 \
   -v /var/log/acari_server:/tmp/app/log \
   -v /etc/localtime:/etc/localtime:ro \
