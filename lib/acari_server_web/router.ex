@@ -44,6 +44,7 @@ defmodule AcariServerWeb.Router do
     pipe_through [:browser, :auth, :ensure_auth]
 
     get "/", PageController, :index
+    get "/zabbix", PageController, :zabbix
 
     get "/tunnels", TunnelController, :index
     get "/tunnels/:id", TunnelController, :grp
