@@ -76,7 +76,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   def zbx_auth(_state) do
-    zbx_post("user.login", %{user: "Admin", password: "zabbix"}, nil)
+    zbx_post("user.login", %{user: "Admin", password: "acari&zabbix"}, nil)
   end
 
   def get_hostgroup_id(state) do

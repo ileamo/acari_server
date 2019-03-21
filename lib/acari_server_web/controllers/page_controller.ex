@@ -6,7 +6,8 @@ defmodule AcariServerWeb.PageController do
   end
 
   def zabbix(conn, _params) do
-    redirect(conn, external: "http://zabbix-web-nginx-pgsql")
+    zbx_url = conn |> Plug.Conn.request_url() |> URI.parse()
+    redirect(conn, external: "http://#{zbx_url.host}:10080")
   end
 
   def secret(conn, _) do
