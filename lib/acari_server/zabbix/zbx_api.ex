@@ -57,7 +57,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
     else
       res ->
         Logger.error("Can't init zbx_api: #{inspect(res)}")
-        {:noreply, state}
+        Process.sleep(60_000)
+        {:stop, :shutdown, state}
     end
   end
 
@@ -151,7 +152,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
     case zbx_post("host.create", request, state.auth) do
       {:ok, %{"hostids" => [host_id]}} ->
         put_in(state, [Access.key(:hosts), host_name], %{hostid: host_id, items: %{}})
-      _ -> state
+
+      _ ->
+        state
     end
   end
 
@@ -168,6 +171,17 @@ defmodule AcariServer.Zabbix.ZbxApi do
          {:ok, %{"result" => result}} <- Jason.decode(body_json) do
       {:ok, result}
     else
+      {:ok, %{"error" => error}} ->
+        case error["data"] |> String.contains?("re-login") do
+          true ->
+            Logger.error("zbx_api: Bad auth_token")
+            Process.sleep(60_000)
+            Process.exit(self(), :kill)
+
+          _ ->
+            {:error, {:no_result, error}}
+        end
+
       {:ok, response} ->
         {:error, {:bad_response, response}}
 
