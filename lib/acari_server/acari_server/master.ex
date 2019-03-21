@@ -123,7 +123,18 @@ defmodule AcariServer.Master do
              sslink_state ->
                sslink_state |> update_link_state(link_state)
            end) do
-             AcariServer.Zabbix.ZbxApi.zbx_send(tun_name, "alive[#{sslink_name}]", (if link_state, do: 1, else: 0))
+      AcariServer.Zabbix.ZbxApi.zbx_send(
+        tun_name,
+        "alive[#{sslink_name}]",
+        if(link_state, do: 1, else: 0)
+      )
+
+      AcariServer.Zabbix.ZbxApi.zbx_send(
+        tun_name,
+        "alive",
+        if(get_sslinks(tun_state).links_up, do: 1, else: 0)
+      )
+
       :ets.update_element(
         :tuns,
         tun_name,
@@ -293,5 +304,26 @@ defmodule AcariServer.Master do
       n when is_number(n) -> n
       _ -> 0
     end
+  end
+
+  def get_sslinks(nil), do: %{links_up: nil, links_down: nil}
+
+  def get_sslinks(tun_state) do
+    tun_state.sslinks
+    |> Enum.reduce(
+      %{links_up: [], links_down: []},
+      fn
+        {name, %{up: true}}, %{links_up: links_up} = acc ->
+          %{acc | links_up: [name | links_up]}
+
+        {name, %{up: _}}, %{links_down: links_down} = acc ->
+          %{acc | links_down: [name | links_down]}
+      end
+    )
+    |> Enum.map(fn
+      {k, []} -> {k, nil}
+      {k, list} -> {k, Enum.join(list, ", ")}
+    end)
+    |> Enum.into(%{})
   end
 end

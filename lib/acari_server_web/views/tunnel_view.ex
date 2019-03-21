@@ -14,7 +14,9 @@ defmodule AcariServerWeb.TunnelView do
 
     nodes
     |> Enum.map(fn %{name: n, description: d} -> %{name: n, description: d} end)
-    |> Enum.map(fn %{name: name} = m -> Map.merge(m, get_sslinks(tuns[name])) end)
+    |> Enum.map(fn %{name: name} = m ->
+      Map.merge(m, AcariServer.Master.get_sslinks(tuns[name]))
+    end)
     |> Enum.map(fn
       %{links_up: nil} = m -> Map.put(m, :alert, 1)
       %{links_down: nil} = m -> Map.put(m, :alert, 3)
@@ -103,26 +105,5 @@ defmodule AcariServerWeb.TunnelView do
 
   defp get_link_params(link) do
     %{latency: link[:latency]}
-  end
-
-  defp get_sslinks(nil), do: %{links_up: nil, links_down: nil}
-
-  defp get_sslinks(tun_state) do
-    tun_state.sslinks
-    |> Enum.reduce(
-      %{links_up: [], links_down: []},
-      fn
-        {name, %{up: true}}, %{links_up: links_up} = acc ->
-          %{acc | links_up: [name | links_up]}
-
-        {name, %{up: _}}, %{links_down: links_down} = acc ->
-          %{acc | links_down: [name | links_down]}
-      end
-    )
-    |> Enum.map(fn
-      {k, []} -> {k, nil}
-      {k, list} -> {k, Enum.join(list, ", ")}
-    end)
-    |> Enum.into(%{})
   end
 end
