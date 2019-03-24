@@ -37,6 +37,16 @@ RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
 libcap libcap-dev iproute2 openssh-client
 
+
+# Zabbix Agent
+RUN echo "readproc:x:30:zabbix" >> /etc/group
+RUN apk --no-cache add zabbix-agent
+RUN echo "Server=zabbix-server-pgsql" > /etc/zabbix/zabbix_agentd.conf
+RUN echo "Hostname=acari-server" >> /etc/zabbix/zabbix_agentd.conf
+RUN echo "ListenPort=10050" >> /etc/zabbix/zabbix_agentd.conf
+RUN echo "LogFile=/var/log/zabbix/zabbix_agentd.log" >> /etc/zabbix/zabbix_agentd.conf
+
+
 RUN adduser -D app
 
 ARG MIX_ENV=docker
