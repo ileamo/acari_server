@@ -14,8 +14,9 @@ config :acari_server, AcariServerWeb.Endpoint,
   https: [
     port: 50020,
     cipher_suite: :strong,
-    keyfile: "/etc/ssl/acari/ssl.key",
-    certfile: "/etc/ssl/acari/ssl.crt"
+    keyfile: "/etc/ssl/acari/privkey.pem",
+    cacertfile: "/etc/ssl/acari/chain.pem",
+    certfile: "/etc/ssl/acari/cert.pem"
   ],
   # This is critical for ensuring web-sockets properly authorize.
   url: [host: "localhost", port: 50020],
