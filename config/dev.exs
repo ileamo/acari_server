@@ -94,3 +94,7 @@ config :acari_server, AcariServer.Listener,
   port: 50019,
   keyfile: "priv/cert/selfsigned_key.pem",
   certfile: "priv/cert/selfsigned.pem"
+
+config :acari_server, :zabbix,
+  api_url: nil,
+  web_port: nil

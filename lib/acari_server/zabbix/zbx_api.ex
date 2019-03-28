@@ -2,10 +2,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
   require Logger
   use GenServer
 
-  @zbx_url "http://zabbix-web-nginx-pgsql/api_jsonrpc.php"
-
   defmodule State do
     defstruct [
+      :zbx_url,
       :auth,
       :hostgroup_id,
       :template_id,
@@ -20,7 +19,14 @@ defmodule AcariServer.Zabbix.ZbxApi do
   ## Callbacks
   @impl true
   def init(_params) do
-    {:ok, %State{}, {:continue, :init}}
+    case Application.get_env(:acari_server, :zabbix)[:api_url] do
+      url when is_binary(url) ->
+        {:ok, %State{zbx_url: url <> "/api_jsonrpc.php"}, {:continue, :init}}
+
+      _ ->
+        Logger.warn("Zabbix: No URL for zabbix server")
+        :ignore
+    end
   end
 
   @impl true
@@ -56,7 +62,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
        }}
     else
       res ->
-        Logger.error("Can't init zbx_api: #{inspect(res)}")
+        Logger.error("Can't init zbx_api(#{state.zbx_url}): #{inspect(res)}")
         Process.sleep(60_000)
         {:stop, :shutdown, state}
     end
@@ -75,12 +81,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
     json
   end
 
-  def zbx_auth(_state) do
-    zbx_post("user.login", %{user: "Admin", password: "acari&zabbix"}, nil)
+  def zbx_auth(state) do
+    zbx_post(state.zbx_url, "user.login", %{user: "Admin", password: "acari&zabbix"}, nil)
   end
 
   def get_hostgroup_id(state) do
     zbx_post(
+      state.zbx_url,
       "hostgroup.get",
       %{output: ["extend"], filter: %{name: ["acari_clients"]}},
       state.auth
@@ -89,6 +96,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def get_template_id(state) do
     zbx_post(
+      state.zbx_url,
       "template.get",
       %{output: ["extend"], filter: %{host: ["acari_client"]}},
       state.auth
@@ -96,15 +104,30 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   def get_hosts(state, hostgroup_id) do
-    zbx_post("host.get", %{output: ["host"], groupids: [hostgroup_id]}, state.auth)
+    zbx_post(
+      state.zbx_url,
+      "host.get",
+      %{output: ["host"], groupids: [hostgroup_id]},
+      state.auth
+    )
   end
 
   def get_host(state, host_name) do
-    zbx_post("host.get", %{output: ["host", "hostid"], filter: %{host: [host_name]}}, state.auth)
+    zbx_post(
+      state.zbx_url,
+      "host.get",
+      %{output: ["host", "hostid"], filter: %{host: [host_name]}},
+      state.auth
+    )
   end
 
   def get_host_items(state, host_id) do
-    zbx_post("item.get", %{hostids: host_id, output: ["key_", "value_type"]}, state.auth)
+    zbx_post(
+      state.zbx_url,
+      "item.get",
+      %{hostids: host_id, output: ["key_", "value_type"]},
+      state.auth
+    )
   end
 
   def add_host_if_not_exists(state, host_name) do
@@ -149,7 +172,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
       inventory_mode: 1
     }
 
-    case zbx_post("host.create", request, state.auth) do
+    case zbx_post(state.zbx_url, "host.create", request, state.auth) do
       {:ok, %{"hostids" => [host_id]}} ->
         put_in(state, [Access.key(:hosts), host_name], %{hostid: host_id, items: %{}})
 
@@ -158,11 +181,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  def zbx_post(method, params, auth) do
+  defp zbx_post(zbx_url, method, params, auth) do
     with request <- request(method, params, auth),
          {:ok, %{status_code: 200, body: body_json}} <-
            HTTPoison.post(
-             @zbx_url,
+             zbx_url,
              request,
              [
                {"Content-Type", "application/json-rpc"}
