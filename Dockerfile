@@ -49,6 +49,7 @@ WORKDIR /opt/app
 
 # Copy release from build stage
 COPY --from=build /build/_build/${MIX_ENV}/rel/* ./
+COPY priv/cert /etc/ssl/acari
 
 RUN setcap cap_net_admin=ep /opt/app/erts-10.1.1/bin/beam.smp cap_net_admin=ep /sbin/ip
 
