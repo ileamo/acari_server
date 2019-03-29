@@ -96,5 +96,5 @@ config :acari_server, AcariServer.Listener,
   certfile: "priv/cert/selfsigned.pem"
 
 config :acari_server, :zabbix,
-  api_url: nil,
-  web_port: nil
+  zbx_web_port: nil,
+  zbx_api_url: nil

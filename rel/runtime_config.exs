@@ -5,7 +5,7 @@ config :logger,
   backends: [
     {LoggerFileBackend, :info_log},
     {LoggerFileBackend, :error_log}
-]
+  ]
 
 config :logger, :info_log,
   path: "/tmp/app/log/info.log",
@@ -34,5 +34,7 @@ config :acari_server, AcariServer.Listener,
   certfile: "priv/cert/selfsigned.pem"
 
 config :acari_server, :zabbix,
-  api_url: System.get_env("ZBX_API_URL"),
-  web_port: System.get_env("ZBX_WEB_PORT")
+  zbx_web_port: System.get_env("ZBX_WEB_PORT"),
+  zbx_api_url: System.get_env("ZBX_API_URL"),
+  zbx_snd_host: System.get_env("ZBX_SND_HOST"),
+  zbx_snd_port: System.get_env("ZBX_SND_PORT")
