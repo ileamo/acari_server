@@ -7,6 +7,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
       :zbx_api_url,
       :zbx_snd_host,
       :zbx_snd_port,
+      :zbx_username,
+      :zbx_password,
       :auth,
       :hostgroup_id,
       :template_id,
@@ -23,7 +25,21 @@ defmodule AcariServer.Zabbix.ZbxApi do
   def init(_params) do
     case Application.get_env(:acari_server, :zabbix)[:zbx_api_url] do
       url when is_binary(url) ->
-        {:ok, %State{zbx_api_url: url <> "/api_jsonrpc.php"}, {:continue, :init}}
+        zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host] || "localhost"
+        zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port] || 10051
+        zbx_username = Application.get_env(:acari_server, :zabbix)[:zbx_username] || "Admin"
+
+        zbx_password =
+          Application.get_env(:acari_server, :zabbix)[:zbx_password] || "acari&zabbix"
+
+        {:ok,
+         %State{
+           zbx_api_url: url <> "/api_jsonrpc.php",
+           zbx_snd_host: zbx_snd_host,
+           zbx_snd_port: zbx_snd_port,
+           zbx_username: zbx_username,
+           zbx_password: zbx_password
+         }, {:continue, :init}}
 
       _ ->
         Logger.warn("Zabbix: No URL for zabbix server")
@@ -54,18 +70,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
              {host_name, %{hostid: host_id, items: items}}
            end)
            |> Enum.into(%{}) do
-      zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host] || "localhost"
-      zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port] || 10051
-
       {:noreply,
        %State{
          state
          | auth: auth,
            hostgroup_id: hostgroup_id,
            template_id: template_id,
-           hosts: hosts,
-           zbx_snd_host: zbx_snd_host,
-           zbx_snd_port: zbx_snd_port
+           hosts: hosts
        }}
     else
       res ->
@@ -89,7 +100,12 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   def zbx_auth(state) do
-    zbx_post(state.zbx_api_url, "user.login", %{user: "Admin", password: "acari&zabbix"}, nil)
+    zbx_post(
+      state.zbx_api_url,
+      "user.login",
+      %{user: state.zbx_username, password: state.zbx_password},
+      nil
+    )
   end
 
   def get_hostgroup_id(state) do
@@ -229,7 +245,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
              "-z",
              state.zbx_snd_host,
              "-p",
-             state.zbx_snd_port,
+             to_string(state.zbx_snd_port),
              "-s",
              host,
              "-k",
@@ -251,7 +267,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   def handle_cast({:send_master, key, value}, state) do
-    zabbix_sender(nil, "acari_master", key, value)
+    zabbix_sender(state, "acari_master", key, value)
     {:noreply, state}
   end
 
