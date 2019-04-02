@@ -35,7 +35,7 @@ FROM alpine:3.8
 
 RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
-libcap libcap-dev iproute2 openssh-client
+libcap libcap-dev iproute2 openssh-client su-exec
 
 RUN adduser -D app
 
@@ -57,7 +57,6 @@ USER app
 
 # Mutable Runtime Environment
 RUN mkdir /tmp/app
-RUN mkdir /tmp/app/log
 ENV RELEASE_MUTABLE_DIR /tmp/app
 ENV START_ERL_DATA /tmp/app/start_erl.data
 
@@ -65,5 +64,8 @@ ENV SHELL /bin/bash
 
 RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa
 
-ENTRYPOINT ["/opt/app/bin/acari_server"]
-#CMD ["/bin/sh"]
+USER root
+
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["foreground"]

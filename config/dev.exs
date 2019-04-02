@@ -7,9 +7,9 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :acari_server, AcariServerWeb.Endpoint,
-  http: [port: 50080],
+  http: [port: 4000],
   https: [
-    port: 50443,
+    port: 4443,
     cipher_suite: :strong,
     keyfile: "priv/cert/selfsigned_key.pem",
     certfile: "priv/cert/selfsigned.pem"

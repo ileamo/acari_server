@@ -8,7 +8,7 @@ defmodule AcariServerWeb.PageController do
   def zabbix(conn, _params) do
     zbx_web_url = conn |> Plug.Conn.request_url() |> URI.parse()
     zbx_web_port = Application.get_env(:acari_server, :zabbix)[:zbx_web_port] || 10433
-    redirect(conn, external: "https://#{zbx_web_url.host}:#{zbx_web_port}")
+    redirect(conn, external: "#{zbx_web_url.scheme}://#{zbx_web_url.host}:#{zbx_web_port}")
   end
 
   def secret(conn, _) do
