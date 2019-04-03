@@ -3,18 +3,20 @@ use Mix.Config
 # Logger configuration
 config :logger,
   backends: [
-    {LoggerFileBackend, :info_log},
-    {LoggerFileBackend, :error_log}
+    {Loggix, :info_log},
+    {Loggix, :error_log}
   ]
 
 config :logger, :info_log,
   path: "/var/log/info.log",
   format: "$date $time $metadata[$level] $message\n",
+  rotate: %{max_bytes: 2*1024*1024, keep: 5},
   level: :info
 
 config :logger, :error_log,
   path: "/var/log/error.log",
   format: "$date $time $metadata[$level] $message\n",
+  rotate: %{max_bytes: 2*1024*1024, keep: 5},
   level: :error
 
 # Configure your database

@@ -49,7 +49,7 @@ defmodule AcariServer.MixProject do
       {:temp, "~> 0.4"},
       {:erlexec, "~> 1.9"},
       {:distillery, "~> 2.0"},
-      {:logger_file_backend, "~> 0.0.10"},
+      {:loggix, "~> 0.0.9"},
       {:httpoison, "~> 1.5"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       {:tunctl, git: "https://github.com/msantos/tunctl.git"}
