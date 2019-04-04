@@ -52,7 +52,10 @@ defmodule AcariServer.MixProject do
       {:loggix, "~> 0.0.9"},
       {:httpoison, "~> 1.5"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
-      {:tunctl, git: "https://github.com/msantos/tunctl.git"}
+      {:procket, git: "https://github.com/msantos/procket.git", override: true},
+
+      {:tunctl, git: "https://github.com/msantos/tunctl.git"},
+      {:gen_icmp, git: "https://github.com/msantos/gen_icmp.git"}
     ]
   end
 
