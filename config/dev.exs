@@ -63,7 +63,7 @@ config :acari_server, AcariServerWeb.Endpoint,
   ]
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "$date $time [$level] $message\n"
+config :logger, :console, format: "$date $time [$level] $message\n", level: :info
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -89,7 +89,7 @@ config :acari_server, AcariServer.Listener,
 
 config :acari_server, :zabbix,
   zbx_web_port: nil,
-  zbx_api_url: "http://10.0.10.155:4080",
+  #zbx_api_url: "http://10.0.10.155:4080",
   zbx_snd_host: "10.0.10.155",
   zbx_username: "Admin",
   zbx_password: "IMo19-0708"

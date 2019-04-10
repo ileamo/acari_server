@@ -1,8 +1,12 @@
-<%= for {alert, header, body} <- get_mes() do %>
-  <li class="list-group-item list-group-item-<%= alert %> p-1">
-    <p>
-      <strong><%= header %></br></strong>
-      <%= body %>
-    </p>
-  </li>
+
+<%= for [server, mes_list] <- get_mes() do %>
+  <%= server %>
+  <%= for {alert, header, body} <- mes_list do %>
+    <li class="list-group-item list-group-item-<%= alert %> p-1">
+      <p>
+        <strong><%= header %></br></strong>
+        <%= body %>
+      </p>
+    </li>
+  <% end %>
 <% end %>
