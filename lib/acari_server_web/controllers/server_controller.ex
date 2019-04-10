@@ -17,8 +17,10 @@ defmodule AcariServerWeb.ServerController do
   def create(conn, %{"server" => server_params}) do
     case ServerManager.create_server(server_params) do
       {:ok, server} ->
+        Node.connect(server_params["name"] |> String.to_atom())
+
         conn
-        |> put_flash(:info, "Server created successfully.")
+        |> put_flash(:info, "Сервер создан.")
         |> redirect(to: Routes.server_path(conn, :show, server))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -38,12 +40,17 @@ defmodule AcariServerWeb.ServerController do
   end
 
   def update(conn, %{"id" => id, "server" => server_params}) do
-    server = ServerManager.get_server!(id)
+    server = %{name: oldname} = ServerManager.get_server!(id)
 
     case ServerManager.update_server(server, server_params) do
       {:ok, server} ->
+        if oldname != server_params["name"] do
+          Node.disconnect(oldname |> String.to_atom())
+          Node.connect(server_params["name"] |> String.to_atom())
+        end
+
         conn
-        |> put_flash(:info, "Server updated successfully.")
+        |> put_flash(:info, "Сервер отредактирован.")
         |> redirect(to: Routes.server_path(conn, :show, server))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -55,8 +62,10 @@ defmodule AcariServerWeb.ServerController do
     server = ServerManager.get_server!(id)
     {:ok, _server} = ServerManager.delete_server(server)
 
+    Node.disconnect(server.name |> String.to_atom())
+
     conn
-    |> put_flash(:info, "Server deleted successfully.")
+    |> put_flash(:info, "Сервер удален.")
     |> redirect(to: Routes.server_path(conn, :index))
   end
 end

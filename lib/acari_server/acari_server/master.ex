@@ -36,11 +36,13 @@ defmodule AcariServer.Master do
   def init(_params) do
     tuns = :ets.new(:tuns, [:set, :protected, :named_table])
 
+    AcariServer.ServerManager.list_servers()
+    |> Enum.each(fn %{name: node} -> Node.connect(node |> String.to_atom()) end)
+
     {:ok, %State{tuns: tuns}}
   end
 
   @impl true
-
   def handle_cast({:tun_started, %{tun_name: tun_name} = tun_state}, state) do
     Logger.debug("Master get :tun_started from #{tun_name}, tun_state = #{inspect(tun_state)}")
     params = %{"ifname" => tun_state.ifname}

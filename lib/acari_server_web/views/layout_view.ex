@@ -13,6 +13,11 @@ defmodule AcariServerWeb.LayoutView do
     |> Enum.map(fn node ->
       [node, Agent.get({Acari.LinkEventAgent, node}, Acari.LinkEventAgent, :get_state, [])]
     end)
+    # reject servers with empty mesage list
+    |> Enum.reject(fn
+      [_, []] -> true
+      _ -> false
+    end)
     |> Enum.map(fn [server, mes_list] ->
       [
         server,
