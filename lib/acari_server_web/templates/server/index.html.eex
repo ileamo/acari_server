@@ -1,28 +1,28 @@
-<h1>Listing Servers</h1>
+<h2>Список серверов</h2>
 
-<table>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Description</th>
-
-      <th></th>
+      <th scope="col">Имя</th>
+      <th scope="col">Описание</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
 <%= for server <- @servers do %>
     <tr>
-      <td><%= server.name %></td>
+      <td>
+      <%= link server.name, to: Routes.server_path(@conn, :show, server) %>
+      </td>
       <td><%= server.description %></td>
 
       <td>
-        <%= link "Show", to: Routes.server_path(@conn, :show, server) %>
-        <%= link "Edit", to: Routes.server_path(@conn, :edit, server) %>
-        <%= link "Delete", to: Routes.server_path(@conn, :delete, server), method: :delete, data: [confirm: "Are you sure?"] %>
+        <%= link "Редактировать", to: Routes.server_path(@conn, :edit, server) %>
+        <%= link "удалить", to: Routes.server_path(@conn, :delete, server), method: :delete, data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New Server", to: Routes.server_path(@conn, :new) %></span>
+<span><%= link "Новый сервер", to: Routes.server_path(@conn, :new) %></span>

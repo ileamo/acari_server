@@ -25,6 +25,9 @@
     <%= link "Пользователи", to: Routes.user_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
+    <%= link "Сервера", to: Routes.server_path(@conn, :index), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
     <%= link "Группы", to: Routes.group_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">

@@ -1,18 +1,18 @@
-<h1>Show Server</h1>
+<h1>Параметры Сервера</h1>
 
 <ul>
 
   <li>
-    <strong>Name:</strong>
+    <strong>Имя:</strong>
     <%= @server.name %>
   </li>
 
   <li>
-    <strong>Description:</strong>
+    <strong>Описание:</strong>
     <%= @server.description %>
   </li>
 
 </ul>
 
-<span><%= link "Edit", to: Routes.server_path(@conn, :edit, @server) %></span>
-<span><%= link "Back", to: Routes.server_path(@conn, :index) %></span>
+<span><%= link "Редактировать", to: Routes.server_path(@conn, :edit, @server) %></span>
+<span><%= link "Назад", to: Routes.server_path(@conn, :index) %></span>
