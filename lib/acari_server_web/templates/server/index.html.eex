@@ -1,0 +1,28 @@
+<h1>Listing Servers</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for server <- @servers do %>
+    <tr>
+      <td><%= server.name %></td>
+      <td><%= server.description %></td>
+
+      <td>
+        <%= link "Show", to: Routes.server_path(@conn, :show, server) %>
+        <%= link "Edit", to: Routes.server_path(@conn, :edit, server) %>
+        <%= link "Delete", to: Routes.server_path(@conn, :delete, server), method: :delete, data: [confirm: "Are you sure?"] %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Server", to: Routes.server_path(@conn, :new) %></span>

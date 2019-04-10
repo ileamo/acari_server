@@ -1,0 +1,18 @@
+<h1>Show Server</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @server.name %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @server.description %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.server_path(@conn, :edit, @server) %></span>
+<span><%= link "Back", to: Routes.server_path(@conn, :index) %></span>

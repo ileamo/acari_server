@@ -56,6 +56,7 @@ defmodule AcariServerWeb.Router do
     resources "/newnodes", NewNodeController
     resources "/scripts", ScriptController
     resources "/templates", TemplateController
+    resources "/servers", ServerController
 
     get "/secret", PageController, :secret
   end
