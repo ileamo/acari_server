@@ -1,10 +1,13 @@
-<h2>Список серверов</h2>
+<h2>Список Cерверов</h2>
+
+<% node_list = [node() | Node.list()] |> Enum.map(&to_string/1)%>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Статус</th>
       <th scope="col"></th>
     </tr>
   </thead>
@@ -15,6 +18,14 @@
       <%= link server.name, to: Routes.server_path(@conn, :show, server) %>
       </td>
       <td><%= server.description %></td>
+
+      <%  {color, value} = if node_list |> Enum.member?(server.name) do
+            {"text-success", "UP"}
+          else
+            {"text-danger", "DOWN"}
+          end
+      %>
+      <td class="<%=color%>"><%= value %></td> 
 
       <td>
         <%= link "Редактировать", to: Routes.server_path(@conn, :edit, server) %>
