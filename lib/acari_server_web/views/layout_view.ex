@@ -9,6 +9,7 @@ defmodule AcariServerWeb.LayoutView do
 
   def get_mes() do
     [node() | Node.list()]
+    |> Enum.sort()
     |> Enum.map(fn node ->
       [node, Agent.get({Acari.LinkEventAgent, node}, Acari.LinkEventAgent, :get_state, [])]
     end)
