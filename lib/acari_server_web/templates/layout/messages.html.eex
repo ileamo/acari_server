@@ -1,5 +1,15 @@
+<%  {ser_mes_list, bad_nodes_list} = get_mes() %>
 
-<%= for [server, mes_list] <- get_mes() do %>
+<%= for node <- bad_nodes_list do %>
+  <li class="list-group-item list-group-item-danger p-1">
+    <p>
+      <strong><%= node %></br></strong>
+      Упал на всех серверах
+    </p>
+  </li>
+<% end %>
+
+<%= for [server, {mes_list, _}] <- ser_mes_list do %>
   <%= server %>
   <%= for {alert, header, body} <- mes_list do %>
     <li class="list-group-item list-group-item-<%= alert %> p-1">
