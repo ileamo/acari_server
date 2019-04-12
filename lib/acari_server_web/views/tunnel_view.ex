@@ -7,17 +7,28 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   def get_tunnel_list(nodes) do
-    sslinks_state = GenServer.call({AcariServer.Master, node()}, :sslinks_state)
+    sslinks_state =
+      [node() | Node.list()]
+      |> Enum.map(fn node -> GenServer.call({AcariServer.Master, node}, :sslinks_state) end)
+      |> Enum.reduce(%{}, fn state_from_node, acc ->
+        Map.merge(acc, state_from_node, fn _k, tun_state_1, tun_state_2 ->
+          Map.merge(tun_state_1, tun_state_2, fn
+            _k, nil, nil -> nil
+            _k, str1, str2 -> [str1, str2] |> Enum.reject(&is_nil/1) |> Enum.join(", ")
+          end)
+          |> Map.put(:alert, if(!tun_state_1.links_up or !tun_state_2.links_up, do: 2, else: 3))
+        end)
+      end)
 
     nodes
     |> Enum.map(fn %{name: n, description: d} -> %{name: n, description: d} end)
     |> Enum.map(fn %{name: name} = m ->
-      Map.merge(m, sslinks_state[name] || %{})
+      Map.merge(m, sslinks_state[name] || %{links_up: nil})
     end)
     |> Enum.map(fn
       %{links_up: nil} = m -> Map.put(m, :alert, 1)
-      %{links_down: nil} = m -> Map.put(m, :alert, 3)
-      m -> Map.put(m, :alert, 2)
+      %{links_down: nil} = m -> Map.put(m, :alert, 4)
+      m -> m
     end)
   end
 

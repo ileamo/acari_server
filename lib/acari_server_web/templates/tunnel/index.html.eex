@@ -45,6 +45,7 @@
 <% al = case tunnel[:alert] do
         1 -> "table-danger"
         2 -> "table-warning"
+        3 -> "table-info"
         _ -> ""
       end%>
     <tr class="<%=al%>">
