@@ -43,6 +43,26 @@ defmodule AcariServer.Master do
   end
 
   @impl true
+  def handle_call(:sslinks_state, _from, state) do
+    {:reply, get_sslinks_state(), state}
+  end
+
+  def handle_call(msg, _from, state) do
+    Logger.error("Master: Bad call #{inspect(msg)}")
+    {:reply, nil, state}
+  end
+
+  defp get_sslinks_state() do
+    :ets.tab2list(:tuns)
+    |> Enum.map(fn {name, _, _, state} -> {name, state} end)
+    |> Enum.into(%{})
+    |> Enum.map(fn {tun_name, tun_state} ->
+      {tun_name, AcariServer.Master.get_sslinks(tun_state)}
+    end)
+    |> Enum.into(%{})
+  end
+
+  @impl true
   def handle_cast({:tun_started, %{tun_name: tun_name} = tun_state}, state) do
     Logger.debug("Master get :tun_started from #{tun_name}, tun_state = #{inspect(tun_state)}")
     params = %{"ifname" => tun_state.ifname}

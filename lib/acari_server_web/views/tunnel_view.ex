@@ -7,15 +7,12 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   def get_tunnel_list(nodes) do
-    tuns =
-      :ets.tab2list(:tuns)
-      |> Enum.map(fn {name, _, _, state} -> {name, state} end)
-      |> Enum.into(%{})
+    sslinks_state = GenServer.call({AcariServer.Master, node()}, :sslinks_state)
 
     nodes
     |> Enum.map(fn %{name: n, description: d} -> %{name: n, description: d} end)
     |> Enum.map(fn %{name: name} = m ->
-      Map.merge(m, AcariServer.Master.get_sslinks(tuns[name]))
+      Map.merge(m, sslinks_state[name] || %{})
     end)
     |> Enum.map(fn
       %{links_up: nil} = m -> Map.put(m, :alert, 1)
