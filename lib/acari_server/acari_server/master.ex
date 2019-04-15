@@ -3,6 +3,7 @@ defmodule AcariServer.Master do
   require Logger
   require Acari.Const, as: Const
   alias AcariServerWeb.Endpoint
+  alias AcariServer.Mnesia
 
   defmodule State do
     defstruct [
@@ -35,6 +36,7 @@ defmodule AcariServer.Master do
   @impl true
   def init(_params) do
     tuns = :ets.new(:tuns, [:set, :protected, :named_table])
+    Mnesia.init()
 
     AcariServer.ServerManager.list_servers()
     |> Enum.each(fn %{name: node} -> Node.connect(node |> String.to_atom()) end)
@@ -68,6 +70,7 @@ defmodule AcariServer.Master do
     params = %{"ifname" => tun_state.ifname}
     peer_params = tun_state.peer_params
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
+    Mnesia.add_tun(tun_name)
     exec_local_script(tun_name)
     {:noreply, state}
   end
@@ -162,6 +165,8 @@ defmodule AcariServer.Master do
         tun_name,
         {4, tun_state}
       )
+
+      Mnesia.update_link(sslink_name, tun_name, link_state)
     else
       res -> Logger.error("Can't set sslink state: #{inspect(res)}")
     end

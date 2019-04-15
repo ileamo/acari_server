@@ -1,13 +1,77 @@
+defmodule AcariServer.Mnesia.Attr do
+  def server(), do: [:name, :descr]
+  def tun(), do: [:name, :server_id]
+  def link(), do: [:id, :name, :server_id, :tun_id, :up]
+
+  def table_list(), do: [:server, :tun, :link]
+end
+
+defmodule AcariServer.Mnesia.Rec do
+  alias AcariServer.Mnesia.Attr
+  require Record
+
+  for i <- Attr.table_list() do
+    Record.defrecord(i, apply(Attr, i, []))
+  end
+end
+
 defmodule AcariServer.Mnesia do
+  require Logger
+  require AcariServer.Mnesia.Rec, as: Rec
   alias :mnesia, as: Mnesia
+  alias AcariServer.Mnesia.Attr
 
   def init() do
     Mnesia.start()
 
-    node_list =
-      AcariServer.ServerManager.list_servers()
-      |> Enum.map(fn %{name: name} -> name end)
+    node_list = get_node_list()
 
     Mnesia.change_config(:extra_db_nodes, node_list)
+    table_list = Attr.table_list()
+    Mnesia.wait_for_tables(table_list, 5000)
+
+    existing_table_list = Mnesia.system_info(:tables)
+    create_list = table_list -- existing_table_list
+
+    Logger.info(
+      "Start Mnesia: tables: #{inspect(existing_table_list)}, create: #{inspect(create_list)}"
+    )
+
+    for t <- create_list do
+      Mnesia.create_table(t,
+        attributes: apply(Attr, t, []),
+        ram_copies: node_list
+      )
+    end
+
+    update_servers_list(node_list)
+  end
+
+  def update_servers_list(node_list) do
+    Mnesia.transaction(fn ->
+      existing_servers = Mnesia.all_keys(:server)
+      new = node_list -- existing_servers
+      old = existing_servers -- node_list
+      old |> Enum.each(fn item -> Mnesia.delete({:server, item}) end)
+      new |> Enum.each(fn item -> Mnesia.write(Rec.server(name: item)) end)
+    end)
+  end
+
+  def add_tun(name) do
+    Mnesia.transaction(fn -> Mnesia.write(Rec.tun(name: name)) end)
+  end
+
+  def update_link(name, tun, up) do
+    node = node()
+    id = {name, tun, node}
+
+    Mnesia.transaction(fn ->
+      Mnesia.write(Rec.link(id: id, name: name, tun_id: tun, server_id: node, up: up))
+    end)
+  end
+
+  defp get_node_list() do
+    AcariServer.ServerManager.list_servers()
+    |> Enum.map(fn %{name: name} -> name |> String.to_atom() end)
   end
 end
