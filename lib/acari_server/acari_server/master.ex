@@ -70,8 +70,9 @@ defmodule AcariServer.Master do
     params = %{"ifname" => tun_state.ifname}
     peer_params = tun_state.peer_params
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
-    Mnesia.add_tun(tun_name)
     exec_local_script(tun_name)
+
+    Mnesia.tun_write(name: tun_name)
     {:noreply, state}
   end
 

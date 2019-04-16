@@ -1,9 +1,24 @@
 defmodule AcariServer.Mnesia.Attr do
-  def server(), do: [:name, :descr]
+  def server(), do: [:name, :opt]
   def tun(), do: [:name, :server_id]
   def link(), do: [:id, :name, :server_id, :tun_id, :up]
 
   def table_list(), do: [:server, :tun, :link]
+
+  def pattern(tab, field_pattern) do
+    [
+      tab
+      | apply(__MODULE__, tab, [])
+        |> Enum.map(fn field -> field_pattern[field] || :_ end)
+    ]
+    |> List.to_tuple()
+  end
+
+  def record_to_map(rec) do
+    [tab | fields] = Tuple.to_list(rec)
+    Enum.zip(apply(__MODULE__, tab, []), fields)
+    |> Enum.into(%{})
+  end
 end
 
 defmodule AcariServer.Mnesia.Rec do
@@ -57,8 +72,8 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
-  def add_tun(name) do
-    Mnesia.transaction(fn -> Mnesia.write(Rec.tun(name: name)) end)
+  def tun_write(kl) do
+    Mnesia.transaction(fn -> Mnesia.write(Rec.tun(kl)) end)
   end
 
   def update_link(name, tun, up) do
@@ -70,8 +85,16 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
+  def match(tab, field_pattern) do
+    {:atomic, rec_list} = Mnesia.transaction(fn ->
+      Mnesia.match_object(Attr.pattern(tab, field_pattern))
+    end)
+    rec_list |> Enum.map(fn r -> r |> Attr.record_to_map() end)
+  end
+
   defp get_node_list() do
     AcariServer.ServerManager.list_servers()
     |> Enum.map(fn %{name: name} -> name |> String.to_atom() end)
   end
+
 end
