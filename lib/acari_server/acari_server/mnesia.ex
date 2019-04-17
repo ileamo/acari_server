@@ -16,6 +16,7 @@ defmodule AcariServer.Mnesia.Attr do
 
   def record_to_map(rec) do
     [tab | fields] = Tuple.to_list(rec)
+
     Enum.zip(apply(__MODULE__, tab, []), fields)
     |> Enum.into(%{})
   end
@@ -85,16 +86,89 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
-  def match(tab, field_pattern) do
-    {:atomic, rec_list} = Mnesia.transaction(fn ->
-      Mnesia.match_object(Attr.pattern(tab, field_pattern))
+  def get_tunnel_list(nodes) do
+    status =
+      match(:link)
+      |> link_list_to_map()
+
+    nodes
+    |> Enum.map(fn %{name: name, description: descr} ->
+      %{name: name, description: descr}
+      |> Map.merge(status[name])
     end)
+  end
+
+  def match(tab, field_pattern \\ %{}) do
+    {:atomic, rec_list} =
+      Mnesia.transaction(fn ->
+        Mnesia.match_object(Attr.pattern(tab, field_pattern))
+      end)
+
     rec_list |> Enum.map(fn r -> r |> Attr.record_to_map() end)
+  end
+
+  def link_list_to_map(link_list) do
+    node_to_name = AcariServer.ServerManager.get_node_to_name_map()
+
+    link_list
+    |> Enum.reduce(%{}, fn %{tun_id: tun_name} = link, acc ->
+      new_link = %{
+        name: link.name,
+        server: node_to_name[link.server_id] || link.server_id,
+        up: link.up
+      }
+
+      new_link_list =
+        case acc[tun_name] do
+          nil -> [new_link]
+          list when is_list(list) -> [new_link | list]
+        end
+
+      acc |> Map.put(tun_name, new_link_list)
+    end)
+    |> Enum.map(fn {tun_name, link_list} ->
+      {tun_name, link_list |> reduce_link_list()}
+    end)
+    |> Enum.into(%{})
+  end
+
+  defp reduce_link_list(link_list) do
+    link_list
+    |> Enum.reduce(
+      %{links_up: [], links_down: []},
+      fn %{name: name, server: server, up: up}, %{links_up: lu, links_down: ld} ->
+        case up do
+          true -> %{links_up: [{name, server} | lu], links_down: ld}
+          _ -> %{links_up: lu, links_down: [{name, server} | ld]}
+        end
+      end
+    )
+    |> alert()
+  end
+
+  defp alert(%{links_up: [], links_down: ld}), do: %{alert: 1, links_down: ld |> get_links_str()}
+  defp alert(%{links_up: lu, links_down: []}), do: %{alert: 4, links_up: lu |> get_links_str()}
+
+  defp alert(%{links_up: lu, links_down: ld}) do
+    alert =
+      if get_serv(ld) -- get_serv(lu) == [] and get_link(ld) -- get_link(lu) == [] do
+        3
+      else
+        2
+      end
+
+    %{alert: alert, links_up: lu |> get_links_str(), links_down: ld |> get_links_str()}
+  end
+
+  defp get_link(l), do: l |> Enum.map(fn {l, _} -> l end) |> Enum.uniq()
+  defp get_serv(l), do: l |> Enum.map(fn {_, s} -> s end) |> Enum.uniq()
+
+  defp get_links_str(l) do
+    l |> Enum.map(fn {l, s} -> "#{l}@#{s}" end) |> Enum.join(", ")
   end
 
   defp get_node_list() do
     AcariServer.ServerManager.list_servers()
     |> Enum.map(fn %{system_name: name} -> name |> String.to_atom() end)
   end
-
 end

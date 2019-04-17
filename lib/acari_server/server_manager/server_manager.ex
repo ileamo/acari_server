@@ -46,6 +46,15 @@ defmodule AcariServer.ServerManager do
     end
   end
 
+  def get_node_to_name_map() do
+    Server
+    |> Repo.all()
+    |> Enum.map(fn %{name: name, system_name: system_name} ->
+      {system_name |> String.to_atom(), name}
+    end)
+    |> Enum.into(%{})
+  end
+
   @doc """
   Creates a server.
 
