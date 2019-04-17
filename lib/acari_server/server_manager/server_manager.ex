@@ -37,6 +37,15 @@ defmodule AcariServer.ServerManager do
   """
   def get_server!(id), do: Repo.get!(Server, id)
 
+  def get_server_name_by_system_name(system_name) do
+    Server
+    |> Repo.get_by(system_name: to_string(system_name))
+    |> case do
+      %{name: name} -> name
+      _ -> system_name
+    end
+  end
+
   @doc """
   Creates a server.
 

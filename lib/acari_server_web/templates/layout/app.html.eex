@@ -14,7 +14,10 @@
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="#">NSG</a>
       <div class="navbar-nav px-3 d-flex flex-wrap">
-        <span class="navbar-text pr-3"><%= node() %> <i class="fas fa-server"></i></span>
+        <span class="navbar-text pr-3">
+          <%= AcariServer.ServerManager.get_server_name_by_system_name(node()) %> 
+          <i class="fas fa-server"></i>
+        </span>
         <span class="navbar-text pr-0"><%= username(@conn) %> <i class="fas fa-user-alt"></i></span>
         <a class="nav-link ml-2" data-toggle="collapse" href="#collapseMessages" role="button"   aria-expanded="false" aria-controls="collapseMessages">
           <span class="d-none d-md-block">Сообщения <i class="fas fa-bell"></i>
