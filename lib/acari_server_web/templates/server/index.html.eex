@@ -6,6 +6,7 @@
   <thead>
     <tr>
       <th scope="col">Имя</th>
+      <th scope="col">Системное имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Статус</th>
       <th scope="col"></th>
@@ -17,15 +18,16 @@
       <td>
       <%= link server.name, to: Routes.server_path(@conn, :show, server) %>
       </td>
+      <td><%= server.system_name %></td>
       <td><%= server.description %></td>
 
-      <%  {color, value} = if node_list |> Enum.member?(server.name) do
+      <%  {color, value} = if node_list |> Enum.member?(server.system_name) do
             {"text-success", "UP"}
           else
             {"text-danger", "DOWN"}
           end
       %>
-      <td class="<%=color%>"><%= value %></td> 
+      <td class="<%=color%>"><%= value %></td>
 
       <td>
         <%= link "Редактировать", to: Routes.server_path(@conn, :edit, server) %>

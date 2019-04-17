@@ -8,6 +8,11 @@
   </li>
 
   <li>
+    <strong>Системное имя:</strong>
+    <%= @server.system_name %>
+  </li>
+
+  <li>
     <strong>Описание:</strong>
     <%= @server.description %>
   </li>

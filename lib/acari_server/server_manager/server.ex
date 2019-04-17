@@ -6,6 +6,7 @@ defmodule AcariServer.ServerManager.Server do
   schema "servers" do
     field :description, :string
     field :name, :string
+    field :system_name, :string
 
     timestamps()
   end
@@ -13,8 +14,9 @@ defmodule AcariServer.ServerManager.Server do
   @doc false
   def changeset(server, attrs) do
     server
-    |> cast(attrs, [:name, :description])
-    |> validate_required([:name, :description])
+    |> cast(attrs, [:name, :system_name, :description])
+    |> validate_required([:name, :system_name])
     |> unique_constraint(:name)
+    |> unique_constraint(:system_name)
   end
 end

@@ -94,7 +94,7 @@ defmodule AcariServer.Mnesia do
 
   defp get_node_list() do
     AcariServer.ServerManager.list_servers()
-    |> Enum.map(fn %{name: name} -> name |> String.to_atom() end)
+    |> Enum.map(fn %{system_name: name} -> name |> String.to_atom() end)
   end
 
 end

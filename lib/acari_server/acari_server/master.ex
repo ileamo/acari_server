@@ -39,7 +39,7 @@ defmodule AcariServer.Master do
     Mnesia.init()
 
     AcariServer.ServerManager.list_servers()
-    |> Enum.each(fn %{name: node} -> Node.connect(node |> String.to_atom()) end)
+    |> Enum.each(fn %{system_name: node} -> Node.connect(node |> String.to_atom()) end)
 
     {:ok, %State{tuns: tuns}}
   end
