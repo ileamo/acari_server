@@ -87,6 +87,7 @@ defmodule AcariServer.Mnesia do
   end
 
   def get_tunnel_list(nodes) do
+    node_to_name = AcariServer.ServerManager.get_node_to_name_map()
     status =
       match(:link)
       |> link_list_to_map()
@@ -94,7 +95,12 @@ defmodule AcariServer.Mnesia do
     nodes
     |> Enum.map(fn %{name: name, description: descr} ->
       %{name: name, description: descr}
-      |> Map.merge(status[name])
+      |> Map.merge(
+        case status[name] do
+          nil -> %{}
+          link_list -> link_list |> reduce_link_list(node_to_name)
+        end
+      )
     end)
   end
 
@@ -108,35 +114,27 @@ defmodule AcariServer.Mnesia do
   end
 
   def link_list_to_map(link_list) do
-    node_to_name = AcariServer.ServerManager.get_node_to_name_map()
-
     link_list
     |> Enum.reduce(%{}, fn %{tun_id: tun_name} = link, acc ->
-      new_link = %{
-        name: link.name,
-        server: node_to_name[link.server_id] || link.server_id,
-        up: link.up
-      }
-
       new_link_list =
         case acc[tun_name] do
-          nil -> [new_link]
-          list when is_list(list) -> [new_link | list]
+          list when is_list(list) -> [link | list]
+          nil -> [link]
         end
 
       acc |> Map.put(tun_name, new_link_list)
     end)
-    |> Enum.map(fn {tun_name, link_list} ->
-      {tun_name, link_list |> reduce_link_list()}
-    end)
     |> Enum.into(%{})
   end
 
-  defp reduce_link_list(link_list) do
+  defp reduce_link_list(link_list, node_to_name) do
+
     link_list
     |> Enum.reduce(
       %{links_up: [], links_down: []},
-      fn %{name: name, server: server, up: up}, %{links_up: lu, links_down: ld} ->
+      fn %{name: name, server_id: server_id, up: up}, %{links_up: lu, links_down: ld} ->
+        server = node_to_name[server_id] || server_id
+
         case up do
           true -> %{links_up: [{name, server} | lu], links_down: ld}
           _ -> %{links_up: lu, links_down: [{name, server} | ld]}
