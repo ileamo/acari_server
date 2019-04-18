@@ -5,19 +5,17 @@
         <th scope="col">Состояние</th>
         <th scope="col">Число падений</th>
         <th scope="col">Без связи</th>
-        <th scope="col">Уровень сигнала</th>
-        <th scope="col">Задержка</th>
     </tr>
     <tbody>
-      <%= for {name, state} <- (@links_state || []) do %>
+      <%= for %{name: name, server_id: srv, up: up, state: state} <- (@links_state || []) do %>
         <tr>
-          <th  scope="row"><%= name %></th>
-          <% color = if state.adm_state == "UP", do: "text-success", else: "text-danger" %>
-          <td class="<%=color%>"><%= state.adm_state %></td>
+          <th  scope="row">
+            <%= "#{name}@#{AcariServer.ServerManager.get_server_name_by_system_name(srv)}" %>
+          </th>
+          <% {text, color} = if up, do: {"UP", "text-success"}, else: {"DOWN","text-danger"} %>
+          <td class="<%=color%>"><%= text %></td>
           <td><%= state[:down_count] %></td>
-          <td><%= state[:down_pc] |> Float.round(2) %>%</td>
-          <td><%= state[:csq] %></td>
-          <td><%= pretty_time(state[:latency]) %>
+          <td><%= get_down_pc_m(state, up) |> Float.round(2) %>%</td>
           </td>
         </tr>
       <% end %>

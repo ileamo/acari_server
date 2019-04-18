@@ -1,7 +1,7 @@
 defmodule AcariServer.Mnesia.Attr do
   def server(), do: [:name, :opt]
   def tun(), do: [:name, :server_id]
-  def link(), do: [:id, :name, :server_id, :tun_id, :up]
+  def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
 
   def table_list(), do: [:server, :tun, :link]
 
@@ -80,14 +80,31 @@ defmodule AcariServer.Mnesia do
   def update_link(name, tun, up) do
     node = node()
     id = {name, tun, node}
+    tm = :erlang.system_time(:second)
 
     Mnesia.transaction(fn ->
-      Mnesia.write(Rec.link(id: id, name: name, tun_id: tun, server_id: node, up: up))
+      state =
+        case Mnesia.read(:link, id) do
+          [] -> %{down_count: 0, tm_start: tm, tm_down: 0, tm_down_start: tm}
+          [record] -> record |> Rec.link(:state)
+        end
+
+      state =
+        case up do
+          true -> %{state | tm_down:
+              state.tm_down + tm - state.tm_down_start}
+          _ -> %{state | down_count: state.down_count + 1, tm_down_start: tm}
+        end
+
+      Mnesia.write(
+        Rec.link(id: id, name: name, tun_id: tun, server_id: node, up: up, state: state)
+      )
     end)
   end
 
   def get_tunnel_list(nodes) do
     node_to_name = AcariServer.ServerManager.get_node_to_name_map()
+
     status =
       match(:link)
       |> link_list_to_map()
@@ -102,6 +119,10 @@ defmodule AcariServer.Mnesia do
         end
       )
     end)
+  end
+
+  def get_link_list_for_tunnel(tun_name) do
+    match(:link, %{tun_id: tun_name})
   end
 
   def match(tab, field_pattern \\ %{}) do
@@ -128,7 +149,6 @@ defmodule AcariServer.Mnesia do
   end
 
   defp reduce_link_list(link_list, node_to_name) do
-
     link_list
     |> Enum.reduce(
       %{links_up: [], links_down: []},
