@@ -10,7 +10,7 @@
 
     </div>
 </nav>
-<% tun = get_tunnel(@name) |> IO.inspect()
+<% tun = AcariServer.Mnesia.get_tunnel_state(@name)
    links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 %>
 <%= tun.description %>

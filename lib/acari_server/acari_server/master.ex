@@ -72,7 +72,7 @@ defmodule AcariServer.Master do
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
     exec_local_script(tun_name)
 
-    Mnesia.tun_write(name: tun_name)
+    Mnesia.tun_write(name: tun_name, state: %{inventory: "Нет данных", telemetry: "Нет данных"})
     {:noreply, state}
   end
 
@@ -211,6 +211,9 @@ defmodule AcariServer.Master do
     else
       res -> Logger.error("Can't set inventory: #{inspect(res)}")
     end
+
+    AcariServer.Mnesia.update_tun_inventoty(tun_name, inventory)
+
   end
 
   defp set_telemetry(tun_name, telemetry) do

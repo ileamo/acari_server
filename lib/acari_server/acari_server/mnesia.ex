@@ -1,15 +1,19 @@
 defmodule AcariServer.Mnesia.Attr do
   def server(), do: [:name, :opt]
-  def tun(), do: [:name, :server_id]
+  def tun(), do: [:name, :server_id, :state, :opt]
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
 
   def table_list(), do: [:server, :tun, :link]
 
   def pattern(tab, field_pattern) do
+    mk_record(tab, field_pattern, :_)
+  end
+
+  def mk_record(tab, fields_map, filler \\ nil) do
     [
       tab
       | apply(__MODULE__, tab, [])
-        |> Enum.map(fn field -> field_pattern[field] || :_ end)
+        |> Enum.map(fn field -> fields_map[field] || filler end)
     ]
     |> List.to_tuple()
   end
@@ -74,7 +78,39 @@ defmodule AcariServer.Mnesia do
   end
 
   def tun_write(kl) do
-    Mnesia.transaction(fn -> Mnesia.write(Rec.tun(kl)) end)
+    Mnesia.transaction(fn -> Mnesia.write(Attr.mk_record(:tun, kl)) end)
+  end
+
+  def update_tun_inventoty(name, inventory) do
+    Mnesia.transaction(fn ->
+      case Mnesia.wread({:tun, name}) do
+        [] ->
+          nil
+
+        [record] ->
+          state =
+            record
+            |> Rec.tun(:state)
+            |> Map.put(inventory, inventory)
+
+          Mnesia.write(Rec.tun(record, state: state))
+          AcariServer.NodeMonitorAgent.event(name, "inventory", inventory)
+      end
+    end)
+  end
+
+  def get_tunnel_state(name) do
+    node = AcariServer.NodeManager.get_node_by_name(name)
+
+    case Mnesia.transaction(fn ->
+           Mnesia.read({:tun, name})
+         end) do
+      {:atomic, [record]} ->
+        record |> Rec.tun(:state) |> Map.merge(%{name: name, description: node.description})
+
+      _ ->
+        nil
+    end
   end
 
   def update_link(name, tun, up) do
@@ -84,15 +120,14 @@ defmodule AcariServer.Mnesia do
 
     Mnesia.transaction(fn ->
       state =
-        case Mnesia.read(:link, id) do
+        case Mnesia.wread({:link, id}) do
           [] -> %{down_count: 0, tm_start: tm, tm_down: 0, tm_down_start: tm}
           [record] -> record |> Rec.link(:state)
         end
 
       state =
         case up do
-          true -> %{state | tm_down:
-              state.tm_down + tm - state.tm_down_start}
+          true -> %{state | tm_down: state.tm_down + tm - state.tm_down_start}
           _ -> %{state | down_count: state.down_count + 1, tm_down_start: tm}
         end
 
