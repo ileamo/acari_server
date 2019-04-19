@@ -234,6 +234,7 @@ defmodule AcariServer.Master do
     else
       res -> Logger.error("Can't set sslink state: #{inspect(res)}")
     end
+    AcariServer.Mnesia.update_tun_telemetry(tun_name, telemetry)
   end
 
   defp exec_local_script(tun_name) do

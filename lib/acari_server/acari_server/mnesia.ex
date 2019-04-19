@@ -81,7 +81,15 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn -> Mnesia.write(Attr.mk_record(:tun, kl)) end)
   end
 
-  def update_tun_inventoty(name, inventory) do
+  def update_tun_inventoty(name, data) do
+    update_tun_state(name, :inventory, data)
+  end
+
+  def update_tun_telemetry(name, data) do
+    update_tun_state(name, :telemetry, data)
+  end
+
+  def update_tun_state(name, tag, data) do
     Mnesia.transaction(fn ->
       case Mnesia.wread({:tun, name}) do
         [] ->
@@ -91,10 +99,10 @@ defmodule AcariServer.Mnesia do
           state =
             record
             |> Rec.tun(:state)
-            |> Map.put(inventory, inventory)
+            |> Map.put(tag, data)
 
           Mnesia.write(Rec.tun(record, state: state))
-          AcariServer.NodeMonitorAgent.event(name, "inventory", inventory)
+          AcariServer.NodeMonitorAgent.event(name, tag |> to_string, data)
       end
     end)
   end
