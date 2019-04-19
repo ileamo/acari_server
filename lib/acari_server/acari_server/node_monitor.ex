@@ -26,7 +26,6 @@ defmodule AcariServer.NodeMonitor do
         AcariServer.Master.get_telemetry(tun_name)
 
       "links_state" ->
-        #tun = AcariServerWeb.TunnelView.get_tunnel(tun_name)
         links_state = AcariServer.Mnesia.get_link_list_for_tunnel(tun_name)
 
         ls_html =
