@@ -70,9 +70,16 @@ defmodule AcariServer.Master do
     params = %{"ifname" => tun_state.ifname}
     peer_params = tun_state.peer_params
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
-    exec_local_script(tun_name)
 
-    Mnesia.tun_write(name: tun_name, state: %{inventory: "Нет данных", telemetry: "Нет данных"})
+    case Mnesia.add_tunnel(
+           name: tun_name,
+           server_id: node(),
+           state: %{inventory: "Нет данных", telemetry: "Нет данных"}
+         ) do
+      {:atomic, :ok} -> exec_local_script(tun_name)
+      _ -> nil
+    end
+
     {:noreply, state}
   end
 
@@ -195,45 +202,11 @@ defmodule AcariServer.Master do
 
   defp set_inventory(tun_name, inventory) do
     inventory = "#{AcariServer.get_local_time()}\n#{inventory}"
-
-    with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
-         tun_state <- %TunState{
-           tun_state
-           | inventory: inventory
-         } do
-      :ets.update_element(
-        :tuns,
-        tun_name,
-        {4, tun_state}
-      )
-
-      AcariServer.NodeMonitorAgent.event(tun_name, "inventory", inventory)
-    else
-      res -> Logger.error("Can't set inventory: #{inspect(res)}")
-    end
-
     AcariServer.Mnesia.update_tun_inventoty(tun_name, inventory)
-
   end
 
   defp set_telemetry(tun_name, telemetry) do
     telemetry = "#{AcariServer.get_local_time()}\n#{telemetry}"
-
-    with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
-         tun_state <- %TunState{
-           tun_state
-           | telemetry: telemetry
-         } do
-      :ets.update_element(
-        :tuns,
-        tun_name,
-        {4, tun_state}
-      )
-
-      AcariServer.NodeMonitorAgent.event(tun_name, "telemetry", telemetry)
-    else
-      res -> Logger.error("Can't set sslink state: #{inspect(res)}")
-    end
     AcariServer.Mnesia.update_tun_telemetry(tun_name, telemetry)
   end
 

@@ -35,6 +35,7 @@
       <th scope="col"></th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Сервер</th>
       <th scope="col">Link UP</th>
       <th scope="col">Link DOWN</th>
 
@@ -46,7 +47,8 @@
         1 -> "table-danger"
         2 -> "table-warning"
         3 -> "table-info"
-        _ -> ""
+        4 -> ""
+        _ -> "table-secondary"
       end%>
     <tr class="<%=al%>">
       <td><%= tunnel[:alert] %></td>
@@ -54,6 +56,7 @@
         <%= link tunnel[:name], to: Routes.tunnel_path(@conn, :show, tunnel[:name]) %>
       </td>
       <td><%= tunnel[:description] %></td>
+      <td><%= tunnel[:server] %></td>
       <td><%= tunnel[:links_up] %></td>
       <td><%= tunnel[:links_down] %></td>
 

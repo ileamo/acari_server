@@ -77,8 +77,15 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
-  def tun_write(kl) do
-    Mnesia.transaction(fn -> Mnesia.write(Attr.mk_record(:tun, kl)) end)
+  def add_tunnel(kl) do
+    name = kl |> Keyword.get(:name)
+
+    Mnesia.transaction(fn ->
+      case Mnesia.wread({:tun, name}) do
+        [] -> Mnesia.write(Attr.mk_record(:tun, kl))
+        _ -> nil
+      end
+    end)
   end
 
   def update_tun_inventoty(name, data) do
@@ -93,7 +100,7 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn ->
       case Mnesia.wread({:tun, name}) do
         [] ->
-          nil
+          Logger.error("#{name}: Can't set #{tag}, No such tunnel")
 
         [record] ->
           state =
@@ -114,7 +121,16 @@ defmodule AcariServer.Mnesia do
            Mnesia.read({:tun, name})
          end) do
       {:atomic, [record]} ->
-        record |> Rec.tun(:state) |> Map.merge(%{name: name, description: node.description})
+        record
+        |> Rec.tun(:state)
+        |> Map.merge(%{
+          name: name,
+          description: node.description,
+          server:
+            record
+            |> Rec.tun(:server_id)
+            |> AcariServer.ServerManager.get_server_name_by_system_name()
+        })
 
       _ ->
         nil
@@ -148,13 +164,18 @@ defmodule AcariServer.Mnesia do
   def get_tunnel_list(nodes) do
     node_to_name = AcariServer.ServerManager.get_node_to_name_map()
 
+    name_to_server =
+      match(:tun)
+      |> Enum.map(fn %{name: name, server_id: server} -> {name, server} end)
+      |> Enum.into(%{})
+
     status =
       match(:link)
       |> link_list_to_map()
 
     nodes
     |> Enum.map(fn %{name: name, description: descr} ->
-      %{name: name, description: descr}
+      %{name: name, description: descr, server: node_to_name[name_to_server[name]]}
       |> Map.merge(
         case status[name] do
           nil -> %{}
@@ -169,12 +190,15 @@ defmodule AcariServer.Mnesia do
   end
 
   def match(tab, field_pattern \\ %{}) do
-    {:atomic, rec_list} =
-      Mnesia.transaction(fn ->
-        Mnesia.match_object(Attr.pattern(tab, field_pattern))
-      end)
+    case Mnesia.transaction(fn ->
+           Mnesia.match_object(Attr.pattern(tab, field_pattern))
+         end) do
+      {:atomic, rec_list} ->
+        rec_list |> Enum.map(fn r -> r |> Attr.record_to_map() end)
 
-    rec_list |> Enum.map(fn r -> r |> Attr.record_to_map() end)
+      _ ->
+        []
+    end
   end
 
   def link_list_to_map(link_list) do
