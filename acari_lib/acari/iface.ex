@@ -131,20 +131,41 @@ defmodule Acari.IfaceSnd do
   use GenServer
   require Logger
 
+  defmodule State do
+    defstruct [
+      :tun_name,
+      :ifsocket,
+      main_server: true
+    ]
+  end
+
   def start_link(params) do
     GenServer.start_link(__MODULE__, params)
   end
 
   ## Callbacks
   @impl true
-  def init(%{tun_name: tun_name} = state) do
+  def init(%{tun_name: tun_name, ifsocket: ifsocket}) do
     Phoenix.PubSub.subscribe(AcariServer.PubSub, tun_name)
-    {:ok, state}
+    {:ok, %State{tun_name: tun_name, ifsocket: ifsocket}}
   end
 
   @impl true
-  def handle_cast({:send, packet}, state = %{ifsocket: ifsocket}) do
-    :tuncer.send(ifsocket, packet)
+  def handle_cast({:send, packet}, state = %{main_server: node, ifsocket: ifsocket}) do
+    case node do
+      true ->
+        :tuncer.send(ifsocket, packet)
+
+      node ->
+        Phoenix.PubSub.direct_broadcast_from(
+          node,
+          AcariServer.PubSub,
+          self(),
+          state.tun_name,
+          {:send, packet}
+        )
+    end
+
     {:noreply, state}
   end
 
@@ -152,6 +173,11 @@ defmodule Acari.IfaceSnd do
   def handle_info({:send, packet}, state = %{ifsocket: ifsocket}) do
     :tuncer.send(ifsocket, packet)
     {:noreply, state}
+  end
+
+  def handle_info({:main_server, node}, state) do
+    node = if node == node(), do: true, else: node
+    {:noreply, %State{state | main_server: node}}
   end
 
   def handle_info(msg, state) do

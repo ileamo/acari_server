@@ -80,12 +80,25 @@ defmodule AcariServer.Mnesia do
   def add_tunnel(kl) do
     name = kl |> Keyword.get(:name)
 
-    Mnesia.transaction(fn ->
-      case Mnesia.wread({:tun, name}) do
-        [] -> Mnesia.write(Attr.mk_record(:tun, kl))
-        _ -> nil
-      end
-    end)
+    case Mnesia.transaction(fn ->
+           case Mnesia.wread({:tun, name}) do
+             [] ->
+               :ok = Mnesia.write(Attr.mk_record(:tun, kl))
+               kl |> Keyword.get(:server_id)
+
+             [record] ->
+               record |> Rec.tun(:server_id)
+           end
+         end) do
+      {:atomic, node} ->
+        Phoenix.PubSub.broadcast(
+          AcariServer.PubSub,
+          name,
+          {:main_server, node}
+        )
+
+        node
+    end
   end
 
   def update_tun_inventoty(name, data) do

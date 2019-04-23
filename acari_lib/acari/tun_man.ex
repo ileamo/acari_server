@@ -121,11 +121,6 @@ defmodule Acari.TunMan do
     {:noreply, exec_tun_com(state, com, payload)}
   end
 
-  def handle_cast({:ip_address, com, ifaddr}, state) do
-    ip_address_p(state, com, ifaddr)
-    {:noreply, state}
-  end
-
   def handle_cast(mes, state) do
     Logger.error(" Bad message: #{inspect(mes)} #{inspect(state)}")
     {:noreply, state}
@@ -329,14 +324,6 @@ defmodule Acari.TunMan do
     exec_tun_method(state, method, params)
   end
 
-  defp exec_tun_method(state, "ip_address_add", params) do
-    ip_address_p(state, :add, params)
-  end
-
-  defp exec_tun_method(state, "ip_address_del", params) do
-    ip_address_p(state, :del, params)
-  end
-
   defp exec_tun_method(state, method, _) do
     Logger.error("Unknown method #{method}")
     state
@@ -344,32 +331,6 @@ defmodule Acari.TunMan do
 
   defp via(name) do
     {:via, Registry, {Registry.TunMan, name}}
-  end
-
-  defp ip_address_p(%{ifname: ifname} = state, com, ifaddr) when com in [:add, :del] do
-    com = "#{mk_ifaddr("ip address #{com}", ifaddr)} dev #{ifname}"
-    Acari.exec_sh(com)
-    state
-  end
-
-  defp mk_ifaddr(com, %{"prefix" => prefix} = ifaddr) do
-    mk_ifaddr("#{com} #{prefix}", ifaddr |> Map.delete("prefix"))
-  end
-
-  defp mk_ifaddr(com, %{"peer" => val} = ifaddr) do
-    mk_ifaddr("#{com} peer #{val}", ifaddr |> Map.delete("peer"))
-  end
-
-  defp mk_ifaddr(com, %{"broadcast" => val} = ifaddr) do
-    mk_ifaddr("#{com} broadcast #{val}", ifaddr |> Map.delete("broadcast"))
-  end
-
-  defp mk_ifaddr(com, %{"anycast" => val} = ifaddr) do
-    mk_ifaddr("#{com} anycast #{val}", ifaddr |> Map.delete("anycast"))
-  end
-
-  defp mk_ifaddr(com, _ifaddr) do
-    com
   end
 
   defp sslink_opened(state, name, num) do
@@ -443,9 +404,5 @@ defmodule Acari.TunMan do
 
   def send_tun_com(tun_name, com, payload) do
     GenServer.cast(via(tun_name), {:send_tun_com, com, payload})
-  end
-
-  def ip_address(com, tun_name, ifaddr) do
-    GenServer.cast(via(tun_name), {:ip_address, com, ifaddr})
   end
 end

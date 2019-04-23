@@ -71,13 +71,15 @@ defmodule AcariServer.Master do
     peer_params = tun_state.peer_params
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
 
-    case Mnesia.add_tunnel(
-           name: tun_name,
-           server_id: node(),
-           state: %{inventory: "Нет данных", telemetry: "Нет данных"}
-         ) do
-      {:atomic, :ok} -> exec_local_script(tun_name)
-      _ -> nil
+    server =
+      Mnesia.add_tunnel(
+        name: tun_name,
+        server_id: node(),
+        state: %{inventory: "Нет данных", telemetry: "Нет данных"}
+      )
+
+    if server == node() do
+      exec_local_script(tun_name)
     end
 
     {:noreply, state}
