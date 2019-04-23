@@ -94,14 +94,15 @@ defmodule Acari.TunMan do
         {:set_sslink_params, name, params},
         %State{sslinks: sslinks} = state
       ) do
-    # TODO if no element
-    elem = :ets.lookup_element(sslinks, name, 4)
-    true = :ets.update_element(sslinks, name, {4, elem |> Map.merge(params)})
+    state =
+      case :ets.lookup(sslinks, name) do
+        [{_, _, _, elem}] ->
+          true = :ets.update_element(sslinks, name, {4, elem |> Map.merge(params)})
+          if params[:latency], do: update_best_link(state), else: state
 
-    # get best link
-    # TODO if  new letency set
-
-    state = if params[:latency], do: update_best_link(state), else: state
+        _ ->
+          state
+      end
 
     {:noreply, state}
   end
@@ -166,6 +167,10 @@ defmodule Acari.TunMan do
   def handle_call(:get_all_links, _from, %State{sslinks: sslinks} = state) do
     res = :ets.match(sslinks, {:"$1", :_, :_, :"$2"})
     {:reply, res, state}
+  end
+
+  def handle_call(:get_state, _from, state) do
+    {:reply, state, state}
   end
 
   def handle_call(request, _from, state) do
@@ -251,7 +256,7 @@ defmodule Acari.TunMan do
            sslinks: sslinks,
            iface_pid: iface_pid,
            sslink_sup_pid: sslink_sup_pid
-         } = state,
+         } = _state,
          name,
          connector
        ) do
@@ -291,6 +296,10 @@ defmodule Acari.TunMan do
       Const.master_mes() ->
         GenServer.cast(state.master_pid, {:master_mes, state.tun_name, payload})
 
+      Const.master_mes_plus() ->
+        [main | attach] = decode_mes_plus(payload)
+        GenServer.cast(state.master_pid, {:master_mes_plus, state.tun_name, main, attach})
+
       Const.peer_started() ->
         GenServer.cast(state.master_pid, {:peer_started, state.tun_name})
 
@@ -302,6 +311,16 @@ defmodule Acari.TunMan do
     end
 
     state
+  end
+
+  defp decode_mes_plus(payload, list \\ []) do
+    case payload do
+      <<len::16, first::binary-size(len), rest::binary>> ->
+        decode_mes_plus(rest, [first | list])
+
+      _ ->
+        list |> Enum.reverse()
+    end
   end
 
   defp exec_json_req(state, json) do
@@ -383,6 +402,10 @@ defmodule Acari.TunMan do
     GenServer.call(via(tun_name), :get_all_links)
   end
 
+  def get_state(tun_name) do
+    GenServer.call(via(tun_name), :get_state)
+  end
+
   def set_sslink_snd_pid(tun_pid, name, pid) do
     GenServer.cast(tun_pid, {:set_sslink_snd_pid, name, pid})
   end
@@ -403,6 +426,15 @@ defmodule Acari.TunMan do
   def send_master_mes(tun_name, payload) do
     {:ok, json} = Jason.encode(payload)
     GenServer.cast(via(tun_name), {:send_tun_com, Const.master_mes(), json})
+  end
+
+  def send_master_mes_plus(tun_name, main, attach \\ []) do
+    {:ok, json} = Jason.encode(main)
+
+    payload =
+      [json | attach] |> Enum.reduce("", fn mes, acc -> acc <> <<byte_size(mes)::16>> <> mes end)
+
+    GenServer.cast(via(tun_name), {:send_tun_com, Const.master_mes_plus(), payload})
   end
 
   def send_tun_com(pid, com, payload) when is_pid(pid) do

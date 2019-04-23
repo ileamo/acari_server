@@ -34,7 +34,7 @@ defmodule Acari.Iface do
     :tuncer.persist(ifsocket, false)
     ifname = :tuncer.devname(ifsocket)
     :ok = if_up(ifname)
-    {:ok, ifsnd_pid} = Acari.IfaceSnd.start_link(%{ifsocket: ifsocket})
+    {:ok, ifsnd_pid} = Acari.IfaceSnd.start_link(%{tun_name: tun_name, ifsocket: ifsocket})
 
     #       System.cmd(
     #       "ip",
@@ -119,7 +119,7 @@ defmodule Acari.Iface do
   end
 
   defp if_up(ifname), do: if_set_admstate(ifname, "up")
-  defp if_down(ifname), do: if_set_admstate(ifname, "down")
+  # defp if_down(ifname), do: if_set_admstate(ifname, "down")
 
   defp if_set_admstate(ifname, admstate) do
     {_, 0} = System.cmd("ip", ["link", "set", ifname, admstate], stderr_to_stdout: true)
@@ -129,6 +129,7 @@ end
 
 defmodule Acari.IfaceSnd do
   use GenServer
+  require Logger
 
   def start_link(params) do
     GenServer.start_link(__MODULE__, params)
@@ -136,13 +137,25 @@ defmodule Acari.IfaceSnd do
 
   ## Callbacks
   @impl true
-  def init(state) do
+  def init(%{tun_name: tun_name} = state) do
+    Phoenix.PubSub.subscribe(AcariServer.PubSub, tun_name)
     {:ok, state}
   end
 
   @impl true
   def handle_cast({:send, packet}, state = %{ifsocket: ifsocket}) do
     :tuncer.send(ifsocket, packet)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({:send, packet}, state = %{ifsocket: ifsocket}) do
+    :tuncer.send(ifsocket, packet)
+    {:noreply, state}
+  end
+
+  def handle_info(msg, state) do
+    Logger.warn("#{state.tun_name}: IfaceSnd: unexpected message: #{inspect(msg)}")
     {:noreply, state}
   end
 
