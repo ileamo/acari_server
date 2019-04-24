@@ -180,6 +180,7 @@ defmodule Acari.IfaceSnd do
     end
 
     def handle_info({:main_server, node}, state) do
+      Logger.info("#{state.tun_name}: Set main server as #{node}")
       node = if node == node(), do: true, else: node
       {:noreply, %State{state | main_server: node}}
     end

@@ -24,6 +24,15 @@ defmodule AcariServer.Mnesia.Attr do
     Enum.zip(apply(__MODULE__, tab, []), fields)
     |> Enum.into(%{})
   end
+
+  def merge_record([tab | _fields] = rec, fields_map) do
+    new =
+      rec
+      |> record_to_map()
+      |> Map.merge(fields_map)
+
+    mk_record(tab, new)
+  end
 end
 
 defmodule AcariServer.Mnesia.Rec do
@@ -125,6 +134,34 @@ defmodule AcariServer.Mnesia do
           AcariServer.NodeMonitorAgent.event(name, tag |> to_string, data)
       end
     end)
+  end
+
+  def update_tun_server(name, server) do
+    case Mnesia.transaction(fn ->
+           case Mnesia.wread({:server, server}) do
+             [] ->
+               "No such server #{server}"
+
+             [_] ->
+               case Mnesia.wread({:tun, name}) do
+                 [] ->
+                   "No such tunnel #{name}"
+
+                 [record] ->
+                   Mnesia.write(Rec.tun(record, server_id: server))
+               end
+           end
+         end) do
+      {:atomic, :ok} ->
+        Phoenix.PubSub.broadcast(
+          AcariServer.PubSub,
+          name,
+          {:main_server, server}
+        )
+
+      {:atomic, err} ->
+        Logger.error("update_tun_server: #{inspect(err)}")
+    end
   end
 
   def get_tunnel_state(name) do
