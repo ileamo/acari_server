@@ -146,7 +146,10 @@ defmodule Acari.IfaceSnd do
   ## Callbacks
   @impl true
   def init(%{tun_name: tun_name, ifsocket: ifsocket}) do
-    Phoenix.PubSub.subscribe(AcariServer.PubSub, tun_name)
+    if Application.get_env(:acari, :server) do
+      Phoenix.PubSub.subscribe(AcariServer.PubSub, tun_name)
+    end
+
     {:ok, %State{tun_name: tun_name, ifsocket: ifsocket}}
   end
 
@@ -169,20 +172,22 @@ defmodule Acari.IfaceSnd do
     {:noreply, state}
   end
 
-  @impl true
-  def handle_info({:send, packet}, state = %{ifsocket: ifsocket}) do
-    :tuncer.send(ifsocket, packet)
-    {:noreply, state}
-  end
+  if Application.get_env(:acari, :server) do
+    @impl true
+    def handle_info({:send, packet}, state = %{ifsocket: ifsocket}) do
+      :tuncer.send(ifsocket, packet)
+      {:noreply, state}
+    end
 
-  def handle_info({:main_server, node}, state) do
-    node = if node == node(), do: true, else: node
-    {:noreply, %State{state | main_server: node}}
-  end
+    def handle_info({:main_server, node}, state) do
+      node = if node == node(), do: true, else: node
+      {:noreply, %State{state | main_server: node}}
+    end
 
-  def handle_info(msg, state) do
-    Logger.warn("#{state.tun_name}: IfaceSnd: unexpected message: #{inspect(msg)}")
-    {:noreply, state}
+    def handle_info(msg, state) do
+      Logger.error("#{state.tun_name}: IfaceSnd: unexpected message: #{inspect(msg)}")
+      {:noreply, state}
+    end
   end
 
   # Client
