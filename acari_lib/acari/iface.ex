@@ -34,13 +34,10 @@ defmodule Acari.Iface do
     :tuncer.persist(ifsocket, false)
     ifname = :tuncer.devname(ifsocket)
     :ok = if_up(ifname)
-    {:ok, ifsnd_pid} = Acari.IfaceSnd.start_link(%{tun_name: tun_name, ifsocket: ifsocket})
 
-    #       System.cmd(
-    #       "ip",
-    #       ["address", "add", "192.168.123.5/32", "peer", "192.168.123.4", "dev", ifname],
-    #       stderr_to_stdout: true
-    #     )
+    {:ok, ifsnd_pid} =
+      Acari.IfaceSnd.start_link(%{tun_name: tun_name, ifsocket: ifsocket, ifname: ifname})
+
     Logger.info("#{tun_name}: iface #{ifname}: created")
 
     state = %State{
@@ -57,7 +54,7 @@ defmodule Acari.Iface do
   def handle_cast({:set_sslink_snd_pid, sslink_snd_pid}, state) do
     state =
       if !state.up do
-        :ok = if_up(state.ifname)
+        # :ok = if_up(state.ifname)
         %State{state | up: true}
       else
         state
@@ -89,7 +86,6 @@ defmodule Acari.Iface do
 
   def handle_info({:tuntap, _pid, _packet}, state) do
     Logger.debug("#{state.tun_name}: iface #{state.ifname}: No link to send")
-    # if_down(ifname)
     {:noreply, %{state | up: false}}
   end
 
@@ -118,8 +114,8 @@ defmodule Acari.Iface do
     GenServer.call(iface_pid, :get_if_info, 60 * 1000)
   end
 
-  defp if_up(ifname), do: if_set_admstate(ifname, "up")
-  # defp if_down(ifname), do: if_set_admstate(ifname, "down")
+  def if_up(ifname), do: if_set_admstate(ifname, "up")
+  def if_down(ifname), do: if_set_admstate(ifname, "down")
 
   defp if_set_admstate(ifname, admstate) do
     {_, 0} = System.cmd("ip", ["link", "set", ifname, admstate], stderr_to_stdout: true)
@@ -130,11 +126,13 @@ end
 defmodule Acari.IfaceSnd do
   use GenServer
   require Logger
+  import Acari.Iface, only: [if_up: 1, if_down: 1]
 
   defmodule State do
     defstruct [
       :tun_name,
       :ifsocket,
+      :ifname,
       main_server: true
     ]
   end
@@ -145,12 +143,12 @@ defmodule Acari.IfaceSnd do
 
   ## Callbacks
   @impl true
-  def init(%{tun_name: tun_name, ifsocket: ifsocket}) do
+  def init(%{tun_name: tun_name, ifsocket: ifsocket, ifname: ifname}) do
     if Application.get_env(:acari, :server) do
       Phoenix.PubSub.subscribe(AcariServer.PubSub, tun_name)
     end
 
-    {:ok, %State{tun_name: tun_name, ifsocket: ifsocket}}
+    {:ok, %State{tun_name: tun_name, ifsocket: ifsocket, ifname: ifname}}
   end
 
   @impl true
@@ -179,9 +177,18 @@ defmodule Acari.IfaceSnd do
       {:noreply, state}
     end
 
-    def handle_info({:main_server, node}, state) do
+    def handle_info({:main_server, node}, %{ifname: ifname} = state) do
       Logger.info("#{state.tun_name}: Set main server as #{node}")
-      node = if node == node(), do: true, else: node
+
+      node =
+        if node == node() do
+          if_up(ifname)
+          true
+        else
+          if_down(ifname)
+          node
+        end
+
       {:noreply, %State{state | main_server: node}}
     end
 
