@@ -136,7 +136,7 @@ defmodule Acari.Iface do
           AcariServer.PubSub,
           self(),
           "rcv:#{state.tun_name}",
-          {:recv, packet, [node() | used_nodes]}
+          {:redirect, packet, [node() | used_nodes]}
         )
 
       _ ->
