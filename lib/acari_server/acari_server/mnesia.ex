@@ -102,7 +102,7 @@ defmodule AcariServer.Mnesia do
       {:atomic, node} ->
         Phoenix.PubSub.broadcast(
           AcariServer.PubSub,
-          name,
+          "snd:#{name}",
           {:main_server, node}
         )
 
@@ -155,7 +155,7 @@ defmodule AcariServer.Mnesia do
       {:atomic, :ok} ->
         Phoenix.PubSub.broadcast(
           AcariServer.PubSub,
-          name,
+          "snd:#{name}",
           {:main_server, server}
         )
 

@@ -145,7 +145,7 @@ defmodule Acari.IfaceSnd do
   @impl true
   def init(%{tun_name: tun_name, ifsocket: ifsocket, ifname: ifname}) do
     if Application.get_env(:acari, :server) do
-      Phoenix.PubSub.subscribe(AcariServer.PubSub, tun_name)
+      Phoenix.PubSub.subscribe(AcariServer.PubSub, "snd:#{tun_name}")
     end
 
     {:ok, %State{tun_name: tun_name, ifsocket: ifsocket, ifname: ifname}}
@@ -162,7 +162,7 @@ defmodule Acari.IfaceSnd do
           node,
           AcariServer.PubSub,
           self(),
-          state.tun_name,
+          "snd:#{state.tun_name}",
           {:send, packet}
         )
     end
