@@ -18,7 +18,6 @@ defmodule Acari.Iface do
       :ifsocket,
       :ifname,
       :ifsnd_pid,
-      :up,
       :sslink_snd_pid
     ]
   end
@@ -38,6 +37,10 @@ defmodule Acari.Iface do
     {:ok, ifsnd_pid} =
       Acari.IfaceSnd.start_link(%{tun_name: tun_name, ifsocket: ifsocket, ifname: ifname})
 
+    if Application.get_env(:acari, :server) do
+      Phoenix.PubSub.subscribe(AcariServer.PubSub, "rcv:#{tun_name}")
+    end
+
     Logger.info("#{tun_name}: iface #{ifname}: created")
 
     state = %State{
@@ -52,14 +55,6 @@ defmodule Acari.Iface do
 
   @impl true
   def handle_cast({:set_sslink_snd_pid, sslink_snd_pid}, state) do
-    state =
-      if !state.up do
-        # :ok = if_up(state.ifname)
-        %State{state | up: true}
-      else
-        state
-      end
-
     {:noreply, %State{state | sslink_snd_pid: sslink_snd_pid}}
   end
 
@@ -80,19 +75,30 @@ defmodule Acari.Iface do
         {:noreply, state}
 
       _ ->
+        redirect(state, packet)
         {:noreply, %State{state | sslink_snd_pid: nil}}
     end
   end
 
-  def handle_info({:tuntap, _pid, _packet}, state) do
-    Logger.debug("#{state.tun_name}: iface #{state.ifname}: No link to send")
-    {:noreply, %{state | up: false}}
+  def handle_info({:tuntap, _pid, packet}, state) do
+    redirect(state, packet)
+    {:noreply, state}
   end
 
   def handle_info({:tuntap_error, _pid, reason}, state) do
     Logger.error("#{state.tun_name}: iface #{state.ifname}: #{inspect(reason)}")
     # GenServer.cast(pid, :terminate)
     {:stop, :shutdown, state}
+  end
+
+  def handle_info({:redirect, packet, used_nodes}, %{sslink_snd_pid: sslink_snd_pid} = state) do
+    if is_pid(sslink_snd_pid) && Process.alive?(sslink_snd_pid) do
+      Acari.SSLinkSnd.send(sslink_snd_pid, packet)
+    else
+      redirect(state, packet, used_nodes)
+    end
+
+    {:noreply, state}
   end
 
   def handle_info(msg, state) do
@@ -121,11 +127,28 @@ defmodule Acari.Iface do
     {_, 0} = System.cmd("ip", ["link", "set", ifname, admstate], stderr_to_stdout: true)
     :ok
   end
+
+  defp redirect(state, packet, used_nodes \\ []) do
+    case Node.list() -- used_nodes do
+      [node | _] ->
+        Phoenix.PubSub.direct_broadcast_from(
+          node,
+          AcariServer.PubSub,
+          self(),
+          "rcv:#{state.tun_name}",
+          {:recv, packet, [node() | used_nodes]}
+        )
+
+      _ ->
+        nil
+    end
+  end
 end
 
 defmodule Acari.IfaceSnd do
   use GenServer
   require Logger
+
   import Acari.Iface, only: [if_up: 1, if_down: 1]
 
   defmodule State do
