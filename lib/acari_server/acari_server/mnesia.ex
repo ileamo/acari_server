@@ -2,8 +2,9 @@ defmodule AcariServer.Mnesia.Attr do
   def server(), do: [:name, :opt]
   def tun(), do: [:name, :server_id, :state, :opt]
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
+  def event(), do: [:id, :timestamp, :level, :header, :text]
 
-  def table_list(), do: [:server, :tun, :link]
+  def table_list(), do: [:server, :tun, :link, :event]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -49,6 +50,7 @@ defmodule AcariServer.Mnesia do
   require AcariServer.Mnesia.Rec, as: Rec
   alias :mnesia, as: Mnesia
   alias AcariServer.Mnesia.Attr
+  import AcariServer.Mnesia.Attr, only: [mk_record: 2]
 
   def init() do
     Mnesia.start()
@@ -92,7 +94,7 @@ defmodule AcariServer.Mnesia do
     case Mnesia.transaction(fn ->
            case Mnesia.wread({:tun, name}) do
              [] ->
-               :ok = Mnesia.write(Attr.mk_record(:tun, kl))
+               :ok = Mnesia.write(mk_record(:tun, kl))
                kl |> Keyword.get(:server_id)
 
              [record] ->
@@ -208,6 +210,24 @@ defmodule AcariServer.Mnesia do
       Mnesia.write(
         Rec.link(id: id, name: name, tun_id: tun, server_id: node, up: up, state: state)
       )
+    end)
+
+    case up do
+      true -> delete_event(id)
+      _ -> update_event(%{id: id, level: 3, header: tun, text: "#{name}: упало"})
+    end
+  end
+
+  def update_event(ev) do
+    ev = ev |> Map.put(:timestamp, :os.system_time(:second))
+    Mnesia.transaction(fn ->
+      Mnesia.write(mk_record(:event, ev))
+    end)
+  end
+
+  def delete_event(id) do
+    Mnesia.transaction(fn ->
+      Mnesia.delete({:event, id})
     end)
   end
 
