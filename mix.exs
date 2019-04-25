@@ -26,7 +26,7 @@ defmodule AcariServer.MixProject do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib", "acari_lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
   #
@@ -51,7 +51,7 @@ defmodule AcariServer.MixProject do
       {:distillery, "~> 2.0"},
       {:loggix, "~> 0.0.9"},
       {:httpoison, "~> 1.5"},
-      #{:acari, git: "https://github.com/ileamo/acari.git"},
+      {:acari, git: "https://github.com/ileamo/acari.git"},
       {:procket, git: "https://github.com/msantos/procket.git", override: true},
 
       {:tunctl, git: "https://github.com/msantos/tunctl.git"},
