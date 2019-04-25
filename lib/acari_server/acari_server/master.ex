@@ -71,12 +71,12 @@ defmodule AcariServer.Master do
     peer_params = tun_state.peer_params
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
 
-    #server =
-      Mnesia.add_tunnel(
-        name: tun_name,
-        server_id: node(),
-        state: %{inventory: "Нет данных", telemetry: "Нет данных"}
-      )
+    # server =
+    Mnesia.add_tunnel(
+      name: tun_name,
+      server_id: node(),
+      state: %{inventory: "Нет данных", telemetry: "Нет данных"}
+    )
 
     # if server == node() do
     exec_local_script(tun_name)
@@ -133,9 +133,14 @@ defmodule AcariServer.Master do
     state
   end
 
-  defp exec_server_method(state, tun_name, "get.conf", %{"id" => id}) do
-    Logger.info("Get config request #{id}")
-    send_config(tun_name)
+  defp exec_server_method(state, tun_name, "get.conf", %{"id" => tun_name} = params) do
+    Logger.info("#{tun_name}: Get config request #{inspect(params)}")
+    send_config(params)
+    state
+  end
+
+  defp exec_server_method(state, tun_name, "get.conf", params) do
+    Logger.error("#{tun_name}: Bad config request #{inspect(params)}")
     state
   end
 
@@ -217,7 +222,7 @@ defmodule AcariServer.Master do
     Acari.exec_sh(script)
   end
 
-  def send_config(tun_name) do
+  def send_config(%{"id" => tun_name} = params) do
     request = %{
       method: "put.conf",
       params: %{
@@ -225,7 +230,9 @@ defmodule AcariServer.Master do
       }
     }
 
-    script = AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name))
+    script =
+      AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name) |> Map.merge(params))
+
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 
