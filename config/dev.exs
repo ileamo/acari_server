@@ -77,7 +77,7 @@ config :acari_server, AcariServer.Repo,
   username: "postgres",
   password: "postgres",
   database: "acari_server_dev",
-  hostname: "10.0.10.10",
+  hostname: "localhost",
   pool_size: 10
 
 config :acari_server, AcariServer, allow_unconfigured: false
@@ -89,7 +89,7 @@ config :acari_server, AcariServer.Listener,
 
 config :acari_server, :zabbix,
   zbx_web_port: nil,
-  #zbx_api_url: "http://10.0.10.155:4080",
+  # zbx_api_url: "http://10.0.10.155:4080",
   zbx_snd_host: "10.0.10.155",
   zbx_username: "Admin",
   zbx_password: "IMo19-0708"

@@ -74,7 +74,7 @@ defmodule AcariServer.Mnesia do
     for t <- create_list do
       Mnesia.create_table(t,
         attributes: apply(Attr, t, []),
-        ram_copies: servers_list_db
+        ram_copies: [node() | servers_list_db] |> Enum.uniq()
       )
     end
 
@@ -246,7 +246,7 @@ defmodule AcariServer.Mnesia do
         {level, mes} =
           get_link_list_for_tunnel(tun)
           |> reduce_link_list(node_to_name)
-          |> alert_mes() 
+          |> alert_mes()
 
         update_event(%{
           id: id,
@@ -363,9 +363,14 @@ defmodule AcariServer.Mnesia do
 
   def alert_mes(%{links_up: lu, links_down: ld}) do
     cond do
-      (serv_list = get_serv(ld) -- get_serv(lu)) != [] -> {2, "Нет связи с сервером #{serv_list |> Enum.join(", ")}"}
-      (link_list = get_link(ld) -- get_link(lu)) != [] -> {2, "Порт #{link_list |> Enum.join(", ")} не работает"}
-      true -> {3, ""}
+      (serv_list = get_serv(ld) -- get_serv(lu)) != [] ->
+        {2, "Нет связи с сервером #{serv_list |> Enum.join(", ")}"}
+
+      (link_list = get_link(ld) -- get_link(lu)) != [] ->
+        {2, "Порт #{link_list |> Enum.join(", ")} не работает"}
+
+      true ->
+        {3, ""}
     end
   end
 
