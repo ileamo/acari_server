@@ -236,16 +236,23 @@ defmodule AcariServer.Mnesia do
       )
     end)
 
+    node_to_name = get_node_to_name_map()
+
     case up do
       true ->
         delete_event(id)
 
       _ ->
+        {level, mes} =
+          get_link_list_for_tunnel(tun)
+          |> reduce_link_list(node_to_name)
+          |> alert_mes() 
+
         update_event(%{
           id: id,
-          level: 3,
+          level: level,
           header: tun,
-          text: "#{name}@#{node |> get_server_name_by_system_name()}: упало"
+          text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
         })
     end
   end
@@ -286,7 +293,7 @@ defmodule AcariServer.Mnesia do
       |> Map.merge(
         case status[name] do
           nil -> %{}
-          link_list -> link_list |> reduce_link_list(node_to_name)
+          link_list -> link_list |> reduce_link_list(node_to_name) |> alert()
         end
       )
     end)
@@ -322,7 +329,7 @@ defmodule AcariServer.Mnesia do
     |> Enum.into(%{})
   end
 
-  defp reduce_link_list(link_list, node_to_name) do
+  def reduce_link_list(link_list, node_to_name) do
     link_list
     |> Enum.reduce(
       %{links_up: [], links_down: []},
@@ -335,7 +342,6 @@ defmodule AcariServer.Mnesia do
         end
       end
     )
-    |> alert()
   end
 
   defp alert(%{links_up: [], links_down: ld}), do: %{alert: 1, links_down: ld |> get_links_str()}
@@ -350,6 +356,17 @@ defmodule AcariServer.Mnesia do
       end
 
     %{alert: alert, links_up: lu |> get_links_str(), links_down: ld |> get_links_str()}
+  end
+
+  def alert_mes(%{links_up: [], links_down: _ld}), do: {1, "Устройство недоступно"}
+  def alert_mes(%{links_up: _lu, links_down: []}), do: {4, ""}
+
+  def alert_mes(%{links_up: lu, links_down: ld}) do
+    cond do
+      (serv_list = get_serv(ld) -- get_serv(lu)) != [] -> {2, "Нет связи с сервером #{serv_list |> Enum.join(", ")}"}
+      (link_list = get_link(ld) -- get_link(lu)) != [] -> {2, "Порт #{link_list |> Enum.join(", ")} не работает"}
+      true -> {3, ""}
+    end
   end
 
   defp get_link(l), do: l |> Enum.map(fn {l, _} -> l end) |> Enum.uniq()
