@@ -1,22 +1,8 @@
-<%  {ser_mes_list, bad_nodes_list} = get_mes() %>
-
-<%= for node <- bad_nodes_list do %>
-  <li class="list-group-item list-group-item-danger p-1">
+<%= for {alert, header, body} <- @mes_list do %>
+  <li class="list-group-item list-group-item-<%= alert %> p-1">
     <p>
-      <strong><%= node %></br></strong>
-      Упал на всех серверах
+      <strong><%= header %></br></strong>
+      <%= body %>
     </p>
   </li>
-<% end %>
-
-<%= for [server, {mes_list, _}] <- ser_mes_list do %>
-  <%= AcariServer.Mnesia.get_server_name_by_system_name(server) %>
-  <%= for {alert, header, body} <- mes_list do %>
-    <li class="list-group-item list-group-item-<%= alert %> p-1">
-      <p>
-        <strong><%= header %></br></strong>
-        <%= body %>
-      </p>
-    </li>
-  <% end %>
 <% end %>

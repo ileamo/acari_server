@@ -237,13 +237,21 @@ defmodule AcariServer.Mnesia do
     end)
 
     case up do
-      true -> delete_event(id)
-      _ -> update_event(%{id: id, level: 3, header: tun, text: "#{name}: упало"})
+      true ->
+        delete_event(id)
+
+      _ ->
+        update_event(%{
+          id: id,
+          level: 3,
+          header: tun,
+          text: "#{name}@#{node |> get_server_name_by_system_name()}: упало"
+        })
     end
   end
 
   def update_event(ev) do
-    ev = ev |> Map.put(:timestamp, :os.system_time(:second))
+    ev = ev |> Map.put(:timestamp, :os.system_time(:microsecond))
 
     Mnesia.transaction(fn ->
       Mnesia.write(mk_record(:event, ev))
@@ -254,6 +262,10 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn ->
       Mnesia.delete({:event, id})
     end)
+  end
+
+  def get_event_list() do
+    match(:event)
   end
 
   def get_tunnel_list(nodes) do

@@ -297,8 +297,10 @@ defmodule AcariServer.Master do
 
   defp broadcast_link_event() do
     AcariServer.NodeNumbersAgent.update()
+    mes_list = AcariServerWeb.LayoutView.get_mes()
 
-    mes_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", [])
+    mes_html =
+      Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", mes_list: mes_list)
 
     statistics_html =
       Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
@@ -306,7 +308,7 @@ defmodule AcariServer.Master do
     progress_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "progress.html", [])
 
     Endpoint.broadcast!("room:lobby", "link_event", %{
-      num_of_mes: Acari.LinkEventAgent.get_length(),
+      num_of_mes: mes_list |> length(),
       messages: mes_html,
       statistics: statistics_html,
       progress: progress_html
