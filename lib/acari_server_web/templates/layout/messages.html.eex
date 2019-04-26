@@ -10,7 +10,7 @@
 <% end %>
 
 <%= for [server, {mes_list, _}] <- ser_mes_list do %>
-  <%= AcariServer.ServerManager.get_server_name_by_system_name(server) %>
+  <%= AcariServer.Mnesia.get_server_name_by_system_name(server) %>
   <%= for {alert, header, body} <- mes_list do %>
     <li class="list-group-item list-group-item-<%= alert %> p-1">
       <p>

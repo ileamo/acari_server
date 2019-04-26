@@ -10,7 +10,7 @@
       <%= for %{name: name, server_id: srv, up: up, state: state} <- (@links_state || []) do %>
         <tr>
           <th  scope="row">
-            <%= "#{name}@#{AcariServer.ServerManager.get_server_name_by_system_name(srv)}" %>
+            <%= "#{name}@#{AcariServer.Mnesia.get_server_name_by_system_name(srv)}" %>
           </th>
           <% {text, color} = if up, do: {"UP", "text-success"}, else: {"DOWN","text-danger"} %>
           <td class="<%=color%>"><%= text %></td>

@@ -1,5 +1,5 @@
 defmodule AcariServer.Mnesia.Attr do
-  def server(), do: [:name, :opt]
+  def server(), do: [:system_name, :name, :opt]
   def tun(), do: [:name, :server_id, :state, :opt]
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
   def event(), do: [:id, :timestamp, :level, :header, :text]
@@ -55,9 +55,12 @@ defmodule AcariServer.Mnesia do
   def init() do
     Mnesia.start()
 
-    node_list = get_node_list()
+    servers_db = AcariServer.ServerManager.list_servers()
 
-    Mnesia.change_config(:extra_db_nodes, node_list)
+    servers_list_db =
+      servers_db |> Enum.map(fn %{system_name: name} -> name |> String.to_atom() end)
+
+    Mnesia.change_config(:extra_db_nodes, servers_list_db)
     table_list = Attr.table_list()
     Mnesia.wait_for_tables(table_list, 5000)
 
@@ -71,21 +74,42 @@ defmodule AcariServer.Mnesia do
     for t <- create_list do
       Mnesia.create_table(t,
         attributes: apply(Attr, t, []),
-        ram_copies: node_list
+        ram_copies: servers_list_db
       )
     end
 
-    update_servers_list(node_list)
+    update_servers_list(servers_db)
   end
 
-  def update_servers_list(node_list) do
+  def update_servers_list() do
+    servers_db = AcariServer.ServerManager.list_servers()
+    update_servers_list(servers_db)
+  end
+
+  def update_servers_list(servers_db) do
+    Mnesia.clear_table(:server)
+
     Mnesia.transaction(fn ->
-      existing_servers = Mnesia.all_keys(:server)
-      new = node_list -- existing_servers
-      old = existing_servers -- node_list
-      old |> Enum.each(fn item -> Mnesia.delete({:server, item}) end)
-      new |> Enum.each(fn item -> Mnesia.write(Rec.server(name: item)) end)
+      servers_db
+      |> Enum.each(fn %{system_name: system_name, name: name} ->
+        Mnesia.write(Rec.server(system_name: system_name, name: name))
+      end)
     end)
+  end
+
+  def get_node_to_name_map() do
+    match(:server)
+    |> Enum.map(fn %{name: name, system_name: system_name} ->
+      {system_name |> String.to_atom(), name}
+    end)
+    |> Enum.into(%{})
+  end
+
+  def get_server_name_by_system_name(system_name) do
+    case :mnesia.dirty_read(:server, system_name |> to_string()) do
+      [record] -> record |> Rec.server(:name)
+      _ -> system_name
+    end
   end
 
   def add_tunnel(kl) do
@@ -181,7 +205,7 @@ defmodule AcariServer.Mnesia do
           server:
             record
             |> Rec.tun(:server_id)
-            |> AcariServer.ServerManager.get_server_name_by_system_name()
+            |> get_server_name_by_system_name()
         })
 
       _ ->
@@ -220,6 +244,7 @@ defmodule AcariServer.Mnesia do
 
   def update_event(ev) do
     ev = ev |> Map.put(:timestamp, :os.system_time(:second))
+
     Mnesia.transaction(fn ->
       Mnesia.write(mk_record(:event, ev))
     end)
@@ -232,7 +257,7 @@ defmodule AcariServer.Mnesia do
   end
 
   def get_tunnel_list(nodes) do
-    node_to_name = AcariServer.ServerManager.get_node_to_name_map()
+    node_to_name = get_node_to_name_map()
 
     name_to_server =
       match(:tun)
@@ -320,10 +345,5 @@ defmodule AcariServer.Mnesia do
 
   defp get_links_str(l) do
     l |> Enum.map(fn {l, s} -> "#{l}@#{s}" end) |> Enum.join(", ")
-  end
-
-  defp get_node_list() do
-    AcariServer.ServerManager.list_servers()
-    |> Enum.map(fn %{system_name: name} -> name |> String.to_atom() end)
   end
 end

@@ -7,6 +7,7 @@ defmodule AcariServer.ServerManager do
   alias AcariServer.Repo
 
   alias AcariServer.ServerManager.Server
+  alias AcariServer.Mnesia
 
   @doc """
   Returns the list of servers.
@@ -37,24 +38,6 @@ defmodule AcariServer.ServerManager do
   """
   def get_server!(id), do: Repo.get!(Server, id)
 
-  def get_server_name_by_system_name(system_name) do
-    Server
-    |> Repo.get_by(system_name: to_string(system_name))
-    |> case do
-      %{name: name} -> name
-      _ -> system_name
-    end
-  end
-
-  def get_node_to_name_map() do
-    Server
-    |> Repo.all()
-    |> Enum.map(fn %{name: name, system_name: system_name} ->
-      {system_name |> String.to_atom(), name}
-    end)
-    |> Enum.into(%{})
-  end
-
   @doc """
   Creates a server.
 
@@ -68,9 +51,11 @@ defmodule AcariServer.ServerManager do
 
   """
   def create_server(attrs \\ %{}) do
-    %Server{}
+    res = %Server{}
     |> Server.changeset(attrs)
     |> Repo.insert()
+    Mnesia.update_servers_list()
+    res
   end
 
   @doc """
@@ -86,9 +71,11 @@ defmodule AcariServer.ServerManager do
 
   """
   def update_server(%Server{} = server, attrs) do
-    server
+    res = server
     |> Server.changeset(attrs)
     |> Repo.update()
+    Mnesia.update_servers_list()
+    res
   end
 
   @doc """
@@ -104,7 +91,9 @@ defmodule AcariServer.ServerManager do
 
   """
   def delete_server(%Server{} = server) do
-    Repo.delete(server)
+    res = Repo.delete(server)
+    Mnesia.update_servers_list()
+    res
   end
 
   @doc """
