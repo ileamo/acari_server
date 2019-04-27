@@ -238,16 +238,34 @@ defmodule AcariServer.Mnesia do
 
     node_to_name = get_node_to_name_map()
 
+    {level, mes} =
+      get_link_list_for_tunnel(tun)
+      |> reduce_link_list(node_to_name)
+      |> alert_mes()
+
     case up do
       true ->
         delete_event(id)
 
-      _ ->
-        {level, mes} =
-          get_link_list_for_tunnel(tun)
-          |> reduce_link_list(node_to_name)
-          |> alert_mes()
+        match(:event, %{header: tun})
+        |> Enum.each(fn %{id: {name, _tun, node}, level: prev_level} = event ->
+          if level > prev_level or (level == 2 and prev_level == 2) do
+            Mnesia.transaction(fn ->
+              Mnesia.write(
+                mk_record(
+                  :event,
+                  event
+                  |> Map.merge(%{
+                    level: level,
+                    text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
+                  })
+                )
+              )
+            end)
+          end
+        end)
 
+      _ ->
         update_event(%{
           id: id,
           level: level,
@@ -362,15 +380,20 @@ defmodule AcariServer.Mnesia do
   def alert_mes(%{links_up: _lu, links_down: []}), do: {4, ""}
 
   def alert_mes(%{links_up: lu, links_down: ld}) do
-    cond do
-      (serv_list = get_serv(ld) -- get_serv(lu)) != [] ->
-        {2, "Нет связи с сервером #{serv_list |> Enum.join(", ")}"}
-
-      (link_list = get_link(ld) -- get_link(lu)) != [] ->
-        {2, "Порт #{link_list |> Enum.join(", ")} не работает"}
-
-      true ->
-        {3, ""}
+    case [
+           case get_serv(ld) -- get_serv(lu) do
+             [] -> nil
+             serv_list -> "Нет связи с сервером #{serv_list |> Enum.join(", ")}. "
+           end,
+           case get_link(ld) -- get_link(lu) do
+             [] -> nil
+             link_list -> "Порт #{link_list |> Enum.join(", ")} не работает. "
+           end
+         ]
+         |> Enum.reject(&is_nil/1)
+         |> Enum.join(", ") do
+      "" -> {3, ""}
+      mes -> {2, mes}
     end
   end
 
