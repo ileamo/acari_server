@@ -1,5 +1,6 @@
-<% {bad_nodes, bad_links} = Acari.LinkEventAgent.get_failures() %>
+<% {_, bad_links} = Acari.LinkEventAgent.get_failures() %>
 <% nodes_num = AcariServer.Mnesia.get_tunnels_num()
+   bad_nodes = AcariServer.Mnesia.get_down_tun_num()
    down_count = AcariServer.NodeNumbersAgent.get_down_count()
 %>
 <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">

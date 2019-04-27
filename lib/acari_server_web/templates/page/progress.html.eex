@@ -1,6 +1,6 @@
 <%
-{bad_nodes, _} = Acari.LinkEventAgent.get_failures()
-nodes_num = :ets.info :tuns, :size
+bad_nodes = AcariServer.Mnesia.get_down_tun_num()
+nodes_num = AcariServer.Mnesia.get_tunnels_num()
 percent = case nodes_num do
   0 -> 0
   _ -> (nodes_num - bad_nodes) * 100 / nodes_num |> Float.round(1)

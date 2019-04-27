@@ -27,7 +27,7 @@ defmodule AcariServer.NodeNumbersAgent do
     Agent.update(
       __MODULE__,
       fn [ts_list, num_list, down_list] = state ->
-        {bad_nodes, _bad_links} = Acari.LinkEventAgent.get_failures()
+        bad_nodes = AcariServer.Mnesia.get_down_tun_num()
         nodes_num = AcariServer.Mnesia.get_tunnels_num()
         num = nodes_num - bad_nodes
         prev = List.first(num_list)

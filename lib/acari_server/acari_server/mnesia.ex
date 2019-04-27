@@ -3,8 +3,9 @@ defmodule AcariServer.Mnesia.Attr do
   def tun(), do: [:name, :server_id, :state, :opt]
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
   def event(), do: [:id, :timestamp, :level, :header, :text]
+  def stat(), do: [:key, :value]
 
-  def table_list(), do: [:server, :tun, :link, :event]
+  def table_list(), do: [:server, :tun, :link, :event, :stat]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -82,6 +83,8 @@ defmodule AcariServer.Mnesia do
     update_servers_list(servers_db)
   end
 
+  # server
+
   def update_servers_list() do
     servers_db = AcariServer.ServerManager.list_servers()
     update_servers_list(servers_db)
@@ -112,6 +115,8 @@ defmodule AcariServer.Mnesia do
       _ -> system_name
     end
   end
+
+  # tun
 
   def add_tunnel(kl) do
     name = kl |> Keyword.get(:name)
@@ -221,6 +226,8 @@ defmodule AcariServer.Mnesia do
     end
   end
 
+  # link
+
   def update_link(name, tun, up) do
     node = node()
     id = {name, tun, node}
@@ -273,6 +280,15 @@ defmodule AcariServer.Mnesia do
           end
         end)
 
+        update_stat(:down_tun, fn
+          {_, list} ->
+            list = list |> Enum.reject(fn x -> x == tun end)
+            {length(list), list}
+
+          _ ->
+            nil
+        end)
+
       _ ->
         update_event(%{
           id: id,
@@ -280,6 +296,17 @@ defmodule AcariServer.Mnesia do
           header: tun,
           text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
         })
+
+        if level == 1 do
+          update_stat(:down_tun, fn
+            {_, list} ->
+              list = [tun | list] |> Enum.uniq()
+              {length(list), list}
+
+            _ ->
+              {1, [tun]}
+          end)
+        end
     end
 
     broadcast_link_event()
@@ -305,6 +332,8 @@ defmodule AcariServer.Mnesia do
     })
   end
 
+  # event
+
   def update_event(ev) do
     ev = ev |> Map.put(:timestamp, :os.system_time(:microsecond))
 
@@ -321,6 +350,29 @@ defmodule AcariServer.Mnesia do
 
   def get_event_list() do
     match(:event)
+  end
+
+  # state
+
+  def update_stat(key, func) do
+    Mnesia.transaction(fn ->
+      value =
+        case Mnesia.wread({:stat, key}) do
+          [{:stat, ^key, value}] -> value
+          _ -> nil
+        end
+
+      Mnesia.write({:stat, key, func.(value)})
+    end)
+  end
+
+  # API
+
+  def get_down_tun_num() do
+    case Mnesia.dirty_read({:stat, :down_tun}) do
+      [{:stat, :down_tun, {num, _}}] -> num
+      _ -> 0
+    end
   end
 
   def get_tunnel_list(nodes) do
@@ -413,11 +465,11 @@ defmodule AcariServer.Mnesia do
     case [
            case get_serv(ld) -- get_serv(lu) do
              [] -> nil
-             serv_list -> "Нет связи с сервером #{serv_list |> Enum.join(", ")}. "
+             serv_list -> "Нет связи с сервером #{serv_list |> Enum.join(", ")}"
            end,
            case get_link(ld) -- get_link(lu) do
              [] -> nil
-             link_list -> "Порт #{link_list |> Enum.join(", ")} не работает. "
+             link_list -> "Порт #{link_list |> Enum.join(", ")} не работает"
            end
          ]
          |> Enum.reject(&is_nil/1)
