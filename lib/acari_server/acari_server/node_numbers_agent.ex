@@ -28,7 +28,7 @@ defmodule AcariServer.NodeNumbersAgent do
       __MODULE__,
       fn [ts_list, num_list, down_list] = state ->
         {bad_nodes, _bad_links} = Acari.LinkEventAgent.get_failures()
-        nodes_num = AcariServer.Master.get_nodes_num()
+        nodes_num = AcariServer.Mnesia.get_tunnels_num()
         num = nodes_num - bad_nodes
         prev = List.first(num_list)
 
@@ -41,7 +41,11 @@ defmodule AcariServer.NodeNumbersAgent do
               redraw_chart: true
             })
 
-            AcariServer.Zabbix.ZbxApi.zbx_send_master("acari.clients.number", to_string(nodes_num))
+            AcariServer.Zabbix.ZbxApi.zbx_send_master(
+              "acari.clients.number",
+              to_string(nodes_num)
+            )
+
             AcariServer.Zabbix.ZbxApi.zbx_send_master("acari.clients.active", to_string(num))
 
             ts = :os.system_time(:second)
@@ -53,7 +57,7 @@ defmodule AcariServer.NodeNumbersAgent do
                 true -> [ts | down_list]
                 _ -> down_list
               end
-              |>  Enum.take_while(fn x -> x > ts - 60*60*24 end)
+              |> Enum.take_while(fn x -> x > ts - 60 * 60 * 24 end)
             ]
         end
       end

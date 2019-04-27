@@ -51,6 +51,7 @@ defmodule AcariServer.Mnesia do
   alias :mnesia, as: Mnesia
   alias AcariServer.Mnesia.Attr
   import AcariServer.Mnesia.Attr, only: [mk_record: 2]
+  alias AcariServerWeb.Endpoint
 
   def init() do
     Mnesia.start()
@@ -133,6 +134,13 @@ defmodule AcariServer.Mnesia do
         )
 
         node
+    end
+  end
+
+  def get_tunnels_num() do
+    case Mnesia.table_info(:tun, :size) do
+      n when is_number(n) -> n
+      _ -> 0
     end
   end
 
@@ -273,6 +281,28 @@ defmodule AcariServer.Mnesia do
           text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
         })
     end
+
+    broadcast_link_event()
+  end
+
+  defp broadcast_link_event() do
+    AcariServer.NodeNumbersAgent.update()
+    mes_list = AcariServerWeb.LayoutView.get_mes()
+
+    mes_html =
+      Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", mes_list: mes_list)
+
+    statistics_html =
+      Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
+
+    progress_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "progress.html", [])
+
+    Endpoint.broadcast!("room:lobby", "link_event", %{
+      num_of_mes: mes_list |> length(),
+      messages: mes_html,
+      statistics: statistics_html,
+      progress: progress_html
+    })
   end
 
   def update_event(ev) do
