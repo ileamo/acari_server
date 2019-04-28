@@ -12,7 +12,7 @@ msgstr ""
 "Plural-Forms: nplurals=3\n"
 
 #, elixir-format
-#: lib/acari_server_web/templates/page/statistics.html.eex:8
+#: lib/acari_server_web/templates/page/statistics.html.eex:9
 msgid "node"
 msgid_plural "nodes"
 msgstr[0] "узел"
@@ -20,7 +20,7 @@ msgstr[1] "узла"
 msgstr[2] "узлов"
 
 #, elixir-format
-#: lib/acari_server_web/templates/page/statistics.html.eex:26
+#: lib/acari_server_web/templates/page/statistics.html.eex:27
 msgid "module does not operate"
 msgid_plural "modules do not operate"
 msgstr[0] "порт не работает"
@@ -28,9 +28,9 @@ msgstr[1] "порта не работают"
 msgstr[2] "портов не работают"
 
 #, elixir-format
-#: lib/acari_server_web/templates/page/statistics.html.eex:20
-msgid "down"
-msgid_plural "downs"
-msgstr[0] "сбой за сутки"
-msgstr[1] "сбоя за сутки"
-msgstr[2] "сбоев за сутки"
+#: lib/acari_server_web/templates/page/statistics.html.eex:21
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "сервер"
+msgstr[1] "сервера"
+msgstr[2] "серверов"
