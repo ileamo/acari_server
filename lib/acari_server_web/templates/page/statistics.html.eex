@@ -1,6 +1,6 @@
-<% {_, bad_links} = Acari.LinkEventAgent.get_failures() %>
 <% nodes_num = AcariServer.Mnesia.get_tunnels_num()
    bad_nodes = AcariServer.Mnesia.get_down_tun_num()
+   bad_ports = AcariServer.Mnesia.get_down_port_num()
    down_count = AcariServer.NodeNumbersAgent.get_down_count()
 %>
 <div class="col-md-6 col-lg-3 px-0 pr-md-1 px-lg-1">
@@ -23,7 +23,7 @@
 </div>
 <div class="col-md-6 col-lg-3 px-0 pl-md-1 px-lg-1">
     <div class="statistic__item">
-        <h2 class="number"><%= bad_links %></h2>
-        <span class="desc"><%= ngettext "module does not operate", "modules do not operate", bad_links %></span>
+        <h2 class="number"><%= bad_ports %></h2>
+        <span class="desc"><%= ngettext "module does not operate", "modules do not operate", bad_ports %></span>
     </div>
 </div>

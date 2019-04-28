@@ -253,7 +253,7 @@ defmodule AcariServer.Mnesia do
 
     node_to_name = get_node_to_name_map()
 
-    {level, mes} =
+    {level, port_list, mes} =
       get_link_list_for_tunnel(tun)
       |> reduce_link_list(node_to_name)
       |> alert_mes()
@@ -289,6 +289,15 @@ defmodule AcariServer.Mnesia do
             nil
         end)
 
+        update_stat(:down_port, fn
+          {_, list} ->
+            list = list |> Enum.reject(fn x -> x == {tun, name} end)
+            {length(list), list}
+
+          _ ->
+            nil
+        end)
+
       _ ->
         update_event(%{
           id: id,
@@ -305,6 +314,17 @@ defmodule AcariServer.Mnesia do
 
             _ ->
               {1, [tun]}
+          end)
+        end
+
+        if level == 1 or Enum.member?(port_list, name) do
+          update_stat(:down_port, fn
+            {_, list} ->
+              list = [{tun, name} | list] |> Enum.uniq()
+              {length(list), list}
+
+            _ ->
+              {1, [{tun, name}]}
           end)
         end
     end
@@ -371,6 +391,13 @@ defmodule AcariServer.Mnesia do
   def get_down_tun_num() do
     case Mnesia.dirty_read({:stat, :down_tun}) do
       [{:stat, :down_tun, {num, _}}] -> num
+      _ -> 0
+    end
+  end
+
+  def get_down_port_num() do
+    case Mnesia.dirty_read({:stat, :down_port}) do
+      [{:stat, :down_port, {num, _}}] -> num
       _ -> 0
     end
   end
@@ -458,24 +485,26 @@ defmodule AcariServer.Mnesia do
     %{alert: alert, links_up: lu |> get_links_str(), links_down: ld |> get_links_str()}
   end
 
-  def alert_mes(%{links_up: [], links_down: _ld}), do: {1, "Устройство недоступно"}
-  def alert_mes(%{links_up: _lu, links_down: []}), do: {4, ""}
+  defp alert_mes(%{links_up: [], links_down: ld}), do: {1, ld, "Устройство недоступно"}
+  defp alert_mes(%{links_up: _lu, links_down: []}), do: {4, [], ""}
 
-  def alert_mes(%{links_up: lu, links_down: ld}) do
+  defp alert_mes(%{links_up: lu, links_down: ld}) do
+    port_list = get_link(ld) -- get_link(lu)
+
     case [
            case get_serv(ld) -- get_serv(lu) do
              [] -> nil
              serv_list -> "Нет связи с сервером #{serv_list |> Enum.join(", ")}"
            end,
-           case get_link(ld) -- get_link(lu) do
+           case port_list do
              [] -> nil
-             link_list -> "Порт #{link_list |> Enum.join(", ")} не работает"
+             port_list -> "Порт #{port_list |> Enum.join(", ")} не работает"
            end
          ]
          |> Enum.reject(&is_nil/1)
          |> Enum.join(", ") do
-      "" -> {3, ""}
-      mes -> {2, mes}
+      "" -> {3, [], ""}
+      mes -> {2, port_list, mes}
     end
   end
 
