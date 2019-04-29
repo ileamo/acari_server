@@ -73,7 +73,9 @@ let statisticsContainer = document.querySelector("#statistics")
 let progressContainer = document.querySelector("#progress")
 
 channel.on("link_event", payload => {
-  if (payload.redraw_chart) {
+  if (payload.reload) {
+    document.location.reload(true);
+  } else if (payload.redraw_chart) {
     make_chart()
   } else {
     if (messagesBadge && payload.num_of_mes) {

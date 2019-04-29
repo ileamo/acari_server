@@ -1,5 +1,5 @@
 defmodule AcariServer.Mnesia.Attr do
-  def server(), do: [:system_name, :name, :opt]
+  def server(), do: [:system_name, :name, :up, :opt]
   def tun(), do: [:name, :server_id, :state, :opt]
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
   def event(), do: [:id, :timestamp, :level, :header, :text]
@@ -15,7 +15,12 @@ defmodule AcariServer.Mnesia.Attr do
     [
       tab
       | apply(__MODULE__, tab, [])
-        |> Enum.map(fn field -> fields_map[field] || filler end)
+        |> Enum.map(fn field ->
+          case fields_map[field] do
+            nil -> filler
+            val -> val
+          end
+        end)
     ]
     |> List.to_tuple()
   end
@@ -91,14 +96,32 @@ defmodule AcariServer.Mnesia do
   end
 
   def update_servers_list(servers_db) do
-    Mnesia.clear_table(:server)
+    node_list = [node() | Node.list()] |> Enum.map(&to_string/1)
 
     Mnesia.transaction(fn ->
+      Mnesia.foldl(
+        fn rec, _ ->
+          Mnesia.delete_object(rec)
+        end,
+        nil,
+        :server
+      )
+
       servers_db
       |> Enum.each(fn %{system_name: system_name, name: name} ->
-        Mnesia.write(Rec.server(system_name: system_name, name: name))
+        Mnesia.write(
+          Rec.server(
+            system_name: system_name,
+            name: name,
+            up: Enum.member?(node_list, system_name)
+          )
+        )
       end)
     end)
+  end
+
+  def get_down_servers() do
+    match(:server, %{up: false}) |> Enum.map(fn %{name: name} -> name end)
   end
 
   def get_node_to_name_map() do
@@ -149,8 +172,6 @@ defmodule AcariServer.Mnesia do
         0,
         :event
       )
-
-
     end)
   end
 
