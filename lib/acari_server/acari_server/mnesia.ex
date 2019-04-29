@@ -110,8 +110,10 @@ defmodule AcariServer.Mnesia do
   end
 
   def get_server_name_by_system_name(system_name) do
-    case :mnesia.dirty_read(:server, system_name |> to_string()) do
-      [record] -> record |> Rec.server(:name)
+    case Mnesia.transaction(fn ->
+           Mnesia.read(:server, system_name |> to_string())
+         end) do
+      {:atomic, [record]} -> record |> Rec.server(:name)
       _ -> system_name
     end
   end
@@ -332,7 +334,7 @@ defmodule AcariServer.Mnesia do
     broadcast_link_event()
   end
 
-  defp broadcast_link_event() do
+  def broadcast_link_event() do
     AcariServer.NodeNumbersAgent.update()
     mes_list = AcariServerWeb.LayoutView.get_mes()
 
@@ -389,15 +391,15 @@ defmodule AcariServer.Mnesia do
   # API
 
   def get_down_tun_num() do
-    case Mnesia.dirty_read({:stat, :down_tun}) do
-      [{:stat, :down_tun, {num, _}}] -> num
+    case Mnesia.transaction(fn -> Mnesia.read({:stat, :down_tun}) end) do
+      {:atomic, [{:stat, :down_tun, {num, _}}]} -> num
       _ -> 0
     end
   end
 
   def get_down_port_num() do
-    case Mnesia.dirty_read({:stat, :down_port}) do
-      [{:stat, :down_port, {num, _}}] -> num
+    case Mnesia.transaction(fn -> Mnesia.dirty_read({:stat, :down_port}) end) do
+      {:atomic, [{:stat, :down_port, {num, _}}]} -> num
       _ -> 0
     end
   end

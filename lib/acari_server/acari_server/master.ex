@@ -35,11 +35,6 @@ defmodule AcariServer.Master do
   @impl true
   def init(_params) do
     tuns = :ets.new(:tuns, [:set, :protected, :named_table])
-    Mnesia.init()
-
-    AcariServer.ServerManager.list_servers()
-    |> Enum.each(fn %{system_name: node} -> Node.connect(node |> String.to_atom()) end)
-
     {:ok, %State{tuns: tuns}}
   end
 
