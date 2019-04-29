@@ -118,6 +118,42 @@ defmodule AcariServer.Mnesia do
     end
   end
 
+  def delete_server(server) do
+    Mnesia.transaction(fn ->
+      Mnesia.foldl(
+        fn rec, acc ->
+          case Rec.link(rec, :server_id) do
+            ^server ->
+              Mnesia.delete_object(rec)
+              acc + 1
+
+            _ ->
+              acc
+          end
+        end,
+        0,
+        :link
+      )
+
+      Mnesia.foldl(
+        fn rec, acc ->
+          case Rec.event(rec, :id) do
+            {_, _, ^server} ->
+              Mnesia.delete_object(rec)
+              acc + 1
+
+            _ ->
+              acc
+          end
+        end,
+        0,
+        :event
+      )
+
+
+    end)
+  end
+
   # tun
 
   def add_tunnel(kl) do

@@ -23,6 +23,7 @@ defmodule AcariServer.ServerMonitor do
   @impl true
   def handle_info({:nodedown, node}, state) do
     Logger.error("Server monitor: Node #{node} is DOWN")
+    Mnesia.delete_server(node)
     Mnesia.broadcast_link_event()
     {:noreply, state}
   end
