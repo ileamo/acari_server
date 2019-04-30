@@ -5,8 +5,6 @@ defmodule AcariServerWeb.LayoutView do
     (conn.assigns[:current_user] && conn.assigns.current_user.username) || "Anonymous"
   end
 
-  defdelegate num_of_mes(), to: Acari.LinkEventAgent, as: :get_length
-
   def get_mes() do
     AcariServer.Mnesia.get_event_list()
     |> Enum.sort_by(fn %{timestamp: ts} -> ts end, &>/2)

@@ -199,6 +199,8 @@ defmodule AcariServer.Mnesia do
 
         node
     end
+
+    set_tun_distr()
   end
 
   def get_tunnels_num() do
@@ -260,6 +262,8 @@ defmodule AcariServer.Mnesia do
       {:atomic, err} ->
         Logger.error("update_tun_server: #{inspect(err)}")
     end
+
+    set_tun_distr()
   end
 
   def get_tunnel_state(name) do
@@ -279,6 +283,36 @@ defmodule AcariServer.Mnesia do
             |> Rec.tun(:server_id)
             |> get_server_name_by_system_name()
         })
+
+      _ ->
+        nil
+    end
+  end
+
+  def set_tun_distr() do
+    case Mnesia.transaction(fn ->
+           Mnesia.foldl(
+             fn rec, acc ->
+               serv = Rec.tun(rec, :server_id)
+
+               case acc do
+                 %{^serv => n} -> Map.put(acc, serv, n + 1)
+                 _ -> Map.put(acc, serv, 1)
+               end
+             end,
+             %{},
+             :tun
+           )
+         end) do
+      {:atomic, distr} ->
+        node_to_name = get_node_to_name_map()
+
+        {list, sum} =
+          distr
+          |> Enum.map_reduce(0, fn {node, num}, acc -> {{node_to_name[node], num}, acc + num} end)
+
+        list = list |> Enum.map(fn {n, q} -> {n, q, 100 * q / sum} end)
+        set_stat(:tun_distr, {list, sum})
 
       _ ->
         nil
@@ -433,6 +467,12 @@ defmodule AcariServer.Mnesia do
 
   # state
 
+  def set_stat(key, value) do
+    Mnesia.transaction(fn ->
+      Mnesia.write({:stat, key, value})
+    end)
+  end
+
   def update_stat(key, func) do
     Mnesia.transaction(fn ->
       value =
@@ -458,6 +498,13 @@ defmodule AcariServer.Mnesia do
     case Mnesia.transaction(fn -> Mnesia.dirty_read({:stat, :down_port}) end) do
       {:atomic, [{:stat, :down_port, {num, _}}]} -> num
       _ -> 0
+    end
+  end
+
+  def get_tun_distr() do
+    case Mnesia.transaction(fn -> Mnesia.dirty_read({:stat, :tun_distr}) end) do
+      {:atomic, [{:stat, :tun_distr, distr}]} -> distr
+      _ -> %{}
     end
   end
 

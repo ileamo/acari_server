@@ -16,20 +16,17 @@ end
     </div>
 </div>
 <div class="au-progress">
-    <span class="au-progress__title">Распределения по серверам</span>
+    <span class="au-progress__title">Распределение по серверам</span>
+
+    <% {list, sum} =  AcariServer.Mnesia.get_tun_distr()
+       list_idx = list |> Enum.with_index()
+       color = {"danger","primary","white"}
+    %>
 
     <div class="progress">
-      <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-      <div class="progress-bar bg-info" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
+      <%= for {{n, q, p}, i} <- list_idx do %>
 
-</div>
-<div class="au-progress">
-    <span class="au-progress__title">Операторы связи</span>
-
-    <div class="progress">
-      <div class="progress-bar bg-danger" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-      <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-      <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+      <div class="progress-bar bg-<%= elem(color, i) %>" role="progressbar" style="width: <%= p %>%" aria-valuenow="<%= q %>" aria-valuemin="0" aria-valuemax="<%= sum %>"><%= n %></div>
+      <% end %>
     </div>
 </div>
