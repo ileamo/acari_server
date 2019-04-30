@@ -96,7 +96,7 @@ defmodule AcariServer.Mnesia do
   end
 
   def update_servers_list(servers_db) do
-    node_list = [node() | Node.list()] |> Enum.map(&to_string/1)
+    node_list = [node() | Node.list()]
 
     Mnesia.transaction(fn ->
       Mnesia.foldl(
@@ -109,6 +109,7 @@ defmodule AcariServer.Mnesia do
 
       servers_db
       |> Enum.each(fn %{system_name: system_name, name: name} ->
+        system_name = system_name |> String.to_atom()
         Mnesia.write(
           Rec.server(
             system_name: system_name,
@@ -127,14 +128,14 @@ defmodule AcariServer.Mnesia do
   def get_node_to_name_map() do
     match(:server)
     |> Enum.map(fn %{name: name, system_name: system_name} ->
-      {system_name |> String.to_atom(), name}
+      {system_name, name}
     end)
     |> Enum.into(%{})
   end
 
   def get_server_name_by_system_name(system_name) do
     case Mnesia.transaction(fn ->
-           Mnesia.read(:server, system_name |> to_string())
+           Mnesia.read(:server, system_name)
          end) do
       {:atomic, [record]} -> record |> Rec.server(:name)
       _ -> system_name

@@ -20,7 +20,7 @@ end
 
     <% {list, sum} =  AcariServer.Mnesia.get_tun_distr()
        list_idx = list |> Enum.with_index()
-       color = {"danger","primary","white"}
+       color = {"danger","primary","warning"}
     %>
 
     <div class="progress">
