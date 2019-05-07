@@ -81,7 +81,6 @@ defmodule AcariServer.Master do
 
   def handle_cast({:peer_started, tun_name}, state) do
     Logger.debug("Master get :peer_started from #{tun_name}")
-    # send_config(tun_name)
     get_inventory(tun_name)
 
     {:noreply, state}

@@ -6,9 +6,9 @@ defmodule AcariServerWeb.NodeConfigChannel do
     {:ok, assign(socket, :pathname, pathname)}
   end
 
-  def handle_in("input", %{"input" => input}, socket) do
+  def handle_in("input", _, socket) do
     [_, tun_name] = Regex.run(~r|/([^/]+)$|, socket.assigns[:pathname])
-    AcariServer.Master.send_config(tun_name)
+    AcariServer.Master.send_config(%{"id" => tun_name})
     {:noreply, socket}
   end
 end
