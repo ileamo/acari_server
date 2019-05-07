@@ -19,7 +19,6 @@ defmodule AcariServer.Application do
       Acari.Sup,
       AcariServer.TemplateAgent,
       AcariServer.NodeMonitorAgent,
-      AcariServer.NodeNumbersAgent,
       AcariServer.ServerMonitor,
       AcariServer.Sup,
       {Task.Supervisor, name: AcariClient.TaskSup}

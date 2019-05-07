@@ -111,6 +111,7 @@ defmodule AcariServer.Mnesia do
       servers_db
       |> Enum.each(fn %{system_name: system_name, name: name} ->
         system_name = system_name |> String.to_atom()
+
         Mnesia.write(
           Rec.server(
             system_name: system_name,
@@ -375,14 +376,17 @@ defmodule AcariServer.Mnesia do
           end
         end)
 
-        update_stat(:down_tun, fn
-          {_, list} ->
-            list = list |> Enum.reject(fn x -> x == tun end)
-            {length(list), list}
+        {num, _} =
+          update_stat(:down_tun, fn
+            {_, list} ->
+              list = list |> Enum.reject(fn x -> x == tun end)
+              {length(list), list}
 
-          _ ->
-            nil
-        end)
+            _ ->
+              {0, []}
+          end)
+
+        update_active_tun_chart(num)
 
         update_stat(:down_port, fn
           {_, list} ->
@@ -402,14 +406,17 @@ defmodule AcariServer.Mnesia do
         })
 
         if level == 1 do
-          update_stat(:down_tun, fn
-            {_, list} ->
-              list = [tun | list] |> Enum.uniq()
-              {length(list), list}
+          {num, _} =
+            update_stat(:down_tun, fn
+              {_, list} ->
+                list = [tun | list] |> Enum.uniq()
+                {length(list), list}
 
-            _ ->
-              {1, [tun]}
-          end)
+              _ ->
+                {1, [tun]}
+            end)
+
+          update_active_tun_chart(num)
         end
 
         if level == 1 or Enum.member?(port_list, name) do
@@ -427,8 +434,62 @@ defmodule AcariServer.Mnesia do
     broadcast_link_event()
   end
 
+  @max_items 25
+  def update_active_tun_chart(bad) do
+    tun_num = get_tunnels_num()
+    num = tun_num - bad
+
+    tran =
+      Mnesia.transaction(fn ->
+        old =
+          case Mnesia.wread({:stat, :active_tun}) do
+            [{:stat, :active_tun, value}] -> value
+            _ -> nil
+          end
+
+        new =
+          case old do
+            [ts_list, [prev | _] = num_list] ->
+              case prev == num do
+                true ->
+                  nil
+
+                _ ->
+                  [
+                    [:os.system_time(:second) | ts_list] |> Enum.take(@max_items),
+                    [num | num_list] |> Enum.take(@max_items)
+                  ]
+              end
+
+            _ ->
+              [[:os.system_time(:second)], [num]]
+          end
+
+        case new do
+          nil -> nil
+          new -> Mnesia.write({:stat, :active_tun, new})
+        end
+      end)
+
+    case tran do
+      {:atomic, :ok} ->
+        Endpoint.broadcast!("room:lobby", "link_event", %{
+          redraw_chart: true
+        })
+
+        AcariServer.Zabbix.ZbxApi.zbx_send_master(
+          "acari.clients.number",
+          to_string(tun_num)
+        )
+
+        AcariServer.Zabbix.ZbxApi.zbx_send_master("acari.clients.active", to_string(num))
+
+      _ ->
+        nil
+    end
+  end
+
   def broadcast_link_event() do
-    AcariServer.NodeNumbersAgent.update()
     mes_list = AcariServerWeb.LayoutView.get_mes()
 
     mes_html =
@@ -482,9 +543,12 @@ defmodule AcariServer.Mnesia do
           [{:stat, ^key, value}] -> value
           _ -> nil
         end
+        |> func.()
 
-      Mnesia.write({:stat, key, func.(value)})
+      :ok = Mnesia.write({:stat, key, value})
+      value
     end)
+    |> elem(1)
   end
 
   # zabbix
@@ -492,8 +556,9 @@ defmodule AcariServer.Mnesia do
   def update_zabbix(host, key, value) do
     id = {host, key}
     ts = :os.system_time(:second)
+
     Mnesia.transaction(fn ->
-      Mnesia.write(Rec.zabbix(id: id, host: host, key: key, value: value, timestamp: ts ))
+      Mnesia.write(Rec.zabbix(id: id, host: host, key: key, value: value, timestamp: ts))
     end)
   end
 
@@ -502,6 +567,13 @@ defmodule AcariServer.Mnesia do
   end
 
   # API
+
+  def get_active_tun_chart() do
+    case Mnesia.transaction(fn -> Mnesia.read({:stat, :active_tun}) end) do
+      {:atomic, [{:stat, :active_tun, chart}]} when is_list(chart) -> chart
+      _ -> [[], []]
+    end
+  end
 
   def get_down_tun_num() do
     case Mnesia.transaction(fn -> Mnesia.read({:stat, :down_tun}) end) do
