@@ -58,7 +58,7 @@ defmodule AcariServer.Zabbix.Server do
       data
       |> Enum.reduce(0, fn
         %{"host" => host, "key" => key, "value" => value}, acc ->
-          AcariServer.Zabbix.LastDataAgent.put(host, key, value)
+          AcariServer.Mnesia.update_zabbix(host, key, value)
           AcariServer.Zabbix.ZbxApi.zbx_send(host, key, value)
           acc + 1
 

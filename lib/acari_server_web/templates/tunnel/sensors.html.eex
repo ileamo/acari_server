@@ -7,7 +7,7 @@
         <th scope="col">Получено</th>
     </tr>
     <tbody>
-      <%= for {sensor, {value, tm}} <- @sensors || [] do %>
+      <%= for %{key: sensor, value: value, timestamp: tm} <- @sensors || [] do %>
         <tr>
           <th  scope="row"><%= sensor %></th>
           <td><%= value |> String.slice(0,64) %></td>

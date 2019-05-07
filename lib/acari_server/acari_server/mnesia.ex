@@ -4,8 +4,9 @@ defmodule AcariServer.Mnesia.Attr do
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
   def event(), do: [:id, :timestamp, :level, :header, :text]
   def stat(), do: [:key, :value]
+  def zabbix(), do: [:id, :host, :key, :value, :timestamp]
 
-  def table_list(), do: [:server, :tun, :link, :event, :stat]
+  def table_list(), do: [:server, :tun, :link, :event, :stat, :zabbix]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -486,6 +487,20 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
+  # zabbix
+
+  def update_zabbix(host, key, value) do
+    id = {host, key}
+    ts = :os.system_time(:second)
+    Mnesia.transaction(fn ->
+      Mnesia.write(Rec.zabbix(id: id, host: host, key: key, value: value, timestamp: ts ))
+    end)
+  end
+
+  def get_zabbix(host) do
+    match(:zabbix, %{host: host})
+  end
+
   # API
 
   def get_down_tun_num() do
@@ -505,7 +520,7 @@ defmodule AcariServer.Mnesia do
   def get_tun_distr() do
     case Mnesia.transaction(fn -> Mnesia.dirty_read({:stat, :tun_distr}) end) do
       {:atomic, [{:stat, :tun_distr, distr}]} -> distr
-      _ -> %{}
+      _ -> {["нет данных", 0, 100], 0}
     end
   end
 

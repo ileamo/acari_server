@@ -14,7 +14,7 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   def get_sensors_html(name) do
-    render(__MODULE__, "sensors.html", sensors: AcariServer.Zabbix.LastDataAgent.get(name))
+    render(__MODULE__, "sensors.html", sensors: get_sensors(name))
   end
 
   def get_sensors_html(:string, name) do
@@ -38,7 +38,7 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   defp get_sensors(name) do
-    (AcariServer.Zabbix.LastDataAgent.get(name) || [])
-    |> Enum.sort_by(&elem(&1, 0))
+    (AcariServer.Mnesia.get_zabbix(name) || [])
+    |> Enum.sort_by(&Map.get(&1, :key))
   end
 end
