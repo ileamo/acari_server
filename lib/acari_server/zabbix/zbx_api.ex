@@ -253,7 +253,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
              "-o",
              to_string(value)
            ]) do
-        {res, 0} -> Logger.debug("zabbix_sender: #{res}")
+        {res, 0} -> Logger.debug("zabbix_sender: #{host}:#{key}=#{value}\n#{res}")
         {err, code} -> Logger.warn("zabbix_sender exits with code #{code}, output: #{err}")
       end
     end)

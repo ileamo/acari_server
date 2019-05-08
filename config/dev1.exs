@@ -5,7 +5,7 @@ config :acari_server, AcariServerWeb.Endpoint,
   check_origin: false
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "$date $time [$level] $message\n", level: :info
+config :logger, :console, format: "$date $time [$level] $message\n", level: :debug
 
 # Configure your database
 config :acari_server, AcariServer.Repo,
@@ -23,7 +23,7 @@ config :acari_server, AcariServer.Listener,
 config :acari_server, :zabbix,
   zbx_listen_port: 51051,
   zbx_web_port: nil,
-  # zbx_api_url: "http://10.0.10.155:4080",
+  zbx_api_url: "http://10.0.10.155:4080",
   zbx_snd_host: "10.0.10.155",
   zbx_username: "Admin",
   zbx_password: "IMo19-0708"
