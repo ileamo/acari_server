@@ -376,6 +376,17 @@ defmodule AcariServer.Mnesia do
           end
         end)
 
+        update_stat(:down_port, fn
+          {_, list} ->
+            list = list |> Enum.reject(fn x -> x == {tun, name} end)
+            {length(list), list}
+
+          _ ->
+            nil
+        end)
+
+        AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 1)
+
         {num, _} =
           update_stat(:down_tun, fn
             {_, list} ->
@@ -386,16 +397,8 @@ defmodule AcariServer.Mnesia do
               {0, []}
           end)
 
+        AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 1)
         update_active_tun_chart(num)
-
-        update_stat(:down_port, fn
-          {_, list} ->
-            list = list |> Enum.reject(fn x -> x == {tun, name} end)
-            {length(list), list}
-
-          _ ->
-            nil
-        end)
 
       _ ->
         update_event(%{
@@ -416,6 +419,7 @@ defmodule AcariServer.Mnesia do
                 {1, [tun]}
             end)
 
+          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 0)
           update_active_tun_chart(num)
         end
 
@@ -428,6 +432,8 @@ defmodule AcariServer.Mnesia do
             _ ->
               {1, [{tun, name}]}
           end)
+          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 0)
+
         end
     end
 
