@@ -59,6 +59,7 @@ defmodule AcariServer.Mnesia do
   alias AcariServer.Mnesia.Attr
   import AcariServer.Mnesia.Attr, only: [mk_record: 2]
   alias AcariServerWeb.Endpoint
+  require Acari.Const
 
   def init() do
     Mnesia.start()
@@ -200,10 +201,9 @@ defmodule AcariServer.Mnesia do
           {:main_server, node}
         )
 
+        set_tun_distr()
         node
     end
-
-    set_tun_distr()
   end
 
   def get_tunnels_num() do
@@ -322,6 +322,19 @@ defmodule AcariServer.Mnesia do
     end
   end
 
+  def get_main_server(tun_name) do
+    case Mnesia.transaction(fn ->
+           Mnesia.read({:tun, tun_name})
+         end) do
+      {:atomic, [record]} ->
+        record
+        |> Rec.tun(:server_id)
+
+      _ ->
+        nil
+    end
+  end
+
   # link
 
   def update_link(name, tun, up) do
@@ -400,6 +413,12 @@ defmodule AcariServer.Mnesia do
         AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 1)
         update_active_tun_chart(num)
 
+        if get_main_server(tun) == node() do
+          Acari.TunMan.send_all_link_com(tun, Acari.Const.prio(), <<1>>)
+        else
+          Acari.TunMan.send_all_link_com(tun, Acari.Const.prio(), <<0>>)
+        end
+
       _ ->
         update_event(%{
           id: id,
@@ -432,8 +451,8 @@ defmodule AcariServer.Mnesia do
             _ ->
               {1, [{tun, name}]}
           end)
-          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 0)
 
+          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 0)
         end
     end
 
