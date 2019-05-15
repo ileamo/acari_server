@@ -128,6 +128,12 @@ defmodule AcariServer.Mnesia do
     match(:server, %{up: false}) |> Enum.map(fn %{name: name} -> name end)
   end
 
+  def get_unregistered_servers() do
+    [node() | Node.list()] --
+      (match(:server, %{})
+       |> Enum.map(fn %{system_name: name} -> name end))
+  end
+
   def get_node_to_name_map() do
     match(:server)
     |> Enum.map(fn %{name: name, system_name: system_name} ->
