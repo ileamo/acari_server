@@ -268,11 +268,12 @@ defmodule AcariServer.Mnesia do
           {:main_server, server}
         )
 
+        set_tun_distr()
+        broadcast_link_event()
+
       {:atomic, err} ->
         Logger.error("update_tun_server: #{inspect(err)}")
     end
-
-    set_tun_distr()
   end
 
   def get_tunnel_state(name) do
@@ -309,7 +310,9 @@ defmodule AcariServer.Mnesia do
                  _ -> Map.put(acc, serv, 1)
                end
              end,
-             %{},
+             match(:server)
+             |> Enum.map(fn %{system_name: name} -> {name, 0} end)
+             |> Enum.into(%{}),
              :tun
            )
          end) do
@@ -318,9 +321,11 @@ defmodule AcariServer.Mnesia do
 
         {list, sum} =
           distr
-          |> Enum.map_reduce(0, fn {node, num}, acc -> {{node_to_name[node], num}, acc + num} end)
+          |> Enum.map_reduce(0, fn {node, num}, acc ->
+            {{node, node_to_name[node], num}, acc + num}
+          end)
 
-        list = list |> Enum.map(fn {n, q} -> {n, q, 100 * q / sum} end)
+        list = list |> Enum.map(fn {node, name, q} -> {node, name, q, 100 * q / sum} end)
         set_stat(:tun_distr, {list, sum})
 
       _ ->
@@ -339,6 +344,57 @@ defmodule AcariServer.Mnesia do
       _ ->
         nil
     end
+  end
+
+  def redistribute_tun() do
+    {server_list, tun_num} = get_tun_distr()
+    down_server_list = get_down_servers()
+    up_server_num = length(server_list) - length(down_server_list)
+    avg_tun_num = tun_num / up_server_num
+
+    {decr, incr} =
+      server_list
+      |> Enum.map(fn {node, name, num, _} ->
+        {node,
+         case Enum.member?(down_server_list, name) do
+           true -> -tun_num
+           _ -> round(avg_tun_num - num)
+         end}
+      end)
+      |> Enum.split_with(fn {_, inc} -> inc < 0 end)
+
+    decr = decr |> Enum.into(%{})
+    incr = incr |> Enum.into(%{})
+
+    Mnesia.transaction(fn ->
+      Mnesia.foldl(
+        fn rec, {decr, incr} = acc ->
+          server = Rec.tun(rec, :server_id)
+
+          case decr[server] do
+            num when is_integer(num) and num < 0 ->
+              {new_server, new_num} = incr |> Enum.max_by(fn {_, n} -> n end)
+              Mnesia.write(Rec.tun(rec, server_id: new_server))
+
+              Phoenix.PubSub.broadcast(
+                AcariServer.PubSub,
+                "snd:#{Rec.tun(rec, :name)}",
+                {:main_server, new_server}
+              )
+
+              {decr |> Map.put(server, num + 1), incr |> Map.put(new_server, new_num - 1)}
+
+            _ ->
+              acc
+          end
+        end,
+        {decr, incr},
+        :tun
+      )
+    end)
+
+    set_tun_distr()
+    broadcast_link_event()
   end
 
   # link
