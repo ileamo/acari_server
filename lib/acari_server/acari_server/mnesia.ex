@@ -214,8 +214,10 @@ defmodule AcariServer.Mnesia do
     case Mnesia.transaction(fn ->
            case Mnesia.wread({:tun, name}) do
              [] ->
+               serv = get_best_server()
+               kl = kl |> Keyword.put(:server_id, serv)
                :ok = Mnesia.write(mk_record(:tun, kl))
-               kl |> Keyword.get(:server_id)
+               serv
 
              [record] ->
                record |> Rec.tun(:server_id)
@@ -364,6 +366,18 @@ defmodule AcariServer.Mnesia do
 
       _ ->
         nil
+    end
+  end
+
+  def get_best_server() do
+    with {[{node,_,_,_}|_] = server_list, _} when not is_nil(node) <- get_tun_distr() do
+      down_server_list = get_down_servers()
+      server_list
+      |> Enum.reject(fn {_, name, _, _} -> Enum.member?(down_server_list, name) end)
+      |> Enum.min_by(fn {_, _, num, _} -> num end)
+      |> elem(0)
+    else
+      _ -> node()
     end
   end
 
