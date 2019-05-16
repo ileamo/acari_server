@@ -87,7 +87,7 @@ defmodule AcariServer.Mnesia do
       )
     end
 
-    update_servers_list(servers_db)
+    update_servers_list(servers_db, true)
   end
 
   # server
@@ -97,7 +97,7 @@ defmodule AcariServer.Mnesia do
     update_servers_list(servers_db)
   end
 
-  def update_servers_list(servers_db) do
+  def update_servers_list(servers_db, first \\ nil) do
     node_list = [node() | Node.list()]
 
     Mnesia.transaction(fn ->
@@ -122,10 +122,31 @@ defmodule AcariServer.Mnesia do
         )
       end)
     end)
+
+    if is_master_server() do
+      redistribute_tun()
+
+      if first do
+        Task.start(fn ->
+          Process.sleep(1000)
+
+          AcariServerWeb.Endpoint.broadcast!("room:lobby", "link_event", %{
+            reload: true
+          })
+        end)
+      end
+    end
   end
 
   def get_down_servers() do
     match(:server, %{up: false}) |> Enum.map(fn %{name: name} -> name end)
+  end
+
+  def is_master_server() do
+    node() ==
+      match(:server, %{up: true})
+      |> Enum.min_by(fn %{name: name} -> name end, fn -> %{} end)
+      |> Map.get(:system_name)
   end
 
   def get_unregistered_servers() do
