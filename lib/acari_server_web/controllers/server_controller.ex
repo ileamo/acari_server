@@ -17,7 +17,7 @@ defmodule AcariServerWeb.ServerController do
   def create(conn, %{"server" => server_params}) do
     case ServerManager.create_server(server_params) do
       {:ok, server} ->
-        Node.connect(server_params["name"] |> String.to_atom())
+        AcariServer.ServerMonitor.connect_all_nodes()
 
         conn
         |> put_flash(:info, "Сервер создан.")
@@ -40,13 +40,13 @@ defmodule AcariServerWeb.ServerController do
   end
 
   def update(conn, %{"id" => id, "server" => server_params}) do
-    server = %{name: oldname} = ServerManager.get_server!(id)
+    server = %{system_name: oldnode} = ServerManager.get_server!(id)
 
     case ServerManager.update_server(server, server_params) do
       {:ok, server} ->
-        if oldname != server_params["name"] do
-          Node.disconnect(oldname |> String.to_atom())
-          Node.connect(server_params["name"] |> String.to_atom())
+        if oldnode != server_params["system_name"] do
+          Node.disconnect(oldnode |> String.to_atom())
+          AcariServer.ServerMonitor.connect_all_nodes()
         end
 
         conn

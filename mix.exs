@@ -20,7 +20,7 @@ defmodule AcariServer.MixProject do
   def application do
     [
       mod: {AcariServer.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :mnesia]
     ]
   end
 
