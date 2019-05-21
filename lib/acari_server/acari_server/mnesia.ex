@@ -382,9 +382,9 @@ defmodule AcariServer.Mnesia do
   end
 
   def redistribute_tun() do
-    with {server_list, tun_num} when is_integer(tun_num) and tun_num > 0 <- get_tun_distr() do
-      down_server_list = get_down_servers()
-      up_server_num = length(server_list) - length(down_server_list)
+    with {server_list, tun_num} when is_integer(tun_num) and tun_num > 0 <- get_tun_distr(),
+      down_server_list <- get_down_servers(),
+      up_server_num when up_server_num > 0 <- length(server_list) - length(down_server_list) do
       avg_tun_num = tun_num / up_server_num
 
       {decr, incr} =
