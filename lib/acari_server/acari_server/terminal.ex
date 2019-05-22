@@ -3,11 +3,12 @@ defmodule AcariServer.Terminal do
   require Logger
 
   def start_link(params) do
-    GenServer.start(__MODULE__, params, timeout: 5_000)
+    GenServer.start_link(__MODULE__, params, timeout: 5_000)
   end
 
   @impl true
-  def init(%{output_pid: output_pid, tun_name: name} = _params) do
+  def init(%{output_pid: output_pid, pathname: pathname} = _params) do
+    [_, name] = Regex.run(~r|/([^/]+)$|, pathname)
     Process.flag(:trap_exit, true)
 
     with dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(name),
@@ -28,8 +29,8 @@ defmodule AcariServer.Terminal do
        }}
     else
       res ->
-        Logger.error("Terminal #{name} #{inspect(res)}")
-        send(output_pid, {:output, "Не могу подключиться к узлу #{name} \r\n#{inspect(res)}"})
+        Logger.error("Terminal #{pathname} #{inspect(res)}")
+        send(output_pid, {:output, "Не могу подключиться к узлу #{name} \r\n"})
 
         {:ok,
          %{

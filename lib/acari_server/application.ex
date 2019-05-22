@@ -21,7 +21,8 @@ defmodule AcariServer.Application do
       AcariServer.NodeMonitorAgent,
       AcariServer.ServerMonitor,
       AcariServer.Sup,
-      {Task.Supervisor, name: AcariServer.TaskSup}
+      {Task.Supervisor, name: AcariClient.TaskSup}
+      #AcariClient.TunCreator
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
