@@ -1,5 +1,5 @@
 defmodule AcariServer.Terminal do
-  use GenServer
+  use GenServer, restart: :temporary
   require Logger
 
   def start_link(params) do
@@ -7,8 +7,7 @@ defmodule AcariServer.Terminal do
   end
 
   @impl true
-  def init(%{output_pid: output_pid, pathname: pathname} = _params) do
-    [_, name] = Regex.run(~r|/([^/]+)$|, pathname)
+  def init(%{output_pid: output_pid, tun_name: name} = _params) do
     Process.flag(:trap_exit, true)
 
     with dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(name),
@@ -29,7 +28,7 @@ defmodule AcariServer.Terminal do
        }}
     else
       res ->
-        Logger.error("Terminal #{pathname} #{inspect(res)}")
+        Logger.error("Terminal #{name} #{inspect(res)}")
         send(output_pid, {:output, "Не могу подключиться к узлу #{name} \r\n"})
 
         {:ok,
@@ -79,11 +78,10 @@ defmodule AcariServer.Terminal do
     GenServer.cast(terminal, {:input, input})
   end
 
-  def start_child(params) do
+  def start_child(node, params) do
     DynamicSupervisor.start_child(
-      AcariServer.TermSup,
+      {AcariServer.TermSup, node},
       child_spec(params)
     )
   end
-
 end

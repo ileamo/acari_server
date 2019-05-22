@@ -4,13 +4,16 @@ defmodule AcariServerWeb.TerminalChannel do
   require Logger
 
   def join("terminal:" <> _id, payload, socket) do
-    with {:ok, terminal} <-
-           Terminal.start_child(%{output_pid: self(), pathname: payload["pathname"]}) do
+    with [_, tun_name] when is_binary(tun_name) <- Regex.run(~r|/([^/]+)$|, payload["pathname"]),
+         node when not is_nil(node) <- AcariServer.Mnesia.get_main_server(tun_name),
+         {:ok, terminal} <-
+           Terminal.start_child(Node.self(), %{output_pid: self(), tun_name: tun_name}) do
+      Process.link(terminal) |> IO.inspect()
       {:ok, assign(socket, :terminal, terminal)}
     else
       err ->
         Logger.error("Can't start terminal #{payload["pathname"]}: #{inspect(err)}")
-        #Restart erlexec
+        # Restart erlexec
         Process.exit(Process.whereis(:exec), :kill)
         {:error, %{reason: "terminal error"}}
     end
