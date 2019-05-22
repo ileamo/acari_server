@@ -78,4 +78,12 @@ defmodule AcariServer.Terminal do
   def send_input(terminal, input) do
     GenServer.cast(terminal, {:input, input})
   end
+
+  def start_child(params) do
+    DynamicSupervisor.start_child(
+      AcariServer.TermSup,
+      child_spec(params)
+    )
+  end
+
 end

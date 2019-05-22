@@ -5,7 +5,7 @@ defmodule AcariServerWeb.TerminalChannel do
 
   def join("terminal:" <> _id, payload, socket) do
     with {:ok, terminal} <-
-           Terminal.start_link(%{output_pid: self(), pathname: payload["pathname"]}) do
+           Terminal.start_child(%{output_pid: self(), pathname: payload["pathname"]}) do
       {:ok, assign(socket, :terminal, terminal)}
     else
       err ->
