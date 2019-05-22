@@ -16,13 +16,13 @@ defmodule AcariServer.Application do
       # {AcariServer.Worker, arg},
       AcariServer.Zabbix.ZbxApi,
       AcariServer.Zabbix.Sup,
+      AcariServer.TermSup,
       Acari.Sup,
       AcariServer.TemplateAgent,
       AcariServer.NodeMonitorAgent,
       AcariServer.ServerMonitor,
       AcariServer.Sup,
-      {Task.Supervisor, name: AcariClient.TaskSup}
-      #AcariClient.TunCreator
+      #{Task.Supervisor, name: AcariServer.TaskSup}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
