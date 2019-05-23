@@ -370,8 +370,9 @@ defmodule AcariServer.Mnesia do
   end
 
   def get_best_server() do
-    with {[{node,_,_,_}|_] = server_list, _} when not is_nil(node) <- get_tun_distr() do
+    with {[{node, _, _, _} | _] = server_list, _} when not is_nil(node) <- get_tun_distr() do
       down_server_list = get_down_servers()
+
       server_list
       |> Enum.reject(fn {_, name, _, _} -> Enum.member?(down_server_list, name) end)
       |> Enum.min_by(fn {_, _, num, _} -> num end)
@@ -383,8 +384,8 @@ defmodule AcariServer.Mnesia do
 
   def redistribute_tun() do
     with {server_list, tun_num} when is_integer(tun_num) and tun_num > 0 <- get_tun_distr(),
-      down_server_list <- get_down_servers(),
-      up_server_num when up_server_num > 0 <- length(server_list) - length(down_server_list) do
+         down_server_list <- get_down_servers(),
+         up_server_num when up_server_num > 0 <- length(server_list) - length(down_server_list) do
       avg_tun_num = tun_num / up_server_num
 
       {decr, incr} =
@@ -469,10 +470,10 @@ defmodule AcariServer.Mnesia do
       true ->
         delete_event(id)
 
-        match(:event, %{header: tun})
-        |> Enum.each(fn %{id: {name, _tun, node}, level: prev_level} = event ->
-          if level > prev_level or (level == 2 and prev_level == 2) do
-            Mnesia.transaction(fn ->
+        Mnesia.transaction(fn ->
+          match_clean(:event, %{header: tun})
+          |> Enum.each(fn %{id: {name, _tun, node}, level: prev_level} = event ->
+            if level > prev_level or (level == 2 and prev_level == 2) do
               Mnesia.write(
                 mk_record(
                   :event,
@@ -483,8 +484,8 @@ defmodule AcariServer.Mnesia do
                   })
                 )
               )
-            end)
-          end
+            end
+          end)
         end)
 
         update_stat(:down_port, fn
@@ -752,6 +753,16 @@ defmodule AcariServer.Mnesia do
            Mnesia.match_object(Attr.pattern(tab, field_pattern))
          end) do
       {:atomic, rec_list} ->
+        rec_list |> Enum.map(fn r -> r |> Attr.record_to_map() end)
+
+      _ ->
+        []
+    end
+  end
+
+  def match_clean(tab, field_pattern \\ %{}) do
+    case Mnesia.match_object(Attr.pattern(tab, field_pattern)) do
+      rec_list when is_list(rec_list) ->
         rec_list |> Enum.map(fn r -> r |> Attr.record_to_map() end)
 
       _ ->
