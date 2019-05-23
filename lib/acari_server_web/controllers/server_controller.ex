@@ -4,6 +4,9 @@ defmodule AcariServerWeb.ServerController do
   alias AcariServer.ServerManager
   alias AcariServer.ServerManager.Server
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:edit, :delete, :new]
+
   def index(conn, _params) do
     servers = ServerManager.list_servers()
     render(conn, "index.html", servers: servers)
