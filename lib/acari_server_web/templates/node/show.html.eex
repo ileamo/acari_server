@@ -32,4 +32,6 @@
 
 <span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node) %></span>
 |
+<span><%= link "Клонировать", to: Routes.node_path(@conn, :new, node_id: @node.id) %></span>
+|
 <span><%= link "Назад", to: Routes.node_path(@conn, :index) %></span>

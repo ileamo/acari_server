@@ -12,6 +12,14 @@ defmodule AcariServerWeb.NodeController do
     render(conn, "index.html", nodes: nodes)
   end
 
+  def new(conn, %{"node_id" => id}) do
+    node = NodeManager.get_node!(id)
+
+    changeset = NodeManager.change_node(node |> Ecto.put_meta(state: :built))
+
+    render(conn, "new.html", changeset: changeset, node: node)
+  end
+
   def new(conn, params) do
     changeset = NodeManager.change_node(%Node{name: params["name"]})
     render(conn, "new.html", changeset: changeset)
