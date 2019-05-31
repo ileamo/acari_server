@@ -110,11 +110,6 @@ defmodule AcariServer.Master do
   def handle_cast({:del_tun, tun_name}, state) do
     Acari.TunsSup.stop_tun(tun_name)
 
-    Task.start(fn ->
-      Process.sleep(5_000)
-      AcariServer.Mnesia.del_tunnel(tun_name)
-    end)
-
     Logger.info("Tunnel #{tun_name} deleted")
     {:noreply, state}
   end
@@ -315,6 +310,14 @@ defmodule AcariServer.Master do
   end
 
   def delete_tunnel(tun_name) do
-    GenServer.cast(__MODULE__, {:del_tun, tun_name})
+    [node() | Node.list()]
+    |> Enum.each(fn node ->
+      GenServer.cast({__MODULE__, node}, {:del_tun, tun_name})
+    end)
+
+    Task.start(fn ->
+      Process.sleep(5_000)
+      AcariServer.Mnesia.del_tunnel(tun_name)
+    end)
   end
 end
