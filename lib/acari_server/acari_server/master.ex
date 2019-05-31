@@ -65,16 +65,16 @@ defmodule AcariServer.Master do
     peer_params = tun_state.peer_params
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
 
-    #server =
-      Mnesia.add_tunnel(
-        name: tun_name,
-        server_id: node(),
-        state: %{inventory: "Нет данных", telemetry: "Нет данных"}
-      )
+    # server =
+    Mnesia.add_tunnel(
+      name: tun_name,
+      server_id: node(),
+      state: %{inventory: "Нет данных", telemetry: "Нет данных"}
+    )
 
-    #if server == node() do
-      exec_local_script(tun_name)
-    #end
+    # if server == node() do
+    exec_local_script(tun_name)
+    # end
 
     {:noreply, state}
   end
@@ -104,6 +104,18 @@ defmodule AcariServer.Master do
         Logger.error("Bad master_mes from #{tun_name}: #{inspect(res)}")
     end
 
+    {:noreply, state}
+  end
+
+  def handle_cast({:del_tun, tun_name}, state) do
+    Acari.TunsSup.stop_tun(tun_name)
+
+    Task.start(fn ->
+      Process.sleep(5_000)
+      AcariServer.Mnesia.del_tunnel(tun_name)
+    end)
+
+    Logger.info("Tunnel #{tun_name} deleted")
     {:noreply, state}
   end
 
@@ -300,5 +312,9 @@ defmodule AcariServer.Master do
       {k, list} -> {k, Enum.join(list, ", ")}
     end)
     |> Enum.into(%{})
+  end
+
+  def delete_tunnel(tun_name) do
+    GenServer.cast(__MODULE__, {:del_tun, tun_name})
   end
 end

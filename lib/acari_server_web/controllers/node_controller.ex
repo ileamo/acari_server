@@ -81,6 +81,7 @@ defmodule AcariServerWeb.NodeController do
   def delete(conn, %{"id" => id}) do
     node = NodeManager.get_node!(id)
     {:ok, _node} = NodeManager.delete_node(node)
+    AcariServer.Master.delete_tunnel(node.name)
 
     conn
     |> put_flash(:info, "Узел удален.")

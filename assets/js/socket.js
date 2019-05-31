@@ -78,10 +78,10 @@ channel.on("link_event", payload => {
   } else if (payload.redraw_chart) {
     make_chart()
   } else {
-    if (messagesBadge && payload.num_of_mes) {
+    if (messagesBadge && payload.num_of_mes != null) {
       messagesBadge.innerText = `${payload.num_of_mes}`
     }
-    if (messagesContainer && payload.messages) {
+    if (messagesContainer && payload.messages != null) {
       messagesContainer.innerHTML = `${payload.messages}`
     }
     if (statisticsContainer && payload.statistics) {

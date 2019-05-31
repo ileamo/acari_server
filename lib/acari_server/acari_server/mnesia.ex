@@ -1,6 +1,8 @@
 defmodule AcariServer.Mnesia.Attr do
   def server(), do: [:system_name, :name, :up, :opt]
   def tun(), do: [:name, :server_id, :state, :opt]
+
+  # for link and event id = {dev, tun, node}
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
   def event(), do: [:id, :timestamp, :level, :header, :text]
   def stat(), do: [:key, :value]
@@ -233,6 +235,14 @@ defmodule AcariServer.Mnesia do
         set_tun_distr()
         node
     end
+  end
+
+  def del_tunnel(name) do
+    Mnesia.transaction(fn ->
+      Mnesia.delete({:tun, name})
+    end)
+
+    purge_stat()
   end
 
   def get_tunnels_num() do
@@ -518,6 +528,7 @@ defmodule AcariServer.Mnesia do
           Acari.TunMan.send_all_link_com(tun, Acari.Const.prio(), <<0>>)
         end
 
+      # down
       _ ->
         update_event(%{
           id: id,
@@ -650,6 +661,67 @@ defmodule AcariServer.Mnesia do
 
   def get_event_list() do
     match(:event)
+  end
+
+  defp purge_link_table(tab) do
+    Mnesia.transaction(fn ->
+      Mnesia.foldl(
+        fn rec, acc ->
+          case Rec.event(rec, :id) do
+            {_dev, tun, node} ->
+              if Mnesia.wread({:tun, tun}) == [] or
+                   Mnesia.wread({:server, node}) == [] do
+                Mnesia.delete_object(rec)
+                acc + 1
+              else
+                acc
+              end
+
+            _ ->
+              acc
+          end
+        end,
+        0,
+        tab
+      )
+    end)
+  end
+
+  def purge_stat() do
+    # clean link and event lists
+    purge_link_table(:link)
+    purge_link_table(:event)
+
+    # Clean down_tun
+    {num, _} =
+      update_stat(:down_tun, fn
+        {_, list} ->
+          all_tun = Mnesia.dirty_all_keys(:tun)
+          list = MapSet.intersection(MapSet.new(list), MapSet.new(all_tun)) |> MapSet.to_list()
+          {length(list), list}
+
+        _ ->
+          {0, []}
+      end)
+
+    update_active_tun_chart(num)
+
+    # Clean down_port
+    update_stat(:down_port, fn
+      {_, list} ->
+        all_ports =
+          Mnesia.dirty_all_keys(:link)
+          |> Enum.map(fn {dev, tun, _} -> {tun, dev} end)
+          |> Enum.uniq()
+
+        list = MapSet.intersection(MapSet.new(list), MapSet.new(all_ports)) |> MapSet.to_list()
+        {length(list), list}
+
+      _ ->
+        nil
+    end)
+
+    broadcast_link_event()
   end
 
   # state

@@ -102,7 +102,7 @@ defmodule AcariServer.Hs do
   end
 
   defp start_tun(id, params) do
-    case Acari.start_tun(id, AcariServer.Master, params) do
+    case Acari.start_tun(id, AcariServer.Master, peer_params: params) do
       :ok -> :ok
       {:error, {:already_started, _}} -> :ok
     end
