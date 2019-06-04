@@ -44,6 +44,11 @@
   </li>
 
   <li>
+    <strong>Валидатор:</strong>
+    <%= @template.validator %>
+  </li>
+
+  <li>
     <strong>Создан:</strong>
     <%= AcariServer.db_time_to_local(@template.inserted_at) %>
   </li>
@@ -63,6 +68,9 @@
 <ul>
     <li>
       <strong>Параметры для тестирования взяты из класса <%=@template.script.name%></strong>
+      <%= if (res = validate(@template.validator, template)) != :ok do %>
+        <p class = "text-danger mt-2"><%= res %><p>
+      <% end %>
       <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template %></code></pre>
     </li>
 </ul>

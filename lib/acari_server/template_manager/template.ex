@@ -7,6 +7,7 @@ defmodule AcariServer.TemplateManager.Template do
     field :name, :string
     field :template, :string
     field :executable, :boolean, default: false
+    field :validator, :string
     belongs_to :script, AcariServer.ScriptManager.Script
 
     timestamps()
@@ -15,7 +16,7 @@ defmodule AcariServer.TemplateManager.Template do
   @doc false
   def changeset(template, attrs) do
     template
-    |> cast(attrs, [:name, :description, :template, :script_id, :executable])
+    |> cast(attrs, [:name, :description, :template, :script_id, :executable, :validator])
     |> validate_required([:name, :template])
     |> validate_change(:name, &validate_templ_name/2)
     |> foreign_key_constraint(:script_id)
