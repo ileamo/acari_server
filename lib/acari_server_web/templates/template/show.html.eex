@@ -35,12 +35,17 @@
 
   <li>
     <strong>Шаблон:</strong>
+    <% pretempl = (@template.script && @template.script.prefix || "")<>@template.template %>
     <%= if template_error do %>
+      <% {head, line, tail} = highlight_line(pretempl, get_line(template_error)) %>
+
       <p class = "text-danger mt-2"><%= template_error %><p>
+        <pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
+    <% else %>
+      <pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%=
+      pretempl
+      %></code></pre>
     <% end %>
-    <pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%=
-      (@template.script && @template.script.prefix || "")<>@template.template
-    %></code></pre>
   </li>
 
   <li>
@@ -70,8 +75,12 @@
       <strong>Параметры для тестирования взяты из класса <%=@template.script.name%></strong>
       <%= if (res = validate(@template.validator, template)) != :ok do %>
         <p class = "text-danger mt-2"><%= res %><p>
+        <% {head, line, tail} = highlight_line(template, get_line(res)) %>
+
+        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
+      <% else %>
+        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template %></code></pre>
       <% end %>
-      <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template %></code></pre>
     </li>
 </ul>
 <% end %>

@@ -33,6 +33,29 @@ defmodule AcariServer.Template do
     {head, char, tail}
   end
 
+  def highlight_line(text, n) when n > 0 do
+    case Regex.scan(~r/[^\n]*\n/, text, return: :index) |> Enum.at(n - 1) do
+      [{start, len}] ->
+        {text |> binary_part(0, start), text |> binary_part(start, len),
+         text
+         |> binary_part(start + len, byte_size(text) - (start + len))}
+
+      _ ->
+        {text, "", ""}
+    end
+  end
+
+  def highlight_line(text, _) do
+    {text, "", ""}
+  end
+
+  def get_line(str) do
+    case Regex.run(~r|(\d+):|, str) do
+      [_, n] -> n |> String.to_integer()
+      _ -> 0
+    end
+  end
+
   def get_json(nil), do: {%{}, nil}
 
   def get_json(json) do

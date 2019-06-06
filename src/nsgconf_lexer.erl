@@ -15,10 +15,10 @@
 -file("src/nsgconf_lexer.xrl", 22).
 
 extract_string(Chars) ->
-    list_to_binary(lists:sublist(Chars, 2, length(Chars) - 2)).
+    unicode:characters_to_binary(lists:sublist(Chars, 2, length(Chars) - 2)).
 
 extract_key(Chars) ->
-      list_to_binary(Chars).
+    unicode:characters_to_binary(Chars).
 
 -file("/home/igor/.asdf/installs/erlang/21.2.4/lib/parsetools-2.1.8/include/leexinc.hrl", 14).
 

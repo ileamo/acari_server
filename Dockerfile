@@ -18,6 +18,7 @@ COPY lib lib
 #COPY test test
 COPY config config
 COPY rel rel
+COPY src src
 
 # Uncomment line below if you have assets in the priv dir
 COPY priv priv

@@ -43,7 +43,7 @@
 
       <%= if error do %>
         <% {head, char, tail} = AcariServer.Template.highlight_char(@script.definition, error.position) %>
-        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"> <%= char %> </span><%= tail %></code></pre>
+        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"><%= char %></span><%= tail %></code></pre>
         <p class = "text-danger">Ошибка декодирования JSON<p>
       <% else %>
         <pre class="border rounded bg-white pl-2 p-2"><code><%= @script.definition %></code></pre>
@@ -67,7 +67,7 @@
     <strong>Значения для тестирования:</strong>
       <%= if tst_error do %>
         <% {head, char, tail} = AcariServer.Template.highlight_char(@script.test, tst_error.position) %>
-        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"> <%= char %> </span><%= tail %></code></pre>
+        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"><%= char %></span><%= tail %></code></pre>
         <p class = "text-danger">Ошибка декодирования JSON<p>
       <% else %>
         <pre class="border rounded bg-white pl-2 p-2"><code><%= @script.test %></code></pre>

@@ -22,7 +22,7 @@ Rules.
 Erlang code.
 
 extract_string(Chars) ->
-    list_to_binary(lists:sublist(Chars, 2, length(Chars) - 2)).
+    unicode:characters_to_binary(lists:sublist(Chars, 2, length(Chars) - 2)).
 
 extract_key(Chars) ->
-      list_to_binary(Chars).
+    unicode:characters_to_binary(Chars).

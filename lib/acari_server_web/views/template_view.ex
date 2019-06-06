@@ -27,4 +27,7 @@ defmodule AcariServerWeb.TemplateView do
       _ -> :ok
     end
   end
+
+  defdelegate highlight_line(s, n), to: AcariServer.Template
+  defdelegate get_line(n), to: AcariServer.Template
 end
