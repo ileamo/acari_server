@@ -7,10 +7,11 @@
         <th scope="col">Без связи</th>
     </tr>
     <tbody>
-      <%= for %{name: name, server_id: srv, up: up, state: state} <- (@links_state || []) do %>
+      <%= for %{name_srv: name, up: up, state: state} <-
+                                      links_sorted(@links_state) do %>
         <tr>
           <th  scope="row">
-            <%= "#{name}@#{AcariServer.Mnesia.get_server_name_by_system_name(srv)}" %>
+            <%= name %>
           </th>
           <% {text, color} = if up, do: {"UP", "text-success"}, else: {"DOWN","text-danger"} %>
           <td class="<%=color%>"><%= text %></td>

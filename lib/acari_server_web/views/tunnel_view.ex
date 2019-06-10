@@ -41,4 +41,16 @@ defmodule AcariServerWeb.TunnelView do
     (AcariServer.Mnesia.get_zabbix(name) || [])
     |> Enum.sort_by(&Map.get(&1, :key))
   end
+
+  def links_sorted(links_state) do
+    (links_state || [])
+    |> Enum.map(fn %{name: name, server_id: srv, up: up, state: state} ->
+      %{
+        name_srv: "#{name}@#{AcariServer.Mnesia.get_server_name_by_system_name(srv)}",
+        up: up,
+        state: state
+      }
+    end)
+    |> Enum.sort_by(fn %{name_srv: ns} -> ns end)
+  end
 end
