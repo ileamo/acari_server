@@ -10,6 +10,9 @@ defmodule AcariServer.TemplateManager.Template do
     field :validator, :string
     belongs_to :script, AcariServer.ScriptManager.Script
 
+    many_to_many :scripts, AcariServer.ScriptManager.Script,
+      join_through: AcariServer.ScriptTemplateAssociation.ScriptTemplateNode
+
     timestamps()
   end
 

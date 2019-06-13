@@ -18,7 +18,9 @@ defmodule AcariServer.ScriptManager do
 
   """
   def list_scripts do
-    Repo.all(Script)
+    Script
+    |> Repo.all()
+    |> Repo.preload(:templates)
   end
 
   def script_name_id_pairs_list(no_script) do
@@ -42,7 +44,11 @@ defmodule AcariServer.ScriptManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_script!(id), do: Repo.get!(Script, id)
+  def get_script!(id) do
+    Script
+    |> Repo.get!(id)
+    |> Repo.preload(:templates)
+  end
 
   @doc """
   Creates a script.
@@ -59,6 +65,7 @@ defmodule AcariServer.ScriptManager do
   def create_script(attrs \\ %{}) do
     %Script{}
     |> Script.changeset(attrs)
+    |> Script.put_templates(attrs)
     |> Repo.insert()
   end
 
@@ -77,6 +84,7 @@ defmodule AcariServer.ScriptManager do
   def update_script(%Script{} = script, attrs) do
     script
     |> Script.changeset(attrs)
+    |> Script.put_templates(attrs)
     |> Repo.update()
   end
 

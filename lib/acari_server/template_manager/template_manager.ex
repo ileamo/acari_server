@@ -21,12 +21,19 @@ defmodule AcariServer.TemplateManager do
     Repo.all(Template)
   end
 
-  def templ_name_id_pairs_list(no_templ \\ "<NO_TEMPL>") do
+  def templ_name_list(no_templ \\ "<NO_TEMPL>") do
     list_templates()
     |> Enum.filter(fn %{executable: ex} -> ex end)
     |> Enum.map(fn %{name: name} -> name end)
     |> Enum.sort()
     |> List.insert_at(0, {no_templ, nil})
+  end
+
+  def templ_name_id_pairs_list() do
+    list_templates()
+    |> Enum.filter(fn %{executable: ex} -> ex end)
+    |> Enum.map(fn %{name: name, id: id} -> {name, id} end)
+    |> Enum.sort()
   end
 
   def script_list() do
