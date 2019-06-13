@@ -257,7 +257,6 @@ defmodule AcariServer.Mnesia do
   end
 
   def update_tun_state(name, tag, data) do
-    IO.inspect({name, tag, data}, label: "MNESIA")
     Mnesia.transaction(fn ->
       case Mnesia.wread({:tun, name}) do
         [] ->

@@ -29,11 +29,16 @@ defmodule AcariServer.NodeMonitorAgent do
   end
 
   def push_data(state, tun_name, id, data) do
-    IO.inspect({state, tun_name, id, data}, label: "AGENT")
     state
     |> Enum.reject(fn
       {pid, ^tun_name, ^id} ->
-        AcariServer.NodeMonitor.put_data(pid, "script", data, id)
+        AcariServer.NodeMonitor.put_data(
+          pid,
+          "script",
+          data,
+          AcariServer.TemplateManager.get_template_by_name(id).description
+        )
+
         true
 
       {pid, _, _} ->

@@ -18,8 +18,6 @@ defmodule AcariServer.NodeMonitor do
 
   @impl true
   def handle_cast({:input, %{"input" => id} = params}, %{tun_name: tun_name} = state) do
-    IO.inspect(params, label: "MONITOR")
-
     case id do
       "links_state" ->
         links_state = AcariServer.Mnesia.get_link_list_for_tunnel(tun_name)
@@ -39,7 +37,7 @@ defmodule AcariServer.NodeMonitor do
           self(),
           "script",
           AcariServer.Mnesia.get_tunnel_state(tun_name)[params["script"]] || "Нет данных",
-          params["script"]
+          AcariServer.TemplateManager.get_template_by_name(params["script"]).description
         )
 
       "script" ->
@@ -55,7 +53,6 @@ defmodule AcariServer.NodeMonitor do
   end
 
   def handle_cast({:output, id, data, opt}, %{output_pid: output_pid} = state) do
-    IO.inspect({id, data}, label: "OUTPUT")
     send(output_pid, {:output, id, data, opt})
     {:noreply, state}
   end

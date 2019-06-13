@@ -78,8 +78,8 @@
             Скрипт
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="nm-script">
-            <%= for script_name <- script_list do %>
-              <%= link script_name, to: "#", class: "dropdown-item", id: script_name %>
+            <%= for {descr, script_name} <- script_list do %>
+              <%= link descr, to: "#", class: "dropdown-item", id: script_name %>
             <% end %>
           </div>
         </li>

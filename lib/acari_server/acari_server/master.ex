@@ -185,7 +185,7 @@ defmodule AcariServer.Master do
   end
 
   defp set_script(tun_name, script_id, data) do
-    data = "#{script_id}\n#{AcariServer.get_local_time()}\n#{data}"
+    data = "#{AcariServer.get_local_time()}  #{script_id}\n\n#{data}"
     AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
   end
 

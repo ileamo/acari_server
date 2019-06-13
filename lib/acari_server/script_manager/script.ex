@@ -45,7 +45,6 @@ defmodule AcariServer.ScriptManager.Script do
 
   defp parse_templates(%{"templates_list" => templates_list}) do
     templates_list
-    |> IO.inspect(label: "PARSE")
     |> Enum.map(&String.to_integer/1)
     |> Enum.map(&AcariServer.TemplateManager.get_template!/1)
   end

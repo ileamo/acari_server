@@ -26,12 +26,6 @@ if (node_monitor) {
     }
   }) // From the Channel
 
-  document.querySelector("#node-monitor").addEventListener("load", scriptLoaded, false);
-  function scriptLoaded() {
-    console.log("SCRIPT Loaded")
-  }
-
-
 
   var scripts = document.querySelectorAll("#nm-script a")//.addEventListener("click", getScript, false);
 
