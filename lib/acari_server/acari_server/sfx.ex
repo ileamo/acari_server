@@ -11,7 +11,7 @@ defmodule AcariServer.SFX do
   def create_sfx(templ_id, node, req_params) do
     res =
       with %{params: config_params, script: %{} = script} <- node,
-           main_templ_name when is_binary(main_templ_name) <- Map.get(script, templ_id),
+           main_templ_name when is_binary(main_templ_name) <- Map.get(script, templ_id) || templ_id,
            prefix <- script.prefix || "",
            assigns <-
              req_params

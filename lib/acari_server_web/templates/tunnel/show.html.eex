@@ -39,25 +39,8 @@
       <%= render "links_state.html", links_state: links_state  %>
     </div>
 
+<!--
     <hr/>
-
-    <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
-        <div class="navbar p-0">
-          <span class="navbar-brand">Инвентарные данные</span>
-        </div>
-        <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
-            href="#nm-inventory" role="button" aria-expanded="false" aria-controls="nm-inventory">
-            Скрыть/Показать
-          </button>
-            <button id="nm-get-inventory" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
-              Обновить
-            </button>
-        </div>
-    </nav>
-    <pre><code class="collapse" id="nm-inventory"><%= tun.inventory %></code></pre>
-    <hr/>
-
     <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
         <div class="navbar p-0">
           <span class="navbar-brand">Текущие показатели</span>
@@ -73,8 +56,9 @@
         </div>
     </nav>
     <pre><code class="collapse" id="nm-telemetry"><%= tun.telemetry %></code></pre>
-    <hr/>
+-->
 
+    <hr/>
     <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
         <div class="navbar p-0">
           <span class="navbar-brand">Датчики</span>
@@ -96,6 +80,44 @@
     <div id="acari-xterm"></div>
 
   </div>
+
+  <hr/>
+
+  <% script_list = AcariServer.TemplateManager.script_list()
+  %>
+
+  <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
+      <div class="navbar p-0">
+        <span class="navbar-brand" id="nm-script-name">Скрипт</span>
+      </div>
+
+      <ul class="navbar-nav mr-auto pr-3">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Скрипт
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="nm-script">
+            <%= for script_name <- script_list do %>
+              <%= link script_name, to: "#", class: "dropdown-item", id: script_name %>
+            <% end %>
+          </div>
+        </li>
+      </ul>
+
+
+      <div class="navbar">
+        <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+          href="#nm-script-field" role="button" aria-expanded="false" aria-controls="nm-script-field">
+          Скрыть/Показать
+        </button>
+          <button id="nm-update-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+            Обновить
+          </button>
+      </div>
+  </nav>
+  <pre><code class="collapse" id="nm-script-field">Нет данных</code></pre>
+
+
 <% else %>
  <h5 class="text-danger">Это устройство не подключено</h5>
 <% end %>

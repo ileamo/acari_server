@@ -81,7 +81,6 @@ defmodule AcariServer.Master do
 
   def handle_cast({:peer_started, tun_name}, state) do
     Logger.debug("Master get :peer_started from #{tun_name}")
-    get_inventory(tun_name)
 
     {:noreply, state}
   end
@@ -128,6 +127,12 @@ defmodule AcariServer.Master do
   defp exec_server_method(state, tun_name, "put.data", %{"id" => "telemetry", "data" => data}) do
     Logger.info("Get telemetry data #{data}")
     set_telemetry(tun_name, data)
+    state
+  end
+
+  defp exec_server_method(state, tun_name, "put.data", %{"id" => script_id, "data" => data}) do
+    Logger.info("Get script data #{data}")
+    set_script(tun_name,script_id, data)
     state
   end
 
@@ -193,9 +198,15 @@ defmodule AcariServer.Master do
     end
   end
 
+  defp set_script(tun_name, script_id, data) do
+    data = "#{script_id}\n#{AcariServer.get_local_time()}\n#{data}"
+    AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
+  end
+
   defp set_inventory(tun_name, inventory) do
+    IO.inspect({tun_name, inventory})
     inventory = "#{AcariServer.get_local_time()}\n#{inventory}"
-    AcariServer.Mnesia.update_tun_inventoty(tun_name, inventory)
+    AcariServer.Mnesia.update_tun_inventory(tun_name, inventory)
   end
 
   defp set_telemetry(tun_name, telemetry) do
@@ -220,6 +231,19 @@ defmodule AcariServer.Master do
       AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name) |> Map.merge(params))
 
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
+  end
+
+  def exec_script_on_peer(tun_name, templ) do
+    {:ok, json} =
+      Jason.encode(%{
+        method: "get_exec_sh",
+        params: %{
+          id: templ,
+          script: AcariServer.SFX.get_script(tun_name, templ, get_tun_params(tun_name))
+        }
+      })
+
+    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
   end
 
   def get_inventory(tun_name) do

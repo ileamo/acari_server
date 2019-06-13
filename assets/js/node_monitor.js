@@ -11,12 +11,16 @@ if (node_monitor) {
   channel.on('output', payload => {
     console.log("node moniotor get:", payload, payload.id);
     switch (payload.id) {
-      case "inventory":
-        document.querySelector("#nm-inventory").innerText = `${payload.data}`
+      case "script":
+        document.querySelector("#nm-script-name").innerText = `${payload.opt}`
+        document.querySelector("#nm-script-field").innerText = `${payload.data}`
         break;
-      case "telemetry":
-        document.querySelector("#nm-telemetry").innerText = `${payload.data}`
-        break;
+      //case "inventory":
+      //  document.querySelector("#nm-script-field").innerText = `${payload.data}`
+      //  break;
+      //case "telemetry":
+      //  document.querySelector("#nm-telemetry").innerText = `${payload.data}`
+      //  break;
       case "links_state":
         document.querySelector("#nm-links-state").innerHTML = `${payload.data}`
         break;
@@ -28,21 +32,46 @@ if (node_monitor) {
     }
   }) // From the Channel
 
-  document.getElementById("nm-get-inventory").addEventListener("click", getInventory, false);
+  document.querySelector("#node-monitor").addEventListener("load", scriptLoaded, false);
+  function scriptLoaded() {
+    console.log("SCRIPT Loaded")
+  }
 
-  function getInventory() {
+
+
+  var scripts = document.querySelectorAll("#nm-script a")//.addEventListener("click", getScript, false);
+
+  scripts.forEach(function(item) {item.addEventListener("click", getScript, false)})
+
+  function getScript(param) {
+    sessionStorage.setItem("lastScript" + window.location.pathname, this.id)
+    console.log("SCRIPT", sessionStorage)
     channel.push('input', {
-      input: "inventory"
+      input: "get_script",
+      script: this.id
     })
   }
 
-  document.getElementById("nm-get-telemetry").addEventListener("click", getTelemetry, false);
 
-  function getTelemetry() {
+
+
+  document.getElementById("nm-update-script").addEventListener("click", updateScript, false);
+
+  function updateScript() {
+    var id = sessionStorage.getItem("lastScript" + window.location.pathname)
     channel.push('input', {
-      input: "telemetry"
+      input: "script",
+      script: id
     })
   }
+
+  //document.getElementById("nm-get-telemetry").addEventListener("click", getTelemetry, false);
+
+  //function getTelemetry() {
+  //  channel.push('input', {
+  //    input: "telemetry"
+  //  })
+  //}
 
   document.getElementById("nm-get-links-state").addEventListener("click", getLinksState, false);
 

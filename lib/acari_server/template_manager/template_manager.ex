@@ -29,6 +29,15 @@ defmodule AcariServer.TemplateManager do
     |> List.insert_at(0, {no_templ, nil})
   end
 
+  def script_list() do
+    list_templates()
+    |> Enum.filter(fn %{executable: ex} -> ex end)
+    |> Enum.map(fn %{name: name} -> name end)
+    |> Enum.sort()
+  end
+
+
+
   def get_templ_names_ex_noex() do
     list_templates()
     |> Enum.reduce([[], []], fn %{name: name, executable: ex}, [ex_list, list] ->

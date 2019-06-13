@@ -17,7 +17,9 @@ defmodule AcariServer.NodeMonitor do
   end
 
   @impl true
-  def handle_cast({:input, id}, %{tun_name: tun_name} = state) do
+  def handle_cast({:input, %{"input" => id} = params}, %{tun_name: tun_name} = state) do
+    IO.inspect(params, label: "MONITOR")
+
     case id do
       "inventory" ->
         AcariServer.Master.get_inventory(tun_name)
@@ -38,16 +40,29 @@ defmodule AcariServer.NodeMonitor do
       "sensors" ->
         put_data(self(), "sensors", AcariServerWeb.TunnelView.get_sensors_html(:string, tun_name))
 
+      "get_script" ->
+        put_data(
+          self(),
+          "script",
+          AcariServer.Mnesia.get_tunnel_state(tun_name)[params["script"]] || "Нет данных",
+          params["script"]
+        )
+
+      "script" ->
+        tag = params["script"]
+        AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
+        AcariServer.Master.exec_script_on_peer(tun_name, tag)
+
       _ ->
         nil
     end
 
-    AcariServer.NodeMonitorAgent.callback(self(), tun_name, id)
     {:noreply, state}
   end
 
-  def handle_cast({:output, id, data}, %{output_pid: output_pid} = state) do
-    send(output_pid, {:output, id, data})
+  def handle_cast({:output, id, data, opt}, %{output_pid: output_pid} = state) do
+    IO.inspect({id, data}, label: "OUTPUT")
+    send(output_pid, {:output, id, data, opt})
     {:noreply, state}
   end
 
@@ -56,7 +71,7 @@ defmodule AcariServer.NodeMonitor do
     GenServer.cast(node_monitor, {:input, input})
   end
 
-  def put_data(node_monitor, id, data) do
-    GenServer.cast(node_monitor, {:output, id, data})
+  def put_data(node_monitor, id, data, opt \\ nil) do
+    GenServer.cast(node_monitor, {:output, id, data, opt})
   end
 end
