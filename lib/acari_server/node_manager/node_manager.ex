@@ -54,10 +54,10 @@ defmodule AcariServer.NodeManager do
     |> Repo.get_by(name: name)
   end
 
-  def get_node_with_script(name) do
+  def get_node_with_script(name, script_assoc \\ []) do
     Node
     |> Repo.get_by(name: name)
-    |> Repo.preload(:script)
+    |> Repo.preload(script: script_assoc)
   end
 
   @doc """

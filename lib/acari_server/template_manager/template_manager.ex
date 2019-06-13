@@ -36,14 +36,13 @@ defmodule AcariServer.TemplateManager do
     |> Enum.sort()
   end
 
-  def script_list() do
-    list_templates()
-    |> Enum.filter(fn %{executable: ex} -> ex end)
+  def script_list(tun_name) do
+    AcariServer.NodeManager.get_node_with_script(tun_name, :templates)
+    |> get_in([Access.key(:script), Access.key(:templates)])
+    |> IO.inspect()
     |> Enum.map(fn %{name: name} -> name end)
     |> Enum.sort()
   end
-
-
 
   def get_templ_names_ex_noex() do
     list_templates()

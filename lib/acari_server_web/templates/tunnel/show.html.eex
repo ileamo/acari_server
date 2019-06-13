@@ -64,7 +64,7 @@
 
   <hr/>
 
-  <% script_list = AcariServer.TemplateManager.script_list()
+  <% script_list = AcariServer.TemplateManager.script_list(@name)
   %>
 
   <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
