@@ -13,8 +13,6 @@ defmodule AcariServer.Master do
   defmodule TunState do
     defstruct [
       :node,
-      inventory: "Нет данных",
-      telemetry: "Нет данных",
       sslinks: %{}
     ]
   end
@@ -69,7 +67,7 @@ defmodule AcariServer.Master do
     Mnesia.add_tunnel(
       name: tun_name,
       server_id: node(),
-      state: %{inventory: "Нет данных", telemetry: "Нет данных"}
+      state: %{}
     )
 
     # if server == node() do
@@ -116,18 +114,6 @@ defmodule AcariServer.Master do
   def handle_cast(mes, state) do
     Logger.warn("Master get unknown message: #{inspect(mes)}")
     {:noreply, state}
-  end
-
-  defp exec_server_method(state, tun_name, "put.data", %{"id" => "inventory", "data" => data}) do
-    Logger.info("Get inventory data #{data}")
-    set_inventory(tun_name, data)
-    state
-  end
-
-  defp exec_server_method(state, tun_name, "put.data", %{"id" => "telemetry", "data" => data}) do
-    Logger.info("Get telemetry data #{data}")
-    set_telemetry(tun_name, data)
-    state
   end
 
   defp exec_server_method(state, tun_name, "put.data", %{"id" => script_id, "data" => data}) do
@@ -203,17 +189,6 @@ defmodule AcariServer.Master do
     AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
   end
 
-  defp set_inventory(tun_name, inventory) do
-    IO.inspect({tun_name, inventory})
-    inventory = "#{AcariServer.get_local_time()}\n#{inventory}"
-    AcariServer.Mnesia.update_tun_inventory(tun_name, inventory)
-  end
-
-  defp set_telemetry(tun_name, telemetry) do
-    telemetry = "#{AcariServer.get_local_time()}\n#{telemetry}"
-    AcariServer.Mnesia.update_tun_telemetry(tun_name, telemetry)
-  end
-
   defp exec_local_script(tun_name) do
     script = AcariServer.SFX.get_script(tun_name, :local, get_tun_params(tun_name))
     Acari.exec_sh(script)
@@ -240,32 +215,6 @@ defmodule AcariServer.Master do
         params: %{
           id: templ,
           script: AcariServer.SFX.get_script(tun_name, templ, get_tun_params(tun_name))
-        }
-      })
-
-    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
-  end
-
-  def get_inventory(tun_name) do
-    {:ok, json} =
-      Jason.encode(%{
-        method: "get_exec_sh",
-        params: %{
-          id: "inventory",
-          script: AcariServer.SFX.get_script(tun_name, :inventory, get_tun_params(tun_name))
-        }
-      })
-
-    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
-  end
-
-  def get_telemetry(tun_name) do
-    {:ok, json} =
-      Jason.encode(%{
-        method: "get_exec_sh",
-        params: %{
-          id: "telemetry",
-          script: AcariServer.SFX.get_script(tun_name, :telemetry, get_tun_params(tun_name))
         }
       })
 

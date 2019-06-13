@@ -41,22 +41,6 @@
     </div>
   </div>
 
-  <div class="form-group row">
-    <%= label f, "Инвентарные данные", class: "col-sm-4 col-form-label" %>
-    <div class="col-sm-8">
-      <%= select f, :inventory, templ_list, class: "form-control" %>
-      <%= error_tag f, :inventory %>
-    </div>
-  </div>
-
-  <div class="form-group row">
-    <%= label f, "Телеметрия", class: "col-sm-4 col-form-label" %>
-    <div class="col-sm-8">
-      <%= select f, :telemetry, templ_list, class: "form-control" %>
-      <%= error_tag f, :telemetry %>
-    </div>
-  </div>
-
   <div class="form-group">
     <%= label f, "Определения параметров", class: "control-label" %>
     <%= textarea f, :definition, class: "form-control text-monospace", rows: "6" %>

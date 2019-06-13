@@ -21,12 +21,6 @@ defmodule AcariServer.NodeMonitor do
     IO.inspect(params, label: "MONITOR")
 
     case id do
-      "inventory" ->
-        AcariServer.Master.get_inventory(tun_name)
-
-      "telemetry" ->
-        AcariServer.Master.get_telemetry(tun_name)
-
       "links_state" ->
         links_state = AcariServer.Mnesia.get_link_list_for_tunnel(tun_name)
 

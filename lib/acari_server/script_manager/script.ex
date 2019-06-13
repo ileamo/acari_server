@@ -10,8 +10,6 @@ defmodule AcariServer.ScriptManager.Script do
     field :definition, :string
     field :prefix, :string
     field :test, :string
-    field :inventory, :string
-    field :telemetry, :string
 
     has_many :nodes, AcariServer.NodeManager.Node
     has_many :templates, AcariServer.TemplateManager.Template
@@ -29,9 +27,7 @@ defmodule AcariServer.ScriptManager.Script do
       :remote,
       :definition,
       :prefix,
-      :test,
-      :inventory,
-      :telemetry
+      :test
     ])
     |> validate_required([:name])
     |> unique_constraint(:name)

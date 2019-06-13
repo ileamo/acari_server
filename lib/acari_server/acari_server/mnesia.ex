@@ -256,14 +256,6 @@ defmodule AcariServer.Mnesia do
     update_tun_state(name, tag, data)
   end
 
-  def update_tun_inventory(name, data) do
-    update_tun_state(name, :inventory, data)
-  end
-
-  def update_tun_telemetry(name, data) do
-    update_tun_state(name, :telemetry, data)
-  end
-
   def update_tun_state(name, tag, data) do
     IO.inspect({name, tag, data}, label: "MNESIA")
     Mnesia.transaction(fn ->

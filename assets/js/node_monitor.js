@@ -15,12 +15,6 @@ if (node_monitor) {
         document.querySelector("#nm-script-name").innerText = `${payload.opt}`
         document.querySelector("#nm-script-field").innerText = `${payload.data}`
         break;
-      //case "inventory":
-      //  document.querySelector("#nm-script-field").innerText = `${payload.data}`
-      //  break;
-      //case "telemetry":
-      //  document.querySelector("#nm-telemetry").innerText = `${payload.data}`
-      //  break;
       case "links_state":
         document.querySelector("#nm-links-state").innerHTML = `${payload.data}`
         break;
@@ -64,14 +58,6 @@ if (node_monitor) {
       script: id
     })
   }
-
-  //document.getElementById("nm-get-telemetry").addEventListener("click", getTelemetry, false);
-
-  //function getTelemetry() {
-  //  channel.push('input', {
-  //    input: "telemetry"
-  //  })
-  //}
 
   document.getElementById("nm-get-links-state").addEventListener("click", getLinksState, false);
 

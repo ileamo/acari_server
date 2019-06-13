@@ -23,16 +23,6 @@
     <%= @script.local %>
   </li>
 
-  <li>
-    <strong>Инвентарные данные:</strong>
-    <%= @script.inventory %>
-  </li>
-
-  <li>
-    <strong>Телеметрия:</strong>
-    <%= @script.telemetry %>
-  </li>
-
   <% {var, error} = AcariServer.Template.get_json(@script.definition)
      {tst, tst_error} = AcariServer.Template.get_json(@script.test)
       test_ass = AcariServer.Template.test_assigns(var, tst)

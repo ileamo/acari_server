@@ -39,25 +39,6 @@
       <%= render "links_state.html", links_state: links_state  %>
     </div>
 
-<!--
-    <hr/>
-    <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
-        <div class="navbar p-0">
-          <span class="navbar-brand">Текущие показатели</span>
-        </div>
-        <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
-            href="#nm-telemetry" role="button" aria-expanded="false" aria-controls="nm-telemetry">
-            Скрыть/Показать
-          </button>
-          <button id="nm-get-telemetry" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
-            Обновить
-          </button>
-        </div>
-    </nav>
-    <pre><code class="collapse" id="nm-telemetry"><%= tun.telemetry %></code></pre>
--->
-
     <hr/>
     <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
         <div class="navbar p-0">
