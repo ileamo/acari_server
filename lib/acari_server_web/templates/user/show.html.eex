@@ -17,6 +17,11 @@
     <%= @user.is_admin %>
   </li>
 
+  <li>
+    <strong>Группы:</strong>
+    <%= AcariServerWeb.NodeView.groups_list(@user) %>
+  </li>
+
 </ul>
 
 <span><%= link "Редактировать", to: Routes.user_path(@conn, :edit, @user) %></span>

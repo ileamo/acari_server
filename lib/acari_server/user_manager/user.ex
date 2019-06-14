@@ -9,6 +9,12 @@ defmodule AcariServer.UserManager.User do
     field :username, :string
     field :password, :string, virtual: true
     field :rpt_psw, :string, virtual: true
+    field :groups_list, {:array, :integer}, virtual: true
+
+    many_to_many :groups, AcariServer.GroupManager.Group,
+      join_through: AcariServer.GroupUserAssociation.GroupUser,
+      on_replace: :delete
+
 
     timestamps()
   end

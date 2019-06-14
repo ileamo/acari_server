@@ -45,6 +45,7 @@ defmodule AcariServer.GroupManager do
     Group
     |> Repo.get!(id)
     |> Repo.preload(:nodes)
+    |> Repo.preload(:users)
   end
 
   def get_group_wo_nodes!(id) do

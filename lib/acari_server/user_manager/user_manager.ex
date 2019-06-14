@@ -19,7 +19,9 @@ defmodule AcariServer.UserManager do
 
   """
   def list_users do
-    Repo.all(User)
+    User
+    |> Repo.all()
+    |> Repo.preload(:groups)
   end
 
   @doc """
@@ -36,7 +38,12 @@ defmodule AcariServer.UserManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id) do
+    User
+    |> Repo.get!(id)
+    |> Repo.preload(:groups)
+  end
+
   def get_user(id), do: Repo.get(User, id)
 
   @doc """
@@ -54,6 +61,7 @@ defmodule AcariServer.UserManager do
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.changeset(attrs)
+    |> AcariServer.NodeManager.Node.put_groups(attrs)
     |> Repo.insert()
   end
 
@@ -72,6 +80,7 @@ defmodule AcariServer.UserManager do
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
+    |> AcariServer.NodeManager.Node.put_groups(attrs)
     |> Repo.update()
   end
 
@@ -137,7 +146,7 @@ defmodule AcariServer.UserManager do
 
   def is_admin(conn, _opts) do
     conn
-    |> Phoenix.Controller.redirect(to:  AcariServerWeb.Router.Helpers.page_path(conn, :noauth))
+    |> Phoenix.Controller.redirect(to: AcariServerWeb.Router.Helpers.page_path(conn, :noauth))
     |> Conn.halt()
   end
 end

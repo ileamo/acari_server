@@ -14,7 +14,12 @@
 
   <li>
     <strong>Узлы:</strong>
-    <%= @group.nodes |> Enum.map(fn %{name: name} -> name end) |> Enum.join(",") %>
+    <%= @group.nodes |> Enum.map(fn %{name: name} -> name end) |> Enum.join(", ") %>
+  </li>
+
+  <li>
+    <strong>Пользователи:</strong>
+    <%= @group.users |> Enum.map(fn %{username: name} -> name end) |> Enum.join(", ") %>
   </li>
 
 </ul>

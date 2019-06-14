@@ -9,6 +9,9 @@ defmodule AcariServer.GroupManager.Group do
     many_to_many :nodes, AcariServer.NodeManager.Node,
       join_through: AcariServer.GroupNodeAssociation.GroupNode
 
+    many_to_many :users, AcariServer.UserManager.User,
+      join_through: AcariServer.GroupUserAssociation.GroupUser
+
     timestamps()
   end
 
