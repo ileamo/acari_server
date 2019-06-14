@@ -25,18 +25,4 @@ defmodule AcariServer.NodeManager.Node do
     |> unique_constraint(:name)
   end
 
-  def put_groups(node, attrs) do
-    node
-    |> put_assoc(:groups, parse_groups(attrs))
-  end
-
-  defp parse_groups(%{"groups_list" => groups_list}) do
-    groups_list
-    |> Enum.map(&String.to_integer/1)
-    |> Enum.map(&AcariServer.GroupManager.get_group_wo_nodes!/1)
-  end
-
-  defp parse_groups(_) do
-    []
-  end
 end

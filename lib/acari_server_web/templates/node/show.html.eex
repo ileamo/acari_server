@@ -14,7 +14,7 @@
 
   <li>
     <strong>Группы:</strong>
-    <%= groups_list(@node) %>
+    <%= AcariServer.GroupManager.groups_list(@node) %>
   </li>
 
   <li>

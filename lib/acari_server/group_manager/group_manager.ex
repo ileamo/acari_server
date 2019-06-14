@@ -117,4 +117,21 @@ defmodule AcariServer.GroupManager do
   def change_group(%Group{} = group) do
     Group.changeset(group, %{})
   end
+
+  def groups_list(obj) do
+    obj.groups
+    |> Enum.map(fn %{name: name} -> name end)
+    |> Enum.join(", ")
+  end
+
+  def group_id_list(nil) do
+    []
+  end
+
+  def group_id_list(obj) do
+    obj.groups
+    |> Enum.map(fn %{id: id} -> id end)
+  end
+
+
 end

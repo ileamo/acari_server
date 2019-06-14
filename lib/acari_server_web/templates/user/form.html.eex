@@ -43,7 +43,7 @@
     <%= label f, "Группы", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-10">
       <% select_list = AcariServer.GroupManager.group_name_id_pairs_list() %>
-      <%= multiple_select f, :groups_list, select_list, selected: AcariServerWeb.NodeView.group_id_list(assigns[:user]), class: "form-control", size: min(length(select_list), 16) %>
+      <%= multiple_select f, :groups_list, select_list, selected: AcariServer.GroupManager.group_id_list(assigns[:user]), class: "form-control", size: min(length(select_list), 16) %>
       <%= error_tag f, :groups %>
     </div>
   </div>

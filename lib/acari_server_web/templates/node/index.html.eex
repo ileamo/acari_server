@@ -21,7 +21,7 @@
       <td><%= node.description %></td>
       <td><%= script_name(node) %></td>
       <td><%= param_list(node.params) %></td>
-      <td><%= groups_list(node) %></td>
+      <td><%= AcariServer.GroupManager.groups_list(node) %></td>
 
       <td>
         <%= link "Редактировать", to: Routes.node_path(@conn, :edit, node) %>

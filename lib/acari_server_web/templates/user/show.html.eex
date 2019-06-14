@@ -19,7 +19,7 @@
 
   <li>
     <strong>Группы:</strong>
-    <%= AcariServerWeb.NodeView.groups_list(@user) %>
+    <%= AcariServer.GroupManager.groups_list(@user) %>
   </li>
 
 </ul>

@@ -75,7 +75,7 @@ defmodule AcariServer.NodeManager do
   def create_node(attrs \\ %{}) do
     %Node{}
     |> Node.changeset(attrs)
-    |> Node.put_groups(attrs)
+    |> AcariServer.GroupManager.Group.put_groups(attrs)
     |> Repo.insert()
   end
 
@@ -94,7 +94,7 @@ defmodule AcariServer.NodeManager do
   def update_node(%Node{} = node, attrs) do
     node
     |> Node.changeset(attrs)
-    |> Node.put_groups(attrs)
+    |> AcariServer.GroupManager.Group.put_groups(attrs)
     |> Repo.update()
   end
 
