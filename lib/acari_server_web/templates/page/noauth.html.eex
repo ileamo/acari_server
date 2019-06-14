@@ -1,1 +1,1 @@
-<h2 class="text-center">У Вас нет прав администратора</h2>
+<h2 class="text-center"><%= @message %></h2>

@@ -3,6 +3,10 @@ defmodule AcariServerWeb.TunnelController do
   alias AcariServer.GroupManager
   alias AcariServer.NodeManager
 
+  import AcariServer.UserManager, only: [is_user_in_group: 2]
+  plug :is_user_in_group when action in [:show]
+
+
   def index(conn, _params) do
     nodes = NodeManager.list_nodes_wo_preload()
     render(conn, "index.html", nodes: nodes, group_id: nil, group_name: "Все")

@@ -16,8 +16,8 @@ defmodule AcariServerWeb.PageController do
     render(conn, "secret.html", current_user: user)
   end
 
-  def noauth(conn, _) do
-    render(conn, "noauth.html")
+  def noauth(conn, %{"message" => mes}) do
+    render(conn, "noauth.html", message: mes)
   end
 
   def test(conn, _params) do
