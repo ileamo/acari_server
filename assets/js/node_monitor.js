@@ -2,11 +2,17 @@ import socket from './socket'
 
 let node_monitor = document.getElementById('node-monitor');
 if (node_monitor) {
-  console.log("node_monitor")
   let channel = socket.channel("node_monitor:1", {
     pathname: window.location.pathname
   })
   channel.join()
+  .receive("ok", resp => {
+    console.log("node_monitor: Joined successfully", resp)
+    updateScript()
+  })
+  .receive("error", resp => {
+    console.log("node_monitor: Unable to join", resp)
+  })
 
   channel.on('output', payload => {
     console.log("node moniotor get:", payload, payload.id);
