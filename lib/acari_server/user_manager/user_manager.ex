@@ -148,6 +148,17 @@ defmodule AcariServer.UserManager do
     no_auth(conn, "У вас нет прав администратора")
   end
 
+  def is_user_in_group(conn = %{assigns: %{current_user: %{is_admin: true}}}, _opts) do
+    conn
+  end
+
+  def is_user_in_group(
+        %{assigns: %{current_user: user}, params: %{"id" => group_id}} = conn,
+        _opts
+      ) do
+    is_user_in_group(conn, user, [group_id |> String.to_integer()])
+  end
+
   def is_user_in_group(
         %{assigns: %{current_user: user}, params: %{"name" => node_name}} = conn,
         _opts
@@ -157,16 +168,20 @@ defmodule AcariServer.UserManager do
       |> AcariServer.NodeManager.get_node_with_groups()
       |> AcariServer.GroupManager.group_id_list()
 
-    user_groups = user |> Repo.preload(:groups) |> AcariServer.GroupManager.group_id_list()
-
-    case node_groups |> Enum.any?(fn x -> Enum.member?(user_groups, x) end) do
-      true -> conn
-      _ -> no_auth(conn, "Вы не являетесь членом группы")
-    end
+    is_user_in_group(conn, user, node_groups)
   end
 
   def is_user_in_group(conn, _opts) do
     no_auth(conn, "Проблемы с группой")
+  end
+
+  defp is_user_in_group(conn, user, groups_list) do
+    user_groups = user |> Repo.preload(:groups) |> AcariServer.GroupManager.group_id_list()
+
+    case groups_list |> Enum.any?(fn x -> Enum.member?(user_groups, x) end) do
+      true -> conn
+      _ -> no_auth(conn, "Вы не являетесь членом группы")
+    end
   end
 
   defp no_auth(conn, mes) do

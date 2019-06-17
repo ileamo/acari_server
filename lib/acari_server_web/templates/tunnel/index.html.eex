@@ -14,7 +14,7 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <%= link "Все", to: Routes.tunnel_path(@conn, :index), class: "dropdown-item" %>
             <div class="dropdown-divider"></div>
-            <% groups = list_groups() %>
+            <% groups = assigns[:groups] || list_groups() %>
             <%= for %{name: name} = group <- groups do %>
               <%= link name, to: Routes.tunnel_path(@conn, :grp, group), class: "dropdown-item" %>
             <% end %>

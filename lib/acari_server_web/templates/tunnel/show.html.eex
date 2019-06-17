@@ -2,15 +2,6 @@
     <div class="navbar p-0">
       <span class="navbar-brand">Туннель <%= @name %></span>
     </div>
-<!-- TODO
-    <div class="navbar">
-      <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2"
-              id="update-node-config">
-        Послать конфиг
-      </button>
-
-    </div>
--->
 </nav>
 <% tun = AcariServer.Mnesia.get_tunnel_state(@name)
    links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
