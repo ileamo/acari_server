@@ -118,7 +118,7 @@ defmodule AcariServer.Master do
 
   defp exec_server_method(state, tun_name, "put.data", %{"id" => script_id, "data" => data}) do
     Logger.info("Get script data #{data}")
-    set_script(tun_name,script_id, data)
+    set_script(tun_name, script_id, data)
     state
   end
 
@@ -209,16 +209,16 @@ defmodule AcariServer.Master do
   end
 
   def exec_script_on_peer(tun_name, templ) do
-    {:ok, json} =
-      Jason.encode(%{
-        method: "get_exec_sh",
-        params: %{
-          id: templ,
-          script: AcariServer.SFX.get_script(tun_name, templ, get_tun_params(tun_name))
-        }
-      })
+    request = %{
+      method: "get_exec_sh",
+      params: %{
+        id: templ,
+        script: 0
+      }
+    }
 
-    Acari.TunMan.send_tun_com(tun_name, Const.master_mes(), json)
+    script = AcariServer.SFX.get_script(tun_name, templ, get_tun_params(tun_name))
+    Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 
   defp get_tun_params(tun_name) do
