@@ -7,15 +7,15 @@ if (node_monitor) {
   })
   channel.join()
   .receive("ok", resp => {
-    console.log("node_monitor: Joined successfully", resp)
-    updateScript()
+    //console.log("node_monitor: Joined successfully", resp)
+    //getScript()
   })
   .receive("error", resp => {
     console.log("node_monitor: Unable to join", resp)
   })
 
   channel.on('output', payload => {
-    console.log("node moniotor get:", payload, payload.id);
+    //console.log("node moniotor get:", payload, payload.id);
     switch (payload.id) {
       case "script":
         document.querySelector("#nm-script-name").innerText = `${payload.opt}`
@@ -37,9 +37,9 @@ if (node_monitor) {
 
   scripts.forEach(function(item) {item.addEventListener("click", getScript, false)})
 
-  function getScript(param) {
+  function getScript() {
     sessionStorage.setItem("lastScript" + window.location.pathname, this.id)
-    console.log("SCRIPT", sessionStorage)
+    //console.log("SCRIPT", sessionStorage)
     channel.push('input', {
       input: "get_script",
       script: this.id
@@ -53,10 +53,14 @@ if (node_monitor) {
 
   function updateScript() {
     var id = sessionStorage.getItem("lastScript" + window.location.pathname)
-    channel.push('input', {
-      input: "script",
-      script: id
-    })
+    var r = confirm("Выполнить скрипт "+id+" на клиенте?")
+    if (r) {
+      document.querySelector("#nm-script-field").innerText = "Wait ..."
+      channel.push('input', {
+        input: "script",
+        script: id
+      })
+    }
   }
 
   document.getElementById("nm-get-links-state").addEventListener("click", getLinksState, false);
