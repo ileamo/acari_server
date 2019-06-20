@@ -1,8 +1,13 @@
 let osm = document.getElementById("osm")
 
 if (osm) {
-  console.log(osm)
-  let mymap = L.map('osm').setView([55.777594, 37.737926], 13);
+  console.log(osm.dataset)
+  let prevPos = {
+    lat: osm.dataset.latitude,
+    lng: osm.dataset.longitude
+  }
+
+  let mymap = L.map('osm').setView([prevPos.lat, prevPos.lng], 13);
 
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaWxlYW1vIiwiYSI6ImNqeDRwMDF6djAxZ2I0NW82aWY0cnRyNmkifQ.KHGb6ZXaBpVWPsFJb3f5IQ', {
     maxZoom: 18,
@@ -12,12 +17,26 @@ if (osm) {
     id: 'mapbox.streets'
   }).addTo(mymap);
 
-  let marker = L.marker([55.777594, 37.737926]).addTo(mymap);
+  mymap.attributionControl.setPrefix(false);
 
+  let marker = L.marker([prevPos.lat, prevPos.lng], {
+    draggable: 'true'
+  });
 
-  function onMapClick(e) {
-    alert("You clicked the map at " + e.latlng);
+  if (osm.dataset.setlocation) {
+    marker.on('dragend', function(event) {
+      var position = marker.getLatLng();
+      r = confirm("Задать новые координаты(" + position.lat + ", " + position.lng + ")?");
+      if (r) {
+
+      } else {
+        marker.setLatLng(prevPos, {
+          draggable: 'true'
+        }).update();
+      }
+    });
+
   }
 
-  mymap.on('click', onMapClick);
+  mymap.addLayer(marker);
 }

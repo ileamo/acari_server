@@ -30,7 +30,8 @@
 
 </ul>
 
-<div id="osm" class="my-3" style="height:480px; width:640px"></div>
+<div id="osm" data-latitude="55.777594" data-longitude="37.737926" data-setlocation="true"
+class="my-3" style="height:480px; width:640px"></div>
 
 <span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node) %></span>
 |
