@@ -1,7 +1,7 @@
 let osm = document.getElementById("osm")
 
 if (osm) {
-  console.log(osm.dataset)
+  console.log(osm.dataset, osm.dataset.setlocation)
   let prevPos = {
     lat: osm.dataset.latitude,
     lng: osm.dataset.longitude
@@ -20,19 +20,23 @@ if (osm) {
   mymap.attributionControl.setPrefix(false);
 
   let marker = L.marker([prevPos.lat, prevPos.lng], {
-    draggable: 'true'
+    draggable: osm.dataset.setlocation ? 'true' : false
   });
 
   if (osm.dataset.setlocation) {
     marker.on('dragend', function(event) {
       var position = marker.getLatLng();
-      r = confirm("Задать новые координаты(" + position.lat + ", " + position.lng + ")?");
+      r = confirm("Задать новое местоположение?");
       if (r) {
+        document.getElementById("node_input_lat").value = position.lat;
+        document.getElementById("node_input_lng").value = position.lng;
 
       } else {
         marker.setLatLng(prevPos, {
           draggable: 'true'
         }).update();
+        document.getElementById("node_input_lat").value = prevPos.lat;
+        document.getElementById("node_input_lng").value = prevPos.lng;
       }
     });
 

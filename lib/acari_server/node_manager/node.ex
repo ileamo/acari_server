@@ -6,6 +6,8 @@ defmodule AcariServer.NodeManager.Node do
     field :name, :string
     field :description, :string
     field :params, :map
+    field :latitude, :float
+    field :longitude, :float
     field :groups_list, {:array, :integer}, virtual: true
     belongs_to :script, AcariServer.ScriptManager.Script
 
@@ -19,7 +21,7 @@ defmodule AcariServer.NodeManager.Node do
   @doc false
   def changeset(node, attrs) do
     node
-    |> cast(attrs, [:name, :description, :params, :script_id])
+    |> cast(attrs, [:name, :description, :params, :script_id, :latitude, :longitude])
     |> validate_required([:name])
     |> foreign_key_constraint(:script_id)
     |> unique_constraint(:name)

@@ -1,5 +1,9 @@
 <h2>Параметры Узла</h2>
 
+<%  lat = @node.latitude || 55.777594
+    lng = @node.longitude || 37.737926
+%>
+
 <ul>
 
   <li>
@@ -23,6 +27,11 @@
   </li>
 
   <li>
+    <strong>Местоположение:</strong>
+    <%= lat %>, <%= lng %>
+  </li>
+
+  <li>
     <strong>Параметры:</strong>
     <%= param_list(@node.params) %>
   </li>
@@ -30,7 +39,7 @@
 
 </ul>
 
-<div id="osm" data-latitude="55.777594" data-longitude="37.737926" data-setlocation="true"
+<div id="osm" data-latitude="<%= lat %>" data-longitude="<%= lng %>"
 class="my-3" style="height:480px; width:640px"></div>
 
 <span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node) %></span>
