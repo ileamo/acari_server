@@ -30,6 +30,8 @@
 
 </ul>
 
+<div id="osm" class="my-3" style="height:480px; width:640px"></div>
+
 <span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node) %></span>
 |
 <span><%= link "Клонировать", to: Routes.node_path(@conn, :new, node_id: @node.id) %></span>

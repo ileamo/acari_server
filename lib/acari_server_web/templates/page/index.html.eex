@@ -39,4 +39,5 @@
             </div>
         </div>
     </section>
+    <div id="mapid" style="height:800px"></div>
 </div>

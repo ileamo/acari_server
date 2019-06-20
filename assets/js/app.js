@@ -31,6 +31,9 @@ import "datatables.net";
 import dt from 'datatables.net-bs4';
 dt(window, $);
 
+import L from "leaflet"
+
+
 //import dtfc from "datatables.net-fixedcolumns";
 //dtfc( window, $ );
 
@@ -39,3 +42,4 @@ import "./xterm.js"
 import "./node_monitor.js"
 import "./node_config.js"
 import "./graph.js"
+import "./osm.js"
