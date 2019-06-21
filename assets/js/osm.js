@@ -1,7 +1,7 @@
 import L from "leaflet"
 import {
   GeoSearchControl,
-  OpenStreetMapProvider
+  OpenStreetMapProvider,
 } from 'leaflet-geosearch';
 
 
@@ -36,9 +36,20 @@ if (osm) {
       provider: provider,
       autoComplete: true, // optional: true|false  - default true
       autoCompleteDelay: 250, // optional: number      - default 250
-      style: 'bar',
+      searchLabel: 'Введите адрес',
+      keepResult: false,
+      //style: 'bar',
     });
     mymap.addControl(searchControl);
+    mymap.on('geosearch/showlocation', function (event) {
+      let searchPos = {lat: event.location.y, lng: event.location.x}
+      console.log("SEARCH", searchPos)
+      marker.setLatLng(searchPos, {
+        draggable: 'true'
+      }).update();
+      document.getElementById("node_input_lat").value = searchPos.lat;
+      document.getElementById("node_input_lng").value = searchPos.lng;
+    })
 
     marker.on('dragend', function(event) {
       var position = marker.getLatLng();
@@ -53,6 +64,7 @@ if (osm) {
         }).update();
         document.getElementById("node_input_lat").value = prevPos.lat;
         document.getElementById("node_input_lng").value = prevPos.lng;
+        mymap.setView([prevPos.lat, prevPos.lng], 13);
       }
     });
 

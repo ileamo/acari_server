@@ -10,3 +10,6 @@
 @import "~xterm/dist/xterm";
 @import "~leaflet/dist/leaflet";
 @import "~leaflet-geosearch/assets/css/leaflet";
+
+.leaflet-control-geosearch .results {
+  width: 300px; }
