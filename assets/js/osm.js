@@ -1,9 +1,9 @@
-import "leaflet.awesome-markers"
 import L from "leaflet"
 import {
   GeoSearchControl,
   OpenStreetMapProvider,
 } from 'leaflet-geosearch';
+import "leaflet.awesome-markers"
 
 
 let osm = document.getElementById("osm")
@@ -26,17 +26,17 @@ if (osm) {
   }).addTo(mymap);
 
   mymap.attributionControl.setPrefix(false);
-
   var markerIcon = L.AwesomeMarkers.icon({
     markerColor: 'blue',
     prefix: 'fa',
     extraClasses: 'fas',
-    icon: 'music'
+    icon: 'map-marker-alt',
+    markerColor: 'red',
+    iconColor: '#ff0000',
   });
 
-
   let marker = L.marker([prevPos.lat, prevPos.lng], {
-    //icon: markerIcon,
+    icon: markerIcon,
     draggable: osm.dataset.setlocation ? 'true' : false
   });
 
@@ -48,11 +48,18 @@ if (osm) {
       autoCompleteDelay: 250, // optional: number      - default 250
       searchLabel: 'Введите адрес',
       keepResult: false,
+      marker: { // optional: L.Marker    - default L.Icon.Default
+        icon: markerIcon,
+        draggable: false,
+      },
       //style: 'bar',
     });
     mymap.addControl(searchControl);
-    mymap.on('geosearch/showlocation', function (event) {
-      let searchPos = {lat: event.location.y, lng: event.location.x}
+    mymap.on('geosearch/showlocation', function(event) {
+      let searchPos = {
+        lat: event.location.y,
+        lng: event.location.x
+      }
       console.log("SEARCH", searchPos)
       marker.setLatLng(searchPos, {
         draggable: 'true'

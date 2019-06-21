@@ -10,7 +10,13 @@
 @import "~xterm/dist/xterm";
 @import "~leaflet/dist/leaflet";
 @import "~leaflet-geosearch/assets/css/leaflet";
-@import "~leaflet.awesome-markers/dist/leaflet.awesome-markers";
+//@import "~leaflet.awesome-markers/dist/leaflet.awesome-markers";
 
 .leaflet-control-geosearch .results {
   width: 300px; }
+
+.awesome-marker i {
+        font-size: 36px;
+        margin-top: 0px;
+
+    }
