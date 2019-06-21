@@ -1,3 +1,4 @@
+import "leaflet.awesome-markers"
 import L from "leaflet"
 import {
   GeoSearchControl,
@@ -26,7 +27,16 @@ if (osm) {
 
   mymap.attributionControl.setPrefix(false);
 
+  var markerIcon = L.AwesomeMarkers.icon({
+    markerColor: 'blue',
+    prefix: 'fa',
+    extraClasses: 'fas',
+    icon: 'music'
+  });
+
+
   let marker = L.marker([prevPos.lat, prevPos.lng], {
+    //icon: markerIcon,
     draggable: osm.dataset.setlocation ? 'true' : false
   });
 
