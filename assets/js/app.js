@@ -31,9 +31,6 @@ import "datatables.net";
 import dt from 'datatables.net-bs4';
 dt(window, $);
 
-import L from "leaflet"
-
-
 //import dtfc from "datatables.net-fixedcolumns";
 //dtfc( window, $ );
 

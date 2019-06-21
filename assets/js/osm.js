@@ -1,3 +1,10 @@
+import L from "leaflet"
+import {
+  GeoSearchControl,
+  OpenStreetMapProvider
+} from 'leaflet-geosearch';
+
+
 let osm = document.getElementById("osm")
 
 if (osm) {
@@ -7,7 +14,7 @@ if (osm) {
     lng: osm.dataset.longitude
   }
 
-  let mymap = L.map('osm').setView([prevPos.lat, prevPos.lng], 13);
+  const mymap = L.map('osm').setView([prevPos.lat, prevPos.lng], 13);
 
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaWxlYW1vIiwiYSI6ImNqeDRwMDF6djAxZ2I0NW82aWY0cnRyNmkifQ.KHGb6ZXaBpVWPsFJb3f5IQ', {
     maxZoom: 18,
@@ -24,9 +31,18 @@ if (osm) {
   });
 
   if (osm.dataset.setlocation) {
+    const provider = new OpenStreetMapProvider();
+    const searchControl = new GeoSearchControl({
+      provider: provider,
+      autoComplete: true, // optional: true|false  - default true
+      autoCompleteDelay: 250, // optional: number      - default 250
+      style: 'bar',
+    });
+    mymap.addControl(searchControl);
+
     marker.on('dragend', function(event) {
       var position = marker.getLatLng();
-      r = confirm("Задать новое местоположение?");
+      let r = confirm("Задать новое местоположение?");
       if (r) {
         document.getElementById("node_input_lat").value = position.lat;
         document.getElementById("node_input_lng").value = position.lng;
