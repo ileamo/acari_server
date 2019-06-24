@@ -21,11 +21,15 @@
           </div>
         </li>
       </ul>
+        <%= link "Карта", to: Routes.map_path(@conn, :index, group_id: @group_id), class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2" %>
+
         <%= if assigns[:group_id] do %>
           <%= link "Обновить", to: Routes.tunnel_path(@conn, :grp, @group_id), class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
         <% else %>
           <%= link "Обновить", to: Routes.tunnel_path(@conn, :index), class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
         <% end %>
+
+
     </div>
 </nav>
 <hr/ class = "mt-0 mb-4">

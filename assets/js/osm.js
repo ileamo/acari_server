@@ -9,7 +9,7 @@ import "leaflet.awesome-markers"
 let osm = document.getElementById("osm")
 
 if (osm) {
-  console.log(osm.dataset, osm.dataset.setlocation)
+  //console.log(osm.dataset)
   let prevPos = {
     lat: osm.dataset.latitude,
     lng: osm.dataset.longitude
@@ -35,57 +35,70 @@ if (osm) {
     iconColor: '#ff0000',
   });
 
-  let marker = L.marker([prevPos.lat, prevPos.lng], {
-    icon: markerIcon,
-    draggable: osm.dataset.setlocation ? 'true' : false
-  });
-
-  if (osm.dataset.setlocation) {
-    const provider = new OpenStreetMapProvider();
-    const searchControl = new GeoSearchControl({
-      provider: provider,
-      autoComplete: true, // optional: true|false  - default true
-      autoCompleteDelay: 250, // optional: number      - default 250
-      searchLabel: 'Введите адрес',
-      keepResult: false,
-      marker: { // optional: L.Marker    - default L.Icon.Default
+  if (osm.dataset.markers) {
+    let markers = JSON.parse(decodeURIComponent(osm.dataset.markers))
+    for (var i = 0; i < markers.length; i++) {
+      let point = markers[i];
+      L.marker([point.lat, point.lng], {
         icon: markerIcon,
-        draggable: false,
-      },
-      //style: 'bar',
+        title: point.title
+      }).addTo(mymap);
+    }
+
+    let bounds = JSON.parse(decodeURIComponent(osm.dataset.bounds))
+    mymap.fitBounds(bounds)
+  } else {
+
+    let marker = L.marker([prevPos.lat, prevPos.lng], {
+      icon: markerIcon,
+      draggable: osm.dataset.setlocation ? 'true' : false
     });
-    mymap.addControl(searchControl);
-    mymap.on('geosearch/showlocation', function(event) {
-      let searchPos = {
-        lat: event.location.y,
-        lng: event.location.x
-      }
-      console.log("SEARCH", searchPos)
-      marker.setLatLng(searchPos, {
-        draggable: 'true'
-      }).update();
-      document.getElementById("node_input_lat").value = searchPos.lat;
-      document.getElementById("node_input_lng").value = searchPos.lng;
-    })
+    mymap.addLayer(marker);
 
-    marker.on('dragend', function(event) {
-      var position = marker.getLatLng();
-      let r = confirm("Задать новое местоположение?");
-      if (r) {
-        document.getElementById("node_input_lat").value = position.lat;
-        document.getElementById("node_input_lng").value = position.lng;
-
-      } else {
-        marker.setLatLng(prevPos, {
+    if (osm.dataset.setlocation) {
+      const provider = new OpenStreetMapProvider();
+      const searchControl = new GeoSearchControl({
+        provider: provider,
+        autoComplete: true, // optional: true|false  - default true
+        autoCompleteDelay: 250, // optional: number      - default 250
+        searchLabel: 'Введите адрес',
+        keepResult: false,
+        marker: { // optional: L.Marker    - default L.Icon.Default
+          icon: markerIcon,
+          draggable: false,
+        },
+        //style: 'bar',
+      });
+      mymap.addControl(searchControl);
+      mymap.on('geosearch/showlocation', function(event) {
+        let searchPos = {
+          lat: event.location.y,
+          lng: event.location.x
+        }
+        marker.setLatLng(searchPos, {
           draggable: 'true'
         }).update();
-        document.getElementById("node_input_lat").value = prevPos.lat;
-        document.getElementById("node_input_lng").value = prevPos.lng;
-        mymap.setView([prevPos.lat, prevPos.lng], 13);
-      }
-    });
+        document.getElementById("node_input_lat").value = searchPos.lat;
+        document.getElementById("node_input_lng").value = searchPos.lng;
+      })
 
+      marker.on('dragend', function(event) {
+        var position = marker.getLatLng();
+        let r = confirm("Задать новое местоположение?");
+        if (r) {
+          document.getElementById("node_input_lat").value = position.lat;
+          document.getElementById("node_input_lng").value = position.lng;
+
+        } else {
+          marker.setLatLng(prevPos, {
+            draggable: 'true'
+          }).update();
+          document.getElementById("node_input_lat").value = prevPos.lat;
+          document.getElementById("node_input_lng").value = prevPos.lng;
+          mymap.setView([prevPos.lat, prevPos.lng], 13);
+        }
+      });
+
+    }
   }
-
-  mymap.addLayer(marker);
 }

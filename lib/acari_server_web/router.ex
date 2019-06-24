@@ -46,6 +46,8 @@ defmodule AcariServerWeb.Router do
     get "/", PageController, :index
     get "/zabbix", PageController, :zabbix
 
+    get "/map", MapController, :index
+
     get "/tunnels", TunnelController, :index
     get "/tunnels/:id", TunnelController, :grp
     get "/tunnel/:name", TunnelController, :show
