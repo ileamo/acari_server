@@ -30,9 +30,8 @@ if (osm) {
     markerColor: 'blue',
     prefix: 'fa',
     extraClasses: 'fas',
-    icon: 'map-marker-alt',
-    markerColor: 'red',
-    iconColor: '#ff0000',
+    icon: 'upload',
+    iconColor: '#000000',
   });
 
   if (osm.dataset.markers) {

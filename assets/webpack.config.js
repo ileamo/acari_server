@@ -23,6 +23,35 @@ module.exports = (env, options) => ({
 
   resolve: {
      alias: {
+         "./images/markers-soft.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.awesome-markers/dist/images/markers-soft.png"
+         ),
+         "./images/markers-soft@2x.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.awesome-markers/dist/images/markers-soft@2x.png"
+         ),
+         "./images/markers-shadow.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.awesome-markers/dist/images/markers-shadow.png"
+         ),
+         "./images/markers-shadow@2x.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.awesome-markers/dist/images/markers-shadow@2x.png"
+         ),
+         "./images/markers-matte.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.awesome-markers/dist/images/markers-matte.png"
+         ),
+         "./images/markers-matte@2x.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.awesome-markers/dist/images/markers-matte@2x.png"
+         ),
+         "./images/markers-plain.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.awesome-markers/dist/images/markers-plain.png"
+         ),
+
          "./images/layers.png$": path.resolve(
              __dirname,
              "./node_modules/leaflet/dist/images/layers.png"
