@@ -44,14 +44,18 @@ if (osm) {
     let markers = JSON.parse(decodeURIComponent(osm.dataset.markers))
     for (var i = 0; i < markers.length; i++) {
       let point = markers[i];
-      L.marker([point.lat, point.lng], {
+      let marker = L.marker([point.lat, point.lng], {
         icon: markerIcon,
-        title: point.title
+        //title: point.title,
       }).addTo(mymap);
+
+      marker.bindPopup(point.title)
     }
 
     let bounds = JSON.parse(decodeURIComponent(osm.dataset.bounds))
     mymap.fitBounds(bounds)
+
+
   } else {
 
     let marker = L.marker([prevPos.lat, prevPos.lng], {
