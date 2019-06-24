@@ -30,7 +30,13 @@ if (osm) {
     markerColor: 'blue',
     prefix: 'fa',
     extraClasses: 'fas',
-    icon: 'upload',
+    icon: 'cat',
+    //icon: 'hdd',
+    //icon: 'broadcast-tower',
+    //icon: 'money-check-alt',
+    //icon: 'satellite-dish',
+    //icon: 'external-link-alt',
+    //icon: 'linux',
     iconColor: '#000000',
   });
 
