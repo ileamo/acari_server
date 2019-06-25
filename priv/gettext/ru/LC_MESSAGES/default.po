@@ -15,9 +15,9 @@ msgstr ""
 #: lib/acari_server_web/templates/page/statistics.html.eex:9
 msgid "node"
 msgid_plural "nodes"
-msgstr[0] "узел"
-msgstr[1] "узла"
-msgstr[2] "узлов"
+msgstr[0] "клиент"
+msgstr[1] "клиента"
+msgstr[2] "клиентов"
 
 #, elixir-format
 #: lib/acari_server_web/templates/page/statistics.html.eex:27

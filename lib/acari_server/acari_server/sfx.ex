@@ -23,7 +23,7 @@ defmodule AcariServer.SFX do
         makeself(templ_map, setup_file_name)
       else
         %AcariServer.NodeManager.Node{script: nil, name: name} ->
-          create_setup("Узлу #{name} не назначен класс")
+          create_setup("Клиенту #{name} не назначен класс")
 
         res ->
           create_setup("Ошибка при создании SFX: #{inspect(res)}")

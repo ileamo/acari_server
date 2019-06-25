@@ -1,4 +1,4 @@
-<h2>Список Узлов</h2>
+<h2>Список Клиентов</h2>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
@@ -27,10 +27,12 @@
         <%= link "Редактировать", to: Routes.node_path(@conn, :edit, node) %>
         |
         <%= link "Удалить", to: Routes.node_path(@conn, :delete, node), method: :delete, data: [confirm: "Вы уверены?"] %>
+        |
+        <%= link "Блокировать", to: "#", data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "Новый узел", to: Routes.node_path(@conn, :new) %></span>
+<span><%= link "Новый клиент", to: Routes.node_path(@conn, :new) %></span>

@@ -21,7 +21,7 @@ defmodule AcariServerWeb.NewNodeController do
                params: env,
                source: "QR"
              }) do
-        {nn, "Узел добавлен в таблицу обнаруженных:"}
+        {nn, "Клиент добавлен в таблицу обнаруженных:"}
       else
         {:error, %{errors: err}} -> {nil, "Ошибка БД: #{inspect(err)}"}
         {:error, message} -> {nil, message}
@@ -58,7 +58,7 @@ defmodule AcariServerWeb.NewNodeController do
     case NewNodeDiscovery.create_new_node(new_node_params) do
       {:ok, new_node} ->
         conn
-        |> put_flash(:info, "Новый узел успешно создан.")
+        |> put_flash(:info, "Новый клиент успешно создан.")
         |> redirect(to: Routes.new_node_path(conn, :show, new_node))
 
       {:error, %Ecto.Changeset{} = changeset} ->

@@ -37,10 +37,15 @@ defmodule AcariServer.TemplateManager do
   end
 
   def script_list(tun_name) do
-    AcariServer.NodeManager.get_node_with_script(tun_name, :templates)
-    |> get_in([Access.key(:script), Access.key(:templates)])
-    |> Enum.map(fn %{name: name, description: descr} -> {descr, name} end)
-    |> Enum.sort()
+    with node <- AcariServer.NodeManager.get_node_with_script(tun_name, :templates),
+         script when is_map(script) <- node |> Map.get(:script),
+         templ when is_list(templ) <- script |> Map.get(:templates) do
+      templ
+      |> Enum.map(fn %{name: name, description: descr} -> {descr, name} end)
+      |> Enum.sort()
+    else
+      _ -> []
+    end
   end
 
   def get_templ_names_ex_noex() do

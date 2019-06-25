@@ -11,7 +11,7 @@ defmodule AcariServer.Terminal do
     Process.flag(:trap_exit, true)
 
     with dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(name),
-         send(output_pid, {:output, "Подключение к узлу #{name} \r\n"}),
+         send(output_pid, {:output, "Подключение к клиенту #{name} \r\n"}),
          {:ok, shell, _os_pid} <-
            :exec.run_link('ssh root@#{dstaddr} -o StrictHostKeyChecking=no', [
              :stdin,
@@ -29,7 +29,7 @@ defmodule AcariServer.Terminal do
     else
       res ->
         Logger.error("Terminal #{name} #{inspect(res)}")
-        send(output_pid, {:output, "Не могу подключиться к узлу #{name} \r\n"})
+        send(output_pid, {:output, "Не могу подключиться к клиенту #{name} \r\n"})
 
         {:ok,
          %{

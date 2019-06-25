@@ -86,7 +86,7 @@
     <div class="collapse" id="nm-sensors"><%=get_sensors_html(@name)%></div>
     <hr/>
 
-    <button id="start_xterm">Подключиться к узлу</button>
+    <button id="start_xterm">Подключиться к клиенту</button>
     <div id="acari-xterm"></div>
 
   </div>

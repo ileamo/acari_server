@@ -17,7 +17,7 @@ function startXterm() {
     term.destroy()
     term = false
     channel.leave()
-    document.getElementById("start_xterm").firstChild.data = "Подключиться к узлу";
+    document.getElementById("start_xterm").firstChild.data = "Подключиться к клиенту";
   }
   else {
     document.getElementById("start_xterm").firstChild.data = "Отключить терминал";

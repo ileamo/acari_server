@@ -51,7 +51,7 @@ window.make_chart = function() {
           },
           title: {
             display: true,
-            text: "Количество работающих узлов",
+            text: "Количество работающих клиентов",
           },
           tooltips: {
             callbacks: {

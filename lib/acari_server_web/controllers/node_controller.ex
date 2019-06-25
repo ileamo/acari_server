@@ -32,7 +32,7 @@ defmodule AcariServerWeb.NodeController do
 
         if node.script_id == nil do
           conn
-          |> put_flash(:info, "Узел создан.")
+          |> put_flash(:info, "Клиент создан.")
           |> redirect(to: Routes.node_path(conn, :show, node))
         else
           conn
@@ -65,7 +65,7 @@ defmodule AcariServerWeb.NodeController do
       {:ok, node} ->
         if old_node.script_id == node.script_id or node.script_id == nil do
           conn
-          |> put_flash(:info, "Узел отредактирован.")
+          |> put_flash(:info, "Клиент отредактирован.")
           |> redirect(to: Routes.node_path(conn, :show, node))
         else
           conn
@@ -84,7 +84,7 @@ defmodule AcariServerWeb.NodeController do
     AcariServer.Master.delete_tunnel(node.name)
 
     conn
-    |> put_flash(:info, "Узел удален.")
+    |> put_flash(:info, "Клиент удален.")
     |> redirect(to: Routes.node_path(conn, :index))
   end
 end
