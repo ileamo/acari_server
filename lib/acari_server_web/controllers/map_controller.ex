@@ -9,7 +9,7 @@ defmodule AcariServerWeb.MapController do
       end
       |> Enum.map(fn
         %{latitude: lat, longitude: lng, name: name, description: descr} when is_float(lat) and is_float(lng) ->
-          %{lat: lat, lng: lng, title: "<b>#{name}</b><br> #{descr}"}
+          %{lat: lat, lng: lng, title: "<a href='/tunnel/#{name}'>#{name}</a><br/>#{descr}"}
 
         _ ->
           %{lat: 55.777594, lng: 37.737926}
