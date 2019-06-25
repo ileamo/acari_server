@@ -1,4 +1,4 @@
-<h1>Edit Server</h1>
+<h1>Редактировать Сервер</h1>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.server_path(@conn, :update, @server)) %>
 

@@ -801,8 +801,14 @@ defmodule AcariServer.Mnesia do
       |> link_list_to_map()
 
     nodes
-    |> Enum.map(fn %{name: name, description: descr} ->
-      %{name: name, description: descr, server: node_to_name[name_to_server[name]]}
+    |> Enum.map(fn %{name: name, description: descr, latitude: lat, longitude: lng} ->
+      %{
+        name: name,
+        description: descr,
+        latitude: lat,
+        longitude: lng,
+        server: node_to_name[name_to_server[name]]
+      }
       |> Map.merge(
         case status[name] do
           nil -> %{}

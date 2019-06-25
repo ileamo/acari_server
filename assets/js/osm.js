@@ -26,8 +26,8 @@ if (osm) {
   }).addTo(mymap);
 
   mymap.attributionControl.setPrefix(false);
-  var markerIcon = L.AwesomeMarkers.icon({
-    markerColor: 'blue',
+  let markerIconConf = L.AwesomeMarkers.icon({
+    markerColor: 'purple',
     prefix: 'fa',
     extraClasses: 'fas',
     icon: 'cat',
@@ -40,13 +40,24 @@ if (osm) {
     iconColor: '#000000',
   });
 
+  let colors = ['lightgray', 'red', 'orange', 'blue', 'green']
+  let markerIcon = colors.map(function(color) {
+    return (
+      L.AwesomeMarkers.icon({
+        markerColor: color,
+        prefix: 'fa',
+        extraClasses: 'fas',
+        icon: 'cat',
+        iconColor: '#000000',
+      }));
+  })
+
   if (osm.dataset.markers) {
     let markers = JSON.parse(decodeURIComponent(osm.dataset.markers))
     for (var i = 0; i < markers.length; i++) {
       let point = markers[i];
       let marker = L.marker([point.lat, point.lng], {
-        icon: markerIcon,
-        //title: point.title,
+        icon: markerIcon[point.alert || 0],
       }).addTo(mymap);
 
       marker.bindPopup(point.title)
@@ -59,7 +70,7 @@ if (osm) {
   } else {
 
     let marker = L.marker([prevPos.lat, prevPos.lng], {
-      icon: markerIcon,
+      icon: markerIconConf,
       draggable: osm.dataset.setlocation ? 'true' : false
     });
     mymap.addLayer(marker);
@@ -73,7 +84,7 @@ if (osm) {
         searchLabel: 'Введите адрес',
         keepResult: false,
         marker: { // optional: L.Marker    - default L.Icon.Default
-          icon: markerIcon,
+          icon: markerIconConf,
           draggable: false,
         },
         //style: 'bar',

@@ -7,13 +7,18 @@ defmodule AcariServerWeb.MapController do
         "" -> AcariServer.NodeManager.list_nodes_wo_preload()
         n -> AcariServer.GroupManager.get_group!(n).nodes
       end
+      |> AcariServer.Mnesia.get_tunnel_list()
+      |> IO.inspect()
       |> Enum.map(fn
-        %{latitude: lat, longitude: lng, name: name, description: descr} when is_float(lat) and is_float(lng) ->
-          %{lat: lat, lng: lng, title: "<a href='/tunnel/#{name}'>#{name}</a><br/>#{descr}"}
-
-        _ ->
-          %{lat: 55.777594, lng: 37.737926}
+        %{latitude: lat, longitude: lng, name: name, description: descr} = node ->
+          %{
+            lat: lat || 55.777594,
+            lng: lng || 37.737926,
+            alert: node[:alert] || 0,
+            title: "<a href='/tunnel/#{name}'>#{name}</a><br/>#{descr}"
+          }
       end)
+      |> IO.inspect()
 
     case nodes do
       [] ->
