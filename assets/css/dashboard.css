@@ -96,7 +96,8 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts"
 }
 
 .sidebar .nav-link:hover {
-  color: #333;
+  color: #000;
+  background-color: #eee;
 }
 
 /*
