@@ -64,7 +64,9 @@
               <%= if dsl != [] or usl != [] do %>
                 <p class="alert alert-danger" role="alert">
                   <%= if dsl != [] do %>
-                    Сервер <%= dsl |> Enum.join(", ") %> не работает
+                    <%= for ser <- dsl do %>
+                    Сервер <%= ser %> не работает</br>
+                    <% end %>
                     <%= if usl != [] do %>
                       </br>
                     <% end %>

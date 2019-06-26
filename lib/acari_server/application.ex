@@ -6,6 +6,7 @@ defmodule AcariServer.Application do
   use Application
 
   def start(_type, _args) do
+    set_secret_key()
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
@@ -21,8 +22,8 @@ defmodule AcariServer.Application do
       AcariServer.TemplateAgent,
       AcariServer.NodeMonitorAgent,
       AcariServer.ServerMonitor,
-      AcariServer.Sup,
-      #{Task.Supervisor, name: AcariServer.TaskSup}
+      AcariServer.Sup
+      # {Task.Supervisor, name: AcariServer.TaskSup}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -36,5 +37,21 @@ defmodule AcariServer.Application do
   def config_change(changed, _new, removed) do
     AcariServerWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  def set_secret_key() do
+    :ets.new(:secret, [:set, :protected, :named_table])
+
+    secret_key =
+      JOSE.JWS.generate_key(%{"alg" => "HS512"})
+      |> JOSE.JWK.to_map()
+      |> elem(1)
+      |> Map.take(["k", "kty"])
+
+    :ets.insert(:secret, {:guardian_secret_key, secret_key})
+  end
+
+  def get_secret_key() do
+    :ets.lookup_element(:secret, :guardian_secret_key, 2)
   end
 end
