@@ -40,5 +40,8 @@
             </div>
         </div>
     </section>
-    <div id="mapid" style="height:800px"></div>
+    <div class="mt-3">
+      <hr>
+      <%= render "session.html", assigns %>
+    </div>
 </div>

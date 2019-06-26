@@ -7,8 +7,9 @@ defmodule AcariServer.Mnesia.Attr do
   def event(), do: [:id, :timestamp, :level, :header, :text]
   def stat(), do: [:key, :value]
   def zabbix(), do: [:id, :host, :key, :value, :timestamp]
+  def session(), do: [:jti, :params]
 
-  def table_list(), do: [:server, :tun, :link, :event, :stat, :zabbix]
+  def table_list(), do: [:server, :tun, :link, :event, :stat, :zabbix, :session]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -756,6 +757,24 @@ defmodule AcariServer.Mnesia do
 
   def get_zabbix(host) do
     match(:zabbix, %{host: host})
+  end
+
+  # session
+
+  def add_session(jti, params) do
+    Mnesia.transaction(fn ->
+      Mnesia.write({:session, jti, params})
+    end)
+  end
+
+  def delete_session(jti) do
+    Mnesia.transaction(fn ->
+      Mnesia.delete({:session, jti})
+    end)
+  end
+
+  def get_sessions() do
+    match(:session)
   end
 
   # API

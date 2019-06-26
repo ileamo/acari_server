@@ -39,7 +39,11 @@ defmodule AcariServerWeb.SessionController do
   defp login_reply({:ok, user}, conn, prev_path) do
     conn
     |> put_flash(:success, "Welcome back!")
-    |> Guardian.Plug.sign_in(user)
+    |> Guardian.Plug.sign_in(%{
+      user: user,
+      remote_ip: conn.remote_ip,
+      user_agent: conn.req_headers |> Enum.into(%{}) |> Map.get("user-agent")
+    })
     |> redirect(to: prev_path)
   end
 

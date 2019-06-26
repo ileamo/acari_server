@@ -3,7 +3,7 @@ defmodule AcariServer.UserManager.Guardian do
 
   alias AcariServer.UserManager
 
-  def subject_for_token(user, _claims) do
+  def subject_for_token(%{user: user}, _claims) do
     {:ok, to_string(user.id)}
   end
 
@@ -14,10 +14,15 @@ defmodule AcariServer.UserManager.Guardian do
     end
   end
 
-  """
   # Callbacks
   def after_encode_and_sign(resource, claims, token, _options) do
     IO.inspect({claims, token, resource}, label: "SIGN")
+
+    AcariServer.Mnesia.add_session(
+      claims["jti"],
+      claims |> Map.merge(resource) |> Map.put(:server, Node.self())
+    )
+
     {:ok, token}
   end
 
@@ -33,7 +38,7 @@ defmodule AcariServer.UserManager.Guardian do
 
   def on_revoke(claims, token, _options) do
     IO.inspect({claims, token}, label: "ON_REVOKE")
+    AcariServer.Mnesia.delete_session(claims["jti"])
     {:ok, claims}
   end
-  """
 end

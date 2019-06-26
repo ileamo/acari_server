@@ -1,0 +1,26 @@
+<% sessions = AcariServer.Mnesia.get_sessions() %>
+<h2>Активные пользователи</h2>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+  <thead>
+    <tr>
+      <th scope="col">Пользователь</th>
+      <th scope="col">Сервер</th>
+      <th scope="col">IP адрес</th>
+      <th scope="col">Время</th>
+
+    </tr>
+  </thead>
+  <tbody>
+<%= for %{params: ses} <- sessions do %>
+    <tr>
+      <td><%= ses.user.username %></td>
+      <td>
+        <%= ses.server %>
+      </td>
+      <td><%= ses.remote_ip |> :inet.ntoa() |> to_string() %></td>
+      <td><%= AcariServer.get_local_time(ses["iat"]) %></td>
+
+    </tr>
+<% end %>
+  </tbody>
+</table>
