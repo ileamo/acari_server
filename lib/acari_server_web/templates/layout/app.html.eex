@@ -101,8 +101,8 @@
             </button>
           </div>
           <div class="modal-body">
-            <p>Группа сетевые системы - NSG</p>
-            <p>Версия 0.0.1</p>
+            <p>ООО "ЭН-ЭС-ДЖИ" (NSG Ltd.)</p>
+            <p>Версия <%= Mix.Project.config[:version] %></p>
           </div>
         </div>
       </div>
