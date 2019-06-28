@@ -9,3 +9,12 @@ $('#collapseMessages').on('show.bs.collapse', function () {
 })
 
 $('#collapseMessages').collapse(sessionStorage.showMessages || 'show')
+
+
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+
+$('.popover-dismiss').popover({
+  trigger: 'focus'
+})

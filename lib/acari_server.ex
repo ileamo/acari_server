@@ -21,8 +21,8 @@ defmodule AcariServer do
   end
 
   def get_local_time(system_time) do
-    {_, {h, m, s}} = :calendar.system_time_to_local_time(system_time, :second)
-    :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s])
+    {{y, mn, d}, {h, m, s}} = :calendar.system_time_to_local_time(system_time, :second)
+    :io_lib.format("~4..0B-~2..0B-~2..0B ~2..0B:~2..0B:~2..0B", [y, mn, d, h, m, s])
   end
 
 end

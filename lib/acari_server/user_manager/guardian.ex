@@ -28,6 +28,7 @@ defmodule AcariServer.UserManager.Guardian do
 
   def on_verify(claims, token, _options) do
     IO.inspect({claims, token}, label: "ON_VERIFY")
+    AcariServer.Mnesia.update_session_activity(claims["jti"])
     {:ok, claims}
   end
 

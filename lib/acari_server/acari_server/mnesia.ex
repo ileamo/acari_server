@@ -7,7 +7,7 @@ defmodule AcariServer.Mnesia.Attr do
   def event(), do: [:id, :timestamp, :level, :header, :text]
   def stat(), do: [:key, :value]
   def zabbix(), do: [:id, :host, :key, :value, :timestamp]
-  def session(), do: [:jti, :params]
+  def session(), do: [:jti, :params, :activity]
 
   def table_list(), do: [:server, :tun, :link, :event, :stat, :zabbix, :session]
 
@@ -640,6 +640,14 @@ defmodule AcariServer.Mnesia do
     })
   end
 
+  def broadcast_sessions() do
+    sessions_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "session.html", [])
+
+    Endpoint.broadcast!("room:lobby", "link_event", %{
+      sessions: sessions_html
+    })
+  end
+
   # event
 
   def update_event(ev) do
@@ -763,13 +771,30 @@ defmodule AcariServer.Mnesia do
 
   def add_session(jti, params) do
     Mnesia.transaction(fn ->
-      Mnesia.write({:session, jti, params})
+      Mnesia.write({:session, jti, params, :os.system_time(:second)})
     end)
+
+    broadcast_sessions()
   end
 
   def delete_session(jti) do
     Mnesia.transaction(fn ->
       Mnesia.delete({:session, jti})
+    end)
+
+    broadcast_sessions()
+  end
+
+  def update_session_activity(jti) do
+    Mnesia.transaction(fn ->
+      case Mnesia.wread({:session, jti}) do
+        [] ->
+          Logger.error("No session with jti = #{jti}")
+
+        [record] ->
+          Mnesia.write(Rec.session(record, activity: :os.system_time(:second)))
+          broadcast_sessions()
+      end
     end)
   end
 

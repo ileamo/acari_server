@@ -71,6 +71,7 @@ let messagesBadge = document.querySelector("#num-of-mes")
 let messagesContainer = document.querySelector("#event-log")
 let statisticsContainer = document.querySelector("#statistics")
 let progressContainer = document.querySelector("#progress")
+let sessionsContainer = document.querySelector("#sessions")
 
 channel.on("link_event", payload => {
   if (payload.reload) {
@@ -89,6 +90,10 @@ channel.on("link_event", payload => {
     }
     if (progressContainer && payload.progress) {
       progressContainer.innerHTML = `${payload.progress}`
+    }
+    if (sessionsContainer && payload.sessions) {
+      sessionsContainer.innerHTML = `${payload.sessions}`
+      table.draw(true);
     }
   }
 })

@@ -104,7 +104,7 @@
           </div>
           <div class="modal-body">
             <p>ООО "ЭН-ЭС-ДЖИ" (NSG Ltd.)</p>
-            <p>Версия <%= Mix.Project.config[:version] %></p>
+            <p>Версия <%= {:ok, vsn} = :application.get_key(:acari_server, :vsn); vsn %></p>
           </div>
         </div>
       </div>

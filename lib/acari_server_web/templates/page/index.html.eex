@@ -40,8 +40,7 @@
             </div>
         </div>
     </section>
-    <div class="mt-3">
-      <hr>
+    <div id="sessions" class="mt-3">
       <%= render "session.html", assigns %>
     </div>
 </div>
