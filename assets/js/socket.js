@@ -93,7 +93,7 @@ channel.on("link_event", payload => {
     }
     if (sessionsContainer && payload.sessions) {
       sessionsContainer.innerHTML = `${payload.sessions}`
-      table.draw(true);
+      $(".user_agent_popover").popover()
     }
   }
 })

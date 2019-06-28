@@ -8,7 +8,6 @@ defmodule AcariServerWeb.MapController do
         n -> AcariServer.GroupManager.get_group!(n).nodes
       end
       |> AcariServer.Mnesia.get_tunnel_list()
-      |> IO.inspect()
       |> Enum.map(fn
         %{latitude: lat, longitude: lng, name: name, description: descr} = node ->
           %{
@@ -18,7 +17,6 @@ defmodule AcariServerWeb.MapController do
             title: "<a href='/tunnel/#{name}'>#{name}</a><br/>#{descr}"
           }
       end)
-      |> IO.inspect()
 
     case nodes do
       [] ->

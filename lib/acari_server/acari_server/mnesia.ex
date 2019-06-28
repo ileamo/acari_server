@@ -799,7 +799,20 @@ defmodule AcariServer.Mnesia do
   end
 
   def get_sessions() do
+    node_to_name = get_node_to_name_map()
+    tm = :os.system_time(:second)
+
     match(:session)
+    |> Enum.reject(fn %{params: params, activity: act} ->
+      if params["exp"] < tm, do: delete_session(params["jti"])
+      act + 15 * 60 < tm
+    end)
+    |> Enum.map(fn %{params: params} = item ->
+
+      item |> put_in([:params, :server], node_to_name[params.server])
+    end)
+
+    |> Enum.sort_by(fn %{params: params} -> params["iat"] end, &>=/2)
   end
 
   # API

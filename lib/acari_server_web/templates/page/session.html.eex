@@ -8,25 +8,21 @@
       <th scope="col">Сервер</th>
       <th scope="col">IP адрес</th>
       <th scope="col">Агент</th>
-      <th scope="col">Годен до</th>
       <th scope="col">Активность</th>
 
     </tr>
   </thead>
   <tbody>
 <%= for %{params: ses, activity: act} <- sessions do %>
-<% IO.inspect({ses, act}) %>
     <tr>
-      <td><%= AcariServer.get_local_time(ses["iat"]) %></td>
+      <td><%= AcariServer.get_local_date(ses["iat"]) %></td>
       <td><%= ses.user.username %></td>
       <td><%= ses.server %></td>
       <td><%= ses.remote_ip |> :inet.ntoa() |> to_string() %></td>
-  <%#    <td><%= (ses.user_agent |> String.slice(0, 32))<>"..." % ></td> %>
-      <td> <a tabindex="0" class="" data-toggle="popover" data-trigger="focus"
+      <td> <a tabindex="0" class="user_agent_popover" data-toggle="popover" data-trigger="focus"
             data-content="<%= ses.user_agent %>">
             <%= (ses.user_agent |> String.slice(0, 32))<>"..." %>
       </a></td>
-      <td><%= AcariServer.get_local_time(ses["exp"]) %></td>
       <td><%= AcariServer.get_local_time(act) %></td>
     </tr>
 <% end %>

@@ -16,7 +16,7 @@ defmodule AcariServer.UserManager.Guardian do
 
   # Callbacks
   def after_encode_and_sign(resource, claims, token, _options) do
-    IO.inspect({claims, token, resource}, label: "SIGN")
+    #IO.inspect({claims, token, resource}, label: "SIGN")
 
     AcariServer.Mnesia.add_session(
       claims["jti"],
@@ -27,18 +27,18 @@ defmodule AcariServer.UserManager.Guardian do
   end
 
   def on_verify(claims, token, _options) do
-    IO.inspect({claims, token}, label: "ON_VERIFY")
+    #IO.inspect({claims, token}, label: "ON_VERIFY")
     AcariServer.Mnesia.update_session_activity(claims["jti"])
     {:ok, claims}
   end
 
   def on_refresh({old_token, old_claims}, {new_token, new_claims}, _options) do
-    IO.inspect({old_claims, new_claims}, label: "ON_REFRESH")
+    #IO.inspect({old_claims, new_claims}, label: "ON_REFRESH")
     {:ok, {old_token, old_claims}, {new_token, new_claims}}
   end
 
   def on_revoke(claims, token, _options) do
-    IO.inspect({claims, token}, label: "ON_REVOKE")
+    #IO.inspect({claims, token}, label: "ON_REVOKE")
     AcariServer.Mnesia.delete_session(claims["jti"])
     {:ok, claims}
   end
