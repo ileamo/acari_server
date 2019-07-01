@@ -63,8 +63,8 @@
     <% end %>
   <% end %>
 
-  <%  lat = assigns[:node] && @node.latitude || 55.777594
-      lng = assigns[:node] && @node.longitude || 37.737926
+  <%  lat = assigns[:node] && @node.latitude || @changeset.data.latitude || 55.777594
+      lng = assigns[:node] && @node.longitude || @changeset.data.longitude || 37.737926
   %>
 
 

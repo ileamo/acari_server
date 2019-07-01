@@ -75,7 +75,7 @@ defmodule AcariServerWeb.NewNodeController do
     new_node = NewNodeDiscovery.get_new_node!(id)
 
     redirect(conn,
-      to: Routes.node_path(conn, :new, name: new_node.name)
+      to: Routes.node_path(conn, :new, new_node.params)
     )
   end
 

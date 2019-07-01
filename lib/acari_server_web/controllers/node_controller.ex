@@ -21,7 +21,14 @@ defmodule AcariServerWeb.NodeController do
   end
 
   def new(conn, params) do
-    changeset = NodeManager.change_node(%Node{name: params["name"]})
+    IO.inspect(params)
+
+    changeset =
+      NodeManager.change_node(%Node{name: params["id"],
+      latitude: params["latitude"],
+      longitude: params["longitude"]
+      })
+
     render(conn, "new.html", changeset: changeset)
   end
 
