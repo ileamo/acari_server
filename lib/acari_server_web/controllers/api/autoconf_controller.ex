@@ -36,6 +36,13 @@ defmodule AcariServerWeb.Api.AutoconfController do
        ) do
     case AcariServer.NodeManager.get_node_with_script(node_name) do
       %{} = node ->
+        with {lat, _} <- Float.parse(params["latitude"] |> to_string()),
+             {lng, _} <- Float.parse(params["longitude"] |> to_string()) do
+          node
+          |> AcariServer.Repo.preload(:groups)
+          |> AcariServer.NodeManager.update_node(%{latitude: lat, longitude: lng})
+        end
+
         conn
         |> assign(:sfx, SFX.create_sfx(:remote, node, params))
 
