@@ -14,10 +14,11 @@ config :acari_server, AcariServerWeb.Endpoint,
   http: [port: 50080],
   https: [
     port: 50443,
-    cipher_suite: :strong,
+    #cipher_suite: :strong,
     keyfile: "/etc/ssl/acari/privkey.pem",
     cacertfile: "/etc/ssl/acari/chain.pem",
-    certfile: "/etc/ssl/acari/cert.pem"
+    certfile: "/etc/ssl/acari/cert.pem",
+    versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
   ],
   # This is critical for ensuring web-sockets properly authorize.
   url: [host: "localhost", port: 50443],
