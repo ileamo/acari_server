@@ -8,7 +8,7 @@ if (node_monitor) {
   channel.join()
   .receive("ok", resp => {
     //console.log("node_monitor: Joined successfully", resp)
-    //getScript()
+    getLastScript()
   })
   .receive("error", resp => {
     console.log("node_monitor: Unable to join", resp)
@@ -39,10 +39,17 @@ if (node_monitor) {
 
   function getScript() {
     sessionStorage.setItem("lastScript" + window.location.pathname, this.id)
-    //console.log("SCRIPT", sessionStorage)
     channel.push('input', {
       input: "get_script",
       script: this.id
+    })
+  }
+
+  function getLastScript() {
+    let id = sessionStorage.getItem("lastScript" + window.location.pathname)
+    channel.push('input', {
+      input: "get_script",
+      script: id
     })
   }
 
@@ -52,8 +59,8 @@ if (node_monitor) {
   document.getElementById("nm-update-script").addEventListener("click", updateScript, false);
 
   function updateScript() {
-    var id = sessionStorage.getItem("lastScript" + window.location.pathname)
-    var r = confirm("Выполнить скрипт "+id+" на клиенте?")
+    let id = sessionStorage.getItem("lastScript" + window.location.pathname)
+    let r = confirm("Выполнить скрипт "+id+" на клиенте?")
     if (r) {
       document.querySelector("#nm-script-field").innerText = "Wait ..."
       channel.push('input', {

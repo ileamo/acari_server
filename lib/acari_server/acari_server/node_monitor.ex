@@ -37,13 +37,29 @@ defmodule AcariServer.NodeMonitor do
           self(),
           "script",
           AcariServer.Mnesia.get_tunnel_state(tun_name)[params["script"]] || "Нет данных",
-          AcariServer.TemplateManager.get_template_by_name(params["script"]).description
+          with %AcariServer.TemplateManager.Template{description: descr} <-
+                 AcariServer.TemplateManager.get_template_by_name(params["script"] |> to_string()) do
+            descr
+          else
+            _ -> "Скрипт не определен"
+          end
         )
 
       "script" ->
-        tag = params["script"]
-        AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
-        AcariServer.Master.exec_script_on_peer(tun_name, tag)
+        with tag when is_binary(tag) <- params["script"] do
+          IO.inspect(tag, label: "TAG")
+          AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
+          AcariServer.Master.exec_script_on_peer(tun_name, tag)
+        else
+          _ ->
+            put_data(
+              self(),
+              "script",
+              "                            ^\n" <>
+                "Выберите скрипт из меню ----|",
+              "Скрипт не определен"
+            )
+        end
 
       _ ->
         nil
