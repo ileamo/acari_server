@@ -78,7 +78,7 @@ MS_PrintLicense()
 MS_diskspace()
 {
 	(
-	df -kP "\$1" | tail -1 | awk '{ if (\$4 ~ /%/) {print \$3} else {print \$4} }'
+	df -k "\$1" | tail -1 | awk '{ if (\$4 ~ /%/) {print \$3} else {print \$4} }'
 	)
 }
 
@@ -415,7 +415,7 @@ fi
 
 if test x"$NEED_ROOT" = xy -a \`id -u\` -ne 0; then
 	echo "Administrative privileges required for this archive (use su or sudo)" >&2
-	exit 1	
+	exit 1
 fi
 
 if test x"\$copy" \!= xphase2; then
@@ -506,7 +506,7 @@ fi
 
 if test x"\$quiet" = xn; then
 	MS_Printf "Uncompressing \$label"
-	
+
     # Decrypting with openssl will ask for password,
     # the prompt needs to start on new line
 	if test x"$ENCRYPT" = xy; then

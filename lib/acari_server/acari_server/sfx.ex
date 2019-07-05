@@ -98,6 +98,8 @@ defmodule AcariServer.SFX do
            System.cmd(
              makeself_sh,
              [
+               "--nomd5",
+               "--nocrc",
                dir_path,
                sfx_filename,
                "acari",
