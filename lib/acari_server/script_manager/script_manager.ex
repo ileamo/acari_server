@@ -50,6 +50,11 @@ defmodule AcariServer.ScriptManager do
     |> Repo.preload(:templates)
   end
 
+  def get_script(id) do
+    Script
+    |> Repo.get(id)
+  end
+
   @doc """
   Creates a script.
 

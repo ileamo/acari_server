@@ -1,0 +1,21 @@
+<%= if map_size(@vars) != 0 do %>
+
+  <h2> Параметры: </h2>
+  <%= for  {k, v}  <-  @vars  do %>
+    <div class="form-group row">
+      <%= label :node, k, k, class: "col-sm-2 col-form-label" %>
+      <% value = @node_params && @node_params[k] %>
+      <% opts = [class: "form-control", onfocus: "this.style.color='#000'"] ++
+      (value && [value: value] || [value: is_binary(v) && v || Enum.at(v, 0), style: "color: #AAA"]) %>
+
+      <div class="col-sm-10">
+        <%= if is_binary(v) do %>
+        <%= text_input :params, k, opts %>
+        <% else %>
+        <%= select :params, k, v, opts %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+<% end %>

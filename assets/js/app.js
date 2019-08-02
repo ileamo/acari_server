@@ -37,6 +37,6 @@ dt(window, $);
 import "./tables.js";
 import "./xterm.js"
 import "./node_monitor.js"
-import "./node_config.js"
+import "./class_select.js"
 import "./graph.js"
 import "./osm.js"
