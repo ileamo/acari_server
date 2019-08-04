@@ -40,16 +40,28 @@
   </div>
 
   <div id="node_parameters_input_form">
-    <%  {vars, params} = if @changeset.changes[:script_id] do
+    <%
+        vars = if @changeset.changes[:script_id] do
           script = AcariServer.ScriptManager.get_script(@changeset.changes.script_id)
-          {AcariServer.Template.get_vars(script.definition), @changeset.changes[:params]}
+          AcariServer.Template.get_vars(script.definition)
         else
           if assigns[:node] && @node.script do
-            {AcariServer.Template.get_vars(@node.script.definition), @node.params}
+            AcariServer.Template.get_vars(@node.script.definition)
           else
-            {%{}, nil}
+            %{}
           end
         end
+
+        params = if @changeset.changes[:params] do
+          @changeset.changes.params
+        else
+          if assigns[:node] do
+            @node.params
+          else
+            nil
+          end
+        end
+
     %>
     <%= render "parameters_form.html", vars: vars, node_params: params %>
   </div>

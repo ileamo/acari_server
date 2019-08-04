@@ -3,7 +3,7 @@ defmodule AcariServerWeb.ClassChangeChannel do
 
   def join("class_change:" <> _id, %{"pathname" => pathname}, socket) do
     node_id =
-      case Regex.run(~r|([\d]+)/edit$|, pathname) do
+      case Regex.run(~r|nodes/([\d]+)|, pathname) do
         [_, id] -> String.to_integer(id)
         _ -> nil
       end
