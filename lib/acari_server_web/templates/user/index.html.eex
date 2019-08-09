@@ -4,6 +4,7 @@
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Админ</th>
+      <th scope="col">Группы</th>
 
       <th scope="col"></th>
     </tr>
@@ -15,6 +16,7 @@
         <%= link user.username, to: Routes.user_path(@conn, :show, user) %>
       </td>
       <td><%= if user.is_admin, do: "Да", else: "Нет" %></td>
+      <td><%= AcariServer.GroupManager.groups_list(user) %></td>
 
       <td>
         <%= link "Редактировать", to: Routes.user_path(@conn, :edit, user) %>
