@@ -16,7 +16,7 @@ config :acari_server, AcariServerWeb.Endpoint,
     port: 50443,
     #cipher_suite: :strong,
     keyfile: "/etc/ssl/acari/privkey.pem",
-    cacertfile: "/etc/ssl/acari/chain.pem",
+    #cacertfile: "/etc/ssl/acari/chain.pem",
     certfile: "/etc/ssl/acari/cert.pem",
     versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
   ],
