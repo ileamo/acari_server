@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.template_path(@conn, :update, @template)) %>
 
-<span><%= link "Назад", to: Routes.template_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>

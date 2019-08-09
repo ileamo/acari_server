@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.script_path(@conn, :create)) %>
 
-<span><%= link "Назад", to: Routes.script_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.script_path(@conn, :index) %></span>

@@ -26,4 +26,4 @@
 
 <span><%= link "Редактировать", to: Routes.user_path(@conn, :edit, @user) %></span>
 |
-<span><%= link "Назад", to: Routes.user_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.user_path(@conn, :index) %></span>

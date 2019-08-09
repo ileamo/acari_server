@@ -26,4 +26,4 @@
 
 <span><%= link "Редактироать", to: Routes.group_path(@conn, :edit, @group) %></span>
 |
-<span><%= link "Назад", to: Routes.group_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.group_path(@conn, :index) %></span>

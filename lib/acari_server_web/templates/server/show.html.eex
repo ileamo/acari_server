@@ -20,4 +20,5 @@
 </ul>
 
 <span><%= link "Редактировать", to: Routes.server_path(@conn, :edit, @server) %></span>
-<span><%= link "Назад", to: Routes.server_path(@conn, :index) %></span>
+|
+<span><%= link "К списку", to: Routes.server_path(@conn, :index) %></span>
