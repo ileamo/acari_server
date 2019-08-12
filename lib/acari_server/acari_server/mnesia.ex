@@ -126,6 +126,8 @@ defmodule AcariServer.Mnesia do
       end)
     end)
 
+    set_tun_distr()
+
     if is_master_server() do
       redistribute_tun()
 
@@ -143,6 +145,10 @@ defmodule AcariServer.Mnesia do
 
   def get_down_servers() do
     match(:server, %{up: false}) |> Enum.map(fn %{name: name} -> name end)
+  end
+
+  def get_up_servers() do
+    match(:server, %{up: true}) |> Enum.map(fn %{name: name} -> name end)
   end
 
   def is_master_server() do
@@ -355,7 +361,12 @@ defmodule AcariServer.Mnesia do
             {{node, node_to_name[node], num}, acc + num}
           end)
 
-        list = list |> Enum.map(fn {node, name, q} -> {node, name, q, 100 * q / sum} end)
+        list =
+          list
+          |> Enum.map(fn {node, name, q} ->
+            {node, name, q, if(sum == 0, do: 0, else: 100 * q / sum)}
+          end)
+
         set_stat(:tun_distr, {list, sum})
 
       _ ->
@@ -390,18 +401,20 @@ defmodule AcariServer.Mnesia do
   end
 
   def redistribute_tun() do
-    with {server_list, tun_num} when is_integer(tun_num) and tun_num > 0 <- get_tun_distr(),
-         down_server_list <- get_down_servers(),
-         up_server_num when up_server_num > 0 <- length(server_list) - length(down_server_list) do
+    with {server_list, tun_num} when is_integer(tun_num) and tun_num > 0 <-
+           get_tun_distr(),
+         up_server_list <- get_up_servers(),
+         up_server_num when up_server_num > 0 <-
+           length(up_server_list) do
       avg_tun_num = tun_num / up_server_num
 
       {decr, incr} =
         server_list
         |> Enum.map(fn {node, name, num, _} ->
           {node,
-           case Enum.member?(down_server_list, name) do
-             true -> -tun_num
-             _ -> round(avg_tun_num - num)
+           case Enum.member?(up_server_list, name) do
+             true -> round(avg_tun_num - num)
+             _ -> -tun_num
            end}
         end)
         |> Enum.split_with(fn {_, inc} -> inc < 0 end)
@@ -808,10 +821,8 @@ defmodule AcariServer.Mnesia do
       act + 15 * 60 < tm
     end)
     |> Enum.map(fn %{params: params} = item ->
-
       item |> put_in([:params, :server], node_to_name[params.server])
     end)
-
     |> Enum.sort_by(fn %{params: params} -> params["iat"] end, &>=/2)
   end
 
