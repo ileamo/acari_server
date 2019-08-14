@@ -37,12 +37,7 @@ defmodule AcariServer.NodeMonitor do
           self(),
           "script",
           AcariServer.Mnesia.get_tunnel_state(tun_name)[params["script"]] || "Нет данных",
-          with %AcariServer.TemplateManager.Template{description: descr} <-
-                 AcariServer.TemplateManager.get_template_by_name(params["script"] |> to_string()) do
-            descr
-          else
-            _ -> "Скрипт не определен"
-          end
+          get_templ_descr_by_name(params["script"])
         )
 
       "script" ->
@@ -71,6 +66,16 @@ defmodule AcariServer.NodeMonitor do
   def handle_cast({:output, id, data, opt}, %{output_pid: output_pid} = state) do
     send(output_pid, {:output, id, data, opt})
     {:noreply, state}
+  end
+
+  # functions
+  def get_templ_descr_by_name(name) do
+    with %AcariServer.TemplateManager.Template{description: descr} <-
+           AcariServer.TemplateManager.get_template_by_name(name |> to_string()) do
+      descr
+    else
+      _ -> "Скрипт не определен"
+    end
   end
 
   # API

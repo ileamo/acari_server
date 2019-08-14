@@ -2,34 +2,39 @@
 
 <% grp_scripts = get_group_scripts(@group) %>
 
+<div id="grp_oper" data-group_id="<%= @group.id %>">
 
-<nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
-    <div class="navbar p-0">
-      <span class="navbar-brand" id="nm-script-name">Скрипт</span>
-    </div>
-
-    <ul class="navbar-nav mr-auto pr-3">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Скрипт
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="nm-script">
-          <%= for {descr, script_name} <- grp_scripts.common_script do %>
-            <%= link descr, to: "#", class: "dropdown-item", id: script_name %>
-          <% end %>
+  <%= if is_map(grp_scripts.common_script) and MapSet.size(grp_scripts.common_script) != 0 do %>
+    <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
+        <div class="navbar p-0">
+          <span class="navbar-brand" id="go-script-name">Скрипт</span>
         </div>
-      </li>
-    </ul>
 
-    <div class="navbar">
-        <button id="nm-update-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
-          Выполнить
-        </button>
-    </div>
-</nav>
-<pre><code id="nm-script-field">Нет данных</code></pre>
+        <ul class="navbar-nav mr-auto pr-3">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Скрипт
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="go-script">
+              <%= for {descr, script_name} <- grp_scripts.common_script do %>
+                <%= link descr, to: "#", class: "dropdown-item", id: script_name %>
+              <% end %>
+            </div>
+          </li>
+        </ul>
 
+        <div class="navbar">
+            <button id="go-update-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+              Выполнить
+            </button>
+        </div>
+    </nav>
+  <pre><code id="go-script-field">Нет данных</code></pre>
+  <% else %>
+    <p>Нет общих скриптов для всех клиентов группы</p>
+  <% end %>
 
+</div>
 
 
 <pre><code>

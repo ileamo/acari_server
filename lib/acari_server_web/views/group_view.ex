@@ -22,7 +22,7 @@ defmodule AcariServerWeb.GroupView do
 
           {{class.id, class.name},
            class.templates
-           |> Enum.map(fn %{description: name, id: id} -> {name, id} end)
+           |> Enum.map(fn %{description: descr, name: name} -> {descr, name} end)
            |> MapSet.new()}
       end)
 
