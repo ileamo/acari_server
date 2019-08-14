@@ -62,4 +62,9 @@ defmodule AcariServerWeb.GroupController do
     |> put_flash(:info, "Группа удалена.")
     |> redirect(to: Routes.group_path(conn, :index))
   end
+
+  def oper(conn, %{"id" => id}) do
+    group = GroupManager.get_group!(id)
+    render(conn, "oper.html", group: group)
+  end
 end

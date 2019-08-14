@@ -43,7 +43,7 @@ defmodule AcariServerWeb.Router do
     pipe_through [:browser, :auth, :ensure_auth]
 
     post "/logout", SessionController, :logout
-    
+
     get "/", PageController, :index
     get "/zabbix", PageController, :zabbix
 
@@ -55,6 +55,7 @@ defmodule AcariServerWeb.Router do
 
     resources "/users", UserController
     resources "/groups", GroupController
+    get "/groups/:id/oper", GroupController, :oper
     resources "/nodes", NodeController
     resources "/newnodes", NewNodeController
     resources "/scripts", ScriptController
