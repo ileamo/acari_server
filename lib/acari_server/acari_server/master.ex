@@ -185,7 +185,7 @@ defmodule AcariServer.Master do
   end
 
   defp set_script(tun_name, script_id, data) do
-    data = "#{AcariServer.get_local_time()}  #{script_id}\n\n#{data}"
+    data = %{timestamp: :os.system_time(:second), data: data}
     AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
   end
 
@@ -228,6 +228,8 @@ defmodule AcariServer.Master do
       |> Enum.concat(Map.to_list(params))
       |> List.insert_at(0, {"id", tun_name})
       |> Enum.into(%{})
+    else
+      _ -> %{}
     end
   end
 

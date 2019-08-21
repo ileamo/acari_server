@@ -10,9 +10,25 @@ defmodule AcariServerWeb.GrpOperChannel do
 
     case params["cmd"] do
       "get_script" ->
+        script_res_list =
+          AcariServer.GroupManager.get_group!(params["group_id"])
+          |> Map.get(:nodes)
+          |> Enum.map(fn %{name: name} -> name end)
+          |> Enum.map(fn tun_name ->
+            %{timestamp: ts, data: data} =
+              AcariServer.Mnesia.get_tunnel_state(tun_name)[params["template_name"]] ||
+                %{timestamp: 0, data: "нет данных"}
+
+            %{id: tun_name, timestamp: ts, data: data |> to_string() |> String.slice(0, 16)}
+          end)
+
         push(socket, "output", %{
           id: "script",
-          opt: AcariServer.NodeMonitor.get_templ_descr_by_name(params["template_name"])
+          opt: AcariServer.NodeMonitor.get_templ_descr_by_name(params["template_name"]),
+          data:
+            Phoenix.View.render_to_string(AcariServerWeb.GroupView, "oper_res.html",
+              script_res_list: script_res_list
+            )
         })
 
       "script" ->

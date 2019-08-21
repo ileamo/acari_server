@@ -35,7 +35,7 @@ defmodule AcariServer.NodeMonitorAgent do
         AcariServer.NodeMonitor.put_data(
           pid,
           "script",
-          data,
+          AcariServer.NodeMonitor.script_to_string(id, data),
           AcariServer.TemplateManager.get_template_by_name(id).description
         )
 

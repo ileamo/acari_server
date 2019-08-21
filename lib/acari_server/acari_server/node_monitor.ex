@@ -36,7 +36,10 @@ defmodule AcariServer.NodeMonitor do
         put_data(
           self(),
           "script",
-          AcariServer.Mnesia.get_tunnel_state(tun_name)[params["script"]] || "Нет данных",
+          script_to_string(
+            params["script"],
+            AcariServer.Mnesia.get_tunnel_state(tun_name)[params["script"]]
+          ),
           get_templ_descr_by_name(params["script"])
         )
 
@@ -75,6 +78,16 @@ defmodule AcariServer.NodeMonitor do
       descr
     else
       _ -> "Скрипт не определен"
+    end
+  end
+
+  def script_to_string(id, data) do
+    case data do
+      %{timestamp: ts, data: data} ->
+        "#{AcariServer.get_local_time(ts)}  #{id}\n\n#{data}"
+
+      _ ->
+        "Нет данных"
     end
   end
 

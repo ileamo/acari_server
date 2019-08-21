@@ -22,7 +22,11 @@ if (grp_oper) {
     switch (payload.id) {
       case "script":
         document.querySelector("#go-script-name").innerText = `${payload.opt}`
-        document.querySelector("#go-script-field").innerText = `${payload.data}`
+        document.querySelector("#go-script-field").innerHTML = `${payload.data}`
+        $("#datatable").DataTable({
+          stateSave: true,
+          responsive: true
+        });
         break;
 
       default:
@@ -40,6 +44,7 @@ if (grp_oper) {
     sessionStorage.setItem("lastScript" + window.location.pathname, this.id)
     channel.push('input', {
       cmd: "get_script",
+      group_id: grp_oper.dataset.group_id,
       template_name: this.id
     })
   }
@@ -48,6 +53,7 @@ if (grp_oper) {
     let id = sessionStorage.getItem("lastScript" + window.location.pathname)
     channel.push('input', {
       cmd: "get_script",
+      group_id: grp_oper.dataset.group_id,
       template_name: id
     })
   }

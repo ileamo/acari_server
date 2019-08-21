@@ -1,0 +1,20 @@
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+  <thead>
+    <tr>
+      <th scope="col">Имя</th>
+      <th scope="col">Время</th>
+      <th scope="col">Данные</th>
+      <th scope="col">Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for %{id: id, timestamp: ts, data: data} <- @script_res_list do %>
+      <tr>
+        <td><%= id %></td>
+        <td><%= ts %></td>
+        <td><%= data %></td>
+        <td><%= "xxx" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

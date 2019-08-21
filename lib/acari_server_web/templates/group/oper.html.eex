@@ -29,19 +29,20 @@
             </button>
         </div>
     </nav>
-  <pre><code id="go-script-field">Нет данных</code></pre>
+  <div id="go-script-field">Нет данных</div>
   <% else %>
     <p>Нет общих скриптов для всех клиентов группы</p>
   <% end %>
 
 </div>
 
-
+<!--
 <pre><code>
 <%=
   grp_scripts
   |> inspect(pretty: true, charlists: :as_list)
 %>
 </code></pre>
+-->
 
 <span><%= link "К списку", to: Routes.group_path(@conn, :index) %></span>
