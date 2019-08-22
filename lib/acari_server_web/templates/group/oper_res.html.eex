@@ -1,3 +1,9 @@
+<hr/>
+<p><strong>Последний запрос:</strong> <%= AcariServer.get_local_date(@request_date) %></p>
+<button id="go-update-res" class="btn btn-outline-secondary btn-sm py-1 px-2 mb-3">
+  Обновить таблицу
+</button>
+
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
@@ -11,9 +17,18 @@
     <%= for %{id: id, timestamp: ts, data: data} <- @script_res_list do %>
       <tr>
         <td><%= id %></td>
-        <td><%= ts %></td>
+        <td><%= case ts do
+                  0 -> "-"
+                  ts -> AcariServer.get_local_date(ts)
+                end
+        %></td>
         <td><%= data %></td>
-        <td><%= "xxx" %></td>
+        <% {text, color} = cond do
+                  ts > 0 and ts >= @request_date -> {"выполнен", "text-success"}
+                  true -> {"ожидание", "text-warning"}
+                end
+           %>
+        <td class="<%=color%>"><%= text %></td>
       </tr>
     <% end %>
   </tbody>

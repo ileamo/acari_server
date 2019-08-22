@@ -27,6 +27,15 @@ if (grp_oper) {
           stateSave: true,
           responsive: true
         });
+
+        let go_update_res = document.getElementById("go-update-res")
+        if (go_update_res) {
+          go_update_res.addEventListener("click", updateRes, false);
+
+          function updateRes() {getLastScript()}
+        }
+
+        
         break;
 
       default:

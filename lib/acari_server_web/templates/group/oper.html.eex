@@ -1,3 +1,4 @@
+<div  style="min-height: 300px;">
 <h2>Выполнить скрипт для группы "<%= @group.name %>"</h2>
 
 <% grp_scripts = get_group_scripts(@group) %>
@@ -46,3 +47,4 @@
 -->
 
 <span><%= link "К списку", to: Routes.group_path(@conn, :index) %></span>
+</div>

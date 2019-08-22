@@ -8,8 +8,9 @@ defmodule AcariServer.Mnesia.Attr do
   def stat(), do: [:key, :value]
   def zabbix(), do: [:id, :host, :key, :value, :timestamp]
   def session(), do: [:jti, :params, :activity]
+  def grp_oper(), do: [:id, :timestamp, :opt]
 
-  def table_list(), do: [:server, :tun, :link, :event, :stat, :zabbix, :session]
+  def table_list(), do: [:server, :tun, :link, :event, :stat, :zabbix, :session, :grp_oper]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -824,6 +825,20 @@ defmodule AcariServer.Mnesia do
       item |> put_in([:params, :server], node_to_name[params.server])
     end)
     |> Enum.sort_by(fn %{params: params} -> params["iat"] end, &>=/2)
+  end
+
+  #grp_oper
+  def add_grp_oper(group_id, template_name) do
+    Mnesia.transaction(fn ->
+      Mnesia.write({:grp_oper, {group_id, template_name}, :os.system_time(:second), nil})
+    end)
+  end
+
+  def get_grp_oper_timestamp(group_id, template_name) do
+    case Mnesia.dirty_read({:grp_oper, {group_id, template_name}}) do
+      [record] -> record |> Rec.grp_oper(:timestamp)
+      _ -> 0
+    end
   end
 
   # API
