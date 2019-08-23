@@ -32,7 +32,7 @@ defmodule AcariServerWeb.GrpOperChannel do
             AcariServer.Master.exec_script_on_peer(name, tag)
           end)
 
-          Process.sleep(0)
+          Process.sleep(1_000)
           get_script(socket, tag, params["group_id"])
         else
           _ ->
@@ -43,6 +43,28 @@ defmodule AcariServerWeb.GrpOperChannel do
                   "Выберите скрипт из меню ----|</code></pre>",
               opt: "Скрипт не определен"
             })
+        end
+
+      "repeat_script" ->
+        with tag when is_binary(tag) <- params["template_name"] do
+          req_ts = AcariServer.Mnesia.get_grp_oper_timestamp(params["group_id"], tag)
+
+          AcariServer.GroupManager.get_group!(params["group_id"])
+          |> Map.get(:nodes)
+          |> Enum.filter(fn %{name: name} ->
+            with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
+                 %{timestamp: ts} <- stat[tag] do
+              ts < req_ts
+            else
+              _ -> false
+            end
+          end)
+          |> Enum.each(fn %{name: name} ->
+            AcariServer.Master.exec_script_on_peer(name, tag)
+          end)
+
+          Process.sleep(1_000)
+          get_script(socket, tag, params["group_id"])
         end
 
       _ ->
@@ -69,7 +91,6 @@ defmodule AcariServerWeb.GrpOperChannel do
 
         %{id: tun_name, timestamp: ts, data: data |> to_string() |> String.slice(0, 16)}
       end)
-      |> IO.inspect()
 
     push(socket, "output", %{
       id: "script",

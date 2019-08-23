@@ -35,7 +35,25 @@ if (grp_oper) {
           function updateRes() {getLastScript()}
         }
 
-        
+        let go_repeat = document.getElementById("go-repeat")
+        if (go_repeat) {
+          go_repeat.addEventListener("click", repeatReq, false);
+
+          function repeatReq() {
+            let id = sessionStorage.getItem("lastScript" + window.location.pathname)
+            let r = confirm("Повторить скрипт " + id + " для оставшихся клиентов?")
+            if (r) {
+              channel.push('input', {
+                cmd: "repeat_script",
+                template_name: id,
+                group_id: grp_oper.dataset.group_id
+              })
+            }
+
+          }
+        }
+
+
         break;
 
       default:
@@ -76,7 +94,7 @@ if (grp_oper) {
 
     function updateScript() {
       let id = sessionStorage.getItem("lastScript" + window.location.pathname)
-      let r = confirm("Выполнить скрипт " + id + " на клиенте?")
+      let r = confirm("Выполнить скрипт " + id + " для группы?")
       if (r) {
         document.querySelector("#go-script-field").innerText = "Wait ..."
         channel.push('input', {
