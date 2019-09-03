@@ -49,11 +49,8 @@ if (grp_oper) {
                 group_id: grp_oper.dataset.group_id
               })
             }
-
           }
         }
-
-
         break;
 
       default:
@@ -85,9 +82,6 @@ if (grp_oper) {
     })
   }
 
-
-
-
   let go_update_scriprt = document.getElementById("go-update-script")
   if (go_update_scriprt) {
     go_update_scriprt.addEventListener("click", updateScript, false);
@@ -105,5 +99,4 @@ if (grp_oper) {
       }
     }
   }
-
 }
