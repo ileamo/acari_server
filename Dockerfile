@@ -63,9 +63,12 @@ ENV START_ERL_DATA /tmp/app/start_erl.data
 
 ENV SHELL /bin/bash
 
-RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa
+# RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa
 
 USER root
+
+COPY priv/.ssh /home/app/.ssh
+RUN  chown -R app:app /home/app/.ssh
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
