@@ -36,6 +36,7 @@ config :acari_server, AcariServer.Listener,
   certfile: "priv/cert/selfsigned.pem"
 
 config :acari_server, :zabbix,
+  zbx_ext_url: System.get_env("ZBX_EXT_URL"),
   zbx_web_port: System.get_env("ZBX_WEB_PORT"),
   zbx_api_url: System.get_env("ZBX_API_URL"),
   zbx_snd_host: System.get_env("ZBX_SND_HOST"),
