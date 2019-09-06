@@ -78,7 +78,7 @@ config :acari_server, AcariServer.Repo,
   username: "postgres",
   password: "postgres",
   database: "acari_server_dev",
-  hostname: "localhost",
+  hostname: "10.0.10.10",
   pool_size: 10
 
 config :acari_server, AcariServer, allow_unconfigured: false
