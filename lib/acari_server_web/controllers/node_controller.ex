@@ -22,9 +22,10 @@ defmodule AcariServerWeb.NodeController do
 
   def new(conn, params) do
     changeset =
-      NodeManager.change_node(%Node{name: params["id"],
-      latitude: params["latitude"],
-      longitude: params["longitude"]
+      NodeManager.change_node(%Node{
+        name: params["id"],
+        latitude: params["latitude"],
+        longitude: params["longitude"]
       })
 
     render(conn, "new.html", changeset: changeset)
@@ -37,15 +38,9 @@ defmodule AcariServerWeb.NodeController do
       {:ok, node} ->
         AcariServer.NewNodeDiscovery.delete_new_node_by_name(node.name)
 
-        #if node.script_id == nil do
-          conn
-          |> put_flash(:info, "Клиент создан.")
-          |> redirect(to: Routes.node_path(conn, :show, node))
-        #else
-        #  conn
-        #  |> put_flash(:error, "Изменен параметр Класс. Проверьте параметры.")
-        #  |> edit(%{"id" => node.id})
-        #end
+        conn
+        |> put_flash(:info, "Клиент создан.")
+        |> redirect(to: Routes.node_path(conn, :show, node))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -70,15 +65,9 @@ defmodule AcariServerWeb.NodeController do
 
     case NodeManager.update_node(old_node, node_params) do
       {:ok, node} ->
-        # if old_node.script_id == node.script_id or node.script_id == nil do
-          conn
-          |> put_flash(:info, "Клиент отредактирован.")
-          |> redirect(to: Routes.node_path(conn, :show, node))
-        # else
-        #   conn
-        #   |> put_flash(:error, "Изменен параметр Класс. Проверьте параметры.")
-        #   |> edit(%{"id" => node.id})
-        # end
+        conn
+        |> put_flash(:info, "Клиент отредактирован.")
+        |> redirect(to: Routes.node_path(conn, :show, node))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", node: old_node, changeset: changeset)
@@ -92,6 +81,16 @@ defmodule AcariServerWeb.NodeController do
 
     conn
     |> put_flash(:info, "Клиент удален.")
+    |> redirect(to: Routes.node_path(conn, :index))
+  end
+
+  def toggle_lock(conn, %{"id" => id, "lock" => lock}) do
+    node = NodeManager.get_node!(id)
+    node_params = %{"lock" => lock, "groups_list" => false}
+    {:ok, node} = NodeManager.update_node(node, node_params)
+
+    conn
+    |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
     |> redirect(to: Routes.node_path(conn, :index))
   end
 end

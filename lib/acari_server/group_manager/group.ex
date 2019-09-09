@@ -23,6 +23,10 @@ defmodule AcariServer.GroupManager.Group do
     |> unique_constraint(:name)
   end
 
+  def put_groups(obj, %{"groups_list" => false}) do
+    obj
+  end
+
   def put_groups(obj, attrs) do
     obj
     |> put_assoc(:groups, parse_groups(attrs))
