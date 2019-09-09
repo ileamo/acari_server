@@ -56,6 +56,9 @@ defmodule AcariServer.Hs do
           {:error, :not_configured} ->
             :ok
 
+          {:error, :locked} ->
+            :ok
+
           res ->
             Logger.error("Can't accept connection #{inspect(res)}")
         end
@@ -94,7 +97,10 @@ defmodule AcariServer.Hs do
               new_node(request, ipaddr)
               {:error, :not_configured}
 
-            _ ->
+            %{lock: true} ->
+              {:error, :locked}
+
+            _node ->
               start_tun(id, request["params"])
           end
         end
