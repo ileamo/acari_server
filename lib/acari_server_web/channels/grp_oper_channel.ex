@@ -56,7 +56,8 @@ defmodule AcariServerWeb.GrpOperChannel do
                  %{timestamp: ts} <- stat[tag] do
               ts < req_ts
             else
-              _ -> false
+              _ ->
+                true
             end
           end)
           |> Enum.each(fn %{name: name} ->
