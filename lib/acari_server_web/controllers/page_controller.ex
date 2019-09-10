@@ -20,6 +20,11 @@ defmodule AcariServerWeb.PageController do
     redirect(conn, external: zbx_url)
   end
 
+  def xterm(conn, _params) do
+    render(conn, "xterm.html")
+  end
+
+
   def secret(conn, _) do
     user = Guardian.Plug.current_resource(conn)
     render(conn, "secret.html", current_user: user)

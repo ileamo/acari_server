@@ -7,13 +7,12 @@ defmodule AcariServer.Terminal do
   end
 
   @impl true
-  def init(%{output_pid: output_pid, tun_name: name} = _params) do
+  def init(%{output_pid: output_pid, tun_name: name, command: command} = _params) do
     Process.flag(:trap_exit, true)
 
-    with dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(name),
-         send(output_pid, {:output, "Подключение к клиенту #{name} \r\n"}),
+    with send(output_pid, {:output, "Подключение к #{name} \r\n"}),
          {:ok, shell, _os_pid} <-
-           :exec.run_link('ssh root@#{dstaddr} -o StrictHostKeyChecking=no', [
+           :exec.run_link(command, [
              :stdin,
              :stdout,
              :stderr,
@@ -29,7 +28,7 @@ defmodule AcariServer.Terminal do
     else
       res ->
         Logger.error("Terminal #{name} #{inspect(res)}")
-        send(output_pid, {:output, "Не могу подключиться к клиенту #{name} \r\n"})
+        send(output_pid, {:output, "Не могу подключиться к #{name} \r\n"})
 
         {:ok,
          %{
