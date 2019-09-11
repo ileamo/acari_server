@@ -1,6 +1,9 @@
 defmodule AcariServerWeb.PageController do
   use AcariServerWeb, :controller
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:xterm]
+
   def index(conn, _params) do
     render(conn, "index.html")
   end
@@ -23,7 +26,6 @@ defmodule AcariServerWeb.PageController do
   def xterm(conn, _params) do
     render(conn, "xterm.html")
   end
-
 
   def secret(conn, _) do
     user = Guardian.Plug.current_resource(conn)
