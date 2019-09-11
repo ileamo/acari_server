@@ -37,7 +37,12 @@
                   ts -> AcariServer.get_local_date(ts)
                 end
         %></td>
-        <td><%= data %></td>
+        <td>
+          <a href="#" data-toggle="modal" data-target="#grp-script-res"
+            data-content="<%= data %>" data-name="<%= id %>">
+                <%= if String.length(data) <= 16, do: data, else: (data |> String.slice(0, 16))<>"..." %>
+          </a>
+        </td>
         <% {text, color} = cond do
                   ts > 0 and ts >= @request_date -> {"выполнен", "text-success"}
                   true -> {"ожидание", "text-warning"}

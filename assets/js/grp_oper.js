@@ -28,11 +28,22 @@ if (grp_oper) {
           responsive: true
         });
 
+        $('#grp-script-res').on('show.bs.modal', function(event) {
+          let data_field = $(event.relatedTarget)
+          let content = data_field.data('content')
+          let name = data_field.data('name')
+          let modal = $(this)
+          modal.find('.modal-title').text('' + name)
+          modal.find('.modal-body code').text(content)
+        })
+
         let go_update_res = document.getElementById("go-update-res")
         if (go_update_res) {
           go_update_res.addEventListener("click", updateRes, false);
 
-          function updateRes() {getLastScript()}
+          function updateRes() {
+            getLastScript()
+          }
         }
 
         let go_repeat = document.getElementById("go-repeat")

@@ -90,7 +90,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] ||
             %{timestamp: 0, data: "нет данных"}
 
-        %{id: tun_name, timestamp: ts, data: data |> to_string() |> String.slice(0, 16)}
+        %{id: tun_name, timestamp: ts, data: data |> to_string()}
       end)
 
     push(socket, "output", %{
