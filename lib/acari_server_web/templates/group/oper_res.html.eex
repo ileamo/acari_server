@@ -1,11 +1,23 @@
 <hr/>
-<p><strong>Последний запрос:</strong> <%= AcariServer.get_local_date(@request_date) %></p>
-<button id="go-update-res" class="btn btn-outline-secondary btn-sm py-1 px-2 mb-3">
-  Обновить таблицу
-</button>
-<button id="go-repeat" class="btn btn-outline-secondary btn-sm py-1 px-2 mb-3">
-  Повторить для невыполненных
-</button>
+<%= if @request_date > 0 do %>
+<p><strong>Последний запрос:</strong>
+  <%= AcariServer.get_local_date(@request_date) %>
+</p>
+<% end %>
+<%
+  waitlist =
+    @script_res_list
+    |> Enum.filter(fn %{timestamp: ts} -> not (ts > 0 and ts >= @request_date) end)
+%>
+
+<%= if waitlist != [] do %>
+  <button id="go-update-res" class="btn btn-outline-secondary btn-sm py-1 px-2 mb-3">
+    Обновить таблицу
+  </button>
+  <button id="go-repeat" class="btn btn-outline-secondary btn-sm py-1 px-2 mb-3">
+    Повторить для невыполненных
+  </button>
+<% end %>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
