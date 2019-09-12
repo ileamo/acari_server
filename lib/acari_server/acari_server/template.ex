@@ -102,7 +102,7 @@ defmodule AcariServer.Template do
 
   defp check_var(_), do: nil
 
-  defp get_only_value(var) do
+  def get_only_value(var) do
     var
     |> normalize_vars()
     |> Enum.map(fn

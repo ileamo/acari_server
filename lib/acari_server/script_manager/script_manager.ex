@@ -121,4 +121,8 @@ defmodule AcariServer.ScriptManager do
   def change_script(%Script{} = script) do
     Script.changeset(script, %{})
   end
+
+  def get_clients_of_class(%Script{} = script) do
+    Repo.preload(script, :nodes).nodes
+  end
 end
