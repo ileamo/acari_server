@@ -77,7 +77,7 @@ defmodule AcariServerWeb.ScriptController do
 
     client
     |> AcariServer.Repo.preload(:groups)
-    |> AcariServer.NodeManager.update_node(%{"params" => params})
+    |> AcariServer.NodeManager.update_node(%{"params" => params, "groups_list" => false})
   end
 
   def delete(conn, %{"id" => id}) do
