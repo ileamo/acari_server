@@ -25,7 +25,8 @@
   <% {template, template_error} = with %{} = script <- @template.script,
           {var, nil} <- AcariServer.Template.get_json(script.definition),
           {tst, nil} <- AcariServer.Template.get_json(script.test),
-          test_ass = %{} <- AcariServer.Template.test_assigns(var, tst) do
+          test_ass = %{} <- AcariServer.Template.test_assigns(var,
+                            tst |> Map.merge(%{"class" => script_name(@template)})) do
         test_ass && eval_template(script.prefix, @template.template, test_ass) || {nil, nil}
       else
         _ -> {nil, nil}
