@@ -25,6 +25,9 @@
     <%= link "Клиенты", to: Routes.tunnel_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
+    <%= link "Групповые операции", to: Routes.grp_oper_path(@conn, :index), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
     <%= link "Zabbix", to: Routes.page_path(@conn, :zabbix), class: "nav-link" , target: "_blank"%>
   </li>
 </ul>

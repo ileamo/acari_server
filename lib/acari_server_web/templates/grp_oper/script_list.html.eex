@@ -1,0 +1,3 @@
+<%= for {descr, script_name} <- @script_list do %>
+  <%= link descr, to: "#", class: "dropdown-item", id: script_name %>
+<% end %>

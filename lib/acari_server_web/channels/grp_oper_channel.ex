@@ -6,9 +6,29 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   def handle_in("input", params, socket) do
-    IO.inspect(params)
+    IO.inspect(params, label: "PARAMS")
 
     case params["cmd"] do
+      "select" ->
+        nodes =
+          case params["group_id"] do
+            "nil" -> AcariServer.NodeManager.list_nodes()
+            id -> AcariServer.GroupManager.get_group!(id).nodes
+          end
+
+        %{common_script: cs, class_list: _cl} =
+          get_group_scripts(nodes)
+          |> IO.inspect()
+
+        push(socket, "output", %{
+          id: "script_list",
+          data:
+            Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "script_list.html",
+              script_list: cs
+            ),
+          opt: ""
+        })
+
       "get_script" ->
         case params["template_name"] do
           nil ->
@@ -81,6 +101,7 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   def get_script(socket, tag, group_id) do
+    IO.inspect({tag, group_id})
     script_res_list =
       AcariServer.GroupManager.get_group!(group_id)
       |> Map.get(:nodes)
@@ -102,5 +123,47 @@ defmodule AcariServerWeb.GrpOperChannel do
           request_date: AcariServer.Mnesia.get_grp_oper_timestamp(group_id, tag)
         )
     })
+  end
+
+  defp get_group_scripts(nodes) do
+    class_id_list =
+      nodes
+      |> Enum.reduce([], fn node, acc ->
+        case Enum.member?(acc, node.script_id) do
+          false -> [node.script_id | acc]
+          _ -> acc
+        end
+      end)
+
+    class_list =
+      class_id_list
+      |> Enum.map(fn
+        nil ->
+          {nil, MapSet.new()}
+
+        id ->
+          class = AcariServer.ScriptManager.get_script!(id)
+
+          {{class.id, class.name},
+           class.templates
+           |> Enum.map(fn %{description: descr, name: name} -> {descr, name} end)
+           |> MapSet.new()}
+      end)
+
+    common_script =
+      class_list
+      |> Enum.reduce(nil, fn
+        {_, ms}, nil -> ms
+        {_, ms}, acc -> MapSet.intersection(acc, ms)
+      end)
+      |> case(
+        do:
+          (
+            nil -> []
+            ms -> MapSet.to_list(ms)
+          )
+      )
+
+    %{class_list: class_list, common_script: common_script}
   end
 end

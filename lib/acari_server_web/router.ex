@@ -54,6 +54,8 @@ defmodule AcariServerWeb.Router do
     get "/tunnels/:id", TunnelController, :grp
     get "/tunnel/:name", TunnelController, :show
 
+    get "/grpoper", GrpOperController, :index
+
     resources "/users", UserController
     resources "/groups", GroupController
     get "/groups/:id/oper", GroupController, :oper

@@ -1,0 +1,66 @@
+<div  style="min-height: 300px;">
+  <h2>Групповые операции</h2>
+  <div id="grp-oper" >
+    <div class="input-group mb-1">
+      <div class="input-group-prepend">
+        <label class="input-group-text">Класс</label>
+      </div>
+
+      <select class="custom-select" id="grp-oper-class">
+        <option value="nil">Все</option>
+        <option disabled="disabled">─────────────</option>
+        <% classes = AcariServer.ScriptManager.list_scripts()
+                    |> Enum.sort_by(fn %{name: name} -> name end) %>
+        <%= for %{id: id, name: name} = class <- classes do %>
+          <option value="<%= id %>" ><%= name %></option>
+        <% end %>
+      </select>
+
+      <div class="input-group-prepend">
+        <label class="input-group-text">Группа</label>
+      </div>
+
+      <select class="custom-select" id="grp-oper-group">
+        <option value="nil">Все</option>
+        <option disabled="disabled">─────────────</option>
+        <% groups = AcariServer.GroupManager.list_groups()
+                    |> Enum.sort_by(fn %{name: name} -> name end) %>
+        <%= for %{id: id, name: name} = group <- groups do %>
+          <option value="<%= id %>" ><%= name %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" placeholder="Фильтр">
+      <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon1">Применить</button>
+      </div>
+    </div>
+  </div>
+
+    <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
+        <div class="navbar p-0">
+          <span class="navbar-brand" id="go-script-name">Скрипт</span>
+        </div>
+
+        <ul class="navbar-nav mr-auto pr-3">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Скрипт
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="grp-oper-script-list">
+            </div>
+          </li>
+        </ul>
+
+        <div class="navbar">
+            <button id="go-update-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+              Выполнить
+            </button>
+        </div>
+    </nav>
+    <div id="go-script-field">Нет данных</div>
+
+
+</div>

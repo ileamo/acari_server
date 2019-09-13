@@ -30,7 +30,7 @@
             </button>
         </div>
     </nav>
-  <div id="go-script-field">Нет данных</div>
+    <div id="go-script-field">Нет данных</div>
   <% else %>
     <p>Нет общих скриптов для всех клиентов группы</p>
   <% end %>
