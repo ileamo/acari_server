@@ -2,8 +2,7 @@ import socket from './socket'
 
 let grp_oper = document.getElementById('grp-oper');
 if (grp_oper) {
-
-  console.log("DATA", grp_oper.dataset.group_id)
+  let grp_oper_script;
 
   let channel = socket.channel("grp_oper:1", {
     pathname: window.location.pathname
@@ -44,16 +43,23 @@ if (grp_oper) {
 
   }
 
+  selectElement();
+
   channel.on('output', payload => {
     console.log("grp_oper get:", payload, payload.id);
     switch (payload.id) {
       case "script_list":
         document.querySelector("#grp-oper-script-list").innerHTML = `${payload.data}`
-        var scripts = document.querySelectorAll("#grp-oper-script-list a")
-        scripts.forEach(function(item) {
-          item.addEventListener("click", getScript, false)
-        })
-
+        grp_oper_script = document.getElementById("grp-oper-script-list")
+        if (grp_oper_script) {
+          grp_oper_script.addEventListener("click", getScript, false);
+          console.log(grp_oper_script.options)
+          grp_oper_script.value = sessionStorage.getItem("grp_oper_last_script");
+          if (grp_oper_script.selectedIndex < 0) {
+            grp_oper_script.selectedIndex = "0";
+          }
+          getScript();
+        }
         break;
 
       case "script":
@@ -93,7 +99,8 @@ if (grp_oper) {
               channel.push('input', {
                 cmd: "repeat_script",
                 template_name: id,
-                group_id: sessionStorage.getItem("grp_oper_group_id")
+                group_id: sessionStorage.getItem("grp_oper_group_id"),
+                class_id: sessionStorage.getItem("grp_oper_class_id")
               })
             }
           }
@@ -105,19 +112,24 @@ if (grp_oper) {
   }) // From the Channel
 
 
-  var scripts = document.querySelectorAll("#grp-oper-script-list a") //.addEventListener("click", getScript, false);
-
-  scripts.forEach(function(item) {
-    item.addEventListener("click", getScript, false)
-  })
 
   function getScript() {
-    sessionStorage.setItem("grp_oper_last_script", this.id)
-    channel.push('input', {
-      cmd: "get_script",
-      group_id: sessionStorage.getItem("grp_oper_group_id"),
-      template_name: this.id
-    })
+    let index = grp_oper_script.selectedIndex
+    console.log("GET_SCRIPT", index);
+    if (index >= 0) {
+      let script_name = grp_oper_script.options[index].value
+      sessionStorage.setItem("grp_oper_last_script", script_name)
+      channel.push('input', {
+        cmd: "get_script",
+        group_id: sessionStorage.getItem("grp_oper_group_id"),
+        class_id: sessionStorage.getItem("grp_oper_class_id"),
+        template_name: script_name
+      })
+    }
+    else {
+      document.querySelector("#go-script-name").innerText = `Нет общих скриптов для группы`
+      document.querySelector("#go-script-field").innerHTML = `Выберите конкретный класс`
+    }
   }
 
   function getLastScript() {
@@ -125,13 +137,14 @@ if (grp_oper) {
     channel.push('input', {
       cmd: "get_script",
       group_id: sessionStorage.getItem("grp_oper_group_id"),
+      class_id: sessionStorage.getItem("grp_oper_class_id"),
       template_name: id
     })
   }
 
-  let go_update_scriprt = document.getElementById("go-update-script")
-  if (go_update_scriprt) {
-    go_update_scriprt.addEventListener("click", updateScript, false);
+  let grp_oper_update_scriprt = document.getElementById("grp-oper-update-script")
+  if (grp_oper_update_scriprt) {
+    grp_oper_update_scriprt.addEventListener("click", updateScript, false);
 
     function updateScript() {
       let id = sessionStorage.getItem("grp_oper_last_script")
@@ -141,7 +154,8 @@ if (grp_oper) {
         channel.push('input', {
           cmd: "script",
           template_name: id,
-          group_id: sessionStorage.getItem("grp_oper_group_id")
+          group_id: sessionStorage.getItem("grp_oper_group_id"),
+          class_id: sessionStorage.getItem("grp_oper_class_id")
         })
       }
     }

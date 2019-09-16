@@ -16,15 +16,36 @@ defmodule AcariServerWeb.GrpOperChannel do
             id -> AcariServer.GroupManager.get_group!(id).nodes
           end
 
-        %{common_script: cs, class_list: _cl} =
+        %{common_script: cs, class_list: cl} =
           get_group_scripts(nodes)
           |> IO.inspect()
+
+        script_list =
+          case params["class_id"] do
+            "nil" ->
+              cs
+
+            class_id ->
+              cl
+              |> IO.inspect()
+              |> Enum.find(fn
+                {{id, _}, _} -> id == String.to_integer(class_id)
+                _ -> false
+              end)
+              |> case(
+                do:
+                  (
+                    {_, l} -> l
+                    _ -> []
+                  )
+              )
+          end
 
         push(socket, "output", %{
           id: "script_list",
           data:
             Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "script_list.html",
-              script_list: cs
+              script_list: script_list
             ),
           opt: ""
         })
@@ -39,21 +60,20 @@ defmodule AcariServerWeb.GrpOperChannel do
             })
 
           tag ->
-            get_script(socket, tag, params["group_id"])
+            get_script(socket, tag, params["group_id"], params["class_id"])
         end
 
       "script" ->
         with tag when is_binary(tag) <- params["template_name"] do
           AcariServer.Mnesia.add_grp_oper(params["group_id"], tag)
 
-          AcariServer.GroupManager.get_group!(params["group_id"])
-          |> Map.get(:nodes)
+          get_nodes_list(params["group_id"], params["class_id"])
           |> Enum.each(fn %{name: name} ->
             AcariServer.Master.exec_script_on_peer(name, tag)
           end)
 
           Process.sleep(1_000)
-          get_script(socket, tag, params["group_id"])
+          get_script(socket, tag, params["group_id"], params["class_id"])
         else
           _ ->
             push(socket, "output", %{
@@ -69,8 +89,7 @@ defmodule AcariServerWeb.GrpOperChannel do
         with tag when is_binary(tag) <- params["template_name"] do
           req_ts = AcariServer.Mnesia.get_grp_oper_timestamp(params["group_id"], tag)
 
-          AcariServer.GroupManager.get_group!(params["group_id"])
-          |> Map.get(:nodes)
+          get_nodes_list(params["group_id"], params["class_id"])
           |> Enum.filter(fn %{name: name} ->
             with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
                  %{timestamp: ts} <- stat[tag] do
@@ -85,7 +104,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           end)
 
           Process.sleep(1_000)
-          get_script(socket, tag, params["group_id"])
+          get_script(socket, tag, params["group_id"], params["class_id"])
         end
 
       _ ->
@@ -100,11 +119,38 @@ defmodule AcariServerWeb.GrpOperChannel do
     {:noreply, socket}
   end
 
-  def get_script(socket, tag, group_id) do
-    IO.inspect({tag, group_id})
+  defp get_nodes_list(group_id, class_id, _filter \\ "") do
+    class_id =
+      case class_id do
+        "nil" -> nil
+        nil -> nil
+        id_str -> String.to_integer(id_str)
+      end
+
+    nodes =
+      case group_id do
+        "nil" ->
+          AcariServer.NodeManager.list_nodes()
+
+        group_id ->
+          AcariServer.GroupManager.get_group!(group_id)
+          |> Map.get(:nodes)
+      end
+
+    case class_id do
+      nil ->
+        nodes
+
+      class_id ->
+        nodes |> Enum.filter(fn %{script_id: id} -> id == class_id end)
+    end
+  end
+
+  defp get_script(socket, tag, group_id, class_id, filter \\ "") do
+    IO.inspect({tag, group_id, class_id, filter}, label: "GET_SCRIPT")
+
     script_res_list =
-      AcariServer.GroupManager.get_group!(group_id)
-      |> Map.get(:nodes)
+      get_nodes_list(group_id, class_id, filter)
       |> Enum.map(fn %{name: name} -> name end)
       |> Enum.map(fn tun_name ->
         %{timestamp: ts, data: data} =
@@ -116,7 +162,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
     push(socket, "output", %{
       id: "script",
-      opt: AcariServer.NodeMonitor.get_templ_descr_by_name(tag),
+      opt: AcariServer.NodeMonitor.get_templ_descr_by_name(tag) <> " (#{tag})",
       data:
         Phoenix.View.render_to_string(AcariServerWeb.GroupView, "oper_res.html",
           script_res_list: script_res_list,
