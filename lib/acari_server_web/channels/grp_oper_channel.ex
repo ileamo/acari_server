@@ -169,7 +169,7 @@ defmodule AcariServerWeb.GrpOperChannel do
       id: "script",
       opt: AcariServer.NodeMonitor.get_templ_descr_by_name(tag) <> " (#{tag})",
       data:
-        Phoenix.View.render_to_string(AcariServerWeb.GroupView, "oper_res.html",
+        Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res.html",
           script_res_list: script_res_list,
           request_date: AcariServer.Mnesia.get_grp_oper_timestamp(group_id, tag)
         )

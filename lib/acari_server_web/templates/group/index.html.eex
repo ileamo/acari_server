@@ -21,8 +21,6 @@
         <%= link "Редактировать", to: Routes.group_path(@conn, :edit, group) %>
         |
         <%= link "Удалить", to: Routes.group_path(@conn, :delete, group), method: :delete, data: [confirm: "Вы уверены?"] %>
-        |
-        <%= link "Действия", to: Routes.group_path(@conn, :oper, group) %>
       </td>
     </tr>
 <% end %>
