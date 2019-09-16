@@ -1,0 +1,12 @@
+<% IO.inspect(@class_list) %>
+<option value="nil">Все</option>
+<option disabled="disabled">─────────────</option>
+<% classes = @class_list
+    |> Enum.reject( fn  nil -> true
+                        _ -> false
+                    end)
+    |> Enum.sort_by(fn {_, name} -> name end)
+%>
+<%= for {id, name} = class <- classes do %>
+  <option value="<%= id %>" ><%= name %></option>
+<% end %>

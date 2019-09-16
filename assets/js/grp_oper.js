@@ -48,12 +48,21 @@ if (grp_oper) {
   channel.on('output', payload => {
     console.log("grp_oper get:", payload, payload.id);
     switch (payload.id) {
-      case "script_list":
-        document.querySelector("#grp-oper-script-list").innerHTML = `${payload.data}`
+      case "select":
+
+        grp_oper_class = document.getElementById("grp-oper-class")
+        if (grp_oper_class) {
+          grp_oper_class.innerHTML = `${payload.class_list}`
+          grp_oper_class.addEventListener("click", selectElement, false);
+          console.log(`${payload.class_id}`)
+          grp_oper_class.value = `${payload.class_id}`;
+          sessionStorage.setItem("grp_oper_class_id", grp_oper_class.value)
+        }
+
         grp_oper_script = document.getElementById("grp-oper-script-list")
         if (grp_oper_script) {
+          grp_oper_script.innerHTML = `${payload.script_list}`
           grp_oper_script.addEventListener("click", getScript, false);
-          console.log(grp_oper_script.options)
           grp_oper_script.value = sessionStorage.getItem("grp_oper_last_script");
           if (grp_oper_script.selectedIndex < 0) {
             grp_oper_script.selectedIndex = "0";
@@ -125,8 +134,7 @@ if (grp_oper) {
         class_id: sessionStorage.getItem("grp_oper_class_id"),
         template_name: script_name
       })
-    }
-    else {
+    } else {
       document.querySelector("#go-script-name").innerText = `Нет общих скриптов для группы`
       document.querySelector("#go-script-field").innerHTML = `Выберите конкретный класс`
     }

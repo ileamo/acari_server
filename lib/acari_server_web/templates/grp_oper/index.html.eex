@@ -21,13 +21,9 @@
       </div>
 
       <select class="custom-select" id="grp-oper-class">
-        <option value="nil">Все</option>
-        <option disabled="disabled">─────────────</option>
-        <% classes = AcariServer.ScriptManager.list_scripts()
-                    |> Enum.sort_by(fn %{name: name} -> name end) %>
-        <%= for %{id: id, name: name} = class <- classes do %>
-          <option value="<%= id %>" ><%= name %></option>
-        <% end %>
+        <%= render "class_list.html",
+          class_list: AcariServer.ScriptManager.list_scripts()
+                      |> Enum.map(fn %{id: id, name: name} -> {id, name} end) %>
       </select>
     </div>
 

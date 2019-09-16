@@ -20,10 +20,11 @@ defmodule AcariServerWeb.GrpOperChannel do
           get_group_scripts(nodes)
           |> IO.inspect()
 
-        script_list =
+
+        {script_list, class_id} =
           case params["class_id"] do
             "nil" ->
-              cs
+              {cs, "nil"}
 
             class_id ->
               cl
@@ -35,19 +36,23 @@ defmodule AcariServerWeb.GrpOperChannel do
               |> case(
                 do:
                   (
-                    {_, l} -> l
-                    _ -> []
+                    {_, l} -> {l, class_id}
+                    _ -> {cs, "nil"}
                   )
               )
           end
 
         push(socket, "output", %{
-          id: "script_list",
-          data:
+          id: "select",
+          class_id: class_id,
+          class_list:
+            Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "class_list.html",
+              class_list: cl |> Enum.map(fn {id_name, _} -> id_name end)
+            ),
+          script_list:
             Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "script_list.html",
               script_list: script_list
-            ),
-          opt: ""
+            )
         })
 
       "get_script" ->
