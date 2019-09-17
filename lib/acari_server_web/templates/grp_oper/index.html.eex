@@ -27,15 +27,19 @@
       </select>
     </div>
 
-    <div class="input-group mb-1">
-      <input type="text" class="form-control" placeholder="Фильтр">
+    <div class="input-group mb-0">
       <div class="input-group-prepend">
-        <button class="btn btn-outline-secondary" type="button" id="button-addon1">Применить</button>
+        <label class="input-group-text">Фильтр</label>
+      </div>
+      <input type="text" class="form-control" id="grp-oper-filter-text">
+      <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter">Применить</button>
       </div>
     </div>
+    <div class = "text-danger" id="grp-oper-filter-error"></div>
   </div>
 
-  <div class="input-group mb-5">
+  <div class="input-group mb-5 mt-1">
     <div class="input-group-prepend">
       <label class="input-group-text">Скрипт</label>
     </div>

@@ -29,16 +29,28 @@ if (grp_oper) {
     grp_oper_group.value = sessionStorage.getItem("grp_oper_group_id") || "nil";
   }
 
+  let grp_oper_filter = document.getElementById("grp-oper-filter")
+  let grp_oper_filter_text = document.getElementById("grp-oper-filter-text")
+  if (grp_oper_filter && grp_oper_filter_text) {
+    grp_oper_filter.addEventListener("click", selectElement, false);
+    grp_oper_filter_text.value = sessionStorage.getItem("grp_oper_filter") || "";
+  }
+
   function selectElement() {
     let class_id = grp_oper_class.options[grp_oper_class.selectedIndex].value
     let group_id = grp_oper_group.options[grp_oper_group.selectedIndex].value
+    let filter = grp_oper_filter_text.value
+    console.log(grp_oper_filter_text, filter)
     sessionStorage.setItem("grp_oper_class_id", class_id)
     sessionStorage.setItem("grp_oper_group_id", group_id)
+    sessionStorage.setItem("grp_oper_filter", filter)
 
     channel.push('input', {
       cmd: "select",
       class_id: class_id,
-      group_id: group_id
+      group_id: group_id,
+      filter: filter
+
     })
 
   }
@@ -46,10 +58,16 @@ if (grp_oper) {
   selectElement();
 
   channel.on('output', payload => {
-    console.log("grp_oper get:", payload, payload.id);
+    console.log("grp_oper get:", payload.id, payload);
     switch (payload.id) {
-      case "select":
+      case "filter_error":
+        let grp_oper_filter_error = document.getElementById("grp-oper-filter-error")
+        if (grp_oper_filter_error) {
+          grp_oper_filter_error.innerText = `${payload.data}`
+        }
+      break;
 
+      case "select":
         grp_oper_class = document.getElementById("grp-oper-class")
         if (grp_oper_class) {
           grp_oper_class.innerHTML = `${payload.class_list}`
@@ -109,7 +127,8 @@ if (grp_oper) {
                 cmd: "repeat_script",
                 template_name: id,
                 group_id: sessionStorage.getItem("grp_oper_group_id"),
-                class_id: sessionStorage.getItem("grp_oper_class_id")
+                class_id: sessionStorage.getItem("grp_oper_class_id"),
+                filter: sessionStorage.getItem("grp_oper_filter")
               })
             }
           }
@@ -132,6 +151,7 @@ if (grp_oper) {
         cmd: "get_script",
         group_id: sessionStorage.getItem("grp_oper_group_id"),
         class_id: sessionStorage.getItem("grp_oper_class_id"),
+        filter: sessionStorage.getItem("grp_oper_filter"),
         template_name: script_name
       })
     } else {
@@ -146,6 +166,7 @@ if (grp_oper) {
       cmd: "get_script",
       group_id: sessionStorage.getItem("grp_oper_group_id"),
       class_id: sessionStorage.getItem("grp_oper_class_id"),
+      filter: sessionStorage.getItem("grp_oper_filter"),
       template_name: id
     })
   }
@@ -163,7 +184,8 @@ if (grp_oper) {
           cmd: "script",
           template_name: id,
           group_id: sessionStorage.getItem("grp_oper_group_id"),
-          class_id: sessionStorage.getItem("grp_oper_class_id")
+          class_id: sessionStorage.getItem("grp_oper_class_id"),
+          filter: sessionStorage.getItem("grp_oper_filter")
         })
       }
     }
