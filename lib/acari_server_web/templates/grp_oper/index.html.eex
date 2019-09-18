@@ -53,10 +53,11 @@
 
 
     <h3 id="go-script-name">Скрипт</h3>
-
-
     <div id="go-script-field">Нет данных</div>
 
+    <button class="btn btn-outline-secondary" type="button" id="grp-oper-new-group">
+      Создать новую группу на основе фильтра
+    </button>
 
 </div>
 

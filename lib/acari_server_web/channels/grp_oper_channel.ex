@@ -77,7 +77,11 @@ defmodule AcariServerWeb.GrpOperChannel do
             push(socket, "output", %{
               id: "script",
               opt: "Скрипт не определен",
-              data: ""
+              data:
+                "Количество узлов в группе: #{
+                  get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+                  |> length()
+                }"
             })
 
           tag ->
@@ -88,13 +92,16 @@ defmodule AcariServerWeb.GrpOperChannel do
         with tag when is_binary(tag) <- params["template_name"] do
           AcariServer.Mnesia.add_grp_oper(params["group_id"], tag)
 
-          get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+          nodes_list =
+            get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+
+          nodes_list
           |> Enum.each(fn %{name: name} ->
             AcariServer.Master.exec_script_on_peer(name, tag)
           end)
 
           Process.sleep(1_000)
-          get_script(socket, tag, params["group_id"], params["class_id"], params["filter"])
+          get_script(socket, tag, params["group_id"], nodes_list)
         else
           _ ->
             push(socket, "output", %{
@@ -110,7 +117,10 @@ defmodule AcariServerWeb.GrpOperChannel do
         with tag when is_binary(tag) <- params["template_name"] do
           req_ts = AcariServer.Mnesia.get_grp_oper_timestamp(params["group_id"], tag)
 
-          get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+          nodes_list =
+            get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+
+          nodes_list
           |> Enum.filter(fn %{name: name} ->
             with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
                  %{timestamp: ts} <- stat[tag] do
@@ -125,8 +135,12 @@ defmodule AcariServerWeb.GrpOperChannel do
           end)
 
           Process.sleep(1_000)
-          get_script(socket, tag, params["group_id"], params["class_id"], params["filter"])
+          get_script(socket, tag, params["group_id"], nodes_list)
         end
+
+      "create_group" ->
+        get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+        |> create_tmp_group("Фильтр: #{params["filter"]}")
 
       _ ->
         nil
@@ -169,8 +183,12 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   defp get_script(socket, tag, group_id, class_id, filter) do
+    get_script(socket, tag, group_id, get_nodes_list(socket, group_id, class_id, filter))
+  end
+
+  defp get_script(socket, tag, group_id, nodes) do
     script_res_list =
-      get_nodes_list(socket, group_id, class_id, filter)
+      nodes
       |> Enum.map(fn %{name: name} -> name end)
       |> Enum.map(fn tun_name ->
         %{timestamp: ts, data: data} =
@@ -301,6 +319,21 @@ defmodule AcariServerWeb.GrpOperChannel do
           {n, ""} -> n
           _ -> str
         end
+    end
+  end
+
+  def create_tmp_group(node_list, descr) do
+    with {:ok, group} <-
+           AcariServer.GroupManager.create_group(%{
+             name:
+               "_TMP_" <>
+                 to_string(:os.system_time(:microsecond)),
+             description: descr
+           }) do
+      node_list
+      |> Enum.map(fn node ->
+        AcariServer.GroupNodeAssociation.create_group_node(%{group_id: group.id, node_id: node.id})
+      end)
     end
   end
 end

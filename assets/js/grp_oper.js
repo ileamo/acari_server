@@ -58,14 +58,14 @@ if (grp_oper) {
   selectElement();
 
   channel.on('output', payload => {
-    console.log("grp_oper get:", payload.id, payload);
+    console.log("grp_oper get:", payload.id);
     switch (payload.id) {
       case "filter_error":
         let grp_oper_filter_error = document.getElementById("grp-oper-filter-error")
         if (grp_oper_filter_error) {
           grp_oper_filter_error.innerText = `${payload.data}`
         }
-      break;
+        break;
 
       case "select":
         grp_oper_class = document.getElementById("grp-oper-class")
@@ -144,9 +144,12 @@ if (grp_oper) {
   function getScript() {
     let index = grp_oper_script.selectedIndex
     console.log("GET_SCRIPT", index);
-    if (index >= 0) {
-      let script_name = grp_oper_script.options[index].value
-      sessionStorage.setItem("grp_oper_last_script", script_name)
+    if (index >= -1) {
+      let script_name
+      if (index >= 0) {
+        script_name = grp_oper_script.options[index].value
+        sessionStorage.setItem("grp_oper_last_script", script_name)
+      }
       channel.push('input', {
         cmd: "get_script",
         group_id: sessionStorage.getItem("grp_oper_group_id"),
@@ -183,6 +186,23 @@ if (grp_oper) {
         channel.push('input', {
           cmd: "script",
           template_name: id,
+          group_id: sessionStorage.getItem("grp_oper_group_id"),
+          class_id: sessionStorage.getItem("grp_oper_class_id"),
+          filter: sessionStorage.getItem("grp_oper_filter")
+        })
+      }
+    }
+  }
+
+  let grp_oper_new_group = document.getElementById("grp-oper-new-group")
+  if (grp_oper_new_group) {
+    grp_oper_new_group.addEventListener("click", newGroup, false);
+
+    function newGroup() {
+      let r = confirm("Создать новую группу,")
+      if (r) {
+        channel.push('input', {
+          cmd: "create_group",
           group_id: sessionStorage.getItem("grp_oper_group_id"),
           class_id: sessionStorage.getItem("grp_oper_class_id"),
           filter: sessionStorage.getItem("grp_oper_filter")
