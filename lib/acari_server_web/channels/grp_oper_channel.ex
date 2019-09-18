@@ -139,8 +139,27 @@ defmodule AcariServerWeb.GrpOperChannel do
         end
 
       "create_group" ->
-        get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
-        |> create_tmp_group("Фильтр: #{params["filter"]}")
+        descr =
+          "#{get_group_name_by_id(params["group_id"])} \\ #{
+            get_class_name_by_id(params["class_id"])
+          } \\ #{params["filter"]}"
+
+        res =
+          case get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+               |> create_tmp_group(descr) do
+            {:ok, group} ->
+              Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "new_group.html",
+                group: group
+              )
+
+            {:error, res} ->
+              "Ошибка при создании группы #{inspect(res)}"
+          end
+
+        push(socket, "output", %{
+          id: "new_group",
+          data: res
+        })
 
       _ ->
         nil
@@ -259,7 +278,6 @@ defmodule AcariServerWeb.GrpOperChannel do
   def node_filter(node_list, filter_str, socket) do
     filter_str = if to_string(filter_str) |> String.trim() == "", do: "true", else: filter_str
 
-    #    try do
     push_filter_error(socket, "")
 
     node_list
@@ -278,6 +296,10 @@ defmodule AcariServerWeb.GrpOperChannel do
       rescue
         e in CompileError ->
           push_filter_error(socket, e.description)
+          true
+
+        e in KeyError ->
+          push_filter_error(socket, "Bad key: #{e.key}")
           true
 
         value ->
@@ -322,18 +344,37 @@ defmodule AcariServerWeb.GrpOperChannel do
     end
   end
 
-  def create_tmp_group(node_list, descr) do
-    with {:ok, group} <-
+  defp create_tmp_group(node_list, descr) do
+    with grp_name <-
+           "_TMP_" <> to_string(:os.system_time(:microsecond)),
+         {:ok, group} <-
            AcariServer.GroupManager.create_group(%{
-             name:
-               "_TMP_" <>
-                 to_string(:os.system_time(:microsecond)),
+             name: grp_name,
              description: descr
            }) do
       node_list
       |> Enum.map(fn node ->
         AcariServer.GroupNodeAssociation.create_group_node(%{group_id: group.id, node_id: node.id})
       end)
+
+      {:ok, group}
+    else
+      {:error, %{errors: res}} -> {:error, res}
+      res -> {:error, res}
+    end
+  end
+
+  defp get_group_name_by_id(id) do
+    case id do
+      "nil" -> "Все"
+      id -> AcariServer.GroupManager.get_group_wo_nodes!(id).name
+    end
+  end
+
+  defp get_class_name_by_id(id) do
+    case id do
+      "nil" -> "Все"
+      id -> AcariServer.ScriptManager.get_script(id).name
     end
   end
 end

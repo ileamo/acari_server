@@ -33,7 +33,9 @@
       </div>
       <input type="text" class="form-control" id="grp-oper-filter-text">
       <div class="input-group-prepend">
-        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter">Применить</button>
+        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter">
+          <span class="grp-oper-blinking">Применить</span>
+        </button>
       </div>
     </div>
     <div class = "text-danger" id="grp-oper-filter-error"></div>
@@ -58,6 +60,8 @@
     <button class="btn btn-outline-secondary" type="button" id="grp-oper-new-group">
       Создать новую группу на основе фильтра
     </button>
+    <div class="mt-3" id="grp-oper-new-group-edit"></div>
+
 
 </div>
 

@@ -17,6 +17,13 @@ if (grp_oper) {
       console.log("grp_oper: Unable to join", resp)
     })
 
+  function blinker() {
+    $('.grp-oper-blinking').fadeOut(500);
+    $('.grp-oper-blinking').fadeIn(500);
+  }
+  let filter_blinking;
+
+
   let grp_oper_class = document.getElementById("grp-oper-class")
   if (grp_oper_class) {
     grp_oper_class.addEventListener("click", selectElement, false);
@@ -32,9 +39,25 @@ if (grp_oper) {
   let grp_oper_filter = document.getElementById("grp-oper-filter")
   let grp_oper_filter_text = document.getElementById("grp-oper-filter-text")
   if (grp_oper_filter && grp_oper_filter_text) {
-    grp_oper_filter.addEventListener("click", selectElement, false);
+    grp_oper_filter.addEventListener("click", selectElementFilter, false);
+    grp_oper_filter_text.addEventListener("input", inputFilterText, false);
     grp_oper_filter_text.value = sessionStorage.getItem("grp_oper_filter") || "";
   }
+
+  function inputFilterText() {
+    console.log("INPUT")
+    if (!filter_blinking) {
+      console.log("INPUT 1")
+      filter_blinking = setInterval(blinker, 1000);
+    }
+  }
+
+  function selectElementFilter() {
+    clearInterval(filter_blinking);
+    filter_blinking = false;
+    selectElement();
+  }
+
 
   function selectElement() {
     let class_id = grp_oper_class.options[grp_oper_class.selectedIndex].value
@@ -64,6 +87,13 @@ if (grp_oper) {
         let grp_oper_filter_error = document.getElementById("grp-oper-filter-error")
         if (grp_oper_filter_error) {
           grp_oper_filter_error.innerText = `${payload.data}`
+        }
+        break;
+
+      case "new_group":
+        let grp_oper_new_group = document.getElementById("grp-oper-new-group-edit")
+        if (grp_oper_new_group) {
+          grp_oper_new_group.innerHTML = `${payload.data}`
         }
         break;
 
@@ -180,7 +210,7 @@ if (grp_oper) {
 
     function updateScript() {
       let id = sessionStorage.getItem("grp_oper_last_script")
-      let r = confirm("Выполнить скрипт " + id + " для группы?")
+      let r = confirm(`Выполнить скрипт ${id} для группы?`)
       if (r) {
         document.querySelector("#go-script-field").innerText = "Wait ..."
         channel.push('input', {
@@ -199,7 +229,7 @@ if (grp_oper) {
     grp_oper_new_group.addEventListener("click", newGroup, false);
 
     function newGroup() {
-      let r = confirm("Создать новую группу,")
+      let r = confirm("Создать новую группу?")
       if (r) {
         channel.push('input', {
           cmd: "create_group",
