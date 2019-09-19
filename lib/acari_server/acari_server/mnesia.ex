@@ -332,7 +332,11 @@ defmodule AcariServer.Mnesia do
         })
 
       _ ->
-        nil
+        %{
+          name: name,
+          description: node.description,
+          server: nil
+        }
     end
   end
 
@@ -827,7 +831,7 @@ defmodule AcariServer.Mnesia do
     |> Enum.sort_by(fn %{params: params} -> params["iat"] end, &>=/2)
   end
 
-  #grp_oper
+  # grp_oper
   def add_grp_oper(group_id, template_name) do
     Mnesia.transaction(fn ->
       Mnesia.write({:grp_oper, {group_id, template_name}, :os.system_time(:second), nil})

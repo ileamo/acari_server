@@ -280,43 +280,33 @@ defmodule AcariServerWeb.GrpOperChannel do
 
     push_filter_error(socket, "")
 
-    node_list
-    |> Enum.filter(fn node ->
-      state =
-        (AcariServer.Mnesia.get_tunnel_state(node.name) || [])
-        |> Enum.map(fn
-          {tag, %{data: data}} -> {tag, try_to_number(data)}
-          x -> x
-        end)
-        |> Enum.into(%{})
+    try do
+      node_list
+      |> Enum.filter(fn node ->
+        state =
+          (AcariServer.Mnesia.get_tunnel_state(node.name) || [])
+          |> Enum.map(fn
+            {tag, %{data: data}} -> {tag, try_to_number(data)}
+            x -> x
+          end)
+          |> Enum.into(%{})
 
-      try do
         Code.eval_string(filter_str, client: node, state: state)
         |> elem(0)
-      rescue
-        e in CompileError ->
-          push_filter_error(socket, e.description)
-          true
+      end)
+    rescue
+      e in CompileError ->
+        push_filter_error(socket, e.description)
+        node_list
 
-        e in KeyError ->
-          push_filter_error(socket, "Bad key: #{e.key}")
-          true
+      e in KeyError ->
+        push_filter_error(socket, "Bad key: #{e.key}")
+        node_list
 
-        value ->
-          push_filter_error(socket, inspect(value))
-          true
-      end
-    end)
-
-    # rescue
-    #   e in CompileError ->
-    #     push_filter_error(socket, e.description)
-    #     node_list
-    #
-    #   value ->
-    #     push_filter_error(socket, inspect(value))
-    #     node_list
-    # end
+      value ->
+        push_filter_error(socket, inspect(value))
+        node_list
+    end
   end
 
   defp push_filter_error(socket, data) do
