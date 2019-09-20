@@ -3,7 +3,8 @@ import socket from './socket'
 let grp_oper = document.getElementById('grp-oper');
 if (grp_oper) {
   let grp_oper_script;
-
+  let grp_oper_script_multi = document.getElementById("grp-oper-script-list-multi")
+  let grp_oper_script_div = document.getElementById("grp-oper-script-div")
   let channel = socket.channel("grp_oper:1", {
     pathname: window.location.pathname
   })
@@ -22,6 +23,30 @@ if (grp_oper) {
     $('.grp-oper-blinking').fadeIn(500);
   }
   let filter_blinking;
+
+  let grp_oper_show_only = document.getElementById("grp-oper-show-only")
+  if (grp_oper_show_only) {
+    let show_only = sessionStorage.getItem("grp_oper_show_only") == "true"
+    grp_oper_show_only.checked = show_only;
+    grp_oper_script_div.hidden = show_only;
+    grp_oper_script_multi.hidden = !show_only;
+
+    grp_oper_show_only.addEventListener("change", showOnly, false);
+    function showOnly() {
+      console.log("SHOW:", grp_oper_show_only, this.checked)
+      let checked = this.checked
+      sessionStorage.setItem("grp_oper_show_only", checked)
+      if (checked) {
+
+        grp_oper_script_multi.hidden = false
+        grp_oper_script_div.hidden = true
+      } else {
+        grp_oper_script_multi.hidden = true
+        grp_oper_script_div.hidden = false
+      }
+    }
+  }
+
 
 
   let grp_oper_class = document.getElementById("grp-oper-class")
@@ -116,6 +141,11 @@ if (grp_oper) {
             grp_oper_script.selectedIndex = "0";
           }
           getScript();
+        }
+
+        if (grp_oper_script_multi) {
+          grp_oper_script_multi.innerHTML = `${payload.script_list}`
+          grp_oper_script_multi.addEventListener("click", getScriptMulti, false);
         }
         break;
 
@@ -222,6 +252,23 @@ if (grp_oper) {
         })
       }
     }
+  }
+
+  function getScriptMulti() {
+    let selectedValues = [];
+    for (var i = 0; i < grp_oper_script_multi.selectedOptions.length; i++) {
+      selectedValues.push(grp_oper_script_multi.selectedOptions[i].value);
+    }
+    console.log("SELECTED VALUE:", selectedValues)
+    sessionStorage.setItem("grp_oper_last_script_multi", selectedValues)
+
+    channel.push('input', {
+      cmd: "get_script_multi",
+      template_name_list: selectedValues,
+      group_id: sessionStorage.getItem("grp_oper_group_id"),
+      class_id: sessionStorage.getItem("grp_oper_class_id"),
+      filter: sessionStorage.getItem("grp_oper_filter")
+    })
   }
 
   let grp_oper_new_group = document.getElementById("grp-oper-new-group")

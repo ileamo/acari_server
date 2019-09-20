@@ -41,7 +41,7 @@
     <div class = "text-danger" id="grp-oper-filter-error"></div>
   </div>
 
-  <div class="input-group mb-5 mt-1">
+  <div class="input-group mb-2 mt-1" id="grp-oper-script-div">
     <div class="input-group-prepend">
       <label class="input-group-text">Скрипт</label>
     </div>
@@ -52,6 +52,17 @@
         id="grp-oper-update-script">Выполнить</button>
     </div>
   </div>
+
+  <select class="custom-select mb-2 mt-1" multiple size="5" id="grp-oper-script-list-multi">
+  </select>
+
+  <div class="form-check form-check-inline mb-5">
+    <input class="form-check-input" type="checkbox" value="" id="grp-oper-show-only">
+    <label class="form-check-label" for="defaultCheck1">
+      Только просмотр
+    </label>
+  </div>
+
 
 
     <h3 id="go-script-name">Скрипт</h3>
