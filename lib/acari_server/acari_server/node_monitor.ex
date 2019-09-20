@@ -75,7 +75,7 @@ defmodule AcariServer.NodeMonitor do
   def get_templ_descr_by_name(name) do
     with %AcariServer.TemplateManager.Template{description: descr} <-
            AcariServer.TemplateManager.get_template_by_name(name |> to_string()) do
-      descr
+      descr || "_#{name}_"
     else
       _ -> "Скрипт не определен"
     end

@@ -20,7 +20,7 @@ defmodule AcariServer.TemplateManager.Template do
   def changeset(template, attrs) do
     template
     |> cast(attrs, [:name, :description, :template, :script_id, :executable, :validator])
-    |> validate_required([:name, :template])
+    |> validate_required([:name, :description, :template])
     |> validate_change(:name, &validate_templ_name/2)
     |> foreign_key_constraint(:script_id)
     |> unique_constraint(:name)
