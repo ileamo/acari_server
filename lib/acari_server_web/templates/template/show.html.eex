@@ -67,6 +67,8 @@
 
 <span><%= link "Редактировать", to: Routes.template_path(@conn, :edit, @template) %></span>
 |
+<span><%= link "Клонировать", to: Routes.template_path(@conn, :new, template_id: @template.id) %></span>
+|
 <span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>
 
 <%= if template do %>

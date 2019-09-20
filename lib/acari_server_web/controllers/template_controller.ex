@@ -12,6 +12,14 @@ defmodule AcariServerWeb.TemplateController do
     render(conn, "index.html", templates: templates)
   end
 
+  def new(conn, %{"template_id" => id}) do
+    template = TemplateManager.get_template!(id)
+
+    changeset = TemplateManager.change_template(template |> Ecto.put_meta(state: :built))
+
+    render(conn, "new.html", changeset: changeset, template: template)
+  end
+
   def new(conn, _params) do
     changeset = TemplateManager.change_template(%Template{})
     render(conn, "new.html", changeset: changeset)
