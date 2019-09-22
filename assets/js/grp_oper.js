@@ -40,7 +40,7 @@ if (grp_oper) {
       if (checked) {
         grp_oper_script_multi.hidden = false
         grp_oper_script_div.hidden = true
-        getScriptMulti()
+        getLastScriptMulti()
       } else {
         grp_oper_script_multi.hidden = true
         grp_oper_script_div.hidden = false
@@ -72,9 +72,7 @@ if (grp_oper) {
   }
 
   function inputFilterText() {
-    console.log("INPUT")
     if (!filter_blinking) {
-      console.log("INPUT 1")
       filter_blinking = setInterval(blinker, 1000);
     }
   }
@@ -104,7 +102,6 @@ if (grp_oper) {
     })
 
   }
-
   selectElement();
 
   channel.on('output', payload => {
@@ -142,12 +139,19 @@ if (grp_oper) {
           if (grp_oper_script.selectedIndex < 0) {
             grp_oper_script.selectedIndex = "0";
           }
-          getScript();
+          if (sessionStorage.getItem("grp_oper_show_only") == "true") {
+            getScriptMulti()
+          } else {
+            getScript();
+          }
         }
 
         if (grp_oper_script_multi) {
           grp_oper_script_multi.innerHTML = `${payload.script_list}`
           grp_oper_script_multi.addEventListener("click", getScriptMulti, false);
+          let selectedValues = JSON.parse(sessionStorage.getItem("grp_oper_last_script_multi"))
+          console.log("SelectedValies = ", selectedValues)
+
         }
         break;
 
@@ -270,8 +274,8 @@ if (grp_oper) {
     for (var i = 0; i < grp_oper_script_multi.selectedOptions.length; i++) {
       selectedValues.push(grp_oper_script_multi.selectedOptions[i].value);
     }
-    console.log("SELECTED VALUE:", selectedValues)
-    sessionStorage.setItem("grp_oper_last_script_multi", selectedValues)
+    console.log("SELECTED VALUES:", selectedValues)
+    sessionStorage.setItem("grp_oper_last_script_multi", JSON.stringify(selectedValues))
 
     channel.push('input', {
       cmd: "get_script_multi",
@@ -280,6 +284,20 @@ if (grp_oper) {
       class_id: sessionStorage.getItem("grp_oper_class_id"),
       filter: sessionStorage.getItem("grp_oper_filter")
     })
+  }
+
+  function getLastScriptMulti() {
+    let selectedValues = JSON.parse(sessionStorage.getItem("grp_oper_last_script_multi"))
+    console.log("LAST SELECTED VALUES:", selectedValues)
+/*
+    channel.push('input', {
+      cmd: "get_script_multi",
+      template_name_list: selectedValues,
+      group_id: sessionStorage.getItem("grp_oper_group_id"),
+      class_id: sessionStorage.getItem("grp_oper_class_id"),
+      filter: sessionStorage.getItem("grp_oper_filter")
+    })
+    */
   }
 
   let grp_oper_new_group = document.getElementById("grp-oper-new-group")
