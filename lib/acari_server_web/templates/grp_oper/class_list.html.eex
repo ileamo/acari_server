@@ -7,6 +7,6 @@
                     end)
     |> Enum.sort_by(fn {_, name} -> name end)
 %>
-<%= for {id, name} = class <- classes do %>
+<%= for {id, name} = _class <- classes do %>
   <option value="<%= id %>" ><%= name %></option>
 <% end %>

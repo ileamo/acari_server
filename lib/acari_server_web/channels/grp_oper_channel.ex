@@ -88,6 +88,29 @@ defmodule AcariServerWeb.GrpOperChannel do
             get_script(socket, tag, params["group_id"], params["class_id"], params["filter"])
         end
 
+      "get_script_multi" ->
+        case params["template_name_list"] do
+          [] ->
+            push(socket, "output", %{
+              id: "script",
+              opt: "Невыбран ни один скрипт",
+              data:
+                "Количество узлов в группе: #{
+                  get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+                  |> length()
+                }"
+            })
+
+          tag_list ->
+            get_script_multi(
+              socket,
+              tag_list,
+              params["group_id"],
+              params["class_id"],
+              params["filter"]
+            )
+        end
+
       "script" ->
         with tag when is_binary(tag) <- params["template_name"] do
           AcariServer.Mnesia.add_grp_oper(params["group_id"], tag)
@@ -224,6 +247,33 @@ defmodule AcariServerWeb.GrpOperChannel do
         Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res.html",
           script_res_list: script_res_list,
           request_date: AcariServer.Mnesia.get_grp_oper_timestamp(group_id, tag)
+        )
+    })
+  end
+
+  defp get_script_multi(socket, tag_list, group_id, class_id, filter) do
+    script_res_multi = get_nodes_list(socket, group_id, class_id, filter)
+    |> Enum.map(fn %{name: name} -> name end)
+    |> Enum.map(fn tun_name ->
+      tag_data_list =
+        tag_list
+        |> Enum.map(fn tag ->
+          %{data: data} =
+            AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] ||
+              %{data: "нет данных"}
+
+          {tag, data}
+        end)
+
+      %{id: tun_name, data_list: tag_data_list}
+    end)
+    |> IO.inspect()
+
+    push(socket, "output", %{
+      id: "script_multi",
+      data:
+        Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res_multi.html",
+          script_res_multi: script_res_multi
         )
     })
   end

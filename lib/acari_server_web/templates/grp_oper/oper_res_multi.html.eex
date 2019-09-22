@@ -1,0 +1,29 @@
+<hr/>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+  <thead>
+    <tr>
+      <th scope="col">Имя</th>
+      <% [%{data_list: data_list} | _] = @script_res_multi %>
+      <%=  for {tag, _data} <- data_list do %>
+        <th scope="col"><%= tag %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for %{id: id, data_list: data_list} <- @script_res_multi do %>
+      <tr>
+        <td><%= id %></td>
+
+        <%= for {_tag, data} <- data_list do  %>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#grp-script-res"
+              data-content="<%= data %>" data-name="<%= id %>">
+                  <%= if String.length(data) <= 16, do: data, else: (data |> String.slice(0, 16))<>"..." %>
+            </a>
+          </td>
+        <% end %>
+
+      </tr>
+    <% end %>
+  </tbody>
+</table>

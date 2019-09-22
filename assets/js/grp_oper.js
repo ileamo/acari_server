@@ -32,17 +32,19 @@ if (grp_oper) {
     grp_oper_script_multi.hidden = !show_only;
 
     grp_oper_show_only.addEventListener("change", showOnly, false);
+
     function showOnly() {
       console.log("SHOW:", grp_oper_show_only, this.checked)
       let checked = this.checked
       sessionStorage.setItem("grp_oper_show_only", checked)
       if (checked) {
-
         grp_oper_script_multi.hidden = false
         grp_oper_script_div.hidden = true
+        getScriptMulti()
       } else {
         grp_oper_script_multi.hidden = true
         grp_oper_script_div.hidden = false
+        getLastScript();
       }
     }
   }
@@ -147,6 +149,15 @@ if (grp_oper) {
           grp_oper_script_multi.innerHTML = `${payload.script_list}`
           grp_oper_script_multi.addEventListener("click", getScriptMulti, false);
         }
+        break;
+
+      case "script_multi":
+        document.querySelector("#go-script-name").innerText = "Результаты запросов"
+        document.querySelector("#go-script-field").innerHTML = `${payload.data}`
+        $("#datatable").DataTable({
+          stateSave: true,
+          responsive: true
+        });
         break;
 
       case "script":

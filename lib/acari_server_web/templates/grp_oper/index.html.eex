@@ -11,7 +11,7 @@
         <option disabled="disabled">─────────────</option>
         <% groups = AcariServer.GroupManager.list_groups()
                     |> Enum.sort_by(fn %{name: name} -> name end) %>
-        <%= for %{id: id, name: name} = group <- groups do %>
+        <%= for %{id: id, name: name} = _group <- groups do %>
           <option value="<%= id %>" ><%= name %></option>
         <% end %>
       </select>
