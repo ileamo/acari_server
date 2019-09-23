@@ -3,6 +3,7 @@
   <thead>
     <tr>
       <th scope="col">Имя</th>
+      <th scope="col">Описание</th>
       <% [%{data_list: data_list} | _] = @script_res_multi %>
       <%=  for {tag, _data} <- data_list do %>
         <th scope="col"><%= tag %></th>
@@ -10,9 +11,10 @@
     </tr>
   </thead>
   <tbody>
-    <%= for %{id: id, data_list: data_list} <- @script_res_multi do %>
+    <%= for %{id: id, description: descr, data_list: data_list} <- @script_res_multi do %>
       <tr>
         <td><%= id %></td>
+        <td><%= descr %></td>
 
         <%= for {_tag, data} <- data_list do  %>
           <% data = to_string(data) %>

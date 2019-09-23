@@ -231,13 +231,12 @@ defmodule AcariServerWeb.GrpOperChannel do
   defp get_script(socket, tag, group_id, nodes) do
     script_res_list =
       nodes
-      |> Enum.map(fn %{name: name} -> name end)
-      |> Enum.map(fn tun_name ->
+      |> Enum.map(fn %{name: tun_name, description: descr} ->
         %{timestamp: ts, data: data} =
           AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] ||
             %{timestamp: 0, data: "нет данных"}
 
-        %{id: tun_name, timestamp: ts, data: data |> to_string()}
+        %{id: tun_name, description: descr, timestamp: ts, data: data |> to_string()}
       end)
 
     push(socket, "output", %{
@@ -254,8 +253,7 @@ defmodule AcariServerWeb.GrpOperChannel do
   defp get_script_multi(socket, tag_list, group_id, class_id, filter) do
     script_res_multi =
       get_nodes_list(socket, group_id, class_id, filter)
-      |> Enum.map(fn %{name: name} -> name end)
-      |> Enum.map(fn tun_name ->
+      |> Enum.map(fn %{name: tun_name, description: descr} ->
         tag_data_list =
           (tag_list || [])
           |> Enum.map(fn tag ->
@@ -266,7 +264,7 @@ defmodule AcariServerWeb.GrpOperChannel do
             {tag, data}
           end)
 
-        %{id: tun_name, data_list: tag_data_list}
+        %{id: tun_name, description: descr, data_list: tag_data_list}
       end)
 
     push(socket, "output", %{
