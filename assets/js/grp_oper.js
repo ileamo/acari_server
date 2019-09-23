@@ -150,7 +150,7 @@ if (grp_oper) {
               selectedValues.indexOf(grp_oper_script_multi.options[i].value) >= 0;
           }
           if (sessionStorage.getItem("grp_oper_show_only") == "true") {
-            getScriptMulti()
+            getScriptMulti(false)
           }
         }
         break;
@@ -268,13 +268,14 @@ if (grp_oper) {
     }
   }
 
-  function getScriptMulti() {
+  function getScriptMulti(save) {
     let selectedValues = [];
     for (var i = 0; i < grp_oper_script_multi.selectedOptions.length; i++) {
       selectedValues.push(grp_oper_script_multi.selectedOptions[i].value);
     }
-    sessionStorage.setItem("grp_oper_last_script_multi", JSON.stringify(selectedValues))
-
+    if (save) {
+      sessionStorage.setItem("grp_oper_last_script_multi", JSON.stringify(selectedValues))
+    }
     channel.push('input', {
       cmd: "get_script_multi",
       template_name_list: selectedValues,
