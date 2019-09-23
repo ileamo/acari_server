@@ -143,6 +143,8 @@ if (grp_oper) {
 
         if (grp_oper_script_multi) {
           grp_oper_script_multi.innerHTML = `${payload.script_list}`
+
+          grp_oper_script_multi.setAttribute("size", Math.min(grp_oper_script_multi.length, 16));
           grp_oper_script_multi.addEventListener("click", getScriptMulti, false);
           let selectedValues = JSON.parse(sessionStorage.getItem("grp_oper_last_script_multi"))
           for (var i = 0; i < grp_oper_script_multi.options.length; i++) {
