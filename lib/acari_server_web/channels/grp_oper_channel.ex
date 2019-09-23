@@ -267,7 +267,6 @@ defmodule AcariServerWeb.GrpOperChannel do
 
       %{id: tun_name, data_list: tag_data_list}
     end)
-    |> IO.inspect()
 
     push(socket, "output", %{
       id: "script_multi",

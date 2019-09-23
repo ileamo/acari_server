@@ -15,6 +15,7 @@
         <td><%= id %></td>
 
         <%= for {_tag, data} <- data_list do  %>
+          <% data = to_string(data) %>
           <td>
             <a href="#" data-toggle="modal" data-target="#grp-script-res"
               data-content="<%= data %>" data-name="<%= id %>">

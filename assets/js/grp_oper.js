@@ -34,7 +34,6 @@ if (grp_oper) {
     grp_oper_show_only.addEventListener("change", showOnly, false);
 
     function showOnly() {
-      console.log("SHOW:", grp_oper_show_only, this.checked)
       let checked = this.checked
       sessionStorage.setItem("grp_oper_show_only", checked)
       if (checked) {
@@ -88,7 +87,6 @@ if (grp_oper) {
     let class_id = grp_oper_class.options[grp_oper_class.selectedIndex].value
     let group_id = grp_oper_group.options[grp_oper_group.selectedIndex].value
     let filter = grp_oper_filter_text.value
-    console.log(grp_oper_filter_text, filter)
     sessionStorage.setItem("grp_oper_class_id", class_id)
     sessionStorage.setItem("grp_oper_group_id", group_id)
     sessionStorage.setItem("grp_oper_filter", filter)
@@ -126,7 +124,6 @@ if (grp_oper) {
         if (grp_oper_class) {
           grp_oper_class.innerHTML = `${payload.class_list}`
           grp_oper_class.addEventListener("click", selectElement, false);
-          console.log(`${payload.class_id}`)
           grp_oper_class.value = `${payload.class_id}`;
           sessionStorage.setItem("grp_oper_class_id", grp_oper_class.value)
         }
@@ -139,9 +136,7 @@ if (grp_oper) {
           if (grp_oper_script.selectedIndex < 0) {
             grp_oper_script.selectedIndex = "0";
           }
-          if (sessionStorage.getItem("grp_oper_show_only") == "true") {
-            getScriptMulti()
-          } else {
+          if (sessionStorage.getItem("grp_oper_show_only") != "true") {
             getScript();
           }
         }
@@ -150,8 +145,13 @@ if (grp_oper) {
           grp_oper_script_multi.innerHTML = `${payload.script_list}`
           grp_oper_script_multi.addEventListener("click", getScriptMulti, false);
           let selectedValues = JSON.parse(sessionStorage.getItem("grp_oper_last_script_multi"))
-          console.log("SelectedValies = ", selectedValues)
-
+          for (var i = 0; i < grp_oper_script_multi.options.length; i++) {
+            grp_oper_script_multi.options[i].selected =
+              selectedValues.indexOf(grp_oper_script_multi.options[i].value) >= 0;
+          }
+          if (sessionStorage.getItem("grp_oper_show_only") == "true") {
+            getScriptMulti()
+          }
         }
         break;
 
@@ -218,7 +218,6 @@ if (grp_oper) {
 
   function getScript() {
     let index = grp_oper_script.selectedIndex
-    console.log("GET_SCRIPT", index);
     if (index >= -1) {
       let script_name
       if (index >= 0) {
@@ -274,7 +273,6 @@ if (grp_oper) {
     for (var i = 0; i < grp_oper_script_multi.selectedOptions.length; i++) {
       selectedValues.push(grp_oper_script_multi.selectedOptions[i].value);
     }
-    console.log("SELECTED VALUES:", selectedValues)
     sessionStorage.setItem("grp_oper_last_script_multi", JSON.stringify(selectedValues))
 
     channel.push('input', {
@@ -288,8 +286,6 @@ if (grp_oper) {
 
   function getLastScriptMulti() {
     let selectedValues = JSON.parse(sessionStorage.getItem("grp_oper_last_script_multi"))
-    console.log("LAST SELECTED VALUES:", selectedValues)
-/*
     channel.push('input', {
       cmd: "get_script_multi",
       template_name_list: selectedValues,
@@ -297,7 +293,6 @@ if (grp_oper) {
       class_id: sessionStorage.getItem("grp_oper_class_id"),
       filter: sessionStorage.getItem("grp_oper_filter")
     })
-    */
   }
 
   let grp_oper_new_group = document.getElementById("grp-oper-new-group")
