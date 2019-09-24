@@ -8,7 +8,6 @@
       <th scope="col">Класс</th>
       <th scope="col">Параметры</th>
       <th scope="col">Группы</th>
-      <th scope="col">Блокировка</th>
 
       <th scope="col"></th>
     </tr>
@@ -24,17 +23,18 @@
       <td><%= param_list(node.params) %></td>
       <td><%= AcariServer.GroupManager.groups_list(node) %></td>
       <% {color, text, confirm} = if node.lock do
-           {"text-danger", "Да", "Разблокировать?"}
+           {"text-danger", "Разблокировать", "Разблокировать?"}
          else
-           {"", "Нет", "Заблокировать?"}
+           {"", "Заблокировать", "Заблокировать?"}
          end
       %>
-      <td class="<%=color%>">
-        <%= link text,
-        to: Routes.node_path(@conn, :toggle_lock, node, lock: !node.lock), class: color, data: [confirm: confirm] %>
-      </td>
       <td>
         <%= link "Редактировать", to: Routes.node_path(@conn, :edit, node) %>
+        |
+        <span class="<%=color%>">
+        <%= link text,
+        to: Routes.node_path(@conn, :toggle_lock, node, lock: !node.lock), class: color, data: [confirm: confirm] %>
+      </span>
         |
         <%= link "Удалить", to: Routes.node_path(@conn, :delete, node),
         method: :delete, data: [confirm: "Вы уверены?"] %>
