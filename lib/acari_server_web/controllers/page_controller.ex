@@ -27,6 +27,14 @@ defmodule AcariServerWeb.PageController do
     render(conn, "xterm.html")
   end
 
+  def help(conn, _params) do
+    render(conn, "help.html")
+  end
+
+  def faq(conn, _params) do
+    render(conn, "faq.html")
+  end
+
   def secret(conn, _) do
     user = Guardian.Plug.current_resource(conn)
     render(conn, "secret.html", current_user: user)

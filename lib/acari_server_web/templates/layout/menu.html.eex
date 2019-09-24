@@ -69,4 +69,10 @@
       О программе
     </a>
   </li>
+  <li class="nav-item">
+    <%= link "Помощь", to: Routes.page_path(@conn, :help), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "ЧаВо", to: Routes.page_path(@conn, :faq), class: "nav-link" %>
+  </li>
 </ul>
