@@ -400,7 +400,7 @@ defmodule AcariServer.Mnesia do
 
       server_list
       |> Enum.reject(fn {_, name, _, _} -> Enum.member?(down_server_list, name) end)
-      |> Enum.min_by(fn {_, _, num, _} -> num end)
+      |> Enum.min_by(fn {_, _, num, _} -> num end, fn -> {node()} end)
       |> elem(0)
     else
       _ -> node()

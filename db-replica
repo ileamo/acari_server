@@ -1,0 +1,32 @@
+#!/bin/sh
+
+#master
+docker run -t \
+  --name bogatka-db \
+  --restart unless-stopped \
+  -e POSTGRESQL_REPLICATION_MODE=master \
+  -e POSTGRESQL_USERNAME=postgres \
+  -e POSTGRESQL_PASSWORD=postgres \
+  -e POSTGRESQL_DATABASE=acari_server_prod \
+  -e POSTGRESQL_REPLICATION_USER=postgres \
+  -e POSTGRESQL_REPLICATION_PASSWORD=postgres \
+  -p 55432:5432 \
+  -v /var/lib/postgresql/docker/acari-server:/bitnami/postgresql \
+  -v /etc/localtime:/etc/localtime:ro \
+  -d bitnami/postgresql:latest
+
+#replica
+docker run -t \
+  --name  bokatka-db-replica-1 \
+  --restart unless-stopped \
+  --link bogatka-db:master \
+  -e POSTGRESQL_REPLICATION_MODE=slave \
+  -e POSTGRESQL_MASTER_HOST=master \
+  -e POSTGRESQL_MASTER_PORT_NUMBER=5432 \
+  -e POSTGRESQL_PASSWORD=postgres \
+  -e POSTGRESQL_REPLICATION_USER=postgres \
+  -e POSTGRESQL_REPLICATION_PASSWORD=postgres \
+  -p 51432:5432 \
+  -v /var/lib/postgresql/docker/acari-server-replica_1:/bitnami/postgresql \
+  -v /etc/localtime:/etc/localtime:ro \
+  -d bitnami/postgresql:latest
