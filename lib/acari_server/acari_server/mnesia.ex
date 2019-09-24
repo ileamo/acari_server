@@ -323,6 +323,7 @@ defmodule AcariServer.Mnesia do
         record
         |> Rec.tun(:state)
         |> Map.merge(%{
+          id: node.id,
           name: name,
           description: node.description,
           server:
@@ -333,6 +334,7 @@ defmodule AcariServer.Mnesia do
 
       _ ->
         %{
+          id: node.id,
           name: name,
           description: node.description,
           server: nil
