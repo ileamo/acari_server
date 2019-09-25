@@ -40,8 +40,8 @@ defmodule AcariServer.RepoManager do
   end
 
   @impl true
-  def handle_call(:get_state, _from, state) do
-    {:reply, state, state}
+  def handle_call(:get_db_conn, _from, state) do
+    {:reply, state |> get_db_conn_p(), state}
   end
 
   defp db_down(repo_type, reason, state) do
@@ -80,12 +80,21 @@ defmodule AcariServer.RepoManager do
     end
   end
 
-  def get_state() do
-    GenServer.call(__MODULE__, :get_state)
+  defp get_db_conn_p(state) do
+    state
+    |> Map.from_struct()
+    |> Enum.map(fn
+      {k, %{config: c}} -> {k, "#{c[:hostname]}:#{c[:port]}"}
+      {k, _} -> {k, nil}
+    end)
   end
 
-  def get_state(node) do
-    GenServer.call({__MODULE__, node}, :get_state)
+  def get_db_conn() do
+    GenServer.call(__MODULE__, :get_db_conn)
+  end
+
+  def get_db_conn(node) do
+    GenServer.call({__MODULE__, node}, :get_db_conn)
   end
 
   def pg_is_in_recovery(repo) do

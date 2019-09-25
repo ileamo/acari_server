@@ -52,7 +52,7 @@
         2 -> "table-warning"
         3 -> "table-info"
         4 -> ""
-        _ -> "table-secondary"
+        _ -> "table-dark"
       end%>
     <tr class="<%=al%>">
       <td><%= tunnel[:alert] %></td>
