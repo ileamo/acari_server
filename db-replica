@@ -17,7 +17,7 @@ docker run -t \
 
 #replica
 docker run -t \
-  --name  bokatka-db-replica-1 \
+  --name  bogatka-db-replica-1 \
   --restart unless-stopped \
   --link bogatka-db:master \
   -e POSTGRESQL_REPLICATION_MODE=slave \

@@ -75,12 +75,12 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
 config :acari_server, AcariServer.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "acari_server_prod",
   hostname: "10.0.10.10",
-  port: 55432,
-  pool_size: 10
+  port: 55432
+
+config :acari_server, AcariServer.RepoRO,
+  hostname: "10.0.10.10",
+  port: 51432
 
 config :acari_server, AcariServer, allow_unconfigured: false
 
