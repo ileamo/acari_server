@@ -11,6 +11,8 @@ defmodule AcariServer.Application do
     children = [
       # Start the Ecto repository
       AcariServer.Repo,
+      AcariServer.RepoManager,
+
       # Start the endpoint when the application starts
       AcariServerWeb.Endpoint,
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
