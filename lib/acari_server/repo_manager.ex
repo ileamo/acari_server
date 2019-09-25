@@ -9,7 +9,7 @@ defmodule AcariServer.RepoManager do
   end
 
   def start_link(params) do
-    GenServer.start_link(__MODULE__, params)
+    GenServer.start_link(__MODULE__, params, name: __MODULE__)
   end
 
   @impl true
@@ -35,12 +35,17 @@ defmodule AcariServer.RepoManager do
   end
 
   def handle_info(_message, state) do
-    #IO.inspect(message)
+    # IO.inspect(message)
     {:noreply, state}
   end
 
-  defp db_down(repo_type, reason, %State{ro: %{config: config}} = state) do
-    IO.inspect(reason)
+  @impl true
+  def handle_call(:get_state, _from, state) do
+    {:reply, state, state}
+  end
+
+  defp db_down(repo_type, reason, state) do
+    config = Map.get(state, repo_type).config
 
     Logger.error(
       "DB #{config[:hostname]}:#{config[:port]} down: #{
@@ -73,6 +78,14 @@ defmodule AcariServer.RepoManager do
         Process.send_after(self(), {:connect_db, repo_type}, 10_000)
         %{pid: nil}
     end
+  end
+
+  def get_state() do
+    GenServer.call(__MODULE__, :get_state)
+  end
+
+  def get_state(node) do
+    GenServer.call({__MODULE__, node}, :get_state)
   end
 
   def pg_is_in_recovery(repo) do

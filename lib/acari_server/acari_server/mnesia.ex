@@ -1,5 +1,6 @@
 defmodule AcariServer.Mnesia.Attr do
   def server(), do: [:system_name, :name, :up, :opt]
+  def db(), do: [:id, :up, :opt]
   def tun(), do: [:name, :server_id, :state, :opt]
 
   # for link and event id = {dev, tun, node}
@@ -10,7 +11,7 @@ defmodule AcariServer.Mnesia.Attr do
   def session(), do: [:jti, :params, :activity]
   def grp_oper(), do: [:id, :timestamp, :opt]
 
-  def table_list(), do: [:server, :tun, :link, :event, :stat, :zabbix, :session, :grp_oper]
+  def table_list(), do: [:server, :db, :tun, :link, :event, :stat, :zabbix, :session, :grp_oper]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -95,6 +96,9 @@ defmodule AcariServer.Mnesia do
   end
 
   # Data Base
+  def update_db(id, up) do
+  end
+
   def get_down_db() do
     []
   end
