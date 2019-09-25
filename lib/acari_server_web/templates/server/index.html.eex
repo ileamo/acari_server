@@ -9,6 +9,8 @@
       <th scope="col">Системное имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Статус</th>
+      <th scope="col">База Данных</th>
+      <th scope="col">БД(readonly)</th>
       <th scope="col"></th>
     </tr>
   </thead>
@@ -28,6 +30,15 @@
           end
       %>
       <td class="<%=color%>"><%= value %></td>
+      <%
+        db_conn = if value == "UP" do
+          AcariServer.RepoManager.get_db_conn(server.system_name |> String.to_atom())
+        else
+          [rw: "", ro: ""]
+        end
+      %>
+      <td class="<%= db_conn[:rw] && "" || "text-danger" %>"><%= db_conn[:rw] || "Отключена" %></td>
+      <td class="<%= db_conn[:ro] && "" || "text-danger" %>"><%= db_conn[:ro] || "Отключена" %></td>
 
       <td>
         <%= link "Редактировать", to: Routes.server_path(@conn, :edit, server) %>
