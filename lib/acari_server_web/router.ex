@@ -67,6 +67,7 @@ defmodule AcariServerWeb.Router do
     resources "/scripts", ScriptController
     resources "/templates", TemplateController
     resources "/servers", ServerController
+    resources "/notes", NoteController
 
     get "/secret", PageController, :secret
   end
