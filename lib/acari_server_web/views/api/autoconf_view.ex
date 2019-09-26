@@ -1,6 +1,5 @@
 defmodule AcariServerWeb.Api.AutoconfView do
   use AcariServerWeb, :view
-  alias AcariServerWeb.Api.AutoconfView
 
   def render("result.json", %{id: id, result: result}) do
     %{"id" => id, "result" => result}

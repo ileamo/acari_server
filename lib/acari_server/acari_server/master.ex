@@ -1,7 +1,6 @@
 defmodule AcariServer.Master do
   use GenServer
   require Logger
-  require Acari.Const, as: Const
   alias AcariServer.Mnesia
 
   defmodule State do

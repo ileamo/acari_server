@@ -95,14 +95,6 @@ defmodule AcariServer.Mnesia do
     update_servers_list(servers_db, true)
   end
 
-  # Data Base
-  def update_db(id, up) do
-  end
-
-  def get_down_db() do
-    []
-  end
-
   # server
 
   def update_servers_list() do

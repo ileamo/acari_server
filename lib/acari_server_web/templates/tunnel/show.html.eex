@@ -91,7 +91,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
     <%= if @current_user.is_admin do %>
       <button id="start_xterm">Подключиться к клиенту</button>
       <div id="acari-xterm"></div>
-    <%= end %>
+    <% end %>
   </div>
 
 

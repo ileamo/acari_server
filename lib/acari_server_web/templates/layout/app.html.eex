@@ -60,9 +60,8 @@
             <main role="main" class="col-12 col-lg px-0 px-lg-4 mr-1" id="mainPage" style="overflow-x: auto">
               <% dsl = AcariServer.Mnesia.get_down_servers()
                  usl = AcariServer.Mnesia.get_unregistered_servers()
-                 dbd = AcariServer.Mnesia.get_down_db()
               %>
-              <%= if dsl != [] or usl != [] or dbd != [] do %>
+              <%= if dsl != [] or usl != [] do %>
                 <p class="alert alert-danger" role="alert">
                   <%= if dsl != [] do %>
                     <%= for ser <- dsl do %>
@@ -74,9 +73,6 @@
                   <% end %>
                   <%= if usl != [] do %>
                     Обнаружены незарегистртрованные сервера: <%= usl |> Enum.join(", ") %>
-                  <% end %>
-                  <%= if dbd != [] do %>
-                    Обнаружены неработающие базы данных: <%= dbd |> Enum.join(", ") %>
                   <% end %>
                 </p>
               <% end %>

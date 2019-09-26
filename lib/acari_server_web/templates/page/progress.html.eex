@@ -24,7 +24,7 @@ end
     %>
 
     <div class="progress">
-      <%= for {{node, n, q, p}, i} <- list_idx do %>
+      <%= for {{_node, n, q, p}, i} <- list_idx do %>
 
       <div class="progress-bar bg-<%= elem(color, rem(i, 3)) %>" role="progressbar" style="width: <%= p %>%" aria-valuenow="<%= q %>" aria-valuemin="0" aria-valuemax="<%= sum %>"><%= n %></div>
       <% end %>
