@@ -4,15 +4,19 @@ defmodule AcariServer.RepoRO do
     adapter: Ecto.Adapters.Postgres,
     read_only: true
 
-  def init(type, config) do
+  @params [
+    username: "postgres",
+    password: "postgres",
+    database: "acari_server_prod",
+    pool_size: 10
+  ]
 
-    params = [
-      username: "postgres",
-      password: "postgres",
-      database: "acari_server_prod",
-      pool_size: 10
-    ]
+  def init(:runtime, config) do
+    {:ok, config |> Keyword.merge(@params)}
+  end
 
-    {:ok, config |> Keyword.merge(params)}
+  def init(_type, config) do
+    host_port = AcariServer.RepoManager.get_db_config(:ro)
+    {:ok, config |> Keyword.merge(@params) |> Keyword.merge(host_port)}
   end
 end

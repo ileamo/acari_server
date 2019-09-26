@@ -82,6 +82,10 @@ config :acari_server, AcariServer.RepoRO,
   hostname: "10.0.10.10",
   port: 51432
 
+config :acari_server, AcariServer.RepoManager,
+  rw: "10.0.10.10:55432,10.0.10.10:51432",
+  ro: "10.0.10.10:51432,10.0.10.10:55432"
+
 config :acari_server, AcariServer, allow_unconfigured: false
 
 config :acari_server, AcariServer.Listener,

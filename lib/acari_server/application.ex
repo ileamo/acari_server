@@ -10,9 +10,9 @@ defmodule AcariServer.Application do
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
+      AcariServer.RepoManager,
       AcariServer.Repo,
       AcariServer.RepoRO,
-      AcariServer.RepoManager,
 
       # Start the endpoint when the application starts
       AcariServerWeb.Endpoint,
