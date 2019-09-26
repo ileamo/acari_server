@@ -74,13 +74,13 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
-config :acari_server, AcariServer.Repo,
-  hostname: "10.0.10.10",
-  port: 55432
+# config :acari_server, AcariServer.Repo,
+#   hostname: "10.0.10.10",
+#   port: 55432
 
-config :acari_server, AcariServer.RepoRO,
-  hostname: "10.0.10.10",
-  port: 51432
+# config :acari_server, AcariServer.RepoRO,
+#   hostname: "10.0.10.10",
+#   port: 51432
 
 config :acari_server, AcariServer.RepoManager,
   rw: "10.0.10.10:55432,10.0.10.10:51432",

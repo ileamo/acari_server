@@ -20,13 +20,18 @@ config :logger, :error_log,
   level: :error
 
 # Configure your database
-config :acari_server, AcariServer.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "acari_server_prod",
-  hostname: System.get_env("DB_HOST"),
-  pool_size: 10
+# config :acari_server, AcariServer.Repo,
+#   adapter: Ecto.Adapters.Postgres,
+#   username: "postgres",
+#   password: "postgres",
+#   database: "acari_server_prod",
+#   hostname: System.get_env("DB_HOST"),
+#   pool_size: 10
+
+config :acari_server, AcariServer.RepoManager,
+  rw: System.get_env("DB_HOSTS_RW"),
+  ro: System.get_env("DB_HOSTS_RO")
+
 
 config :acari_server, AcariServer, allow_unconfigured: false
 

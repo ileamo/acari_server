@@ -14,7 +14,6 @@ defmodule AcariServer.RepoManager do
 
   @impl true
   def init(_params) do
-    IO.inspect("START RepoManager")
     Process.flag(:trap_exit, true)
 
     conf = Application.get_env(:acari_server, AcariServer.RepoManager)
@@ -29,8 +28,7 @@ defmodule AcariServer.RepoManager do
      %State{
        rw: %{pid: rw_pid, config: rw_host_port, db_list: rw_db_list},
        ro: %{pid: ro_pid, config: ro_host_port, db_list: ro_db_list}
-     }
-     |> IO.inspect()}
+     }}
   end
 
   @impl true
@@ -42,14 +40,29 @@ defmodule AcariServer.RepoManager do
     db_down(:ro, reason, state)
   end
 
-  def handle_info({:connect_db, repo_type}, state) do
-    IO.inspect(repo_type, label: "RECONNECT")
+  def handle_info({:connect_db, :rw}, state) do
+    {pid, host_port} = get_db_rw(state.rw[:db_list])
 
-    {:noreply, state}
+    case pid do
+      pid when is_pid(pid) -> AcariServer.Repo.stop()
+      _ -> Process.send_after(self(), {:connect_db, :rw}, 10_000)
+    end
+
+    {:noreply, %State{state | rw: state.rw |> Map.merge(%{pid: pid, config: host_port})}}
   end
 
-  def handle_info(message, state) do
-    IO.inspect(message)
+  def handle_info({:connect_db, :ro}, state) do
+    {pid, host_port} = get_db_ro(state.ro[:db_list])
+
+    case pid do
+      pid when is_pid(pid) -> AcariServer.RepoRO.stop()
+      _ -> Process.send_after(self(), {:connect_db, :ro}, 10_000)
+    end
+
+    {:noreply, %State{state | ro: state.ro |> Map.merge(%{pid: pid, config: host_port})}}
+  end
+
+  def handle_info(_message, state) do
     {:noreply, state}
   end
 
@@ -79,7 +92,8 @@ defmodule AcariServer.RepoManager do
   end
 
   defp db_down(repo_type, reason, state) do
-    config = Map.get(state, repo_type).config
+    repo_state = Map.get(state, repo_type)
+    config = repo_state.config
 
     Logger.error(
       "DB #{config[:hostname]}:#{config[:port]} down: #{
@@ -88,7 +102,7 @@ defmodule AcariServer.RepoManager do
     )
 
     Process.send_after(self(), {:connect_db, repo_type}, 10_000)
-    {:noreply, state |> Map.put(repo_type, %{pid: nil})}
+    {:noreply, state |> Map.put(repo_type, repo_state |> Map.merge(%{pid: nil, config: nil}))}
   end
 
   defp get_db_ro(db_list) do
@@ -128,15 +142,14 @@ defmodule AcariServer.RepoManager do
            # |> Keyword.put(:name, nil)
          ) do
       {:ok, _repo} ->
-        res =
-          pg_is_in_recovery(AcariServer.RepoTest)
+        res = pg_is_in_recovery(AcariServer.RepoTest)
 
-        AcariServer.RepoTest.stop(5000)
+        AcariServer.RepoTest.stop()
 
         !res
 
       _ ->
-        #AcariServer.RepoTest.stop(5000)
+        # AcariServer.RepoTest.stop(5000)
         false
     end
   end
