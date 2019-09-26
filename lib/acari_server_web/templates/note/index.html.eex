@@ -1,10 +1,12 @@
-<h1>Listing Notes</h1>
+<h1>Заметки</h1>
 
-<table>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
-      <th>Subject</th>
-      <th>Body</th>
+      <th>Дата</th>
+      <th>Пользователь</th>
+      <th>Тема</th>
+      <th>Сообщение</th>
 
       <th></th>
     </tr>
@@ -12,17 +14,21 @@
   <tbody>
 <%= for note <- @notes do %>
     <tr>
+      <td><%= AcariServer.db_time_to_local(note.inserted_at) %></td>
+      <td><%= note.id %></td>
       <td><%= note.subject %></td>
       <td><%= note.body %></td>
 
       <td>
-        <%= link "Show", to: Routes.note_path(@conn, :show, note) %>
-        <%= link "Edit", to: Routes.note_path(@conn, :edit, note) %>
-        <%= link "Delete", to: Routes.note_path(@conn, :delete, note), method: :delete, data: [confirm: "Are you sure?"] %>
+        <%= link "Показать", to: Routes.note_path(@conn, :show, note) %>
+        |
+        <%= link "Редактировать", to: Routes.note_path(@conn, :edit, note) %>
+        |
+        <%= link "Удалить", to: Routes.note_path(@conn, :delete, note), method: :delete, data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New Note", to: Routes.note_path(@conn, :new) %></span>
+<span><%= link "Новая заметка", to: Routes.note_path(@conn, :new) %></span>

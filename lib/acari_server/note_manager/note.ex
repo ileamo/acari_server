@@ -1,4 +1,4 @@
-defmodule AcariServer.NotesManager.Note do
+defmodule AcariServer.NoteManager.Note do
   use Ecto.Schema
   import Ecto.Changeset
 

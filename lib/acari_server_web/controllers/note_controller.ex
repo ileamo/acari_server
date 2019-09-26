@@ -1,21 +1,21 @@
 defmodule AcariServerWeb.NoteController do
   use AcariServerWeb, :controller
 
-  alias AcariServer.NotesManager
-  alias AcariServer.NotesManager.Note
+  alias AcariServer.NoteManager
+  alias AcariServer.NoteManager.Note
 
   def index(conn, _params) do
-    notes = NotesManager.list_notes()
+    notes = NoteManager.list_notes()
     render(conn, "index.html", notes: notes)
   end
 
   def new(conn, _params) do
-    changeset = NotesManager.change_note(%Note{})
+    changeset = NoteManager.change_note(%Note{})
     render(conn, "new.html", changeset: changeset)
   end
 
   def create(conn, %{"note" => note_params}) do
-    case NotesManager.create_note(note_params) do
+    case NoteManager.create_note(note_params) do
       {:ok, note} ->
         conn
         |> put_flash(:info, "Note created successfully.")
@@ -27,20 +27,20 @@ defmodule AcariServerWeb.NoteController do
   end
 
   def show(conn, %{"id" => id}) do
-    note = NotesManager.get_note!(id)
+    note = NoteManager.get_note!(id)
     render(conn, "show.html", note: note)
   end
 
   def edit(conn, %{"id" => id}) do
-    note = NotesManager.get_note!(id)
-    changeset = NotesManager.change_note(note)
+    note = NoteManager.get_note!(id)
+    changeset = NoteManager.change_note(note)
     render(conn, "edit.html", note: note, changeset: changeset)
   end
 
   def update(conn, %{"id" => id, "note" => note_params}) do
-    note = NotesManager.get_note!(id)
+    note = NoteManager.get_note!(id)
 
-    case NotesManager.update_note(note, note_params) do
+    case NoteManager.update_note(note, note_params) do
       {:ok, note} ->
         conn
         |> put_flash(:info, "Note updated successfully.")
@@ -52,8 +52,8 @@ defmodule AcariServerWeb.NoteController do
   end
 
   def delete(conn, %{"id" => id}) do
-    note = NotesManager.get_note!(id)
-    {:ok, _note} = NotesManager.delete_note(note)
+    note = NoteManager.get_note!(id)
+    {:ok, _note} = NoteManager.delete_note(note)
 
     conn
     |> put_flash(:info, "Note deleted successfully.")

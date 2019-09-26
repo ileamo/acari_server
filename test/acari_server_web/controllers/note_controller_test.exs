@@ -1,14 +1,14 @@
 defmodule AcariServerWeb.NoteControllerTest do
   use AcariServerWeb.ConnCase
 
-  alias AcariServer.NotesManager
+  alias AcariServer.NoteManager
 
   @create_attrs %{body: "some body", subject: "some subject"}
   @update_attrs %{body: "some updated body", subject: "some updated subject"}
   @invalid_attrs %{body: nil, subject: nil}
 
   def fixture(:note) do
-    {:ok, note} = NotesManager.create_note(@create_attrs)
+    {:ok, note} = NoteManager.create_note(@create_attrs)
     note
   end
 

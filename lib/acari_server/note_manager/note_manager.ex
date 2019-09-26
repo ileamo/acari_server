@@ -1,12 +1,12 @@
-defmodule AcariServer.NotesManager do
+defmodule AcariServer.NoteManager do
   @moduledoc """
-  The NotesManager context.
+  The NoteManager context.
   """
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
 
-  alias AcariServer.NotesManager.Note
+  alias AcariServer.NoteManager.Note
 
   @doc """
   Returns the list of notes.
