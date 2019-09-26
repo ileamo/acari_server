@@ -197,7 +197,12 @@ defmodule AcariServer.RepoManager do
   end
 
   def get_db_config(repo_type) do
-    GenServer.call(__MODULE__, {:get_db_config, repo_type})
+    try do
+      GenServer.call(__MODULE__, {:get_db_config, repo_type})
+    catch
+      # For ecto.migrate
+      _, _ -> []
+    end
   end
 
   def pg_is_in_recovery(repo) do
