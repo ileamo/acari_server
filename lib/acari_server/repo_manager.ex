@@ -2,7 +2,8 @@ defmodule AcariServer.RepoManager do
   use GenServer
   alias Ecto.Adapters.SQL
   require Logger
-
+  @reconnect_timeout 5_000
+  
   defmodule State do
     defstruct rw: %{pid: nil},
               ro: %{pid: nil}
@@ -45,7 +46,7 @@ defmodule AcariServer.RepoManager do
 
     case pid do
       pid when is_pid(pid) -> AcariServer.Repo.stop()
-      _ -> Process.send_after(self(), {:connect_db, :rw}, 10_000)
+      _ -> Process.send_after(self(), {:connect_db, :rw}, @reconnect_timeout)
     end
 
     {:noreply, %State{state | rw: state.rw |> Map.merge(%{pid: pid, config: host_port})}}
@@ -56,7 +57,7 @@ defmodule AcariServer.RepoManager do
 
     case pid do
       pid when is_pid(pid) -> AcariServer.RepoRO.stop()
-      _ -> Process.send_after(self(), {:connect_db, :ro}, 10_000)
+      _ -> Process.send_after(self(), {:connect_db, :ro}, @reconnect_timeout)
     end
 
     {:noreply, %State{state | ro: state.ro |> Map.merge(%{pid: pid, config: host_port})}}
@@ -101,7 +102,7 @@ defmodule AcariServer.RepoManager do
       }"
     )
 
-    Process.send_after(self(), {:connect_db, repo_type}, 10_000)
+    Process.send_after(self(), {:connect_db, repo_type}, @reconnect_timeout)
     {:noreply, state |> Map.put(repo_type, repo_state |> Map.merge(%{pid: nil, config: nil}))}
   end
 
@@ -168,7 +169,7 @@ defmodule AcariServer.RepoManager do
     |> Map.from_struct()
     |> Enum.map(fn
       {k, %{config: nil}} -> {k, nil}
-      {k, %{config: c}} -> {k, c[:hostname]<>(c[:port] && ":#{c[:port]}" || "")}
+      {k, %{config: c}} -> {k, c[:hostname] <> ((c[:port] && ":#{c[:port]}") || "")}
       {k, _} -> {k, nil}
     end)
   end
