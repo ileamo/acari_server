@@ -76,7 +76,7 @@ defmodule AcariServerWeb.ScriptController do
       |> Enum.into(%{})
 
     client
-    |> AcariServer.Repo.preload(:groups)
+    |> AcariServer.RepoRO.preload(:groups)
     |> AcariServer.NodeManager.update_node(%{"params" => params, "groups_list" => false})
   end
 

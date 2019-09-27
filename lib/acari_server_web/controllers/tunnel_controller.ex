@@ -14,7 +14,7 @@ defmodule AcariServerWeb.TunnelController do
   def index(%{assigns: %{current_user: user}} = conn, _params) do
     groups =
       user
-      |> AcariServer.Repo.preload(groups: :nodes)
+      |> AcariServer.RepoRO.preload(groups: :nodes)
       |> Map.get(:groups)
 
     nodes =
@@ -40,7 +40,7 @@ defmodule AcariServerWeb.TunnelController do
 
           _ ->
             user
-            |> AcariServer.Repo.preload(:groups)
+            |> AcariServer.RepoRO.preload(:groups)
             |> Map.get(:groups)
         end
     )

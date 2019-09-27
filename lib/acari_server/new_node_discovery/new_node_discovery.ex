@@ -5,6 +5,7 @@ defmodule AcariServer.NewNodeDiscovery do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.NewNodeDiscovery.NewNode
 
@@ -18,7 +19,7 @@ defmodule AcariServer.NewNodeDiscovery do
 
   """
   def list_newnodes do
-    Repo.all(NewNode)
+    RepoRO.all(NewNode)
   end
 
   @doc """
@@ -35,7 +36,7 @@ defmodule AcariServer.NewNodeDiscovery do
       ** (Ecto.NoResultsError)
 
   """
-  def get_new_node!(id), do: Repo.get!(NewNode, id)
+  def get_new_node!(id), do: RepoRO.get!(NewNode, id)
 
   @doc """
   Creates a new_node.
@@ -56,7 +57,7 @@ defmodule AcariServer.NewNodeDiscovery do
   end
 
   def insert_or_update_new_node(attrs = %{name: name}) do
-    case NewNode |> Repo.get_by(name: name) do
+    case NewNode |> RepoRO.get_by(name: name) do
       nil -> %NewNode{}
       newnode -> newnode
     end
@@ -99,7 +100,7 @@ defmodule AcariServer.NewNodeDiscovery do
   end
 
   def delete_new_node_by_name(name) do
-    case NewNode |> Repo.get_by(name: name) do
+    case NewNode |> RepoRO.get_by(name: name) do
       nil -> nil
       newnode -> Repo.delete(newnode)
     end

@@ -5,6 +5,7 @@ defmodule AcariServer.ScriptManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.ScriptManager.Script
 
@@ -19,8 +20,8 @@ defmodule AcariServer.ScriptManager do
   """
   def list_scripts do
     Script
-    |> Repo.all()
-    |> Repo.preload(:templates)
+    |> RepoRO.all()
+    |> RepoRO.preload(:templates)
   end
 
   def script_name_id_pairs_list(no_script) do
@@ -46,13 +47,13 @@ defmodule AcariServer.ScriptManager do
   """
   def get_script!(id) do
     Script
-    |> Repo.get!(id)
-    |> Repo.preload(:templates)
+    |> RepoRO.get!(id)
+    |> RepoRO.preload(:templates)
   end
 
   def get_script(id) do
     Script
-    |> Repo.get(id)
+    |> RepoRO.get(id)
   end
 
   @doc """
@@ -123,6 +124,6 @@ defmodule AcariServer.ScriptManager do
   end
 
   def get_clients_of_class(%Script{} = script) do
-    Repo.preload(script, :nodes).nodes
+    RepoRO.preload(script, :nodes).nodes
   end
 end

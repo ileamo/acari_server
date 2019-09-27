@@ -5,6 +5,7 @@ defmodule AcariServer.UserManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.UserManager.User
   alias Plug.Conn
@@ -20,8 +21,8 @@ defmodule AcariServer.UserManager do
   """
   def list_users do
     User
-    |> Repo.all()
-    |> Repo.preload(:groups)
+    |> RepoRO.all()
+    |> RepoRO.preload(:groups)
   end
 
   @doc """
@@ -40,11 +41,11 @@ defmodule AcariServer.UserManager do
   """
   def get_user!(id) do
     User
-    |> Repo.get!(id)
-    |> Repo.preload(:groups)
+    |> RepoRO.get!(id)
+    |> RepoRO.preload(:groups)
   end
 
-  def get_user(id), do: Repo.get(User, id)
+  def get_user(id), do: RepoRO.get(User, id)
 
   @doc """
   Creates a user.
@@ -118,7 +119,7 @@ defmodule AcariServer.UserManager do
   def authenticate_user(username, plain_text_password) do
     query = from u in User, where: u.username == ^username
 
-    case Repo.one(query) do
+    case RepoRO.one(query) do
       nil ->
         Bcrypt.dummy_checkpw()
         {:error, :invalid_credentials}
@@ -176,7 +177,7 @@ defmodule AcariServer.UserManager do
   end
 
   defp is_user_in_group(conn, user, groups_list) do
-    user_groups = user |> Repo.preload(:groups) |> AcariServer.GroupManager.group_id_list()
+    user_groups = user |> RepoRO.preload(:groups) |> AcariServer.GroupManager.group_id_list()
 
     case groups_list |> Enum.any?(fn x -> Enum.member?(user_groups, x) end) do
       true -> conn

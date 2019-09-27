@@ -5,6 +5,7 @@ defmodule AcariServer.NoteManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.NoteManager.Note
 
@@ -18,7 +19,7 @@ defmodule AcariServer.NoteManager do
 
   """
   def list_notes do
-    Repo.all(Note)
+    RepoRO.all(Note)
   end
 
   @doc """
@@ -35,7 +36,7 @@ defmodule AcariServer.NoteManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_note!(id), do: Repo.get!(Note, id)
+  def get_note!(id), do: RepoRO.get!(Note, id)
 
   @doc """
   Creates a note.

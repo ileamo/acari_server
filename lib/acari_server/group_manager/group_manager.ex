@@ -5,6 +5,7 @@ defmodule AcariServer.GroupManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.GroupManager.Group
 
@@ -18,7 +19,7 @@ defmodule AcariServer.GroupManager do
 
   """
   def list_groups do
-    Repo.all(Group)
+    RepoRO.all(Group)
   end
 
   def group_name_id_pairs_list() do
@@ -43,14 +44,14 @@ defmodule AcariServer.GroupManager do
   """
   def get_group!(id) do
     Group
-    |> Repo.get!(id)
-    |> Repo.preload(:nodes)
-    |> Repo.preload(:users)
+    |> RepoRO.get!(id)
+    |> RepoRO.preload(:nodes)
+    |> RepoRO.preload(:users)
   end
 
   def get_group_wo_nodes!(id) do
     Group
-    |> Repo.get!(id)
+    |> RepoRO.get!(id)
   end
 
   @doc """

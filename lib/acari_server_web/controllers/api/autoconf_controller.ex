@@ -39,7 +39,7 @@ defmodule AcariServerWeb.Api.AutoconfController do
         with {lat, _} <- Float.parse(params["latitude"] |> to_string()),
              {lng, _} <- Float.parse(params["longitude"] |> to_string()) do
           node
-          |> AcariServer.Repo.preload(:groups)
+          |> AcariServer.RepoRO.preload(:groups)
           |> AcariServer.NodeManager.update_node(%{latitude: lat, longitude: lng})
         end
 

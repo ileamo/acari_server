@@ -5,6 +5,7 @@ defmodule AcariServer.NodeManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
   alias AcariServer.NodeManager.Node
 
   @doc """
@@ -18,14 +19,14 @@ defmodule AcariServer.NodeManager do
   """
   def list_nodes do
     Node
-    |> Repo.all()
-    |> Repo.preload(:groups)
-    |> Repo.preload(:script)
+    |> RepoRO.all()
+    |> RepoRO.preload(:groups)
+    |> RepoRO.preload(:script)
   end
 
   def list_nodes_wo_preload do
     Node
-    |> Repo.all()
+    |> RepoRO.all()
   end
 
   @doc """
@@ -44,26 +45,26 @@ defmodule AcariServer.NodeManager do
   """
   def get_node!(id) do
     Node
-    |> Repo.get!(id)
-    |> Repo.preload(:groups)
-    |> Repo.preload(:script)
+    |> RepoRO.get!(id)
+    |> RepoRO.preload(:groups)
+    |> RepoRO.preload(:script)
   end
 
   def get_node_by_name(name) do
     Node
-    |> Repo.get_by(name: name)
+    |> RepoRO.get_by(name: name)
   end
 
   def get_node_with_groups(name) do
     Node
-    |> Repo.get_by(name: name)
-    |> Repo.preload(:groups)
+    |> RepoRO.get_by(name: name)
+    |> RepoRO.preload(:groups)
   end
 
   def get_node_with_script(name, script_assoc \\ []) do
     Node
-    |> Repo.get_by(name: name)
-    |> Repo.preload(script: script_assoc)
+    |> RepoRO.get_by(name: name)
+    |> RepoRO.preload(script: script_assoc)
   end
 
   @doc """

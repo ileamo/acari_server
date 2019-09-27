@@ -5,6 +5,7 @@ defmodule AcariServer.TemplateManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.TemplateManager.Template
 
@@ -18,7 +19,7 @@ defmodule AcariServer.TemplateManager do
 
   """
   def list_templates do
-    Repo.all(Template)
+    RepoRO.all(Template)
   end
 
   def templ_name_list(no_templ \\ "<NO_TEMPL>") do
@@ -74,13 +75,13 @@ defmodule AcariServer.TemplateManager do
 
   """
   def get_template!(id) do
-    Repo.get!(Template, id)
-    |> Repo.preload(:script)
+    RepoRO.get!(Template, id)
+    |> RepoRO.preload(:script)
   end
 
   def get_template_by_name(name) do
     Template
-    |> Repo.get_by(name: name)
+    |> RepoRO.get_by(name: name)
   end
 
   @doc """

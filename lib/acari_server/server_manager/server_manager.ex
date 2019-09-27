@@ -5,6 +5,7 @@ defmodule AcariServer.ServerManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.ServerManager.Server
   alias AcariServer.Mnesia
@@ -19,7 +20,7 @@ defmodule AcariServer.ServerManager do
 
   """
   def list_servers do
-    Repo.all(Server)
+    RepoRO.all(Server)
   end
 
   @doc """
@@ -36,7 +37,7 @@ defmodule AcariServer.ServerManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_server!(id), do: Repo.get!(Server, id)
+  def get_server!(id), do: RepoRO.get!(Server, id)
 
   @doc """
   Creates a server.
