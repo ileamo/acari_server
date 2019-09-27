@@ -1,18 +1,17 @@
-<h1>Show Note</h1>
+<h5><%= @note.user.username %></h5>
+<h2><%= @note.subject %></h2>
 
-<ul>
+<pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%=
+  @note.body
+%></code></pre>
 
-  <li>
-    <strong>Subject:</strong>
-    <%= @note.subject %>
-  </li>
-
-  <li>
-    <strong>Body:</strong>
-    <%= @note.body %>
-  </li>
-
-</ul>
-
-<span><%= link "Edit", to: Routes.note_path(@conn, :edit, @note) %></span>
-<span><%= link "Back", to: Routes.note_path(@conn, :index) %></span>
+  <p>
+    <strong>Опубликована:</strong>
+    <%= AcariServer.db_time_to_local(@note.inserted_at) %>
+  </br>
+    <strong>Последнее редактирование:</strong>
+    <%= AcariServer.db_time_to_local(@note.updated_at) %>
+  </p>
+<span><%= link "Редактировать", to: Routes.note_path(@conn, :edit, @note) %></span>
+|
+<span><%= link "К списку", to: Routes.note_path(@conn, :index) %></span>

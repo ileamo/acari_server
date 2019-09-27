@@ -55,9 +55,6 @@ defmodule AcariServer.NoteManager do
 
   """
   def create_note(attrs \\ %{}) do
-    attrs = attrs
-    |> Map.put("user_id", "1")
-    |> IO.inspect()
     %Note{}
     |> Note.changeset(attrs)
     |> Repo.insert()

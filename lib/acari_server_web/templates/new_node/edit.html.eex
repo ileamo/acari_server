@@ -1,5 +1,5 @@
-<h1>Edit New node</h1>
+<h2>Edit New node</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.new_node_path(@conn, :update, @new_node)) %>
 
-<span><%= link "Back", to: Routes.new_node_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.new_node_path(@conn, :index) %></span>

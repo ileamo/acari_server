@@ -14,8 +14,8 @@ defmodule AcariServerWeb.NoteController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"note" => note_params}) do
-    case NoteManager.create_note(note_params) do
+  def create(%{assigns: %{current_user: %{id: user_id}}} = conn, %{"note" => note_params}) do
+    case NoteManager.create_note(note_params |> Map.put("user_id", user_id)) do
       {:ok, note} ->
         conn
         |> put_flash(:info, "Note created successfully.")

@@ -4,7 +4,7 @@
   <thead>
     <tr>
       <th>Дата</th>
-      <th>Пользователь</th>
+      <th>Автор</th>
       <th>Тема</th>
       <th>Сообщение</th>
 
@@ -15,12 +15,15 @@
 <%= for note <- @notes do %>
     <tr>
       <td><%= AcariServer.db_time_to_local(note.inserted_at) %></td>
-      <td><%= note.id %></td>
-      <td><%= note.subject %></td>
-      <td><%= note.body %></td>
+      <td><%= note.user.username %></td>
+      <td>
+        <%= link note.subject, to: Routes.note_path(@conn, :show, note) %>
+      </td>
+      <td>
+        <%= if String.length(note.body) <= 32, do: note.body, else: (note.body |> String.slice(0, 32))<>"..." %>
+      </td>
 
       <td>
-        <%= link "Показать", to: Routes.note_path(@conn, :show, note) %>
         |
         <%= link "Редактировать", to: Routes.note_path(@conn, :edit, note) %>
         |
