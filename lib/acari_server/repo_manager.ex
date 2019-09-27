@@ -167,7 +167,8 @@ defmodule AcariServer.RepoManager do
     state
     |> Map.from_struct()
     |> Enum.map(fn
-      {k, %{config: c}} -> {k, "#{c[:hostname]}:#{c[:port]}"}
+      {k, %{config: nil}} -> {k, nil}
+      {k, %{config: c}} -> {k, c[:hostname]<>(c[:port] && ":#{c[:port]}" || "")}
       {k, _} -> {k, nil}
     end)
   end
