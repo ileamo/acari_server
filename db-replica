@@ -10,6 +10,8 @@ docker run -t \
   -e POSTGRESQL_DATABASE=acari_server_prod \
   -e POSTGRESQL_REPLICATION_USER=postgres \
   -e POSTGRESQL_REPLICATION_PASSWORD=postgres \
+  -e POSTGRESQL_SYNCHRONOUS_COMMIT_MODE=on \
+  -e POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1 \
   -p 55432:5432 \
   -v /var/lib/postgresql/docker/acari-server:/bitnami/postgresql \
   -v /etc/localtime:/etc/localtime:ro \
@@ -27,6 +29,6 @@ docker run -t \
   -e POSTGRESQL_REPLICATION_USER=postgres \
   -e POSTGRESQL_REPLICATION_PASSWORD=postgres \
   -p 51432:5432 \
-  -v /var/lib/postgresql/docker/acari-server-replica_1:/bitnami/postgresql \
+  -v /var/lib/postgresql/docker/acari-server-replica-1:/bitnami/postgresql \
   -v /etc/localtime:/etc/localtime:ro \
   -d bitnami/postgresql:latest

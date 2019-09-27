@@ -20,6 +20,7 @@ defmodule AcariServer.NoteManager do
   """
   def list_notes do
     RepoRO.all(Note)
+    |> RepoRO.preload(:user)
   end
 
   @doc """
@@ -36,7 +37,10 @@ defmodule AcariServer.NoteManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_note!(id), do: RepoRO.get!(Note, id)
+  def get_note!(id) do
+     RepoRO.get!(Note, id)
+     |> RepoRO.preload(:user)
+   end
 
   @doc """
   Creates a note.
@@ -51,6 +55,9 @@ defmodule AcariServer.NoteManager do
 
   """
   def create_note(attrs \\ %{}) do
+    attrs = attrs
+    |> Map.put("user_id", "1")
+    |> IO.inspect()
     %Note{}
     |> Note.changeset(attrs)
     |> Repo.insert()

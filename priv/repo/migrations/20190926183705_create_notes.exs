@@ -9,7 +9,5 @@ defmodule AcariServer.Repo.Migrations.CreateNotes do
 
       timestamps()
     end
-
-    create index(:notes, [:user_id])
   end
 end

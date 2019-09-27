@@ -11,6 +11,8 @@ defmodule AcariServer.UserManager.User do
     field :rpt_psw, :string, virtual: true
     field :groups_list, {:array, :integer}, virtual: true
 
+    has_many :notes, AcariServer.NoteManager.Note
+
     many_to_many :groups, AcariServer.GroupManager.Group,
       join_through: AcariServer.GroupUserAssociation.GroupUser,
       on_replace: :delete
