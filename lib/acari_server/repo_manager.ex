@@ -3,7 +3,7 @@ defmodule AcariServer.RepoManager do
   alias Ecto.Adapters.SQL
   require Logger
   @reconnect_timeout 5_000
-  
+
   defmodule State do
     defstruct rw: %{pid: nil},
               ro: %{pid: nil}
@@ -56,8 +56,15 @@ defmodule AcariServer.RepoManager do
     {pid, host_port} = get_db_ro(state.ro[:db_list])
 
     case pid do
-      pid when is_pid(pid) -> AcariServer.RepoRO.stop()
-      _ -> Process.send_after(self(), {:connect_db, :ro}, @reconnect_timeout)
+      pid when is_pid(pid) ->
+        AcariServer.RepoRO.stop()
+
+        if(host_port != state.ro[:db_list] |> Enum.at(0)) do
+          Process.send_after(self(), {:connect_db, :ro}, 1 * 60 * 1000)
+        end
+
+      _ ->
+        Process.send_after(self(), {:connect_db, :ro}, @reconnect_timeout)
     end
 
     {:noreply, %State{state | ro: state.ro |> Map.merge(%{pid: pid, config: host_port})}}

@@ -17,14 +17,15 @@
       <td><%= AcariServer.db_time_to_local(note.inserted_at) %></td>
       <td><%= note.user.username %></td>
       <td>
-        <%= link note.subject, to: Routes.note_path(@conn, :show, note) %>
+        <%= note.subject %>
       </td>
       <td>
-        <%= if String.length(note.body) <= 32, do: note.body, else: (note.body |> String.slice(0, 32))<>"..." %>
+        <%= link (if String.length(note.body) <= 32, do: note.body, else: (note.body |> String.slice(0, 32))<>"...") ,
+          to: Routes.note_path(@conn, :show, note)
+        %>
       </td>
 
       <td>
-        |
         <%= link "Редактировать", to: Routes.note_path(@conn, :edit, note) %>
         |
         <%= link "Удалить", to: Routes.note_path(@conn, :delete, note), method: :delete, data: [confirm: "Вы уверены?"] %>
