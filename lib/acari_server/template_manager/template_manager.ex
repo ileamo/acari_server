@@ -133,7 +133,7 @@ defmodule AcariServer.TemplateManager do
 
   """
   def delete_template(%Template{} = template) do
-    Repo.delete(template)
+    Repo.delete_wait(template)
   end
 
   @doc """

@@ -103,7 +103,7 @@ defmodule AcariServer.GroupManager do
 
   """
   def delete_group(%Group{} = group) do
-    Repo.delete(group)
+    Repo.delete_wait(group)
   end
 
   @doc """

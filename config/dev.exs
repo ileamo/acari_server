@@ -10,10 +10,10 @@ config :acari_server, AcariServerWeb.Endpoint,
   http: [port: 4000],
   https: [
     port: 4443,
-    #cipher_suite: :strong,
+    # cipher_suite: :strong,
     keyfile: "priv/cert/selfsigned_key.pem",
     certfile: "priv/cert/selfsigned.pem",
-    versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3],
+    versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
   ],
   debug_errors: true,
   code_reloader: true,
@@ -74,13 +74,9 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
-# config :acari_server, AcariServer.Repo,
-#   hostname: "10.0.10.10",
-#   port: 55432
-
-# config :acari_server, AcariServer.RepoRO,
-#   hostname: "10.0.10.10",
-#   port: 51432
+config :acari_server, AcariServer.Repo,
+  hostname: "10.0.10.10",
+  port: 55432
 
 config :acari_server, AcariServer.RepoManager,
   rw: "10.0.10.10:55432,10.0.10.10:51432",

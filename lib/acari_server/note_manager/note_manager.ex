@@ -91,7 +91,7 @@ defmodule AcariServer.NoteManager do
 
   """
   def delete_note(%Note{} = note) do
-    Repo.delete(note)
+    Repo.delete_wait(note)
   end
 
   @doc """

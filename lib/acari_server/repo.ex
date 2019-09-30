@@ -17,4 +17,16 @@ defmodule AcariServer.Repo do
     host_port = AcariServer.RepoManager.get_db_config(:rw)
     {:ok, config |> Keyword.merge(@params) |> Keyword.merge(host_port)}
   end
+
+  def delete_wait(record) do
+    res = delete(record)
+
+    [0, 100, 200, 400, 800]
+    |> Enum.find_value(fn delay ->
+      Process.sleep(delay)
+      !AcariServer.RepoRO.get(record.__struct__, record.id)
+    end)
+
+    res
+  end
 end

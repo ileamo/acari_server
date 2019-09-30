@@ -107,7 +107,7 @@ defmodule AcariServer.ScriptManager do
 
   """
   def delete_script(%Script{} = script) do
-    Repo.delete(script)
+    Repo.delete_wait(script)
   end
 
   @doc """

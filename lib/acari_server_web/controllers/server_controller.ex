@@ -24,14 +24,15 @@ defmodule AcariServerWeb.ServerController do
 
         conn
         |> put_flash(:info, "Сервер создан.")
-        |> redirect(to: Routes.server_path(conn, :show, server))
+        |> redirect(to: Routes.server_path(conn, :show, server, after_redirect: true))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
   end
 
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"id" => id} = params) do
+    IO.inspect(params)
     server = ServerManager.get_server!(id)
     render(conn, "show.html", server: server)
   end

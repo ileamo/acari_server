@@ -98,7 +98,7 @@ defmodule AcariServer.UserManager do
 
   """
   def delete_user(%User{} = user) do
-    Repo.delete(user)
+    Repo.delete_wait(user)
   end
 
   @doc """

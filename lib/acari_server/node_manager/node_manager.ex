@@ -118,7 +118,7 @@ defmodule AcariServer.NodeManager do
 
   """
   def delete_node(%Node{} = node) do
-    Repo.delete(node)
+    Repo.delete_wait(node)
   end
 
   @doc """

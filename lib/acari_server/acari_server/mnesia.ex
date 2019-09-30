@@ -102,6 +102,14 @@ defmodule AcariServer.Mnesia do
     update_servers_list(servers_db)
   end
 
+  def update_servers_list(:delay) do
+    Task.start(fn ->
+      Process.sleep(1000)
+      servers_db = AcariServer.ServerManager.list_servers()
+      update_servers_list(servers_db)
+    end)
+  end
+
   def update_servers_list(servers_db, first \\ nil) do
     node_list = [node() | Node.list()]
 
