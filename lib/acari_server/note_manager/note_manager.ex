@@ -38,9 +38,9 @@ defmodule AcariServer.NoteManager do
 
   """
   def get_note!(id) do
-     RepoRO.get!(Note, id)
-     |> RepoRO.preload(:user)
-   end
+    RepoRO.get_wait(Note, id)
+    |> RepoRO.preload(:user)
+  end
 
   @doc """
   Creates a note.

@@ -45,7 +45,7 @@ defmodule AcariServer.NodeManager do
   """
   def get_node!(id) do
     Node
-    |> RepoRO.get!(id)
+    |> RepoRO.get_wait(id)
     |> RepoRO.preload(:groups)
     |> RepoRO.preload(:script)
   end

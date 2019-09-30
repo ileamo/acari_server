@@ -75,7 +75,7 @@ defmodule AcariServer.TemplateManager do
 
   """
   def get_template!(id) do
-    RepoRO.get!(Template, id)
+    RepoRO.get_wait(Template, id)
     |> RepoRO.preload(:script)
   end
 

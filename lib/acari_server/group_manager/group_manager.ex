@@ -44,7 +44,7 @@ defmodule AcariServer.GroupManager do
   """
   def get_group!(id) do
     Group
-    |> RepoRO.get!(id)
+    |> RepoRO.get_wait(id)
     |> RepoRO.preload(:nodes)
     |> RepoRO.preload(:users)
   end

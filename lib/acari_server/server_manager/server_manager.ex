@@ -37,7 +37,7 @@ defmodule AcariServer.ServerManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_server!(id), do: RepoRO.get!(Server, id)
+  def get_server!(id), do: RepoRO.get_wait(Server, id)
 
   @doc """
   Creates a server.
