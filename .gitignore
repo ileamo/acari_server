@@ -43,4 +43,4 @@ npm-debug.log
 
 *.sav
 /log/
-/priv/.ssh/
+#/priv/.ssh/
