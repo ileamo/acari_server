@@ -7,7 +7,7 @@ defmodule AcariServerWeb.LayoutView do
 
   def get_mes() do
     AcariServer.Mnesia.get_event_list()
-    |> Enum.sort_by(fn %{timestamp: ts} -> ts end, &>/2)
+    |> Enum.sort_by(fn %{count: c} -> c end, &>/2)
     |> Enum.uniq_by(fn %{header: hd} -> hd end)
     |> Enum.map(fn %{level: lv, header: hd, text: body, timestamp: ts} ->
       alert =

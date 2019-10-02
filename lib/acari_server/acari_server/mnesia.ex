@@ -1,17 +1,19 @@
 defmodule AcariServer.Mnesia.Attr do
+  def counter(), do: [:key, :count]
   def server(), do: [:system_name, :name, :up, :opt]
   def db(), do: [:id, :up, :opt]
   def tun(), do: [:name, :server_id, :state, :opt]
 
   # for link and event id = {dev, tun, node}
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
-  def event(), do: [:id, :timestamp, :level, :header, :text]
+  def event(), do: [:id, :count, :timestamp, :level, :header, :text]
   def stat(), do: [:key, :value]
   def zabbix(), do: [:id, :host, :key, :value, :timestamp]
   def session(), do: [:jti, :params, :activity]
   def grp_oper(), do: [:id, :timestamp, :opt]
 
-  def table_list(), do: [:server, :db, :tun, :link, :event, :stat, :zabbix, :session, :grp_oper]
+  def table_list(),
+    do: [:counter, :server, :db, :tun, :link, :event, :stat, :zabbix, :session, :grp_oper]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -476,6 +478,7 @@ defmodule AcariServer.Mnesia do
     node = node()
     id = {name, tun, node}
     tm = :erlang.system_time(:second)
+    node_to_name = get_node_to_name_map()
 
     Mnesia.transaction(fn ->
       state =
@@ -495,8 +498,6 @@ defmodule AcariServer.Mnesia do
       )
     end)
 
-    node_to_name = get_node_to_name_map()
-
     {level, port_list, mes} =
       get_link_list_for_tunnel(tun)
       |> reduce_link_list(node_to_name)
@@ -504,9 +505,9 @@ defmodule AcariServer.Mnesia do
 
     case up do
       true ->
-        delete_event(id)
-
         Mnesia.transaction(fn ->
+          Mnesia.delete({:event, id})
+
           match_clean(:event, %{header: tun})
           |> Enum.each(fn %{id: {name, _tun, node}, level: prev_level} = event ->
             if level > prev_level or (level == 2 and prev_level == 2) do
@@ -679,17 +680,19 @@ defmodule AcariServer.Mnesia do
 
   # event
 
-  def update_event(ev) do
-    ev = ev |> Map.put(:timestamp, :os.system_time(:microsecond))
-
+  defp update_event(ev) do
     Mnesia.transaction(fn ->
+      count =
+        case Mnesia.read(:counter, :event) do
+          [{:counter, :event, count}] -> count
+          _ -> 0
+        end
+
+      :ok = Mnesia.write(Rec.counter(key: :event, count: count + 1))
+
+      ev = ev |> Map.merge(%{timestamp: :os.system_time(:microsecond), count: count + 1})
+
       Mnesia.write(mk_record(:event, ev))
-    end)
-  end
-
-  def delete_event(id) do
-    Mnesia.transaction(fn ->
-      Mnesia.delete({:event, id})
     end)
   end
 
@@ -1013,5 +1016,18 @@ defmodule AcariServer.Mnesia do
 
   defp get_links_str(l) do
     l |> Enum.map(fn {l, s} -> "#{l}@#{s}" end) |> Enum.join(", ")
+  end
+
+  def count(key) do
+    Mnesia.transaction(fn ->
+      count =
+        case Mnesia.read(:counter, key) do
+          [{:counter, ^key, count}] -> count
+          _ -> 0
+        end
+
+      :ok = Mnesia.write(Rec.counter(key: key, count: count + 1))
+      count + 1
+    end)
   end
 end
