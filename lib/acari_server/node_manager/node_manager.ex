@@ -50,6 +50,11 @@ defmodule AcariServer.NodeManager do
     |> RepoRO.preload(:script)
   end
 
+  def get_node_rw!(id) do
+    Node
+    |> Repo.get!(id)
+  end
+
   def get_node_by_name(name) do
     Node
     |> RepoRO.get_by(name: name)

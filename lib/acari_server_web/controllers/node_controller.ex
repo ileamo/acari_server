@@ -85,7 +85,7 @@ defmodule AcariServerWeb.NodeController do
   end
 
   def toggle_lock(conn, %{"id" => id, "lock" => lock}) do
-    node = NodeManager.get_node!(id)
+    node = NodeManager.get_node_rw!(id)
     node_params = %{"lock" => lock, "groups_list" => false}
     {:ok, node} = NodeManager.update_node(node, node_params)
 
@@ -93,6 +93,7 @@ defmodule AcariServerWeb.NodeController do
       AcariServer.Master.delete_tunnel(node.name)
     end
 
+    Process.sleep(1000)
     conn
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
     |> redirect(to: Routes.node_path(conn, :index))
