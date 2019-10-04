@@ -84,4 +84,6 @@
 
 <span><%= link "Редактировать", to: Routes.script_path(@conn, :edit, @script) %></span>
 |
+<span><%= link "Клонировать", to: Routes.script_path(@conn, :new, script_id: @script.id) %></span>
+|
 <span><%= link "К списку", to: Routes.script_path(@conn, :index) %></span>

@@ -12,8 +12,10 @@ defmodule AcariServerWeb.ScriptController do
     render(conn, "index.html", scripts: scripts)
   end
 
-  def new(conn, _params) do
-    changeset = ScriptManager.change_script(%Script{})
+  def new(conn, %{"script_id" => id}) do
+    script = ScriptManager.get_script!(id)
+
+    changeset = ScriptManager.change_script(script |> Ecto.put_meta(state: :built))
     render(conn, "new.html", changeset: changeset)
   end
 
