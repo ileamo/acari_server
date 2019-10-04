@@ -188,8 +188,8 @@ defmodule AcariServer.Master do
     AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
   end
 
-  defp exec_local_script(tun_name) do
-    script = AcariServer.SFX.get_script(tun_name, :local, get_tun_params(tun_name))
+  def exec_local_script(tun_name, template \\ :local) do
+    script = AcariServer.SFX.get_script(tun_name, template, get_tun_params(tun_name))
     Acari.exec_sh(script)
   end
 

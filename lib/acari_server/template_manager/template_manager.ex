@@ -38,12 +38,22 @@ defmodule AcariServer.TemplateManager do
   end
 
   def script_list(tun_name) do
-    with node <- AcariServer.NodeManager.get_node_with_script(tun_name, :templates),
+    with node <- AcariServer.NodeManager.get_node_with_class(tun_name, :templates),
          script when is_map(script) <- node |> Map.get(:script),
          templ when is_list(templ) <- script |> Map.get(:templates) do
       templ
       |> Enum.map(fn %{name: name, description: descr} -> {descr, name} end)
       |> Enum.sort()
+    else
+      _ -> []
+    end
+  end
+
+  def srv_script_list(tun_name) do
+    with node <- AcariServer.NodeManager.get_node_with_class(tun_name, :local),
+         class when is_map(class) <- node |> Map.get(:script),
+         templ <- class |> Map.get(:local) do
+      [{templ.description, templ.name}]
     else
       _ -> []
     end

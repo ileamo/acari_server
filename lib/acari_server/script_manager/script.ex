@@ -3,17 +3,19 @@ defmodule AcariServer.ScriptManager.Script do
   import Ecto.Changeset
 
   schema "scripts" do
-    field :local, :string
+    #field :local, :string
     field :description, :string
     field :name, :string
-    field :remote, :string
+    #field :remote, :string
     field :definition, :string
     field :prefix, :string
     field :test, :string
     field :templates_list, {:array, :integer}, virtual: true
 
+    belongs_to :local, AcariServer.TemplateManager.Template
+    belongs_to :remote, AcariServer.TemplateManager.Template
+
     has_many :nodes, AcariServer.NodeManager.Node
-    #has_many :templates, AcariServer.TemplateManager.Template
 
     many_to_many :templates, AcariServer.TemplateManager.Template,
       join_through: AcariServer.ScriptTemplateAssociation.ScriptTemplate,
@@ -28,12 +30,14 @@ defmodule AcariServer.ScriptManager.Script do
     |> cast(attrs, [
       :name,
       :description,
-      :local,
-      :remote,
+      :local_id,
+      :remote_id,
       :definition,
       :prefix,
       :test
     ])
+    |> foreign_key_constraint(:local_id)
+    |> foreign_key_constraint(:remote_id)
     |> validate_required([:name])
     |> unique_constraint(:name)
   end

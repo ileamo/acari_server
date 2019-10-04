@@ -66,7 +66,7 @@ defmodule AcariServer.NodeManager do
     |> RepoRO.preload(:groups)
   end
 
-  def get_node_with_script(name, script_assoc \\ []) do
+  def get_node_with_class(name, script_assoc \\ []) do
     Node
     |> RepoRO.get_by(name: name)
     |> RepoRO.preload(script: script_assoc)

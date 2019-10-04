@@ -59,6 +59,15 @@ defmodule AcariServer.NodeMonitor do
             )
         end
 
+        "get_srv_script" ->
+          put_data(
+            self(),
+            "srv_script",
+            "xxxx",
+            get_templ_descr_by_name(params["script"])
+          )
+
+
       _ ->
         nil
     end

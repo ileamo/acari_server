@@ -2,7 +2,7 @@ defmodule AcariServer.SFX do
   alias AcariServer.TemplateAgent
 
   def get_script(node_name, templ_id, params \\ %{}) do
-    case AcariServer.NodeManager.get_node_with_script(node_name) do
+    case AcariServer.NodeManager.get_node_with_class(node_name, [:local, :remote]) do
       %{} = node -> create_sfx(templ_id, node, Map.put(params, "id", node_name))
       _ -> create_setup("No node #{node_name}")
     end
@@ -13,7 +13,7 @@ defmodule AcariServer.SFX do
     res =
       with %{params: config_params, script: %{} = script} <- node,
            main_templ_name when is_binary(main_templ_name) <-
-             Map.get(script, templ_id) || templ_id,
+             Map.get(script, templ_id) && Map.get(script, templ_id).name || templ_id,
            prefix <- script.prefix || "",
            node_params <- [
              class: script.name,

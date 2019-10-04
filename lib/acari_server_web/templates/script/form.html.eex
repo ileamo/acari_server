@@ -23,25 +23,25 @@
     </div>
   </div>
 
-  <% templ_list = AcariServer.TemplateManager.templ_name_list() %>
+  <% templ_id_pair_list = AcariServer.TemplateManager.templ_name_id_pairs_list() %>
+  <% templ_list_with_nil = [{"<NO_TEMPL>", nil}  | templ_id_pair_list] %>
   <h5>Шаблоны:</h5>
   <div class="form-group row">
     <%= label f, "Конфигурация клиента", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= select f, :remote, templ_list, class: "form-control" %>
-      <%= error_tag f, :remote %>
+      <%= select f, :remote_id, templ_list_with_nil, class: "form-control" %>
+      <%= error_tag f, :remote_id %>
     </div>
   </div>
 
   <div class="form-group row">
     <%= label f, "Конфигурация сервера", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= select f, :local, templ_list, class: "form-control" %>
-      <%= error_tag f, :local %>
+      <%= select f, :local_id, templ_list_with_nil, class: "form-control" %>
+      <%= error_tag f, :local_id %>
     </div>
   </div>
 
-  <% templ_id_pair_list = AcariServer.TemplateManager.templ_name_id_pairs_list() %>
   <div class="form-group row">
     <%= label f, "Скрипты", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-10">
@@ -59,7 +59,7 @@
   <div class="form-group">
     <%= label f, "Префикс", class: "control-label" %>
     <%= textarea f, :prefix, class: "form-control text-monospace", rows: "6" %>
-    <%= error_tag f, :local %>
+    <%= error_tag f, :prefix %>
   </div>
 
   <div class="form-group">

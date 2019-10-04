@@ -21,6 +21,10 @@ if (node_monitor) {
         document.querySelector("#nm-script-name").innerText = `${payload.opt}`
         document.querySelector("#nm-script-field").innerText = `${payload.data}`
         break;
+      case "srv_script":
+        document.querySelector("#nm-srv-script-name").innerText = `${payload.opt}`
+        document.querySelector("#nm-srv-script-field").innerText = `${payload.data}`
+        break;
       case "links_state":
         document.querySelector("#nm-links-state").innerHTML = `${payload.data}`
         break;
@@ -33,6 +37,7 @@ if (node_monitor) {
   }) // From the Channel
 
 
+  // Remote script
   var scripts = document.querySelectorAll("#nm-script a")//.addEventListener("click", getScript, false);
 
   scripts.forEach(function(item) {item.addEventListener("click", getScript, false)})
@@ -53,9 +58,6 @@ if (node_monitor) {
     })
   }
 
-
-
-
   document.getElementById("nm-update-script").addEventListener("click", updateScript, false);
 
   function updateScript() {
@@ -70,6 +72,42 @@ if (node_monitor) {
     }
   }
 
+  // Local script
+  var srv_scripts = document.querySelectorAll("#nm-srv-script a")//.addEventListener("click", getScript, false);
+
+  srv_scripts.forEach(function(item) {item.addEventListener("click", getSrvScript, false)})
+
+  function getSrvScript() {
+    sessionStorage.setItem("lastSrvScript" + window.location.pathname, this.id)
+    channel.push('input', {
+      input: "get_srv_script",
+      script: this.id
+    })
+  }
+
+  function getLastSrvScript() {
+    let id = sessionStorage.getItem("lastSrvScript" + window.location.pathname)
+    channel.push('input', {
+      input: "get_srv_script",
+      script: id
+    })
+  }
+
+  document.getElementById("nm-update-srv-script").addEventListener("click", updateSrvScript, false);
+
+  function updateSrvScript() {
+    let id = sessionStorage.getItem("lastSrvScript" + window.location.pathname)
+    let r = confirm("Выполнить скрипт "+id+" на сервере?")
+    if (r) {
+      document.querySelector("#nm-srv-script-field").innerText = "Wait ..."
+      channel.push('input', {
+        input: "srv_script",
+        script: id
+      })
+    }
+  }
+
+  // Link state
   document.getElementById("nm-get-links-state").addEventListener("click", getLinksState, false);
 
   function getLinksState() {
