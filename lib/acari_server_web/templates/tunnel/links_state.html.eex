@@ -9,14 +9,16 @@
     <tbody>
       <%= for %{name_srv: name, up: up, state: state} <-
                                       links_sorted(@links_state) do %>
+        <% {last_down_tm, pc} = get_down_pc_m(state, up) %>
         <tr>
           <th  scope="row">
             <%= name %>
           </th>
-          <% {text, color} = if up, do: {"UP", "text-success"}, else: {"DOWN","text-danger"} %>
+          <% {text, color} = if up, do: {"UP", "text-success"},
+              else: {"DOWN(#{last_down_tm})","text-danger"} %>
           <td class="<%=color%>"><%= text %></td>
           <td><%= state[:down_count] %></td>
-          <td><%= get_down_pc_m(state, up) |> Float.round(2) %>%</td>
+          <td><%= pc |> Float.round(2) %>%</td>
           </td>
         </tr>
       <% end %>
