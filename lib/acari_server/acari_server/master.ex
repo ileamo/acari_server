@@ -294,4 +294,14 @@ defmodule AcariServer.Master do
       AcariServer.Mnesia.del_tunnel(tun_name)
     end)
   end
+
+  def exec_sh(script, env \\ []) do
+      case System.cmd("sh", ["-c", script |> String.replace("\r\n", "\n")],
+             stderr_to_stdout: true,
+             env: env
+           ) do
+        {data, 0} -> Logger.info(data)
+        {err, code} -> Logger.warn("Script `#{script}` exits with code #{code}, output: #{err}")
+      end
+  end
 end

@@ -86,7 +86,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
         </ul>
         <div class="navbar">
           <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
-            href="#nm-script-field" role="button" aria-expanded="false" aria-controls="nm-srv-script-field">
+            href="#nm-srv-script-field" role="button" aria-expanded="false" aria-controls="nm-srv-script-field">
             Скрыть/Показать
           </button>
             <button id="nm-update-srv-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
