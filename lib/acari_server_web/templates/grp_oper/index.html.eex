@@ -43,8 +43,20 @@
 
   <div class="input-group mb-2 mt-1" id="grp-oper-script-div">
     <div class="input-group-prepend">
-      <label class="input-group-text">Скрипт</label>
+        <label class="input-group-text">Скрипт</label>
     </div>
+
+    <div class="input-group-prepend" id="grp-oper-radio">
+        <label class="input-group-text">
+          <input type="radio" name="grp-oper-radio-group" id="grp-oper-client-script" autocomplete="off" value="client" checked>
+            на клиенте
+        </label>
+        <label class="input-group-text">
+          <input type="radio" name="grp-oper-radio-group" id="grp-oper-server-script" autocomplete="off" value="server">
+            на сервере
+        </label>
+    </div>
+
     <select class="custom-select" id="grp-oper-script-list">
     </select>
     <div class="input-group-prepend">

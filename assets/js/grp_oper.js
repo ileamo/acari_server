@@ -70,6 +70,15 @@ if (grp_oper) {
     grp_oper_filter_text.value = sessionStorage.getItem("grp_oper_filter") || "";
   }
 
+  let grp_oper_client_script = document.getElementById("grp-oper-client-script")
+  if (grp_oper_client_script) {
+    grp_oper_client_script.addEventListener("click", selectElement, false);
+  }
+  let grp_oper_server_script = document.getElementById("grp-oper-server-script")
+  if (grp_oper_server_script) {
+    grp_oper_server_script.addEventListener("click", selectElement, false);
+  }
+
   function inputFilterText() {
     if (!filter_blinking) {
       filter_blinking = setInterval(blinker, 1000);
@@ -91,12 +100,14 @@ if (grp_oper) {
     sessionStorage.setItem("grp_oper_group_id", group_id)
     sessionStorage.setItem("grp_oper_filter", filter)
 
+    let script_type = $('#grp-oper-radio input:radio:checked').val()
+
     channel.push('input', {
       cmd: "select",
       class_id: class_id,
       group_id: group_id,
-      filter: filter
-
+      filter: filter,
+      script_type: script_type
     })
 
   }
