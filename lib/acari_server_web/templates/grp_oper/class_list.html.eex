@@ -1,4 +1,3 @@
-<% IO.inspect(@class_list) %>
 <option value="nil">Все</option>
 <option disabled="disabled">─────────────</option>
 <% classes = @class_list

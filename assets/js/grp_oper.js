@@ -73,6 +73,7 @@ if (grp_oper) {
   let grp_oper_client_script = document.getElementById("grp-oper-client-script")
   if (grp_oper_client_script) {
     grp_oper_client_script.addEventListener("click", selectElement, false);
+    sessionStorage.setItem("grp_oper_script_type", "client")
   }
   let grp_oper_server_script = document.getElementById("grp-oper-server-script")
   if (grp_oper_server_script) {
@@ -96,11 +97,12 @@ if (grp_oper) {
     let class_id = grp_oper_class.options[grp_oper_class.selectedIndex].value
     let group_id = grp_oper_group.options[grp_oper_group.selectedIndex].value
     let filter = grp_oper_filter_text.value
+    let script_type = $('#grp-oper-radio input:radio:checked').val()
     sessionStorage.setItem("grp_oper_class_id", class_id)
     sessionStorage.setItem("grp_oper_group_id", group_id)
     sessionStorage.setItem("grp_oper_filter", filter)
+    sessionStorage.setItem("grp_oper_script_type", script_type)
 
-    let script_type = $('#grp-oper-radio input:radio:checked').val()
 
     channel.push('input', {
       cmd: "select",
@@ -242,6 +244,7 @@ if (grp_oper) {
         group_id: sessionStorage.getItem("grp_oper_group_id"),
         class_id: sessionStorage.getItem("grp_oper_class_id"),
         filter: sessionStorage.getItem("grp_oper_filter"),
+        script_type: sessionStorage.getItem("grp_oper_script_type"),
         template_name: script_name
       })
     } else {
@@ -257,6 +260,7 @@ if (grp_oper) {
       group_id: sessionStorage.getItem("grp_oper_group_id"),
       class_id: sessionStorage.getItem("grp_oper_class_id"),
       filter: sessionStorage.getItem("grp_oper_filter"),
+      script_type: sessionStorage.getItem("grp_oper_script_type"),
       template_name: id
     })
   }

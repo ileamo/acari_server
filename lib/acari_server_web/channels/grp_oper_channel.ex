@@ -28,7 +28,8 @@ defmodule AcariServerWeb.GrpOperChannel do
           nodes
           |> node_filter(params["filter"], socket)
 
-        %{common_script: cs, class_list: cl} = get_group_scripts(nodes)
+        %{common_script: cs, class_list: cl} =
+          get_group_scripts(nodes, (params["script_type"] == "server" && :local) || :templates)
 
         script_list =
           case params["class_id"] do
@@ -85,7 +86,14 @@ defmodule AcariServerWeb.GrpOperChannel do
             })
 
           tag ->
-            get_script(socket, tag, params["group_id"], params["class_id"], params["filter"])
+            get_script(
+              socket,
+              params["script_type"],
+              tag,
+              params["group_id"],
+              params["class_id"],
+              params["filter"]
+            )
         end
 
       "get_script_multi" ->
@@ -124,7 +132,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           end)
 
           Process.sleep(1_000)
-          get_script(socket, tag, params["group_id"], nodes_list)
+          get_script(socket, params["script_type"], tag, params["group_id"], nodes_list)
         else
           _ ->
             push(socket, "output", %{
@@ -158,7 +166,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           end)
 
           Process.sleep(1_000)
-          get_script(socket, tag, params["group_id"], nodes_list)
+          get_script(socket, params["script_type"], tag, params["group_id"], nodes_list)
         end
 
       "create_group" ->
@@ -224,11 +232,39 @@ defmodule AcariServerWeb.GrpOperChannel do
     |> node_filter(filter, socket)
   end
 
-  defp get_script(socket, tag, group_id, class_id, filter) do
-    get_script(socket, tag, group_id, get_nodes_list(socket, group_id, class_id, filter))
+  defp get_script(socket, script_type, tag, group_id, class_id, filter) do
+    get_script(
+      socket,
+      script_type,
+      tag,
+      group_id,
+      get_nodes_list(socket, group_id, class_id, filter)
+    )
   end
 
-  defp get_script(socket, tag, group_id, nodes) do
+  defp get_script(socket, "server", tag, group_id, nodes) do
+    script_res_list =
+      nodes
+      |> Enum.map(fn %{name: tun_name, description: descr} ->
+        data =
+          (AcariServer.Mnesia.get_tunnel_srv_state(tun_name)[tag] ||
+             %{})
+
+        %{id: tun_name, description: descr, data: data}
+      end)
+
+    push(socket, "output", %{
+      id: "script",
+      opt: AcariServer.NodeMonitor.get_templ_descr_by_name(tag) <> " (#{tag})",
+      data:
+        Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res_srv.html",
+          script_res_list: script_res_list,
+          request_date: AcariServer.Mnesia.get_grp_oper_timestamp(group_id, tag)
+        )
+    })
+  end
+
+  defp get_script(socket, _script_type, tag, group_id, nodes) do
     script_res_list =
       nodes
       |> Enum.map(fn %{name: tun_name, description: descr} ->
@@ -290,7 +326,7 @@ defmodule AcariServerWeb.GrpOperChannel do
     end)
   end
 
-  defp get_group_scripts(nodes) do
+  defp get_group_scripts(nodes, templ_group) do
     class_id_list = get_class_list(nodes)
 
     class_list =
@@ -301,7 +337,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
         {_, class} ->
           {{class.id, class.name},
-           class.templates
+           get_templates_list(class, templ_group)
            |> Enum.map(fn %{description: descr, name: name} -> {descr, name} end)
            |> MapSet.new()}
       end)
@@ -321,6 +357,13 @@ defmodule AcariServerWeb.GrpOperChannel do
       )
 
     %{class_list: class_list, common_script: common_script}
+  end
+
+  defp get_templates_list(class, templ_group) do
+    case Map.get(class, templ_group) do
+      res when is_list(res) -> res
+      res -> [res]
+    end
   end
 
   def node_filter(node_list, filter_str, socket) do
