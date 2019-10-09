@@ -9,6 +9,7 @@ if (node_monitor) {
   .receive("ok", resp => {
     //console.log("node_monitor: Joined successfully", resp)
     getLastScript()
+    getLastSrvScript()
   })
   .receive("error", resp => {
     console.log("node_monitor: Unable to join", resp)
@@ -85,6 +86,8 @@ if (node_monitor) {
     })
   }
 
+  document.getElementById("nm-show-srv-script").addEventListener("click", getLastSrvScript, false);
+
   function getLastSrvScript() {
     let id = sessionStorage.getItem("lastSrvScript" + window.location.pathname)
     channel.push('input', {
@@ -99,7 +102,7 @@ if (node_monitor) {
     let id = sessionStorage.getItem("lastSrvScript" + window.location.pathname)
     let r = confirm("Выполнить скрипт "+id+" на сервере?")
     if (r) {
-      document.querySelector("#nm-srv-script-field").innerText = "Wait ..."
+      document.querySelector("#nm-srv-script-field").innerText = "Нажмите 'Обновить' для просмотра результата"
       channel.push('input', {
         input: "srv_script",
         script: id

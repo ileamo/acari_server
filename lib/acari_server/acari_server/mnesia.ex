@@ -163,6 +163,10 @@ defmodule AcariServer.Mnesia do
     match(:server, %{up: true}) |> Enum.map(fn %{name: name} -> name end)
   end
 
+  def get_up_servers(:system_name) do
+    match(:server, %{up: true}) |> Enum.map(fn %{system_name: name} -> name end)
+  end
+
   def is_master_server() do
     node() ==
       match(:server, %{up: true})
@@ -368,6 +372,19 @@ defmodule AcariServer.Mnesia do
           description: node.description,
           server: nil
         }
+    end
+  end
+
+  def get_tunnel_srv_state(name) do
+    case Mnesia.transaction(fn ->
+           Mnesia.read({:tun, name})
+         end) do
+      {:atomic, [record]} ->
+        record
+        |> Rec.tun(:srv_state)
+
+      _ ->
+        %{}
     end
   end
 

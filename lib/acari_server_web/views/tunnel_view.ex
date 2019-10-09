@@ -8,7 +8,13 @@ defmodule AcariServerWeb.TunnelView do
 
   defp get_down_pc_m(state, up) do
     tm = :erlang.system_time(:second)
-    total = tm - state.tm_start
+
+    total =
+      case tm - state.tm_start do
+        0 -> 1
+        other -> other
+      end
+
     last_down_tm = if up, do: 0, else: tm - state.tm_down_start
     down = state.tm_down + last_down_tm
     {interval_to_text(last_down_tm), down * 100 / total}
@@ -18,7 +24,7 @@ defmodule AcariServerWeb.TunnelView do
     cond do
       tm < 60 * 2 -> "#{tm} сек."
       tm < 60 * 60 * 2 -> "#{div(tm, 60)} мин."
-      true -> "#{div(tm, 60*60)} час."
+      true -> "#{div(tm, 60 * 60)} час."
     end
   end
 

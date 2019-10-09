@@ -45,28 +45,33 @@ defmodule AcariServer.NodeMonitor do
 
       "script" ->
         with tag when is_binary(tag) <- params["script"] do
-          IO.inspect(tag, label: "TAG")
           AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
           AcariServer.Master.exec_script_on_peer(tun_name, tag)
         else
           _ ->
-            put_data(
-              self(),
-              "script",
-              "                            ^\n" <>
-                "Выберите скрипт из меню ----|",
-              "Скрипт не определен"
-            )
+            script_not_defined("script")
         end
 
-        "get_srv_script" ->
-          put_data(
-            self(),
-            "srv_script",
-            "xxxx",
-            get_templ_descr_by_name(params["script"])
-          )
+      "srv_script" ->
+        with tag when is_binary(tag) <- params["script"] do
+          # AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
+          AcariServer.Mnesia.get_up_servers(:system_name)
+          |> Enum.each(fn node -> AcariServer.Master.run_script_on_server(tun_name, tag, node) end)
+        else
+          _ ->
+            script_not_defined("srv_script")
+        end
 
+      "get_srv_script" ->
+        put_data(
+          self(),
+          "srv_script",
+          srv_script_to_string(
+            params["script"],
+            AcariServer.Mnesia.get_tunnel_srv_state(tun_name)[params["script"]]
+          ),
+          get_templ_descr_by_name(params["script"])
+        )
 
       _ ->
         nil
@@ -81,6 +86,16 @@ defmodule AcariServer.NodeMonitor do
   end
 
   # functions
+  defp script_not_defined(id) do
+    put_data(
+      self(),
+      id,
+      "                            ^\n" <>
+        "Выберите скрипт из меню ----|",
+      "Скрипт не определен"
+    )
+  end
+
   def get_templ_descr_by_name(name) do
     with %AcariServer.TemplateManager.Template{description: descr} <-
            AcariServer.TemplateManager.get_template_by_name(name |> to_string()) do
@@ -94,6 +109,21 @@ defmodule AcariServer.NodeMonitor do
     case data do
       %{timestamp: ts, data: data} ->
         "#{AcariServer.get_local_time(ts)}  #{id}\n\n#{data}"
+
+      _ ->
+        "Нет данных"
+    end
+  end
+
+  defp srv_script_to_string(id, data) do
+    case data do
+      %{} = data_map ->
+        data_map
+        |> Enum.map(fn {node_name, %{timestamp: ts, data: data}} ->
+          "#{AcariServer.get_local_time(ts)}  #{node_name}\n#{data}"
+        end)
+        |> List.insert_at(0, id<>"\n")
+        |> Enum.join("\n")
 
       _ ->
         "Нет данных"
