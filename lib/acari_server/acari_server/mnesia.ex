@@ -2,7 +2,7 @@ defmodule AcariServer.Mnesia.Attr do
   def counter(), do: [:key, :count]
   def server(), do: [:system_name, :name, :up, :opt]
   def db(), do: [:id, :up, :opt]
-  def tun(), do: [:name, :server_id, :state, :opt]
+  def tun(), do: [:name, :server_id, :state, :srv_state, :opt]
 
   # for link and event id = {dev, tun, node}
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
@@ -289,6 +289,24 @@ defmodule AcariServer.Mnesia do
 
           Mnesia.write(Rec.tun(record, state: state))
           AcariServer.NodeMonitorAgent.event(name, tag |> to_string, data)
+      end
+    end)
+  end
+
+  def update_tun_srv_state(name, tag, node, data) do
+    Mnesia.transaction(fn ->
+      case Mnesia.wread({:tun, name}) do
+        [] ->
+          Logger.error("#{name}: Can't set #{tag}, No such tunnel")
+
+        [record] ->
+          srv_state =
+            record
+            |> Rec.tun(:srv_state)
+            |> Map.put_new(tag, %{})
+            |> put_in([tag, node], data)
+
+          Mnesia.write(Rec.tun(record, srv_state: srv_state))
       end
     end)
   end

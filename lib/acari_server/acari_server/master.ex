@@ -66,7 +66,8 @@ defmodule AcariServer.Master do
     Mnesia.add_tunnel(
       name: tun_name,
       server_id: node(),
-      state: %{}
+      state: %{},
+      srv_state: %{}
     )
 
     # if server == node() do
@@ -189,8 +190,7 @@ defmodule AcariServer.Master do
   end
 
   def exec_local_script(tun_name, template \\ :local) do
-    script = AcariServer.SFX.get_script(tun_name, template, get_tun_params(tun_name))
-    Acari.exec_sh(script)
+    run_script_on_server(tun_name, template)
   end
 
   def send_config(%{"id" => tun_name} = params) do
@@ -201,7 +201,7 @@ defmodule AcariServer.Master do
       }
     }
 
-    script =
+    {script, _} =
       AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name) |> Map.merge(params))
 
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
@@ -216,7 +216,7 @@ defmodule AcariServer.Master do
       }
     }
 
-    script = AcariServer.SFX.get_script(tun_name, templ, get_tun_params(tun_name))
+    {script, _} = AcariServer.SFX.get_script(tun_name, templ, get_tun_params(tun_name))
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 
@@ -295,13 +295,28 @@ defmodule AcariServer.Master do
     end)
   end
 
-  def exec_sh(script, env \\ []) do
-      case System.cmd("sh", ["-c", script |> String.replace("\r\n", "\n")],
-             stderr_to_stdout: true,
-             env: env
-           ) do
-        {data, 0} -> Logger.info(data)
-        {err, code} -> Logger.warn("Script `#{script}` exits with code #{code}, output: #{err}")
-      end
+  def run_script_on_server(tun_name, template, node \\ Node.self()) do
+    try do
+      Task.Supervisor.start_child(
+        {AcariServer.TaskSup, node},
+        AcariServer.Master,
+        :exec_sh,
+        [tun_name, template, []]
+      )
+    catch
+      _, _ -> nil
+    end
+  end
+
+  def exec_sh(tun_name, template, env \\ []) do
+    {script, templ_name} = AcariServer.SFX.get_script(tun_name, template, get_tun_params(tun_name))
+
+    case System.cmd("sh", ["-c", script |> String.replace("\r\n", "\n")],
+           stderr_to_stdout: true,
+           env: env
+         ) do
+      {data, _code} ->
+        AcariServer.Mnesia.update_tun_srv_state(tun_name, templ_name, Node.self(), %{timestamp: :os.system_time(:second), data: data})
+    end
   end
 end
