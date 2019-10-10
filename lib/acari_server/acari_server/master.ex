@@ -295,6 +295,7 @@ defmodule AcariServer.Master do
     end)
   end
 
+
   def run_script_on_server(tun_name, template, node \\ Node.self()) do
     try do
       Task.Supervisor.start_child(
@@ -306,6 +307,11 @@ defmodule AcariServer.Master do
     catch
       _, _ -> nil
     end
+  end
+
+  def run_script_on_all_servers(tun_name, tag) do
+    AcariServer.Mnesia.get_up_servers(:system_name)
+    |> Enum.each(fn node -> AcariServer.Master.run_script_on_server(tun_name, tag, node) end)
   end
 
   def exec_sh(tun_name, template, env \\ []) do

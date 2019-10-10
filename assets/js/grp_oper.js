@@ -279,7 +279,8 @@ if (grp_oper) {
           template_name: id,
           group_id: sessionStorage.getItem("grp_oper_group_id"),
           class_id: sessionStorage.getItem("grp_oper_class_id"),
-          filter: sessionStorage.getItem("grp_oper_filter")
+          filter: sessionStorage.getItem("grp_oper_filter"),
+          script_type: sessionStorage.getItem("grp_oper_script_type"),
         })
       }
     }

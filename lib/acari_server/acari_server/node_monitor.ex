@@ -55,8 +55,7 @@ defmodule AcariServer.NodeMonitor do
       "srv_script" ->
         with tag when is_binary(tag) <- params["script"] do
           # AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
-          AcariServer.Mnesia.get_up_servers(:system_name)
-          |> Enum.each(fn node -> AcariServer.Master.run_script_on_server(tun_name, tag, node) end)
+          AcariServer.Master.run_script_on_all_servers(tun_name, tag)
         else
           _ ->
             script_not_defined("srv_script")

@@ -121,14 +121,21 @@ defmodule AcariServerWeb.GrpOperChannel do
 
       "script" ->
         with tag when is_binary(tag) <- params["template_name"] do
-          AcariServer.Mnesia.add_grp_oper(params["group_id"], tag)
+          ts = :os.system_time(:second)
 
           nodes_list =
             get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
 
           nodes_list
           |> Enum.each(fn %{name: name} ->
-            AcariServer.Master.exec_script_on_peer(name, tag)
+            case params["script_type"] do
+              "server" ->
+                AcariServer.Master.run_script_on_all_servers(name, tag)
+
+              _ ->
+                AcariServer.Mnesia.update_tun_state(name, tag, %{reqv_ts: ts})
+                AcariServer.Master.exec_script_on_peer(name, tag)
+            end
           end)
 
           Process.sleep(1_000)
@@ -146,16 +153,14 @@ defmodule AcariServerWeb.GrpOperChannel do
 
       "repeat_script" ->
         with tag when is_binary(tag) <- params["template_name"] do
-          req_ts = AcariServer.Mnesia.get_grp_oper_timestamp(params["group_id"], tag)
-
           nodes_list =
             get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
 
           nodes_list
           |> Enum.filter(fn %{name: name} ->
             with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
-                 %{timestamp: ts} <- stat[tag] do
-              ts < req_ts
+                 %{timestamp: ts, reqv_ts: reqv_ts} <- stat[tag] do
+              ts < reqv_ts
             else
               _ ->
                 true
@@ -247,8 +252,8 @@ defmodule AcariServerWeb.GrpOperChannel do
       nodes
       |> Enum.map(fn %{name: tun_name, description: descr} ->
         data =
-          (AcariServer.Mnesia.get_tunnel_srv_state(tun_name)[tag] ||
-             %{})
+          AcariServer.Mnesia.get_tunnel_srv_state(tun_name)[tag] ||
+            %{}
 
         %{id: tun_name, description: descr, data: data}
       end)
@@ -259,7 +264,6 @@ defmodule AcariServerWeb.GrpOperChannel do
       data:
         Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res_srv.html",
           script_res_list: script_res_list,
-          request_date: AcariServer.Mnesia.get_grp_oper_timestamp(group_id, tag)
         )
     })
   end
@@ -281,7 +285,6 @@ defmodule AcariServerWeb.GrpOperChannel do
       data:
         Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res.html",
           script_res_list: script_res_list,
-          request_date: AcariServer.Mnesia.get_grp_oper_timestamp(group_id, tag)
         )
     })
   end

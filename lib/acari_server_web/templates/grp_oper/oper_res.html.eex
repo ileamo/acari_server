@@ -1,13 +1,11 @@
 <hr/>
-<%= if @request_date > 0 do %>
-<p><strong>Последний запрос:</strong>
-  <%= AcariServer.get_local_date(@request_date) %>
-</p>
-<% end %>
 <%
   waitlist =
     @script_res_list
-    |> Enum.filter(fn %{timestamp: ts} -> not (ts > 0 and ts >= @request_date) end)
+    |>  Enum.filter(fn
+          %{timestamp: ts} = params -> not (ts > 0 and ts >= (params[:reqv_ts] || 0))
+          _ -> false
+        end)
 %>
 
 <%= if waitlist != [] do %>
@@ -30,7 +28,7 @@
     </tr>
   </thead>
   <tbody>
-    <%= for %{id: id, description: descr, timestamp: ts, data: data} <- @script_res_list do %>
+    <%= for %{id: id, description: descr, timestamp: ts, data: data} = params <- @script_res_list do %>
       <tr>
         <td><%= id %></td>
         <td><%= descr %></td>
@@ -46,7 +44,7 @@
           </a>
         </td>
         <% {text, color} = cond do
-                  ts > 0 and ts >= @request_date -> {"выполнен", "text-success"}
+                  ts > 0 and ts >= (params[:reqv_ts] || 0) -> {"выполнен", "text-success"}
                   true -> {"ожидание", "text-warning"}
                 end
            %>
