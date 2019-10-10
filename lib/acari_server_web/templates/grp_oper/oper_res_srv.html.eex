@@ -1,9 +1,4 @@
 <hr/>
-<%= if @request_date > 0 do %>
-<p><strong>Последний запрос:</strong>
-  <%= AcariServer.get_local_date(@request_date) %>
-</p>
-<% end %>
 <%
   waitlist = []
     #@script_res_list

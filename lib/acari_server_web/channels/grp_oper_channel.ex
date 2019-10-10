@@ -130,6 +130,11 @@ defmodule AcariServerWeb.GrpOperChannel do
           |> Enum.each(fn %{name: name} ->
             case params["script_type"] do
               "server" ->
+                AcariServer.Mnesia.get_up_servers(:system_name)
+                |> Enum.each(fn node ->
+                  AcariServer.Mnesia.update_tun_srv_state(name, tag, node, %{reqv_ts: ts})
+                end)
+
                 AcariServer.Master.run_script_on_all_servers(name, tag)
 
               _ ->
@@ -139,7 +144,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           end)
 
           Process.sleep(1_000)
-          get_script(socket, params["script_type"], tag, params["group_id"], nodes_list)
+          get_script(socket, params["script_type"], tag, nodes_list)
         else
           _ ->
             push(socket, "output", %{
@@ -171,7 +176,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           end)
 
           Process.sleep(1_000)
-          get_script(socket, params["script_type"], tag, params["group_id"], nodes_list)
+          get_script(socket, params["script_type"], tag, nodes_list)
         end
 
       "create_group" ->
@@ -242,12 +247,11 @@ defmodule AcariServerWeb.GrpOperChannel do
       socket,
       script_type,
       tag,
-      group_id,
       get_nodes_list(socket, group_id, class_id, filter)
     )
   end
 
-  defp get_script(socket, "server", tag, group_id, nodes) do
+  defp get_script(socket, "server", tag, nodes) do
     script_res_list =
       nodes
       |> Enum.map(fn %{name: tun_name, description: descr} ->
@@ -263,12 +267,12 @@ defmodule AcariServerWeb.GrpOperChannel do
       opt: AcariServer.NodeMonitor.get_templ_descr_by_name(tag) <> " (#{tag})",
       data:
         Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res_srv.html",
-          script_res_list: script_res_list,
+          script_res_list: script_res_list
         )
     })
   end
 
-  defp get_script(socket, _script_type, tag, group_id, nodes) do
+  defp get_script(socket, _script_type, tag, nodes) do
     script_res_list =
       nodes
       |> Enum.map(fn %{name: tun_name, description: descr} ->
@@ -284,7 +288,7 @@ defmodule AcariServerWeb.GrpOperChannel do
       opt: AcariServer.NodeMonitor.get_templ_descr_by_name(tag) <> " (#{tag})",
       data:
         Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res.html",
-          script_res_list: script_res_list,
+          script_res_list: script_res_list
         )
     })
   end

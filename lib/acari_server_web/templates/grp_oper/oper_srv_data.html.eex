@@ -1,6 +1,6 @@
 <table id="" class="table table-borderless m-0 ">
   <tbody>
-    <%= for {node, %{timestamp: ts, data: data}} <- @data do %>
+    <%= for {node, %{timestamp: ts, data: data} = params} <- @data do %>
       <tr>
         <td><%= node %></td>
         <td><%= case ts do
@@ -16,7 +16,7 @@
           </a>
         </td>
         <% {text, color} = cond do
-              #ts > 0 and ts >= @request_date -> {"выполнен", "text-success"}
+              ts > 0 and ts >= (params[:reqv_ts] || 0) -> {"выполнен", "text-success"}
               true -> {"ожидание", "text-warning"}
             end
         %>

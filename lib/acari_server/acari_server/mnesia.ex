@@ -307,7 +307,10 @@ defmodule AcariServer.Mnesia do
             record
             |> Rec.tun(:srv_state)
             |> Map.put_new(tag, %{})
-            |> update_in([tag, node], fn old_data -> old_data |> Map.merge(data) end)
+            |> update_in([tag, node], fn
+              old_data when is_map(old_data) -> old_data |> Map.merge(data)
+              _ -> data
+            end)
 
           Mnesia.write(Rec.tun(record, srv_state: srv_state))
       end
