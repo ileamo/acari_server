@@ -24,8 +24,7 @@
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
-      <th scope="col">Данные</th>
-      <th scope="col">Статус</th>
+      <th scope="col">Сервер/Время/Данные/Статус</th>
     </tr>
   </thead>
   <tbody>
@@ -33,15 +32,9 @@
       <tr>
         <td><%= id %></td>
         <td><%= descr %></td>
-        <td>
-                <%= render "oper_srv_data.html", data: data %>
+        <td class="p-0">
+                <%= render "oper_srv_data.html", id: id, data: data %>
         </td>
-        <% {text, color} = cond do
-                  #ts > 0 and ts >= @request_date -> {"выполнен", "text-success"}
-                  true -> {"ожидание", "text-warning"}
-                end
-           %>
-        <td class="<%=color%>"><%= text %></td>
       </tr>
     <% end %>
   </tbody>

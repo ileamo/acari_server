@@ -1,3 +1,27 @@
-<pre><code>
-  <%= @data |> inspect(pretty: true) %>
-</code></pre>
+<table id="" class="table table-borderless m-0 ">
+  <tbody>
+    <%= for {node, %{timestamp: ts, data: data}} <- @data do %>
+      <tr>
+        <td><%= node %></td>
+        <td><%= case ts do
+                  0 -> "-"
+                  ts -> AcariServer.get_local_date(ts)
+                end
+            %>
+        </td>
+        <td>
+          <a href="#" data-toggle="modal" data-target="#grp-script-res"
+            data-content="<%= data %>" data-name="<%= "#{@id} на сервере #{node}" %>">
+                <%= if String.length(data) <= 16, do: data, else: (data |> String.slice(0, 16))<>"..." %>
+          </a>
+        </td>
+        <% {text, color} = cond do
+              #ts > 0 and ts >= @request_date -> {"выполнен", "text-success"}
+              true -> {"ожидание", "text-warning"}
+            end
+        %>
+        <td class="<%=color%>"><%= text %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
