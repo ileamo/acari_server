@@ -1,6 +1,10 @@
 <table id="" class="table table-borderless m-0 ">
   <tbody>
-    <%= for {node, %{timestamp: ts, data: data} = params} <- @data do %>
+    <%= for {node, params} <- @data do %>
+      <%
+        ts = params[:timestamp] || 0
+        data = params[:data] || "нет данных"
+      %>
       <tr>
         <td><%= node %></td>
         <td><%= case ts do

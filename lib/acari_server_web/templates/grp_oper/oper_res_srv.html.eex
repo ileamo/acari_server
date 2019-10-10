@@ -1,11 +1,20 @@
 <hr/>
 <%
-  waitlist = []
-    #@script_res_list
-    #|> Enum.filter(fn %{timestamp: ts} -> not (ts > 0 and ts >= @request_date) end)
+  is_wait =
+    @script_res_list
+    |> Enum.reduce_while(false, fn %{data: data}, _ ->
+      case data |> Enum.reduce_while(false, fn
+        %{timestamp: ts, reqv_ts: reqv_ts}, _ -> ts < reqv_ts && {:halt, true} || {:cont, false}
+        %{timestamp: ts}, _ -> {:cont, false}
+        _, _ -> {:halt, true}
+      end) do
+        true -> {:halt, true}
+        _ -> {:cont, false}
+      end
+    end)
 %>
 
-<%= if waitlist != [] do %>
+<%= if is_wait do %>
   <button id="go-update-res" class="btn btn-outline-secondary btn-sm py-1 px-2 mb-3">
     Обновить таблицу
   </button>
