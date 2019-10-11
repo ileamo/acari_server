@@ -167,9 +167,6 @@ if (grp_oper) {
           if (grp_oper_script.selectedIndex < 0) {
             grp_oper_script.selectedIndex = "0";
           }
-          if (sessionStorage.getItem("grp_oper_show_only") != "true") {
-            getScript();
-          }
         }
 
         if (grp_oper_script_multi) {
@@ -182,16 +179,19 @@ if (grp_oper) {
             grp_oper_script_multi.options[i].selected =
               selectedValues.indexOf(grp_oper_script_multi.options[i].value) >= 0;
           }
-          if (sessionStorage.getItem("grp_oper_show_only") == "true") {
-            getScriptMulti(false)
-          }
         }
+        if (sessionStorage.getItem("grp_oper_show_only") == "true") {
+          getScriptMulti(false)
+        } else {
+          getScript()
+        }
+
         break;
 
       case "script_multi":
         document.querySelector("#go-script-name").innerText = "Результаты запросов"
         document.querySelector("#go-script-field").innerHTML = `${payload.data}`
-        $("#datatable").DataTable({
+        $("#datatable-multi").DataTable({
           stateSave: true,
           responsive: true
         });
@@ -200,10 +200,17 @@ if (grp_oper) {
       case "script":
         document.querySelector("#go-script-name").innerText = `${payload.opt}`
         document.querySelector("#go-script-field").innerHTML = `${payload.data}`
-        $("#datatable").DataTable({
-          stateSave: true,
-          responsive: true
-        });
+        if (sessionStorage.getItem("grp_oper_script_type") == "server") {
+          $("#datatable-srv").DataTable({
+            stateSave: true,
+            responsive: true
+          });
+        } else {
+          $("#datatable").DataTable({
+            stateSave: true,
+            responsive: true
+          });
+        }
 
         $('#grp-script-res').on('show.bs.modal', function(event) {
           let data_field = $(event.relatedTarget)

@@ -22,8 +22,7 @@
     Повторить для невыполненных
   </button>
 <% end %>
-
-<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+<table id="datatable-srv" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
       <th scope="col">Имя</th>
