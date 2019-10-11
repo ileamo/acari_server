@@ -161,19 +161,25 @@ defmodule AcariServerWeb.GrpOperChannel do
           nodes_list =
             get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
 
-          nodes_list
-          |> Enum.filter(fn %{name: name} ->
-            with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
-                 %{timestamp: ts, reqv_ts: reqv_ts} <- stat[tag] do
-              ts < reqv_ts
-            else
-              _ ->
-                true
-            end
-          end)
-          |> Enum.each(fn %{name: name} ->
-            AcariServer.Master.exec_script_on_peer(name, tag)
-          end)
+          case params["script_type"] do
+            "server" ->
+              nil
+
+            _ ->
+              nodes_list
+              |> Enum.filter(fn %{name: name} ->
+                with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
+                     %{timestamp: ts, reqv_ts: reqv_ts} <- stat[tag] do
+                  ts < reqv_ts
+                else
+                  _ ->
+                    true
+                end
+              end)
+              |> Enum.each(fn %{name: name} ->
+                AcariServer.Master.exec_script_on_peer(name, tag)
+              end)
+          end
 
           Process.sleep(1_000)
           get_script(socket, params["script_type"], tag, nodes_list)
