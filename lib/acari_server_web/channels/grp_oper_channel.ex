@@ -163,7 +163,31 @@ defmodule AcariServerWeb.GrpOperChannel do
 
           case params["script_type"] do
             "server" ->
-              nil
+              nodes_list
+              |> Enum.reduce([], fn %{name: name}, acc ->
+                servers = AcariServer.Mnesia.get_tunnel_srv_state(name)[tag] || %{}
+
+                servers =
+                  AcariServer.Mnesia.get_up_servers(:system_name)
+                  |> Enum.filter(fn serv_name ->
+                    case servers[serv_name] do
+                      %{timestamp: ts, reqv_ts: reqv_ts} -> ts < reqv_ts
+                      %{timestamp: _} -> false
+                      _ -> true
+                    end
+                  end)
+
+                case servers do
+                  [] -> acc
+                  servers -> [{name, servers} | acc]
+                end
+              end)
+              |> Enum.each(fn {name, server_list} ->
+                server_list
+                |> Enum.each(fn server ->
+                  AcariServer.Master.run_script_on_server(name, tag, server)
+                end)
+              end)
 
             _ ->
               nodes_list

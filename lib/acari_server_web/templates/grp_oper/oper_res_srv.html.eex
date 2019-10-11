@@ -4,9 +4,12 @@
     @script_res_list
     |> Enum.reduce_while(false, fn %{data: data}, _ ->
       case data |> Enum.reduce_while(false, fn
-        %{timestamp: ts, reqv_ts: reqv_ts}, _ -> ts < reqv_ts && {:halt, true} || {:cont, false}
-        %{timestamp: ts}, _ -> {:cont, false}
-        _, _ -> {:halt, true}
+        {_, %{timestamp: ts, reqv_ts: reqv_ts}}, _ ->
+          ((ts < reqv_ts) && {:halt, true}) || {:cont, false}
+        {_, %{timestamp: ts}}, _ ->
+          {:cont, false}
+        _, _ ->
+        {:halt, true}
       end) do
         true -> {:halt, true}
         _ -> {:cont, false}
