@@ -306,9 +306,11 @@ defmodule AcariServerWeb.GrpOperChannel do
     script_res_list =
       nodes
       |> Enum.map(fn %{name: tun_name, description: descr} ->
-        %{timestamp: ts, data: data} =
-          AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] ||
-            %{timestamp: 0, data: "нет данных"}
+        {ts, data} =
+          case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
+            %{timestamp: ts, data: data} -> {ts, data}
+            _ -> {0, "нет данных"}
+          end
 
         %{id: tun_name, description: descr, timestamp: ts, data: data |> to_string()}
       end)
@@ -399,6 +401,7 @@ defmodule AcariServerWeb.GrpOperChannel do
   defp get_templates_list(class, templ_group) do
     case Map.get(class, templ_group) do
       res when is_list(res) -> res
+      nil -> []
       res -> [res]
     end
   end
