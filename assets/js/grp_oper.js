@@ -25,6 +25,7 @@ if (grp_oper) {
   let filter_blinking;
 
   let grp_oper_show_only = document.getElementById("grp-oper-show-only")
+  let grp_oper_show_only_button = document.getElementById("grp-oper-show-only-button")
   if (grp_oper_show_only) {
     let show_only = sessionStorage.getItem("grp_oper_show_only") == "true"
     grp_oper_show_only.checked = show_only;
@@ -71,13 +72,21 @@ if (grp_oper) {
   }
 
   let grp_oper_client_script = document.getElementById("grp-oper-client-script")
-  if (grp_oper_client_script) {
-    grp_oper_client_script.addEventListener("click", selectElement, false);
-    sessionStorage.setItem("grp_oper_script_type", "client")
-  }
   let grp_oper_server_script = document.getElementById("grp-oper-server-script")
-  if (grp_oper_server_script) {
-    grp_oper_server_script.addEventListener("click", selectElement, false);
+  if (grp_oper_client_script && grp_oper_server_script) {
+    grp_oper_client_script.addEventListener("click", selectElementScriptType, false);
+    grp_oper_server_script.addEventListener("click", selectElementScriptType, false);
+
+    let script_type = sessionStorage.getItem("grp_oper_script_type") || "client"
+    if (script_type == "server") {
+      grp_oper_server_script.checked = true;
+      grp_oper_client_script.checked = false;
+      grp_oper_show_only_button.hidden = true;
+    } else {
+      grp_oper_server_script.checked = false;
+      grp_oper_client_script.checked = true;
+      grp_oper_show_only_button.hidden = false;
+    }
   }
 
   function inputFilterText() {
@@ -92,6 +101,10 @@ if (grp_oper) {
     selectElement();
   }
 
+  function selectElementScriptType() {
+    selectElement();
+  }
+
 
   function selectElement() {
     let class_id = grp_oper_class.options[grp_oper_class.selectedIndex].value
@@ -102,6 +115,11 @@ if (grp_oper) {
     sessionStorage.setItem("grp_oper_group_id", group_id)
     sessionStorage.setItem("grp_oper_filter", filter)
     sessionStorage.setItem("grp_oper_script_type", script_type)
+    if (script_type == "server") {
+      grp_oper_show_only_button.hidden = true;
+    } else {
+      grp_oper_show_only_button.hidden = false;
+    }
 
 
     channel.push('input', {

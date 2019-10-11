@@ -68,7 +68,7 @@
   <select class="custom-select mb-2 mt-1" multiple size="5" id="grp-oper-script-list-multi">
   </select>
 
-  <div class="form-check form-check-inline mb-5">
+  <div class="form-check form-check-inline" id="grp-oper-show-only-button">
     <input class="form-check-input" type="checkbox" value="" id="grp-oper-show-only">
     <label class="form-check-label" for="defaultCheck1">
       Только просмотр
@@ -77,7 +77,7 @@
 
 
 
-    <h3 id="go-script-name">Скрипт</h3>
+    <h3 id="go-script-name" class="mt-5">Скрипт</h3>
     <div id="go-script-field">Нет данных</div>
 
     <button class="btn btn-outline-secondary" type="button" id="grp-oper-new-group">
