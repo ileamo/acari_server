@@ -322,12 +322,10 @@ defmodule AcariServer.Master do
            env: env
          ) do
       {data, _code} ->
-        if Enum.random(0..1) == 0 do
           AcariServer.Mnesia.update_tun_srv_state(tun_name, templ_name, Node.self(), %{
             timestamp: :os.system_time(:second),
             data: data
           })
-        end
 
       _ ->
         nil

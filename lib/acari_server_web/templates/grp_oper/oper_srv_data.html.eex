@@ -1,3 +1,4 @@
+<% up_server_list = AcariServer.Mnesia.get_up_servers(:system_name) %>
 <table class="table table-borderless m-0 ">
   <tbody>
     <%= for {node, params} <- @data do %>
@@ -20,6 +21,7 @@
           </a>
         </td>
         <% {text, color} = cond do
+              not Enum.member?(up_server_list, node) -> {"нет сервера", "text-danger"}
               ts > 0 and ts >= (params[:reqv_ts] || 0) -> {"выполнен", "text-success"}
               true -> {"ожидание", "text-warning"}
             end
