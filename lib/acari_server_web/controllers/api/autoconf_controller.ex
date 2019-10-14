@@ -34,7 +34,7 @@ defmodule AcariServerWeb.Api.AutoconfController do
          },
          _
        ) do
-    case AcariServer.NodeManager.get_node_with_class(node_name) do
+    case AcariServer.NodeManager.get_node_with_class(node_name, [:remote]) do
       %{} = node ->
         with {lat, _} <- Float.parse(params["latitude"] |> to_string()),
              {lng, _} <- Float.parse(params["longitude"] |> to_string()) do
