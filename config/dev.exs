@@ -10,10 +10,10 @@ config :acari_server, AcariServerWeb.Endpoint,
   http: [port: 4000],
   https: [
     port: 4443,
-    # cipher_suite: :strong,
     keyfile: "priv/cert/selfsigned_key.pem",
     certfile: "priv/cert/selfsigned.pem",
-    versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
+    cipher_suite: :strong,
+    #versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
   ],
   debug_errors: true,
   code_reloader: true,
