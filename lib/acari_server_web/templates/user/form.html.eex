@@ -39,14 +39,43 @@
     </div>
   </div>
 
-  <div class="form-group row">
-    <%= label f, "Группы", class: "col-sm-2 col-form-label" %>
-    <div class="col-sm-10">
-      <% select_list = AcariServer.GroupManager.group_name_id_pairs_list() %>
-      <%= multiple_select f, :groups_list, select_list, selected: AcariServer.GroupManager.group_id_list(assigns[:user]), class: "form-control", size: min(length(select_list), 16) %>
-      <%= error_tag f, :groups %>
+
+  <%  rights_list = [[key: "Нет", value: "no"],
+                      [key: "Только просмотр", value: "ro"],
+                      [key: "Полный", value: "rw"]]
+      group_list = AcariServer.GroupManager.list_groups()
+
+      groups_users_rights = case assigns[:rights] do
+        %{} = rights ->
+          rights
+          |> Enum.map(fn {group_id, rights} -> {group_id |> String.to_integer(), rights} end)
+          |> Enum.into(%{})
+
+        _ ->
+          case assigns[:user] do
+            %AcariServer.UserManager.User{} ->
+              @user.groups_users
+              |> Enum.map(fn %{group_id: group_id, rights: rights} -> {group_id, rights} end)
+              |> Enum.into(%{})
+            _ -> %{}
+          end
+      end
+  %>
+
+  <h3> Доступ к группам </h3>
+  <%= for gr <- group_list do %>
+    <% rights = groups_users_rights[gr.id] %>
+    <div class="form-group row my-0">
+      <%= label :rights, gr.name, class: "col-sm-2 col-form-label" %>
+      <div class="col-sm-10">
+        <%= select :rights, to_string(gr.id), rights_list, selected: rights,
+              class: "custom-select",
+              id: "class-form-select" %>
+      </div>
     </div>
-  </div>
+
+  <% end %>
+
 
   <div class="form-group">
     <%= submit "Сохранить" %>

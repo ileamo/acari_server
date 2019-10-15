@@ -10,6 +10,8 @@ defmodule AcariServer.UserManager do
   alias AcariServer.UserManager.User
   alias Plug.Conn
 
+  alias AcariServer.GroupUserAssociation
+
   @doc """
   Returns the list of users.
 
@@ -42,7 +44,8 @@ defmodule AcariServer.UserManager do
   def get_user!(id) do
     User
     |> RepoRO.get_wait(id)
-    |> RepoRO.preload(:groups)
+    #|> RepoRO.preload(:groups)
+    |> RepoRO.preload(groups_users: [:group])
   end
 
   def get_user(id), do: RepoRO.get(User, id)
@@ -59,44 +62,57 @@ defmodule AcariServer.UserManager do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> AcariServer.GroupManager.Group.put_groups(attrs)
-    |> Repo.insert()
+  def create_user(attrs \\ %{}, rights) do
+    res =
+      %User{}
+      |> User.changeset(attrs)
+      |> Repo.insert()
+
+    case res do
+      {:ok, user} ->
+        update_group_user_assoc(user.id, rights)
+
+      _ ->
+        nil
+    end
+
+    res
   end
 
-  @doc """
-  Updates a user.
+  def update_user(%User{} = user, attrs, rights) do
+    res =
+      user
+      |> User.changeset(attrs)
+      |> Repo.update()
 
-  ## Examples
+    case res do
+      {:ok, _} ->
+        update_group_user_assoc(user.id, rights)
 
-      iex> update_user(user, %{field: new_value})
-      {:ok, %User{}}
+      _ ->
+        nil
+    end
 
-      iex> update_user(user, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_user(%User{} = user, attrs) do
-    user
-    |> User.changeset(attrs)
-    |> AcariServer.GroupManager.Group.put_groups(attrs)
-    |> Repo.update()
+    res
   end
 
-  @doc """
-  Deletes a User.
+  defp update_group_user_assoc(user_id, rights) do
+    GroupUserAssociation.delete_user(user_id)
 
-  ## Examples
+    rights
+    |> Enum.each(fn
+      {_, "no"} ->
+        nil
 
-      iex> delete_user(user)
-      {:ok, %User{}}
+      {group_id, rights} ->
+        GroupUserAssociation.create_group_user(%{
+          user_id: user_id,
+          group_id: group_id,
+          rights: rights
+        })
+    end)
+  end
 
-      iex> delete_user(user)
-      {:error, %Ecto.Changeset{}}
-
-  """
   def delete_user(%User{} = user) do
     Repo.delete_wait(user)
   end

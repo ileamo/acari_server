@@ -18,15 +18,15 @@ defmodule AcariServerWeb.UserController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"user" => user_params}) do
-    case UserManager.create_user(user_params) do
+  def create(conn, %{"user" => user_params, "rights" => rights}) do
+    case UserManager.create_user(user_params, rights) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Пользователь успешно создан.")
         |> redirect(to: Routes.user_path(conn, :show, user))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "new.html", changeset: changeset, rights: rights)
     end
   end
 
@@ -41,17 +41,17 @@ defmodule AcariServerWeb.UserController do
     render(conn, "edit.html", user: user, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
+  def update(conn, %{"id" => id, "user" => user_params, "rights" => rights}) do
     user = UserManager.get_user!(id)
 
-    case UserManager.update_user(user, user_params) do
+    case UserManager.update_user(user, user_params, rights) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Пользователь отредактирован.")
         |> redirect(to: Routes.user_path(conn, :show, user))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", user: user, changeset: changeset)
+        render(conn, "edit.html", user: user, changeset: changeset, rights: rights)
     end
   end
 

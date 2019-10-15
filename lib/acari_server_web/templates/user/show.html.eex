@@ -19,7 +19,23 @@
 
   <li>
     <strong>Группы:</strong>
-    <%= AcariServer.GroupManager.groups_list(@user) %>
+    <% groups_list = @user.groups_users
+        |> Enum.map(fn %{rights: rights, group: group} -> {group.name,
+              case rights do
+                "rw" -> "Полный доступ"
+                "ro" -> "Только просмотр"
+                _ -> "Нет доступа"
+              end
+        } end)
+    %>
+    <ul>
+      <%= for {name, rights} <- groups_list do %>
+        <li>
+          <strong><%= name %>:</strong>
+          <%= rights %>
+        </li>
+      <% end %>
+    </ul>
   </li>
 
 </ul>

@@ -1,6 +1,6 @@
 <ul class="navbar-nav flex-column">
   <div class="mr-3 d-none d-md-block" data-toggle="modal" data-target="#About">
-    <img src="/images/bogatka_e.jpg" class="img-thumbnail" alt="Богатка">
+    <img src="/images/bg-emo.jpg" class="img-thumbnail" alt="Богатка">
   </div>
 <!--
   <div class="mr-3 d-none d-md-block" data-toggle="modal" data-target="#About">

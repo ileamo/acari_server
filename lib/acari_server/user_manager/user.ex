@@ -17,6 +17,7 @@ defmodule AcariServer.UserManager.User do
       join_through: AcariServer.GroupUserAssociation.GroupUser,
       on_replace: :delete
 
+    has_many :groups_users, AcariServer.GroupUserAssociation.GroupUser
 
     timestamps()
   end

@@ -5,13 +5,14 @@ defmodule AcariServer.GroupUserAssociation.GroupUser do
   schema "groups_users" do
     belongs_to :group, AcariServer.GroupManager.Group
     belongs_to :user, AcariServer.UserManager.User
+    field :rights, :string
 
     timestamps()
   end
 
   def changeset(group_user, attrs \\ %{}) do
     group_user
-    |> Ecto.Changeset.cast(attrs, [:group_id, :user_id])
+    |> Ecto.Changeset.cast(attrs, [:group_id, :user_id, :rights])
     |> Ecto.Changeset.validate_required([:group_id, :user_id])
     |> Ecto.Changeset.foreign_key_constraint(:group_id)
     |> Ecto.Changeset.foreign_key_constraint(:user_id)
