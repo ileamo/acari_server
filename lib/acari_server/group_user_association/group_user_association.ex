@@ -1,12 +1,13 @@
 defmodule AcariServer.GroupUserAssociation do
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.GroupUserAssociation.GroupUser
 
   def list_groups_users do
     GroupUser
-    |> Repo.all()
+    |> RepoRO.all()
   end
 
 
@@ -19,5 +20,10 @@ defmodule AcariServer.GroupUserAssociation do
   def delete_user(user_id) do
     from(gu in GroupUser, where: gu.user_id == ^user_id)
     |> Repo.delete_all()
+  end
+
+  def get_user(user_id) do
+    from(gu in GroupUser, where: gu.user_id == ^user_id)
+    |> RepoRO.all()
   end
 end

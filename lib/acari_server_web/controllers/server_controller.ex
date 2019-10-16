@@ -31,8 +31,7 @@ defmodule AcariServerWeb.ServerController do
     end
   end
 
-  def show(conn, %{"id" => id} = params) do
-    IO.inspect(params)
+  def show(conn, %{"id" => id}) do
     server = ServerManager.get_server!(id)
     render(conn, "show.html", server: server)
   end

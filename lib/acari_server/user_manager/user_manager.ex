@@ -44,7 +44,7 @@ defmodule AcariServer.UserManager do
   def get_user!(id) do
     User
     |> RepoRO.get_wait(id)
-    #|> RepoRO.preload(:groups)
+    # |> RepoRO.preload(:groups)
     |> RepoRO.preload(groups_users: [:group])
   end
 
@@ -207,5 +207,58 @@ defmodule AcariServer.UserManager do
       to: AcariServerWeb.Router.Helpers.page_path(conn, :noauth, message: mes)
     )
     |> Conn.halt()
+  end
+
+  def get_user_node_rights(user_id, node_id) do
+    group_list = AcariServer.GroupNodeAssociation.get_group_list_for_node(node_id)
+
+    AcariServer.GroupUserAssociation.get_user(user_id)
+    |> Enum.filter(fn %{group_id: group_id} -> Enum.member?(group_list, group_id) end)
+    |> Enum.map(fn %{rights: rights} -> rights end)
+    |> Enum.reduce_while(nil, fn
+      "rw", _ -> {:halt, "rw"}
+      "ro", _ -> {:cont, "ro"}
+      _, acc -> {:cont, acc}
+    end)
+  end
+
+  # read_only and read_write test
+  def is_user_node_ro(conn = %{assigns: %{current_user: %{is_admin: true}}}, _opts) do
+    conn
+  end
+
+  def is_user_node_ro(
+        conn = %{assigns: %{current_user: %{id: user_id}}, params: %{"id" => node_id}},
+        :node
+      ) do
+    case get_user_node_rights(user_id, String.to_integer(node_id)) do
+      "rw" -> conn
+      "ro" -> conn
+      _ -> no_auth(conn, "Вы не являетесь членом группы")
+    end
+  end
+
+  def is_user_node_ro(conn, _opts) do
+    no_auth(conn, "Проблемы с правами")
+  end
+
+  # read_write test
+  def is_user_node_rw(conn = %{assigns: %{current_user: %{is_admin: true}}}, _opts) do
+    conn
+  end
+
+  def is_user_node_rw(
+        conn = %{assigns: %{current_user: %{id: user_id}}, params: %{"id" => node_id}},
+        :node
+      ) do
+    case get_user_node_rights(user_id, String.to_integer(node_id)) do
+      "rw" -> conn
+      "ro" -> no_auth(conn, "У Вас права только для просмотра этого клиента")
+      _ -> no_auth(conn, "Вы не являетесь членом группы")
+    end
+  end
+
+  def is_user_node_rw(conn, _opts) do
+    no_auth(conn, "Проблемы с правами")
   end
 end

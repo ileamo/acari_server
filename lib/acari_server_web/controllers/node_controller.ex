@@ -4,11 +4,27 @@ defmodule AcariServerWeb.NodeController do
   alias AcariServer.NodeManager
   alias AcariServer.NodeManager.Node
 
-  import AcariServer.UserManager, only: [is_admin: 2]
-  plug :is_admin when action in [:edit, :delete, :new]
+  import AcariServer.UserManager, only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2]
 
-  def index(conn, _params) do
+  plug :is_admin when action in [:new]
+  plug :is_user_node_rw, :node when action in [:edit, :delete, :toggle_lock]
+  plug :is_user_node_ro, :node when action in [:show]
+
+  def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, _params) do
     nodes = NodeManager.list_nodes()
+    render(conn, "index.html", nodes: nodes)
+  end
+
+  def index(%{assigns: %{current_user: user}} = conn, _params) do
+    nodes =
+      user
+      |> AcariServer.RepoRO.preload(groups: :nodes)
+      |> Map.get(:groups)
+      |> Enum.map(fn %{nodes: nodes} -> nodes end)
+      |> List.flatten()
+      |> Enum.uniq_by(fn %{id: id} -> id end)
+      |> AcariServer.RepoRO.preload([:groups, :script])
+
     render(conn, "index.html", nodes: nodes)
   end
 
@@ -94,6 +110,7 @@ defmodule AcariServerWeb.NodeController do
     end
 
     Process.sleep(1000)
+
     conn
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
     |> redirect(to: Routes.node_path(conn, :index))

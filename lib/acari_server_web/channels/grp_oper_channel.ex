@@ -6,8 +6,6 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   def handle_in("input", params, socket) do
-    IO.inspect(params, label: "PARAMS")
-
     case params["cmd"] do
       "select" ->
         nodes =
