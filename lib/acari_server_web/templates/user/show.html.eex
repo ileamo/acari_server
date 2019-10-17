@@ -30,6 +30,7 @@
                   _ -> "Нет доступа"
                 end
           } end)
+          |> Enum.sort_by(fn {name, _} -> name end)
       %>
       <ul>
         <%= for {name, rights} <- groups_list do %>

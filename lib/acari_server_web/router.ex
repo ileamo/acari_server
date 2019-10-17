@@ -59,6 +59,7 @@ defmodule AcariServerWeb.Router do
     get "/grpoper", GrpOperController, :index
 
     resources "/users", UserController
+    get "/users/:id/rw", UserController, :show_rw
     resources "/groups", GroupController
     get "/groups/:id/oper", GroupController, :oper
     resources "/nodes", NodeController

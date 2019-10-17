@@ -35,6 +35,11 @@ defmodule AcariServerWeb.UserController do
     render(conn, "show.html", user: user)
   end
 
+  def show_rw(conn, %{"id" => id}) do
+    user = UserManager.get_user!(id, :rw)
+    render(conn, "show.html", user: user)
+  end
+
   def edit(conn, %{"id" => id}) do
     user = UserManager.get_user!(id)
     changeset = UserManager.change_user(user)
@@ -42,13 +47,13 @@ defmodule AcariServerWeb.UserController do
   end
 
   def update(conn, %{"id" => id, "user" => user_params, "rights" => rights}) do
-    user = UserManager.get_user!(id)
+    user = UserManager.get_user!(id, :rw)
 
     case UserManager.update_user(user, user_params, rights) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Пользователь отредактирован.")
-        |> redirect(to: Routes.user_path(conn, :show, user))
+        |> redirect(to: Routes.user_path(conn, :show_rw, user))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", user: user, changeset: changeset, rights: rights)
