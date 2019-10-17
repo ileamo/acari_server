@@ -71,13 +71,27 @@
   <div id="user-form-groups"<%= is_admin && "hidden=\"true\"" || "" %>>
     <h3> Доступ к группам </h3>
     <%= for gr <- group_list do %>
-      <% rights = groups_users_rights[gr.id] %>
+      <% rights = groups_users_rights[gr.id] || "no" %>
       <div class="form-group row my-0">
         <%= label :rights, gr.name, class: "col-sm-2 col-form-label" %>
-        <div class="col-sm-10">
+        <div class="input-group-prepen col-sm-10 my-0" data-toggle="buttons">
+            <label class="btn  btn-outline-danger <%= rights == "no" && "active" %>">
+              <%= radio_button :rights, to_string(gr.id), "no", checked: rights == "no", autocomplete: "off" %>
+              Нет
+            </label>
+            <label class="btn btn-outline-info mx-1 <%= rights == "ro" && "active" %>">
+              <%= radio_button :rights, to_string(gr.id), "ro", checked: rights == "ro", autocomplete: "off" %>
+              Только просмотр
+            </label>
+            <label class="btn  btn-outline-success <%= rights == "rw" && "active" %>">
+              <%= radio_button :rights, to_string(gr.id), "rw", checked: rights == "rw", autocomplete: "off" %>
+              Полный
+            </label>
+          <!--
           <%= select :rights, to_string(gr.id), rights_list, selected: rights,
                 class: "custom-select",
                 id: "class-form-select" %>
+              -->
         </div>
       </div>
     <% end %>
