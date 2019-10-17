@@ -25,18 +25,18 @@
       <% groups_list = @user.groups_users
           |> Enum.map(fn %{rights: rights, group: group} -> {group.name,
                 case rights do
-                  "rw" -> "Полный доступ"
-                  "ro" -> "Только просмотр"
-                  _ -> "Нет доступа"
+                  "rw" -> {"Полный доступ", "text-success"}
+                  "ro" -> {"Только просмотр", "text-info"}
+                  _ -> {"Нет доступа", "text-danger"}
                 end
           } end)
           |> Enum.sort_by(fn {name, _} -> name end)
       %>
       <ul>
-        <%= for {name, rights} <- groups_list do %>
+        <%= for {name, {rights, color}} <- groups_list do %>
           <li>
             <strong><%= name %>:</strong>
-            <%= rights %>
+            <span class="<%= color %>"><%= rights %></span>
           </li>
         <% end %>
       </ul>
