@@ -75,17 +75,17 @@
       <% rights = groups_users_rights[gr.id] || "no" %>
       <div class="form-group row my-0">
         <%= label :rights, gr.name, class: "col-sm-2 col-form-label" %>
-        <div class="input-group-prepen col-sm-10 my-0" data-toggle="buttons">
-            <label class="btn  btn-outline-danger <%= rights == "no" && "active" %>">
-              <%= radio_button :rights, to_string(gr.id), "no", checked: rights == "no", autocomplete: "off" %>
+        <div class="input-group-prepend col-sm-10 my-0" data-toggle="buttons">
+            <label class="btn btn-outline-danger <%= rights == "no" && "active" %>">
+              <%= radio_button :rights, to_string(gr.id), "no", checked: rights == "no", autocomplete: "off", class: "custom-control-input" %>
               Нет
             </label>
             <label class="btn btn-outline-info mx-1 <%= rights == "ro" && "active" %>">
-              <%= radio_button :rights, to_string(gr.id), "ro", checked: rights == "ro", autocomplete: "off" %>
+              <%= radio_button :rights, to_string(gr.id), "ro", checked: rights == "ro", autocomplete: "off", class: "custom-control-input" %>
               Только просмотр
             </label>
             <label class="btn  btn-outline-success <%= rights == "rw" && "active" %>">
-              <%= radio_button :rights, to_string(gr.id), "rw", checked: rights == "rw", autocomplete: "off" %>
+              <%= radio_button :rights, to_string(gr.id), "rw", checked: rights == "rw", autocomplete: "off", class: "custom-control-input" %>
               Полный
             </label>
           <!--
