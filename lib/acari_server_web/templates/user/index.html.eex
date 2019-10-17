@@ -16,7 +16,13 @@
         <%= link user.username, to: Routes.user_path(@conn, :show, user) %>
       </td>
       <td><%= if user.is_admin, do: "Да", else: "Нет" %></td>
-      <td><%= AcariServer.GroupManager.groups_list(user) %></td>
+      <td>
+        <%= if user.is_admin do %>
+          Все
+        <% else %>
+          <%= AcariServer.GroupManager.groups_list(user) %>
+        <% end %>  
+      </td>
 
       <td>
         <%= link "Редактировать", to: Routes.user_path(@conn, :edit, user) %>

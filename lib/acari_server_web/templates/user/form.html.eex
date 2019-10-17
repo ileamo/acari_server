@@ -33,7 +33,7 @@
     <%= label f, "Админ", class: "col-2 form-check-label" %>
     <div class="col10">
       <div class="form-check ml-3">
-        <%= checkbox f, :is_admin, class: "form-check-input" %>
+        <%= checkbox f, :is_admin, class: "form-check-input", id: "user-form-is-admin" %>
         <%= error_tag f, :is_admin %>
       </div>
     </div>
@@ -60,22 +60,28 @@
             _ -> %{}
           end
       end
+
+      is_admin = case input_value(f, :is_admin) do
+        "false" -> false
+        "true" -> true
+        other -> other
+      end
   %>
 
-  <h3> Доступ к группам </h3>
-  <%= for gr <- group_list do %>
-    <% rights = groups_users_rights[gr.id] %>
-    <div class="form-group row my-0">
-      <%= label :rights, gr.name, class: "col-sm-2 col-form-label" %>
-      <div class="col-sm-10">
-        <%= select :rights, to_string(gr.id), rights_list, selected: rights,
-              class: "custom-select",
-              id: "class-form-select" %>
+  <div id="user-form-groups"<%= is_admin && "hidden=\"true\"" || "" %>>
+    <h3> Доступ к группам </h3>
+    <%= for gr <- group_list do %>
+      <% rights = groups_users_rights[gr.id] %>
+      <div class="form-group row my-0">
+        <%= label :rights, gr.name, class: "col-sm-2 col-form-label" %>
+        <div class="col-sm-10">
+          <%= select :rights, to_string(gr.id), rights_list, selected: rights,
+                class: "custom-select",
+                id: "class-form-select" %>
+        </div>
       </div>
-    </div>
-
-  <% end %>
-
+    <% end %>
+  </div>
 
   <div class="form-group">
     <%= submit "Сохранить" %>
