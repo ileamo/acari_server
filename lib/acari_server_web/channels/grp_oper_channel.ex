@@ -11,7 +11,7 @@ defmodule AcariServerWeb.GrpOperChannel do
         nodes =
           case params["group_id"] do
             "nil" ->
-              AcariServer.NodeManager.list_nodes()
+              AcariServer.NodeManager.list_nodes(socket.assigns[:current_user_id])
 
             id ->
               AcariServer.GroupManager.get_group!(id).nodes
@@ -253,7 +253,7 @@ defmodule AcariServerWeb.GrpOperChannel do
     nodes =
       case group_id do
         "nil" ->
-          AcariServer.NodeManager.list_nodes()
+          AcariServer.NodeManager.list_nodes(socket.assigns[:current_user_id])
 
         group_id ->
           AcariServer.GroupManager.get_group!(group_id)

@@ -25,6 +25,11 @@ defmodule AcariServer.NodeManager do
   end
 
   def list_nodes(user) do
+    user = case user do
+      %AcariServer.UserManager.User{} -> user
+      _ -> AcariServer.UserManager.get_user!(user, :clean)
+    end
+
     case user.is_admin do
       true ->
         list_nodes()
