@@ -33,6 +33,10 @@ defmodule AcariServer.UserManager do
     |> RepoRO.preload(groups_users: [:group])
   end
 
+  def get_user!(id, :clean) do
+    RepoRO.get!(User, id)
+  end
+
   def get_user!(id, :rw) do
     User
     |> Repo.get(id)
@@ -147,8 +151,12 @@ defmodule AcariServer.UserManager do
   end
 
   def load_current_user(conn, _) do
+    user = Guardian.Plug.current_resource(conn)
+    token = Phoenix.Token.sign(conn, "user token", user.id)
+
     conn
-    |> Conn.assign(:current_user, Guardian.Plug.current_resource(conn))
+    |> Conn.assign(:current_user, user)
+    |> Conn.assign(:user_token, token)
   end
 
   def is_admin(conn = %{assigns: %{current_user: %{is_admin: true}}}, _opts) do
