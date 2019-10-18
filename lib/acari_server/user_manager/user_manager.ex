@@ -267,8 +267,10 @@ defmodule AcariServer.UserManager do
     no_auth(conn, "Проблемы с правами")
   end
 
-  def get_disabled(user_id, node_id) do
-    case AcariServer.UserManager.get_user_node_rights(user_id, node_id) do
+  def get_disabled(%{is_admin: true}, _), do: ""
+
+  def get_disabled(current_user, node_id) do
+    case AcariServer.UserManager.get_user_node_rights(current_user, node_id) do
       "rw" -> ""
       _ -> "bg-disabled"
     end
@@ -278,8 +280,10 @@ defmodule AcariServer.UserManager do
     (current_user.is_admin && "") || "bg-disabled"
   end
 
-  def get_rights_text_color(user_id, node_id) do
-    case AcariServer.UserManager.get_user_node_rights(user_id, node_id) do
+  def get_rights_text_color(%{is_admin: true}, _), do: ""
+
+  def get_rights_text_color(current_user, node_id) do
+    case AcariServer.UserManager.get_user_node_rights(current_user, node_id) do
       "rw" -> "text-success"
       "no" -> "text-danger"
       _ -> ""

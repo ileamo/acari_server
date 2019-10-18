@@ -47,6 +47,7 @@ defmodule AcariServerWeb.TunnelController do
   end
 
   def show(conn, %{"name" => name}) do
-    render(conn, "show.html", name: name)
+    node = AcariServer.NodeManager.get_node_by_name(name)
+    render(conn, "show.html", name: name, node: node)
   end
 end
