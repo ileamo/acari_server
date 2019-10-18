@@ -22,6 +22,18 @@ defmodule AcariServer.GroupManager do
     RepoRO.all(Group)
   end
 
+  def list_groups(user) do
+    case user.is_admin do
+      true ->
+        RepoRO.all(Group)
+
+      _ ->
+        user
+        |> AcariServer.RepoRO.preload(:groups)
+        |> Map.get(:groups)
+    end
+  end
+
   def group_name_id_pairs_list() do
     list_groups()
     |> Enum.map(fn %{name: name, id: id} -> {name, id} end)
@@ -133,6 +145,4 @@ defmodule AcariServer.GroupManager do
     obj.groups
     |> Enum.map(fn %{id: id} -> id end)
   end
-
-
 end

@@ -925,8 +925,9 @@ defmodule AcariServer.Mnesia do
       |> link_list_to_map()
 
     nodes
-    |> Enum.map(fn %{name: name, description: descr, latitude: lat, longitude: lng} ->
+    |> Enum.map(fn %{id: id, name: name, description: descr, latitude: lat, longitude: lng} ->
       %{
+        id: id,
         name: name,
         description: descr,
         latitude: lat,

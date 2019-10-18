@@ -17,14 +17,29 @@ defmodule AcariServer.NodeManager do
       [%Node{}, ...]
 
   """
-  def list_nodes do
+  def list_nodes() do
     Node
     |> RepoRO.all()
     |> RepoRO.preload(:groups)
     |> RepoRO.preload(:script)
   end
 
-  def list_nodes_wo_preload do
+  def list_nodes(user) do
+    case user.is_admin do
+      true ->
+        list_nodes()
+
+      _ ->
+        user
+        |> AcariServer.RepoRO.preload(groups: :nodes)
+        |> Map.get(:groups)
+        |> Enum.map(fn %{nodes: nodes} -> nodes end)
+        |> List.flatten()
+        |> Enum.uniq_by(fn %{id: id} -> id end)
+    end
+  end
+
+  def list_nodes_wo_preload() do
     Node
     |> RepoRO.all()
   end

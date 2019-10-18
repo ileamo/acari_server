@@ -57,7 +57,9 @@
     <tr class="<%=al%>">
       <td><%= tunnel[:alert] %></td>
       <td>
-        <%= link tunnel[:name], to: Routes.tunnel_path(@conn, :show, tunnel[:name]) %>
+        <%= link tunnel[:name], to: Routes.tunnel_path(@conn, :show, tunnel[:name]),
+          class: AcariServer.UserManager.get_rights_text_color(@current_user, tunnel.id)
+        %>
       </td>
       <td><%= tunnel[:description] %></td>
       <td><%= tunnel[:server] %></td>

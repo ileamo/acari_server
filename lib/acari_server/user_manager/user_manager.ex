@@ -267,6 +267,14 @@ defmodule AcariServer.UserManager do
   end
 
   def get_disabled(current_user) do
-    current_user.is_admin && "" || "bg-disabled"
+    (current_user.is_admin && "") || "bg-disabled"
+  end
+
+  def get_rights_text_color(user_id, node_id) do
+    case AcariServer.UserManager.get_user_node_rights(user_id, node_id) do
+      "rw" -> "text-success"
+      "no" -> "text-danger"
+      _ -> ""
+    end
   end
 end
