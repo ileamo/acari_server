@@ -152,11 +152,18 @@ defmodule AcariServer.UserManager do
 
   def load_current_user(conn, _) do
     user = Guardian.Plug.current_resource(conn)
-    token = Phoenix.Token.sign(conn, "user token", user.id)
 
-    conn
-    |> Conn.assign(:current_user, user)
-    |> Conn.assign(:user_token, token)
+    case user do
+      %AcariServer.UserManager.User{} = user ->
+        token = Phoenix.Token.sign(conn, "user token", user.id)
+
+        conn
+        |> Conn.assign(:current_user, user)
+        |> Conn.assign(:user_token, token)
+
+      _ ->
+        conn
+    end
   end
 
   def is_admin(conn = %{assigns: %{current_user: %{is_admin: true}}}, _opts) do
