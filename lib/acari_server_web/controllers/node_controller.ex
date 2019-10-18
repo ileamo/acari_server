@@ -7,7 +7,7 @@ defmodule AcariServerWeb.NodeController do
   import AcariServer.UserManager, only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2]
 
   plug :is_admin when action in [:new]
-  plug :is_user_node_rw, :node when action in [:edit, :delete, :toggle_lock]
+  plug :is_user_node_rw, :node when action in [:edit, :delete]
   plug :is_user_node_ro, :node when action in [:show]
 
   def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, _params) do

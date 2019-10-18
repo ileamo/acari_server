@@ -19,13 +19,16 @@
       <td><%= template.description %></td>
       <td><%= template.executable && "Да" || "Нет" %></td>
       <td>
-        <%= link "Редактировать", to: Routes.template_path(@conn, :edit, template) %>
+        <%= link "Редактировать", to: Routes.template_path(@conn, :edit, template),
+            class: AcariServer.UserManager.get_disabled(@current_user) %>
         |
-        <%= link "Удалить", to: Routes.template_path(@conn, :delete, template), method: :delete, data: [confirm: "Вы уверены?"] %>
+        <%= link "Удалить", to: Routes.template_path(@conn, :delete, template), method: :delete, data: [confirm: "Вы уверены?"],
+            class: AcariServer.UserManager.get_disabled(@current_user) %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "Новый шаблон", to: Routes.template_path(@conn, :new) %></span>
+<span><%= link "Новый шаблон", to: Routes.template_path(@conn, :new),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>

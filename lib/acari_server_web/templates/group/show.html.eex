@@ -24,6 +24,7 @@
 
 </ul>
 
-<span><%= link "Редактироать", to: Routes.group_path(@conn, :edit, @group) %></span>
+<span><%= link "Редактироать", to: Routes.group_path(@conn, :edit, @group),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
 <span><%= link "К списку", to: Routes.group_path(@conn, :index) %></span>

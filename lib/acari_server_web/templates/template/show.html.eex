@@ -65,9 +65,11 @@
   </li>
 </ul>
 
-<span><%= link "Редактировать", to: Routes.template_path(@conn, :edit, @template) %></span>
+<span><%= link "Редактировать", to: Routes.template_path(@conn, :edit, @template),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
-<span><%= link "Клонировать", to: Routes.template_path(@conn, :new, template_id: @template.id) %></span>
+<span><%= link "Клонировать", to: Routes.template_path(@conn, :new, template_id: @template.id),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
 <span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>
 

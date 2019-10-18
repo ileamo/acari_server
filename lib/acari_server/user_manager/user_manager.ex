@@ -27,20 +27,6 @@ defmodule AcariServer.UserManager do
     |> RepoRO.preload(:groups)
   end
 
-  @doc """
-  Gets a single user.
-
-  Raises `Ecto.NoResultsError` if the User does not exist.
-
-  ## Examples
-
-      iex> get_user!(123)
-      %User{}
-
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
-
-  """
   def get_user!(id) do
     User
     |> RepoRO.get_wait(id)
@@ -53,7 +39,10 @@ defmodule AcariServer.UserManager do
     |> Repo.preload(groups_users: [:group])
   end
 
-  def get_user(id), do: RepoRO.get(User, id)
+  def get_user(id) do
+    RepoRO.get(User, id)
+    |> Repo.preload(:groups_users)
+  end
 
   @doc """
   Creates a user.
@@ -217,7 +206,10 @@ defmodule AcariServer.UserManager do
   def get_user_node_rights(user_id, node_id) do
     group_list = AcariServer.GroupNodeAssociation.get_group_list_for_node(node_id)
 
-    AcariServer.GroupUserAssociation.get_user(user_id)
+    case user_id do
+      user = %AcariServer.UserManager.User{} -> user.groups_users
+      id -> AcariServer.GroupUserAssociation.get_user(id)
+    end
     |> Enum.filter(fn %{group_id: group_id} -> Enum.member?(group_list, group_id) end)
     |> Enum.map(fn %{rights: rights} -> rights end)
     |> Enum.reduce_while(nil, fn
@@ -265,5 +257,16 @@ defmodule AcariServer.UserManager do
 
   def is_user_node_rw(conn, _opts) do
     no_auth(conn, "Проблемы с правами")
+  end
+
+  def get_disabled(user_id, node_id) do
+    case AcariServer.UserManager.get_user_node_rights(user_id, node_id) do
+      "rw" -> ""
+      _ -> "bg-disabled"
+    end
+  end
+
+  def get_disabled(current_user) do
+    current_user.is_admin && "" || "bg-disabled"
   end
 end

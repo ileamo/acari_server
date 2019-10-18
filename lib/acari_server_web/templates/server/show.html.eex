@@ -19,6 +19,7 @@
 
 </ul>
 
-<span><%= link "Редактировать", to: Routes.server_path(@conn, :edit, @server) %></span>
+<span><%= link "Редактировать", to: Routes.server_path(@conn, :edit, @server),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
 <span><%= link "К списку", to: Routes.server_path(@conn, :index) %></span>

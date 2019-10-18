@@ -82,8 +82,10 @@
   </li>
 </ul>
 
-<span><%= link "Редактировать", to: Routes.script_path(@conn, :edit, @script) %></span>
+<span><%= link "Редактировать", to: Routes.script_path(@conn, :edit, @script),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
-<span><%= link "Клонировать", to: Routes.script_path(@conn, :new, script_id: @script.id) %></span>
+<span><%= link "Клонировать", to: Routes.script_path(@conn, :new, script_id: @script.id),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
 <span><%= link "К списку", to: Routes.script_path(@conn, :index) %></span>

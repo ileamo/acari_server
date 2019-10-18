@@ -39,7 +39,9 @@
 </h6>
 <ul class="navbar-nav flex-column mb-2">
   <li class="nav-item">
-    <%= link "Пользователи", to: Routes.user_path(@conn, :index), class: "nav-link" %>
+    <%= link "Пользователи", to: Routes.user_path(@conn, :index),
+        class: "nav-link"<>(@current_user.is_admin && "" || " bg-disabled")
+    %>
   </li>
   <li class="nav-item">
     <%= link "Сервера", to: Routes.server_path(@conn, :index), class: "nav-link" %>

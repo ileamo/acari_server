@@ -18,13 +18,17 @@
       <td><%= script.description %></td>
 
       <td>
-        <%= link "Редактировать", to: Routes.script_path(@conn, :edit, script) %>
+        <%= link "Редактировать", to: Routes.script_path(@conn, :edit, script),
+            class: AcariServer.UserManager.get_disabled(@current_user) %>
         |
-        <%= link "Удалить", to: Routes.script_path(@conn, :delete, script), method: :delete, data: [confirm: "Вы уверены?"] %>
+        <%= link "Удалить", to: Routes.script_path(@conn, :delete, script), method: :delete,
+              data: [confirm: "Вы уверены?"],
+              class: AcariServer.UserManager.get_disabled(@current_user) %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "Новый класс", to: Routes.script_path(@conn, :new) %></span>
+<span><%= link "Новый класс", to: Routes.script_path(@conn, :new),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>

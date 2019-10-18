@@ -14,6 +14,8 @@
   </thead>
   <tbody>
 <%= for node <- @nodes do %>
+    <% bg_disabled = AcariServer.UserManager.get_disabled(@current_user, node.id)
+    %>
     <tr>
       <td>
       <%= link node.name, to: Routes.node_path(@conn, :show, node) %>
@@ -29,19 +31,25 @@
          end
       %>
       <td>
-        <%= link "Редактировать", to: Routes.node_path(@conn, :edit, node) %>
+        <%= link "Редактировать", to: Routes.node_path(@conn, :edit, node),
+            class: bg_disabled
+        %>
+        |
+        <%= link "Удалить", to: Routes.node_path(@conn, :delete, node),
+        method: :delete, data: [confirm: "Вы уверены?"],
+        class: bg_disabled
+        %>
         |
         <span class="<%=color%>">
         <%= link text,
         to: Routes.node_path(@conn, :toggle_lock, node, lock: !node.lock), class: color, data: [confirm: confirm] %>
       </span>
-        |
-        <%= link "Удалить", to: Routes.node_path(@conn, :delete, node),
-        method: :delete, data: [confirm: "Вы уверены?"] %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "Новый клиент", to: Routes.node_path(@conn, :new) %></span>
+<span><%= link "Новый клиент", to: Routes.node_path(@conn, :new),
+            class: AcariServer.UserManager.get_disabled(@current_user)
+%></span>

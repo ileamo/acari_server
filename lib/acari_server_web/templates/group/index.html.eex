@@ -18,13 +18,17 @@
       <td><%= group.description %></td>
 
       <td>
-        <%= link "Редактировать", to: Routes.group_path(@conn, :edit, group) %>
+        <%= link "Редактировать", to: Routes.group_path(@conn, :edit, group),
+              class: AcariServer.UserManager.get_disabled(@current_user) %>
         |
-        <%= link "Удалить", to: Routes.group_path(@conn, :delete, group), method: :delete, data: [confirm: "Вы уверены?"] %>
+        <%= link "Удалить", to: Routes.group_path(@conn, :delete, group), method: :delete,
+              data: [confirm: "Вы уверены?"],
+              class: AcariServer.UserManager.get_disabled(@current_user) %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "Новая группа", to: Routes.group_path(@conn, :new) %></span>
+<span><%= link "Новая группа", to: Routes.group_path(@conn, :new),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>
