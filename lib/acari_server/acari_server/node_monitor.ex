@@ -6,13 +6,13 @@ defmodule AcariServer.NodeMonitor do
   end
 
   @impl true
-  def init(%{output_pid: output_pid, pathname: pathname} = _params) do
-    [_, name] = Regex.run(~r|/([^/]+)$|, pathname)
+  def init(%{output_pid: output_pid, tun_name: tun_name, rights: rights} = _params) do
 
     {:ok,
      %{
-       tun_name: name,
-       output_pid: output_pid
+       tun_name: tun_name,
+       output_pid: output_pid,
+       rights: rights
      }}
   end
 
@@ -44,19 +44,26 @@ defmodule AcariServer.NodeMonitor do
         )
 
       "script" ->
-        with tag when is_binary(tag) <- params["script"] do
+        with tag when is_binary(tag) <- params["script"],
+             %AcariServer.TemplateManager.Template{} = template <-
+               AcariServer.TemplateManager.get_template_by_name(tag),
+               :ok <- AcariServer.UserManager.is_script_executable_for_user?(template.rights, state.rights) do
           AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
           AcariServer.Master.exec_script_on_peer(tun_name, tag)
         else
+          :no_rights -> no_rights_for_script("script", params["script"])
           _ ->
             script_not_defined("script")
         end
 
       "srv_script" ->
-        with tag when is_binary(tag) <- params["script"] do
-          # AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
+        with tag when is_binary(tag) <- params["script"],
+             %AcariServer.TemplateManager.Template{} = template <-
+               AcariServer.TemplateManager.get_template_by_name(tag),
+               :ok <- AcariServer.UserManager.is_script_executable_for_user?(template.rights, state.rights) do
           AcariServer.Master.run_script_on_all_servers(tun_name, tag)
         else
+          :no_rights -> no_rights_for_script("srv_script", params["script"])
           _ ->
             script_not_defined("srv_script")
         end
@@ -95,6 +102,15 @@ defmodule AcariServer.NodeMonitor do
     )
   end
 
+  defp no_rights_for_script(id, tag) do
+    put_data(
+      self(),
+      id,
+      "У Вас нет прав на выполнение этого скрипта",
+      get_templ_descr_by_name(tag)
+    )
+  end
+
   def get_templ_descr_by_name(name) do
     with %AcariServer.TemplateManager.Template{description: descr} <-
            AcariServer.TemplateManager.get_template_by_name(name |> to_string()) do
@@ -121,7 +137,7 @@ defmodule AcariServer.NodeMonitor do
         |> Enum.map(fn {node_name, %{timestamp: ts, data: data}} ->
           "#{AcariServer.get_local_time(ts)}  #{node_name}\n#{data}"
         end)
-        |> List.insert_at(0, id<>"\n")
+        |> List.insert_at(0, id <> "\n")
         |> Enum.join("\n")
 
       _ ->

@@ -296,4 +296,23 @@ defmodule AcariServer.UserManager do
       _ -> ""
     end
   end
+
+  def is_script_executable_for_user?(template_rights, user_rights) do
+    case user_rights do
+      "admin" ->
+        :ok
+
+      "rw" ->
+        case template_rights do
+          "admin" -> :no_rights
+          _ -> :ok
+        end
+
+      "ro" ->
+        case template_rights do
+          "ro" -> :ok
+          _ -> :no_rights
+        end
+    end
+  end
 end

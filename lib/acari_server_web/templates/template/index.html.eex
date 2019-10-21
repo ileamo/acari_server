@@ -19,7 +19,7 @@
       </td>
       <td><%= template.description %></td>
       <td><%= template.executable && "Да" || "Нет" %></td>
-      <td><%= rights_descr(template.rights) %></td>
+      <td><%= template.executable && rights_descr(template.rights) || "" %></td>
       <td>
         <%= link "Редактировать", to: Routes.template_path(@conn, :edit, template),
             class: AcariServer.UserManager.get_disabled(@current_user) %>
