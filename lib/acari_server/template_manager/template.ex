@@ -8,6 +8,7 @@ defmodule AcariServer.TemplateManager.Template do
     field :template, :string
     field :executable, :boolean, default: false
     field :validator, :string
+    field :rights, :string, default: "rw"
     belongs_to :script, AcariServer.ScriptManager.Script
 
     #many_to_many :scripts, AcariServer.ScriptManager.Script,
@@ -19,7 +20,7 @@ defmodule AcariServer.TemplateManager.Template do
   @doc false
   def changeset(template, attrs) do
     template
-    |> cast(attrs, [:name, :description, :template, :script_id, :executable, :validator])
+    |> cast(attrs, [:name, :description, :template, :script_id, :executable, :validator, :rights])
     |> validate_required([:name, :description, :template])
     |> validate_change(:name, &validate_templ_name/2)
     |> foreign_key_constraint(:script_id)

@@ -28,6 +28,14 @@ defmodule AcariServerWeb.TemplateView do
     end
   end
 
+  def rights_descr(rights) do
+    case rights do
+      "ro" -> "Ограниченные"
+      "admin" -> "Администратор"
+      _ -> "Полные"
+    end
+  end
+
   defdelegate highlight_line(s, n), to: AcariServer.Template
   defdelegate get_line(n), to: AcariServer.Template
 end

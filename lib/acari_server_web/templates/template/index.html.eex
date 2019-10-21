@@ -7,6 +7,7 @@
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Исп.</th>
+      <th scope="col">Права</th>
       <th scope="col"></th>
     </tr>
   </thead>
@@ -18,6 +19,7 @@
       </td>
       <td><%= template.description %></td>
       <td><%= template.executable && "Да" || "Нет" %></td>
+      <td><%= rights_descr(template.rights) %></td>
       <td>
         <%= link "Редактировать", to: Routes.template_path(@conn, :edit, template),
             class: AcariServer.UserManager.get_disabled(@current_user) %>

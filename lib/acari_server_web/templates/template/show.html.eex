@@ -17,10 +17,12 @@
     <%= @template.executable && "Да" || "Нет" %>
   </li>
 
-  <li>
-    <strong>Класс:</strong>
-    <%= script_name(@template) %>
-  </li>
+  <%= if @template.executable do %>
+    <li>
+      <strong>Требуемые права:</strong>
+      <%= rights_descr(@template.rights) %>
+    </li>
+  <% end %>
 
   <% {template, template_error} = with %{} = script <- @template.script,
           {var, nil} <- AcariServer.Template.get_json(script.definition),
@@ -47,6 +49,11 @@
       pretempl
       %></code></pre>
     <% end %>
+  </li>
+
+  <li>
+    <strong>Класс:</strong>
+    <%= script_name(@template) %>
   </li>
 
   <li>
