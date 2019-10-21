@@ -26,7 +26,7 @@
           |> Enum.map(fn %{rights: rights, group: group} -> {group.name,
                 case rights do
                   "rw" -> {"Полный доступ", "text-success"}
-                  "ro" -> {"Только просмотр", "text-info"}
+                  "ro" -> {"Ограниченный доступ", "text-info"}
                   _ -> {"Нет доступа", "text-danger"}
                 end
           } end)

@@ -40,10 +40,7 @@
   </div>
 
 
-  <%  rights_list = [[key: "Нет", value: "no"],
-                      [key: "Только просмотр", value: "ro"],
-                      [key: "Полный", value: "rw"]]
-      group_list = AcariServer.GroupManager.list_groups()
+  <%  group_list = AcariServer.GroupManager.list_groups()
       |> Enum.sort_by(fn %{name: name} -> name end)
 
       groups_users_rights = case assigns[:rights] do
@@ -74,7 +71,7 @@
     <%= for gr <- group_list do %>
       <% rights = groups_users_rights[gr.id] || "no" %>
       <div class="form-group row my-0">
-        <%= label :rights, gr.name, class: "col-sm-2 col-form-label" %>
+        <%= label :rights, gr.name, class: "col-sm-2 col-form-label" do gr.name end %>
         <div class="input-group-prepend col-sm-10 my-0" data-toggle="buttons">
             <label class="btn btn-outline-danger <%= rights == "no" && "active" %>">
               <%= radio_button :rights, to_string(gr.id), "no", checked: rights == "no", autocomplete: "off", class: "custom-control-input" %>
@@ -82,17 +79,12 @@
             </label>
             <label class="btn btn-outline-info mx-1 <%= rights == "ro" && "active" %>">
               <%= radio_button :rights, to_string(gr.id), "ro", checked: rights == "ro", autocomplete: "off", class: "custom-control-input" %>
-              Только просмотр
+              Ограниченный
             </label>
             <label class="btn  btn-outline-success <%= rights == "rw" && "active" %>">
               <%= radio_button :rights, to_string(gr.id), "rw", checked: rights == "rw", autocomplete: "off", class: "custom-control-input" %>
               Полный
             </label>
-          <!--
-          <%= select :rights, to_string(gr.id), rights_list, selected: rights,
-                class: "custom-select",
-                id: "class-form-select" %>
-              -->
         </div>
       </div>
     <% end %>
