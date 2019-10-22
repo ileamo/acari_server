@@ -330,11 +330,10 @@ defmodule AcariServerWeb.GrpOperChannel do
         tag_data_list =
           (tag_list || [])
           |> Enum.map(fn tag ->
-            %{data: data} =
-              AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] ||
-                %{data: "нет данных"}
-
-            {tag, data}
+            case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
+              %{data: data} -> {tag, data}
+              _ -> {tag, "нет данных"}
+            end
           end)
 
         %{id: tun_name, description: descr, data_list: tag_data_list}

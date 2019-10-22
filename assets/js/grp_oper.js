@@ -175,9 +175,11 @@ if (grp_oper) {
           grp_oper_script_multi.setAttribute("size", Math.min(grp_oper_script_multi.length, 16));
           grp_oper_script_multi.addEventListener("click", getScriptMulti, false);
           let selectedValues = JSON.parse(sessionStorage.getItem("grp_oper_last_script_multi"))
-          for (var i = 0; i < grp_oper_script_multi.options.length; i++) {
-            grp_oper_script_multi.options[i].selected =
-              selectedValues.indexOf(grp_oper_script_multi.options[i].value) >= 0;
+          if (selectedValues) {
+            for (var i = 0; i < grp_oper_script_multi.options.length; i++) {
+              grp_oper_script_multi.options[i].selected =
+                selectedValues.indexOf(grp_oper_script_multi.options[i].value) >= 0;
+            }
           }
         }
         if (sessionStorage.getItem("grp_oper_show_only") == "true") {
