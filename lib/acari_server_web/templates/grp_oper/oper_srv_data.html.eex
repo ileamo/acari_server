@@ -6,7 +6,7 @@
         ts = params[:timestamp] || 0
         data = params[:data] || "нет данных"
       %>
-      <tr>
+      <tr class="<%= @color %>">
         <td><%= node %></td>
         <td><%= case ts do
                   0 -> "-"

@@ -34,12 +34,13 @@
     </tr>
   </thead>
   <tbody>
-    <%= for %{id: id, description: descr, data: data} <- @script_res_list do %>
-      <tr>
+    <%= for %{id: id, description: descr, data: data, rights: rights} <- @script_res_list do %>
+      <% color_class = rights && "" || "table-info" %>
+      <tr class="<%= color_class %>">
         <td><%= id %></td>
         <td><%= descr %></td>
         <td class="p-0">
-                <%= render "oper_srv_data.html", id: id, data: data %>
+                <%= render "oper_srv_data.html", id: id, data: data, color: color_class %>
         </td>
       </tr>
     <% end %>

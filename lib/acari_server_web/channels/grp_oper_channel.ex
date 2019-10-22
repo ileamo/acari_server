@@ -2,7 +2,8 @@ defmodule AcariServerWeb.GrpOperChannel do
   use AcariServerWeb, :channel
 
   def join("grp_oper:" <> _id, _payload, socket) do
-    {:ok, socket}
+    user = AcariServer.UserManager.get_user(socket.assigns[:current_user_id])
+    {:ok, assign(socket, :user, user)}
   end
 
   def handle_in("input", params, socket) do
@@ -11,7 +12,7 @@ defmodule AcariServerWeb.GrpOperChannel do
         nodes =
           case params["group_id"] do
             "nil" ->
-              AcariServer.NodeManager.list_nodes(socket.assigns[:current_user_id])
+              AcariServer.NodeManager.list_nodes(socket.assigns[:user])
 
             id ->
               AcariServer.GroupManager.get_group!(id).nodes
@@ -124,7 +125,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           nodes_list =
             get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
 
-          nodes_list
+          get_exec_nodes_list(nodes_list, socket, tag)
           |> Enum.each(fn %{name: name} ->
             case params["script_type"] do
               "server" ->
@@ -159,9 +160,11 @@ defmodule AcariServerWeb.GrpOperChannel do
           nodes_list =
             get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
 
+          exec_nodes_list = get_exec_nodes_list(nodes_list, socket, tag)
+
           case params["script_type"] do
             "server" ->
-              nodes_list
+              exec_nodes_list
               |> Enum.reduce([], fn %{name: name}, acc ->
                 servers = AcariServer.Mnesia.get_tunnel_srv_state(name)[tag] || %{}
 
@@ -188,7 +191,7 @@ defmodule AcariServerWeb.GrpOperChannel do
               end)
 
             _ ->
-              nodes_list
+              exec_nodes_list
               |> Enum.filter(fn %{name: name} ->
                 with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
                      %{timestamp: ts, reqv_ts: reqv_ts} <- stat[tag] do
@@ -253,7 +256,7 @@ defmodule AcariServerWeb.GrpOperChannel do
     nodes =
       case group_id do
         "nil" ->
-          AcariServer.NodeManager.list_nodes(socket.assigns[:current_user_id])
+          AcariServer.NodeManager.list_nodes(socket.assigns[:user])
 
         group_id ->
           AcariServer.GroupManager.get_group!(group_id)
@@ -270,6 +273,30 @@ defmodule AcariServerWeb.GrpOperChannel do
     |> node_filter(filter, socket)
   end
 
+  defp get_exec_nodes_list(nodes_list, socket, tag) do
+    user = socket.assigns.user
+    template_rights = AcariServer.TemplateManager.get_template_by_name(tag).rights
+
+    case user.is_admin or template_rights == "ro" do
+      true ->
+        nodes_list
+
+      _ ->
+        nodes_list
+        |> Enum.filter(fn %{name: name} ->
+          rights = user_rights(user, name)
+
+          case AcariServer.UserManager.is_script_executable_for_user?(
+                 template_rights,
+                 rights
+               ) do
+            :ok -> true
+            _ -> false
+          end
+        end)
+    end
+  end
+
   defp get_script(socket, script_type, tag, group_id, class_id, filter) do
     get_script(
       socket,
@@ -280,6 +307,9 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   defp get_script(socket, "server", tag, nodes) do
+    template_rights = AcariServer.TemplateManager.get_template_by_name(tag).rights
+    user = socket.assigns.user
+
     script_res_list =
       nodes
       |> Enum.map(fn %{name: tun_name, description: descr} ->
@@ -287,7 +317,25 @@ defmodule AcariServerWeb.GrpOperChannel do
           AcariServer.Mnesia.get_tunnel_srv_state(tun_name)[tag] ||
             %{}
 
-        %{id: tun_name, description: descr, data: data}
+        %{
+          id: tun_name,
+          description: descr,
+          data: data,
+          rights:
+            if user.is_admin or template_rights == "ro" do
+              true
+            else
+              rights = user_rights(user, tun_name)
+
+              case AcariServer.UserManager.is_script_executable_for_user?(
+                     template_rights,
+                     rights
+                   ) do
+                :ok -> true
+                _ -> false
+              end
+            end
+        }
       end)
 
     push(socket, "output", %{
@@ -301,16 +349,40 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   defp get_script(socket, _script_type, tag, nodes) do
+    template_rights = AcariServer.TemplateManager.get_template_by_name(tag).rights
+    user = socket.assigns.user
+
     script_res_list =
       nodes
-      |> Enum.map(fn %{name: tun_name, description: descr} ->
-        {ts, data} =
+      |> Enum.map(fn %{id: id, name: tun_name, description: descr} ->
+        {ts, data, reqv_ts} =
           case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
-            %{timestamp: ts, data: data} -> {ts, data}
-            _ -> {0, "нет данных"}
+            %{timestamp: ts, data: data} = state -> {ts, data, state[:reqv_ts] || 0}
+            state -> {0, "нет данных", state[:reqv_ts] || 0}
           end
 
-        %{id: tun_name, description: descr, timestamp: ts, data: data |> to_string()}
+        %{
+          id: id,
+          name: tun_name,
+          description: descr,
+          timestamp: ts,
+          reqv_ts: reqv_ts,
+          data: data |> to_string(),
+          rights:
+            if user.is_admin or template_rights == "ro" do
+              true
+            else
+              rights = user_rights(user, tun_name)
+
+              case AcariServer.UserManager.is_script_executable_for_user?(
+                     template_rights,
+                     rights
+                   ) do
+                :ok -> true
+                _ -> false
+              end
+            end
+        }
       end)
 
     push(socket, "output", %{
@@ -318,9 +390,23 @@ defmodule AcariServerWeb.GrpOperChannel do
       opt: AcariServer.NodeMonitor.get_templ_descr_by_name(tag) <> " (#{tag})",
       data:
         Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res.html",
-          script_res_list: script_res_list
+          script_res_list: script_res_list,
+          user_id: socket.assigns[:user]
         )
     })
+  end
+
+  defp user_rights(user, tun_name) do
+    case user.is_admin do
+      true ->
+        "admin"
+
+      _ ->
+        AcariServer.UserManager.get_user_node_rights(
+          user,
+          AcariServer.NodeManager.get_node_by_name(tun_name).id
+        )
+    end
   end
 
   defp get_script_multi(socket, tag_list, group_id, class_id, filter) do

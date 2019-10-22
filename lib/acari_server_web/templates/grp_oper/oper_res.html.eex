@@ -3,10 +3,21 @@
   waitlist =
     @script_res_list
     |>  Enum.filter(fn
+          %{rights: false} -> false
           %{timestamp: ts} = params -> not (ts > 0 and ts >= (params[:reqv_ts] || 0))
           _ -> false
         end)
+
+  has_all_rights = @script_res_list
+    |> Enum.reduce_while(true, fn
+      %{rights: false}, _ -> {:halt, false}
+      _, _ -> {:cont, true}
+    end)
+
 %>
+<%= if !has_all_rights do %>
+  <p class="text-info">Для выделенных клиентов выполнение данного скрипта недоступно<p>
+<% end %>
 
 <%= if waitlist != [] do %>
   <button id="go-update-res" class="btn btn-outline-secondary btn-sm py-1 px-2 mb-3">
@@ -22,16 +33,30 @@
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
-      <th scope="col">Время</th>
+      <th scope="col">Запрос</th>
+      <th scope="col">Ответ</th>
       <th scope="col">Данные</th>
       <th scope="col">Статус</th>
     </tr>
   </thead>
   <tbody>
-    <%= for %{id: id, description: descr, timestamp: ts, data: data} = params <- @script_res_list do %>
-      <tr>
-        <td><%= id %></td>
+    <%= for %{id: id,
+              name: name,
+              description: descr,
+              timestamp: ts,
+              reqv_ts: reqv_ts,
+              data: data,
+              rights: rights} = params <- @script_res_list do %>
+      <tr class="<%= rights && "" || "table-info" %>">
+        <td>
+          <%= name %>
+        </td>
         <td><%= descr %></td>
+        <td><%= case reqv_ts do
+                  0 -> "-"
+                  ts -> AcariServer.get_local_date(ts)
+                end
+        %></td>
         <td><%= case ts do
                   0 -> "-"
                   ts -> AcariServer.get_local_date(ts)
@@ -39,7 +64,7 @@
         %></td>
         <td>
           <a href="#" data-toggle="modal" data-target="#grp-script-res"
-            data-content="<%= data %>" data-name="<%= id %>">
+            data-content="<%= data %>" data-name="<%= name %>">
                 <%= if String.length(data) <= 16, do: data, else: (data |> String.slice(0, 16))<>"..." %>
           </a>
         </td>
