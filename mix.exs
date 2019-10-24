@@ -51,6 +51,7 @@ defmodule AcariServer.MixProject do
       {:distillery, "~> 2.0.12"},
       {:loggix, "~> 0.0.9"},
       {:httpoison, "~> 1.5"},
+      {:sandbox, "~> 0.5"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       {:procket, git: "https://github.com/msantos/procket.git", override: true},
 

@@ -497,24 +497,62 @@ defmodule AcariServerWeb.GrpOperChannel do
     try do
       node_list
       |> Enum.filter(fn node ->
-        state =
+        {state, script} =
           (AcariServer.Mnesia.get_tunnel_state(node.name) || [])
+          |> Enum.split_with(fn {k, _} -> is_atom(k) end)
+
+        script =
+          script
           |> Enum.map(fn
             {tag, %{data: data}} -> {tag, try_to_number(data)}
             x -> x
           end)
-          |> Enum.into(%{})
 
-        Code.eval_string(filter_str, client: node, state: state)
-        |> elem(0)
+        lua_state =
+          Sandbox.init()
+          |> Sandbox.set!("state", state)
+          |> Sandbox.set!("script", script)
+          |> Sandbox.set!(
+            "client",
+            node
+            |> Map.from_struct()
+            |> Enum.filter(fn
+              {:name, _} -> true
+              {:description, _} -> true
+              {:params, _} -> true
+              {:lock, _} -> true
+              {:latitude, _} -> true
+              {:longitude, _} -> true
+              _ -> false
+            end)
+          )
+
+        case Sandbox.eval(lua_state, "return (#{filter_str})") do
+          {:ok, res} ->
+            res
+
+          {:error, res} ->
+            res =
+              case res do
+                {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
+                  Enum.join(list)
+
+                {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
+                  "#{a} #{inspect(s)}"
+
+                {:lua_error, {t, a, b}, _} when is_atom(t) ->
+                  "#{t} #{inspect(a)} #{inspect(b)}"
+
+                res ->
+                  inspect(res)
+              end
+
+            raise(res)
+        end
       end)
     rescue
-      e in CompileError ->
-        push_filter_error(socket, e.description)
-        node_list
-
-      e in KeyError ->
-        push_filter_error(socket, "Bad key: #{e.key}")
+      e in RuntimeError ->
+        push_filter_error(socket, e.message)
         node_list
 
       value ->

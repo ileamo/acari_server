@@ -39,7 +39,6 @@
       end
 
       rights = (input_value(f, :rights) || "rw")
-      IO.inspect(input_value(f, :rights))
   %>
 
   <div id="template-form-rights"<%= exec && "" || "hidden=\"true\"" %>>
