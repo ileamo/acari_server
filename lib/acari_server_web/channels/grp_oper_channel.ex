@@ -533,7 +533,8 @@ defmodule AcariServerWeb.GrpOperChannel do
             Sandbox.init()
             |> Sandbox.play!("""
             match = function(s, r)
-              return not not string.match(s, '^'..string.gsub(r, '*', '.*')..'$')
+              s = type(s) == "string" and s or ""
+              return not not string.find(s, '^'..string.gsub(r, '*', '.*')..'$')
             end
             """)
             |> Sandbox.set!("script", script)
