@@ -71,6 +71,11 @@ if (grp_oper) {
     grp_oper_filter_text.value = sessionStorage.getItem("grp_oper_filter") || "";
   }
 
+  let grp_oper_filter_show = document.getElementById("grp-oper-filter-show")
+  if (grp_oper_filter_show) {
+    grp_oper_filter_show.addEventListener("click", filterShow, false);
+  }
+
   let grp_oper_client_script = document.getElementById("grp-oper-client-script")
   let grp_oper_server_script = document.getElementById("grp-oper-server-script")
   if (grp_oper_client_script && grp_oper_server_script) {
@@ -99,6 +104,19 @@ if (grp_oper) {
     clearInterval(filter_blinking);
     filter_blinking = false;
     selectElement();
+  }
+
+  function filterShow() {
+    clearInterval(filter_blinking);
+    filter_blinking = false;
+    let filter = grp_oper_filter_text.value
+    sessionStorage.setItem("grp_oper_filter", filter)
+    channel.push('input', {
+      cmd: "get_filter",
+      group_id: sessionStorage.getItem("grp_oper_group_id"),
+      class_id: sessionStorage.getItem("grp_oper_class_id"),
+      filter: filter
+    })
   }
 
   function selectElementScriptType() {
@@ -200,7 +218,9 @@ if (grp_oper) {
         break;
 
       case "script":
-        document.querySelector("#go-script-name").innerText = `${payload.opt}`
+        if (payload.opt) {
+          document.querySelector("#go-script-name").innerText = `${payload.opt}`
+        }
         document.querySelector("#go-script-field").innerHTML = `${payload.data}`
         if (sessionStorage.getItem("grp_oper_script_type") == "server") {
           $("#datatable-srv").DataTable({

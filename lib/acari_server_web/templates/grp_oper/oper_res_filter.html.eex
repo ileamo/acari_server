@@ -1,0 +1,27 @@
+<hr/>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+  <thead>
+    <tr>
+      <th scope="col">Имя</th>
+      <th scope="col">Описание</th>
+      <th scope="col">Результат фильтра</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for %{name: name,
+              description: descr,
+              filter_show: filter} = params <- @node_list do %>
+      <tr>
+        <td><%= name %></td>
+        <td><%= descr %></td>
+        <td>
+          <a href="#" data-toggle="modal" data-target="#grp-script-res"
+            data-content="<%= filter %>" data-name="<%= "#{name}" %>">
+                <%= if String.length(filter) <= 64, do: filter,
+              else: (filter |> String.slice(0, 64 - 3))<>"..." %>
+          </a>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

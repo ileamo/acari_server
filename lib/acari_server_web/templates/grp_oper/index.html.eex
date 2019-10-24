@@ -33,6 +33,11 @@
       </div>
       <input type="text" class="form-control" id="grp-oper-filter-text">
       <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter-show">
+          <span class="grp-oper-blinking">Посмотреть</span>
+        </button>
+      </div>
+      <div class="input-group-prepend">
         <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter">
           <span class="grp-oper-blinking">Применить</span>
         </button>

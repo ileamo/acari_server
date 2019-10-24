@@ -71,6 +71,20 @@ defmodule AcariServerWeb.GrpOperChannel do
             )
         })
 
+      "get_filter" ->
+        node_list =
+          get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"],
+            filter_show: true
+          )
+
+        push(socket, "output", %{
+          id: "script",
+          data:
+            Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "oper_res_filter.html",
+              node_list: node_list
+            )
+        })
+
       "get_script" ->
         case params["template_name"] do
           nil ->
@@ -245,7 +259,7 @@ defmodule AcariServerWeb.GrpOperChannel do
     {:noreply, socket}
   end
 
-  defp get_nodes_list(socket, group_id, class_id, filter) do
+  defp get_nodes_list(socket, group_id, class_id, filter, opts \\ []) do
     class_id =
       case class_id do
         "nil" -> nil
@@ -270,7 +284,7 @@ defmodule AcariServerWeb.GrpOperChannel do
       class_id ->
         nodes |> Enum.filter(fn %{script_id: id} -> id == class_id end)
     end
-    |> node_filter(filter, socket)
+    |> node_filter(filter, socket, opts)
   end
 
   defp get_exec_nodes_list(nodes_list, socket, tag) do
@@ -489,67 +503,82 @@ defmodule AcariServerWeb.GrpOperChannel do
     end
   end
 
-  def node_filter(node_list, filter_str, socket) do
+  defp node_filter(node_list, filter_str, socket, opts \\ []) do
     filter_str = if to_string(filter_str) |> String.trim() == "", do: "true", else: filter_str
 
     push_filter_error(socket, "")
 
+    enum_func =
+      case opts[:filter_show] do
+        true -> :map
+        _ -> :filter
+      end
+
     try do
-      node_list
-      |> Enum.filter(fn node ->
-        {state, script} =
-          (AcariServer.Mnesia.get_tunnel_state(node.name) || [])
-          |> Enum.split_with(fn {k, _} -> is_atom(k) end)
+      apply(Enum, enum_func, [
+        node_list,
+        fn node ->
+          {_state, script} =
+            (AcariServer.Mnesia.get_tunnel_state(node.name) || [])
+            |> Enum.split_with(fn {k, _} -> is_atom(k) end)
 
-        script =
-          script
-          |> Enum.map(fn
-            {tag, %{data: data}} -> {tag, try_to_number(data)}
-            x -> x
-          end)
-
-        lua_state =
-          Sandbox.init()
-          |> Sandbox.set!("state", state)
-          |> Sandbox.set!("script", script)
-          |> Sandbox.set!(
-            "client",
-            node
-            |> Map.from_struct()
-            |> Enum.filter(fn
-              {:name, _} -> true
-              {:description, _} -> true
-              {:params, _} -> true
-              {:lock, _} -> true
-              {:latitude, _} -> true
-              {:longitude, _} -> true
-              _ -> false
+          script =
+            script
+            |> Enum.map(fn
+              {tag, %{data: data}} -> {tag, try_to_number(data)}
+              x -> x
             end)
-          )
 
-        case Sandbox.eval(lua_state, "return (#{filter_str})") do
-          {:ok, res} ->
-            res
+          lua_state =
+            Sandbox.init()
+            |> Sandbox.play!("""
+            match = function(s, r)
+              return not not string.match(s, '^'..string.gsub(r, '*', '.*')..'$')
+            end
+            """)
+            |> Sandbox.set!("script", script)
+            |> Sandbox.set!(
+              "client",
+              node
+              |> Map.from_struct()
+              |> Enum.filter(fn
+                {:name, _} -> true
+                {:description, _} -> true
+                {:params, _} -> true
+                {:lock, _} -> true
+                {:latitude, _} -> true
+                {:longitude, _} -> true
+                _ -> false
+              end)
+            )
 
-          {:error, res} ->
-            res =
-              case res do
-                {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
-                  Enum.join(list)
-
-                {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
-                  "#{a} #{inspect(s)}"
-
-                {:lua_error, {t, a, b}, _} when is_atom(t) ->
-                  "#{t} #{inspect(a)} #{inspect(b)}"
-
-                res ->
-                  inspect(res)
+          case Sandbox.eval(lua_state, "return (#{filter_str})") do
+            {:ok, res} ->
+              case opts[:filter_show] do
+                true -> node |> Map.put(:filter_show, inspect(res, pretty: true))
+                _ -> res
               end
 
-            raise(res)
+            {:error, res} ->
+              res =
+                case res do
+                  {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
+                    Enum.join(list)
+
+                  {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
+                    "#{a} #{inspect(s)}"
+
+                  {:lua_error, {t, a, b}, _} when is_atom(t) ->
+                    "#{t} #{inspect(a)} #{inspect(b)}"
+
+                  res ->
+                    inspect(res)
+                end
+
+              raise(res)
+          end
         end
-      end)
+      ])
     rescue
       e in RuntimeError ->
         push_filter_error(socket, e.message)
