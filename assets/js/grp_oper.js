@@ -222,7 +222,13 @@ if (grp_oper) {
           document.querySelector("#go-script-name").innerText = `${payload.opt}`
         }
         document.querySelector("#go-script-field").innerHTML = `${payload.data}`
-        if (sessionStorage.getItem("grp_oper_script_type") == "server") {
+        if (!payload.opt) {
+          $("#datatable-filter").DataTable({
+            stateSave: true,
+            responsive: true
+          });
+
+        } else if (sessionStorage.getItem("grp_oper_script_type") == "server") {
           $("#datatable-srv").DataTable({
             stateSave: true,
             responsive: true
