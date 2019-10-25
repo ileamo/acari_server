@@ -1,5 +1,5 @@
 defmodule AcariServerWeb.UserSocket do
-  use Phoenix.Socket
+  use Phoenix.Socket, log: :debug
 
   ## Channels
   channel "room:*", AcariServerWeb.RoomChannel

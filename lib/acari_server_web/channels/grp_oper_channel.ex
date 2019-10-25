@@ -1,5 +1,5 @@
 defmodule AcariServerWeb.GrpOperChannel do
-  use AcariServerWeb, :channel
+  use Phoenix.Channel, log_join: :debug, log_handle_in: false
 
   def join("grp_oper:" <> _id, _payload, socket) do
     user = AcariServer.UserManager.get_user(socket.assigns[:current_user_id])
