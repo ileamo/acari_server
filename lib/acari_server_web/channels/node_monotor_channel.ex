@@ -1,5 +1,5 @@
 defmodule AcariServerWeb.NodeMonitorChannel do
-  use AcariServerWeb, :channel
+  use Phoenix.Channel, log_join: :debug, log_handle_in: false
   alias AcariServer.NodeMonitor
 
   def join("node_monitor:" <> _id, payload, socket) do

@@ -1,5 +1,5 @@
 defmodule AcariServerWeb.TerminalChannel do
-  use AcariServerWeb, :channel
+  use Phoenix.Channel, log_join: :debug, log_handle_in: false
   alias AcariServer.Terminal
   require Logger
 

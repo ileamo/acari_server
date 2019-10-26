@@ -10,7 +10,7 @@
   <tbody>
     <%= for %{name: name,
               description: descr,
-              filter_show: filter} = params <- @node_list do %>
+              filter_show: filter} <- @node_list do %>
       <tr>
         <td><%= name %></td>
         <td><%= descr %></td>

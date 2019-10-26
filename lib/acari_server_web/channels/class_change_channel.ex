@@ -1,5 +1,5 @@
 defmodule AcariServerWeb.ClassChangeChannel do
-  use AcariServerWeb, :channel
+  use Phoenix.Channel, log_join: :debug, log_handle_in: false
 
   def join("class_change:" <> _id, %{"pathname" => pathname}, socket) do
     node_id =

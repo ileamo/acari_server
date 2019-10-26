@@ -1,5 +1,5 @@
 defmodule AcariServerWeb.RoomChannel do
-  use Phoenix.Channel
+  use Phoenix.Channel, log_join: :debug, log_handle_in: false
 
   def join("room:lobby", _message, socket) do
     {:ok, socket}

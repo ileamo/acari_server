@@ -40,7 +40,7 @@
     </tr>
   </thead>
   <tbody>
-    <%= for %{id: id,
+    <%= for %{
               name: name,
               description: descr,
               timestamp: ts,
