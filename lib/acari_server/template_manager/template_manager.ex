@@ -52,7 +52,7 @@ defmodule AcariServer.TemplateManager do
   def srv_script_list(tun_name) do
     with node <- AcariServer.NodeManager.get_node_with_class(tun_name, :local),
          class when is_map(class) <- node |> Map.get(:script),
-         templ <- class |> Map.get(:local) do
+         templ = %Template{} <- class |> Map.get(:local) do
       [{templ.description, templ.name}]
     else
       _ -> []

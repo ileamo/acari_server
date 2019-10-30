@@ -43,4 +43,5 @@ npm-debug.log
 
 *.sav
 /log/
+/acari_lib
 #/priv/.ssh/
