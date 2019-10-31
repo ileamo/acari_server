@@ -79,12 +79,6 @@ channel.on("link_event", payload => {
   } else if (payload.redraw_chart) {
     make_chart()
   } else {
-    if (messagesBadge && payload.num_of_mes != null) {
-      messagesBadge.innerText = `${payload.num_of_mes}`
-    }
-    if (messagesContainer && payload.messages != null) {
-      messagesContainer.innerHTML = `${payload.messages}`
-    }
     if (statisticsContainer && payload.statistics) {
       statisticsContainer.innerHTML = `${payload.statistics}`
     }
@@ -96,6 +90,15 @@ channel.on("link_event", payload => {
       $('[data-toggle="popover"]').popover()
     }
   }
+})
+
+channel.on("link_event_mes", payload => {
+    if (messagesBadge && payload.num_of_mes != null) {
+      messagesBadge.innerText = `${payload.num_of_mes}`
+    }
+    if (messagesContainer && payload.messages != null) {
+      messagesContainer.innerHTML = `${payload.messages}`
+    }
 })
 
 channel.join()

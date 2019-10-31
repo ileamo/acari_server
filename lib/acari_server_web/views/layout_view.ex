@@ -10,7 +10,7 @@ defmodule AcariServerWeb.LayoutView do
 
     AcariServer.Mnesia.get_event_list()
     |> Enum.sort_by(fn %{count: c} -> c end, &>/2)
-    |> Enum.uniq_by(fn %{header: hd} -> hd end)
+    #|> Enum.uniq_by(fn %{header: hd} -> hd end)
     |> Enum.map(fn %{level: lv, header: hd, text: body, timestamp: ts} ->
       alert =
         case lv do

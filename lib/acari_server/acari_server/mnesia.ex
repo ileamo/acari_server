@@ -594,12 +594,16 @@ defmodule AcariServer.Mnesia do
 
       # down
       _ ->
-        update_event(%{
-          id: id,
-          level: level,
-          header: tun,
-          text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
-        })
+        update_event(
+          %{
+            id: id,
+            level: level,
+            header: tun,
+            text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
+          },
+          node_to_name,
+          mes
+        )
 
         if level == 1 do
           {num, _} =
@@ -691,19 +695,18 @@ defmodule AcariServer.Mnesia do
   def broadcast_link_event() do
     mes_list = AcariServerWeb.LayoutView.get_mes()
 
-    mes_html =
-      Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", mes_list: mes_list)
-
     statistics_html =
       Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
 
     progress_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "progress.html", [])
 
     Endpoint.broadcast!("room:lobby", "link_event", %{
-      num_of_mes: mes_list |> length(),
-      messages: mes_html,
       statistics: statistics_html,
       progress: progress_html
+    })
+
+    Endpoint.broadcast!("room:lobby", "link_event_mes", %{
+      mes_list: mes_list
     })
   end
 
@@ -717,8 +720,22 @@ defmodule AcariServer.Mnesia do
 
   # event
 
-  defp update_event(ev) do
+  defp update_event(ev, node_to_name, mes) do
     Mnesia.transaction(fn ->
+      match_clean(:event, %{header: ev.header})
+      |> Enum.each(fn %{id: {name, _tun, node}} = event ->
+        Mnesia.write(
+          mk_record(
+            :event,
+            event
+            |> Map.merge(%{
+              level: ev.level,
+              text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
+            })
+          )
+        )
+      end)
+
       count =
         case Mnesia.read(:counter, :event) do
           [{:counter, :event, count}] -> count
