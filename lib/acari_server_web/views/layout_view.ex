@@ -9,7 +9,7 @@ defmodule AcariServerWeb.LayoutView do
     current_time = :os.system_time(:microsecond)
 
     AcariServer.Mnesia.get_client_status()
-    |> Enum.sort_by(fn %{timestamp: ts} -> ts end)
+    |> Enum.sort_by(fn %{timestamp: ts} -> ts end, &>/2)
     |> Enum.map(fn %{name: hd, timestamp: ts, opts: %{level: lv, text: body}} ->
       alert =
         case lv do

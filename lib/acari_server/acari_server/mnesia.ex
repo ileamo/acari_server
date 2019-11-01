@@ -214,20 +214,7 @@ defmodule AcariServer.Mnesia do
         :link
       )
 
-      Mnesia.foldl(
-        fn rec, acc ->
-          case Rec.event(rec, :id) do
-            {_, _, ^server} ->
-              Mnesia.delete_object(rec)
-              acc + 1
-
-            _ ->
-              acc
-          end
-        end,
-        0,
-        :event
-      )
+      purge_client_status_table()
     end)
   end
 
