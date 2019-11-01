@@ -7,12 +7,13 @@ defmodule AcariServer.Mnesia.Attr do
   # for link and event id = {dev, tun, node}
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
   def event(), do: [:id, :count, :timestamp, :level, :header, :text]
+  def client_status(), do: [:name, :timestamp, :opts]
   def stat(), do: [:key, :value]
   def zabbix(), do: [:id, :host, :key, :value, :timestamp]
   def session(), do: [:jti, :params, :activity]
 
   def table_list(),
-    do: [:counter, :server, :db, :tun, :link, :event, :stat, :zabbix, :session]
+    do: [:counter, :server, :db, :tun, :link, :event, :client_status, :stat, :zabbix, :session]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -533,6 +534,32 @@ defmodule AcariServer.Mnesia do
       Mnesia.write(
         Rec.link(id: id, name: name, tun_id: tun, server_id: node, up: up, state: state)
       )
+
+      {level, port_list, mes} =
+        get_link_list_for_tunnel(tun, :clean)
+        |> reduce_link_list(node_to_name)
+        |> alert_mes()
+        |> IO.inspect(label: "EVENT")
+
+      case level do
+        4 ->
+          Mnesia.delete({:client_status, tun})
+
+        _ ->
+          Mnesia.write(
+            mk_record(
+              :client_status,
+              %{
+                name: tun,
+                timestamp: :os.system_time(:microsecond),
+                opts: %{
+                  level: level,
+                  text: mes
+                }
+              }
+            )
+          )
+      end
     end)
 
     {level, port_list, mes} =
@@ -754,6 +781,11 @@ defmodule AcariServer.Mnesia do
     match(:event)
   end
 
+  #client_status
+  def get_client_status() do
+    match(:client_status)
+  end
+
   defp purge_link_table(tab) do
     Mnesia.transaction(fn ->
       Mnesia.foldl(
@@ -823,7 +855,7 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
-  def update_stat(key, func) do
+  defp update_stat(key, func) do
     Mnesia.transaction(fn ->
       value =
         case Mnesia.wread({:stat, key}) do
@@ -964,6 +996,10 @@ defmodule AcariServer.Mnesia do
     match(:link, %{tun_id: tun_name})
   end
 
+  defp get_link_list_for_tunnel(tun_name, :clean) do
+    match_clean(:link, %{tun_id: tun_name})
+  end
+
   def match(tab, field_pattern \\ %{}) do
     case Mnesia.transaction(fn ->
            Mnesia.match_object(Attr.pattern(tab, field_pattern))
@@ -1000,7 +1036,7 @@ defmodule AcariServer.Mnesia do
     |> Enum.into(%{})
   end
 
-  def reduce_link_list(link_list, node_to_name) do
+  defp reduce_link_list(link_list, node_to_name) do
     link_list
     |> Enum.reduce(
       %{links_up: [], links_down: []},
@@ -1029,7 +1065,7 @@ defmodule AcariServer.Mnesia do
     %{alert: alert, links_up: lu |> get_links_str(), links_down: ld |> get_links_str()}
   end
 
-  defp alert_mes(%{links_up: [], links_down: ld}), do: {1, ld, "Устройство недоступно"}
+  defp alert_mes(%{links_up: [], links_down: ld}), do: {1, get_link(ld), "Устройство недоступно"}
   defp alert_mes(%{links_up: _lu, links_down: []}), do: {4, [], ""}
 
   defp alert_mes(%{links_up: lu, links_down: ld}) do
