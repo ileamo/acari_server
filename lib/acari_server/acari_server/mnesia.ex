@@ -535,11 +535,7 @@ defmodule AcariServer.Mnesia do
         Rec.link(id: id, name: name, tun_id: tun, server_id: node, up: up, state: state)
       )
 
-      {level, port_list, mes} =
-        get_link_list_for_tunnel(tun, :clean)
-        |> reduce_link_list(node_to_name)
-        |> alert_mes()
-        |> IO.inspect(label: "EVENT")
+      {level, port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
       case level do
         4 ->
@@ -560,108 +556,78 @@ defmodule AcariServer.Mnesia do
             )
           )
       end
-    end)
 
-    {level, port_list, mes} =
-      get_link_list_for_tunnel(tun)
-      |> reduce_link_list(node_to_name)
-      |> alert_mes()
-
-    case up do
-      true ->
-        Mnesia.transaction(fn ->
-          Mnesia.delete({:event, id})
-
-          match_clean(:event, %{header: tun})
-          |> Enum.each(fn %{id: {name, _tun, node}, level: prev_level} = event ->
-            if level > prev_level or (level == 2 and prev_level == 2) do
-              Mnesia.write(
-                mk_record(
-                  :event,
-                  event
-                  |> Map.merge(%{
-                    level: level,
-                    text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
-                  })
-                )
-              )
-            end
-          end)
-        end)
-
-        update_stat(:down_port, fn
-          {_, list} ->
-            list = list |> Enum.reject(fn x -> x == {tun, name} end)
-            {length(list), list}
-
-          _ ->
-            nil
-        end)
-
-        AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 1)
-
-        {num, _} =
-          update_stat(:down_tun, fn
+      case up do
+        true ->
+          update_stat(:down_port, fn
             {_, list} ->
-              list = list |> Enum.reject(fn x -> x == tun end)
+              list = list |> Enum.reject(fn x -> x == {tun, name} end)
               {length(list), list}
 
             _ ->
-              {0, []}
+              nil
           end)
 
-        AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 1)
-        update_active_tun_chart(num)
+          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 1)
 
-        if get_main_server(tun) == node() do
-          Acari.TunMan.send_all_link_com(tun, Acari.Const.prio(), <<1>>)
-        else
-          Acari.TunMan.send_all_link_com(tun, Acari.Const.prio(), <<0>>)
-        end
-
-      # down
-      _ ->
-        update_event(
-          %{
-            id: id,
-            level: level,
-            header: tun,
-            text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
-          },
-          node_to_name,
-          mes
-        )
-
-        if level == 1 do
           {num, _} =
             update_stat(:down_tun, fn
               {_, list} ->
-                list = [tun | list] |> Enum.uniq()
+                list = list |> Enum.reject(fn x -> x == tun end)
                 {length(list), list}
 
               _ ->
-                {1, [tun]}
+                {0, []}
             end)
 
-          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 0)
+          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 1)
           update_active_tun_chart(num)
-        end
 
-        if level == 1 or Enum.member?(port_list, name) do
-          update_stat(:down_port, fn
-            {_, list} ->
-              list = [{tun, name} | list] |> Enum.uniq()
-              {length(list), list}
+          if get_main_server(tun) == node() do
+            Acari.TunMan.send_all_link_com(tun, Acari.Const.prio(), <<1>>)
+          else
+            Acari.TunMan.send_all_link_com(tun, Acari.Const.prio(), <<0>>)
+          end
 
-            _ ->
-              {1, [{tun, name}]}
-          end)
+        # down
+        _ ->
+          if level == 1 do
+            {num, _} =
+              update_stat(:down_tun, fn
+                {_, list} ->
+                  list = [tun | list] |> Enum.uniq()
+                  {length(list), list}
 
-          AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 0)
-        end
-    end
+                _ ->
+                  {1, [tun]}
+              end)
+
+            AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 0)
+            update_active_tun_chart(num)
+          end
+
+          if level == 1 or Enum.member?(port_list, name) do
+            update_stat(:down_port, fn
+              {_, list} ->
+                list = [{tun, name} | list] |> Enum.uniq()
+                {length(list), list}
+
+              _ ->
+                {1, [{tun, name}]}
+            end)
+
+            AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 0)
+          end
+      end
+    end)
 
     broadcast_link_event()
+  end
+
+  defp create_tun_status_mes(tun, node_to_name) do
+    get_link_list_for_tunnel(tun, :clean)
+    |> reduce_link_list(node_to_name)
+    |> alert_mes()
   end
 
   @max_items 25
@@ -745,52 +711,16 @@ defmodule AcariServer.Mnesia do
     })
   end
 
-  # event
-
-  defp update_event(ev, node_to_name, mes) do
-    Mnesia.transaction(fn ->
-      match_clean(:event, %{header: ev.header})
-      |> Enum.each(fn %{id: {name, _tun, node}} = event ->
-        Mnesia.write(
-          mk_record(
-            :event,
-            event
-            |> Map.merge(%{
-              level: ev.level,
-              text: "Соединение #{name}@#{node_to_name[node]} упало. #{mes}"
-            })
-          )
-        )
-      end)
-
-      count =
-        case Mnesia.read(:counter, :event) do
-          [{:counter, :event, count}] -> count
-          _ -> 0
-        end
-
-      :ok = Mnesia.write(Rec.counter(key: :event, count: count + 1))
-
-      ev = ev |> Map.merge(%{timestamp: :os.system_time(:microsecond), count: count + 1})
-
-      Mnesia.write(mk_record(:event, ev))
-    end)
-  end
-
-  def get_event_list() do
-    match(:event)
-  end
-
-  #client_status
+  # client_status
   def get_client_status() do
     match(:client_status)
   end
 
-  defp purge_link_table(tab) do
+  defp purge_link_table() do
     Mnesia.transaction(fn ->
       Mnesia.foldl(
         fn rec, acc ->
-          case Rec.event(rec, :id) do
+          case Rec.link(rec, :id) do
             {_dev, tun, node} ->
               if Mnesia.wread({:tun, tun}) == [] or
                    Mnesia.wread({:server, node}) == [] do
@@ -805,15 +735,51 @@ defmodule AcariServer.Mnesia do
           end
         end,
         0,
-        tab
+        :link
       )
     end)
   end
 
-  def purge_stat() do
-    # clean link and event lists
-    purge_link_table(:link)
-    purge_link_table(:event)
+  defp purge_client_status_table() do
+    node_to_name = get_node_to_name_map()
+
+    Mnesia.transaction(fn ->
+      Mnesia.foldl(
+        fn rec, acc ->
+          tun = Rec.client_status(rec, :name)
+
+          if Mnesia.wread({:tun, tun}) == [] do
+            Mnesia.delete_object(rec)
+            acc + 1
+          else
+            {level, _port_list, mes} = create_tun_status_mes(tun, node_to_name)
+
+            Mnesia.write(
+              mk_record(
+                :client_status,
+                %{
+                  name: tun,
+                  timestamp: Rec.client_status(rec, :timestamp),
+                  opts: %{
+                    level: level,
+                    text: mes
+                  }
+                }
+              )
+            )
+
+            acc
+          end
+        end,
+        0,
+        :client_status
+      )
+    end)
+  end
+
+  defp purge_stat() do
+    purge_link_table()
+    purge_client_status_table()
 
     # Clean down_tun
     {num, _} =
@@ -1083,9 +1049,15 @@ defmodule AcariServer.Mnesia do
          ]
          |> Enum.reject(&is_nil/1)
          |> Enum.join(", ") do
-      "" -> {3, [], ""}
+      "" -> {3, [], "Соединение #{link_join(ld)} упало"}
       mes -> {2, port_list, mes}
     end
+  end
+
+  defp link_join(ld) do
+    ld
+    |> Enum.map(fn {lnk, srv} -> "#{lnk}@#{srv}" end)
+    |> Enum.join(", ")
   end
 
   defp get_link(l), do: l |> Enum.map(fn {l, _} -> l end) |> Enum.uniq()
