@@ -6,6 +6,7 @@ defmodule AcariServer.Mnesia.Attr do
 
   # for link and event id = {dev, tun, node}
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
+  #TODO delete :event after db migration
   def event(), do: [:id, :count, :timestamp, :level, :header, :text]
   def client_status(), do: [:name, :timestamp, :opts]
   def stat(), do: [:key, :value]
@@ -739,21 +740,27 @@ defmodule AcariServer.Mnesia do
             Mnesia.delete_object(rec)
             acc + 1
           else
-            {level, _port_list, mes} = create_tun_status_mes(tun, node_to_name)
+            {level, _port_list, mes} =
+              create_tun_status_mes(tun, node_to_name)
 
-            Mnesia.write(
-              mk_record(
-                :client_status,
-                %{
-                  name: tun,
-                  timestamp: Rec.client_status(rec, :timestamp),
-                  opts: %{
-                    level: level,
-                    text: mes
-                  }
-                }
-              )
-            )
+            case level do
+              4 -> Mnesia.delete_object(rec)
+
+              _ ->
+                Mnesia.write(
+                  mk_record(
+                    :client_status,
+                    %{
+                      name: tun,
+                      timestamp: Rec.client_status(rec, :timestamp),
+                      opts: %{
+                        level: level,
+                        text: mes
+                      }
+                    }
+                  )
+                )
+            end
 
             acc
           end
