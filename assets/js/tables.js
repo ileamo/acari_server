@@ -1,6 +1,10 @@
 //import $ from "jquery"
-
+//require('jszip')(window, $);
 require('datatables.net-bs4')(window, $);
+require('datatables.net-buttons')(window, $);
+require('datatables.net-buttons/js/buttons.html5.js')(window, $);
+require('datatables.net-buttons/js/buttons.print.js')(window, $);
+
 
 $.extend($.fn.dataTable.defaults, {
   language: {
@@ -28,14 +32,17 @@ $.extend($.fn.dataTable.defaults, {
 
 });
 
-//$(document).ready(function() {
-//    $('#datatable').DataTable();
-//} );
-
-var table = $("#datatable").DataTable({
+datatable_params = {
   stateSave: true,
-  responsive: true
-});
+  responsive: true,
+  dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+    "<'row'<'col-sm-12'tr>>" +
+    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>" +
+    "<B>",
+  buttons: ['csv', 'print']
+}
+
+var table = $("#datatable").DataTable(datatable_params);
 
 
 $('.buttonNext').addClass('btn btn-success');

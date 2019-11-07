@@ -27,9 +27,21 @@ import socket from "./socket"
 
 import "./dashboard.js";
 
+
+//import "jszip"
+
 import "datatables.net";
 import dt from 'datatables.net-bs4';
 dt(window, $);
+
+import dtb from 'datatables.net-buttons'
+dtb(window, $);
+
+import dtbh from 'datatables.net-buttons/js/buttons.html5.js'
+dtbh(window, $);
+
+import dtbp from 'datatables.net-buttons/js/buttons.print.js'
+dtbh(window, $);
 
 //import dtfc from "datatables.net-fixedcolumns";
 //dtfc( window, $ );
