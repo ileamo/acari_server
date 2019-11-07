@@ -10,7 +10,7 @@
 
 
   <body>
-    <% mes_list = get_mes()
+    <% mes_list = AcariServer.Mnesia.get_client_status(@current_user)
        num_of_mes = mes_list |> length() %>
     <nav class="navbar navbar-expand navbar-dark flex-sm-nowrap p-0 justify-content-between"
           style="background-color: #305478;">

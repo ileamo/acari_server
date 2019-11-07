@@ -315,4 +315,25 @@ defmodule AcariServer.UserManager do
         end
     end
   end
+
+  def get_node_id_list_for_user(user) do
+    user =
+      case user do
+        %AcariServer.UserManager.User{} -> user
+        _ -> AcariServer.UserManager.get_user!(user, :clean)
+      end
+
+    case user.is_admin do
+      true ->
+        nil
+
+      _ ->
+        AcariServer.GroupUserAssociation.get_user(user.id)
+        |> Enum.map(fn %{group_id: group_id} ->
+          AcariServer.GroupNodeAssociation.get_node_list_for_group(group_id)
+        end)
+        |> List.flatten()
+        |> Enum.uniq()
+    end
+  end
 end

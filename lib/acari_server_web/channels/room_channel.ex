@@ -12,6 +12,7 @@ defmodule AcariServerWeb.RoomChannel do
   intercept(["link_event_mes"])
 
   def handle_out("link_event_mes", %{mes_list: mes_list}, socket) do
+    mes_list = mes_list |> AcariServer.Mnesia.get_client_status(socket.assigns.current_user_id)
 
     mes_html =
       Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", mes_list: mes_list)

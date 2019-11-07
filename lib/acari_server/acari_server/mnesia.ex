@@ -6,7 +6,7 @@ defmodule AcariServer.Mnesia.Attr do
 
   # for link and event id = {dev, tun, node}
   def link(), do: [:id, :name, :server_id, :tun_id, :up, :state, :opt]
-  #TODO delete :event after db migration
+  # TODO delete :event after db migration
   def event(), do: [:id, :count, :timestamp, :level, :header, :text]
   def client_status(), do: [:name, :timestamp, :opts]
   def stat(), do: [:key, :value]
@@ -674,7 +674,7 @@ defmodule AcariServer.Mnesia do
   end
 
   def broadcast_link_event() do
-    mes_list = AcariServerWeb.LayoutView.get_mes()
+    mes_list = AcariServer.Mnesia.get_client_status()
 
     statistics_html =
       Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
@@ -702,6 +702,27 @@ defmodule AcariServer.Mnesia do
   # client_status
   def get_client_status() do
     match(:client_status)
+  end
+
+  def get_client_status(user) do
+    match(:client_status)
+    |> get_client_status(user)
+  end
+
+  def get_client_status(list, user) do
+    node_id_list = AcariServer.UserManager.get_node_id_list_for_user(user)
+
+    case node_id_list do
+      l when is_list(l) ->
+        list
+        |> Enum.filter(fn %{name: client_name} ->
+          Enum.member?(node_id_list, AcariServer.NodeManager.get_node_by_name(client_name).id)
+        end)
+
+      _ ->
+        list
+    end
+    |> Enum.sort_by(fn %{timestamp: ts} -> ts end, &>/2)
   end
 
   defp purge_link_table() do
@@ -740,11 +761,11 @@ defmodule AcariServer.Mnesia do
             Mnesia.delete_object(rec)
             acc + 1
           else
-            {level, _port_list, mes} =
-              create_tun_status_mes(tun, node_to_name)
+            {level, _port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
             case level do
-              4 -> Mnesia.delete_object(rec)
+              4 ->
+                Mnesia.delete_object(rec)
 
               _ ->
                 Mnesia.write(
