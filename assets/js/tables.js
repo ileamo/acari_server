@@ -32,17 +32,54 @@ $.extend($.fn.dataTable.defaults, {
 
 });
 
+let datatable_dom = "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+  "<'row'<'col-sm-12'tr>>" +
+  "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>" +
+  "<B>"
+
+let datatatable_csv_text = '<i class="fas fa-file-csv"></i> Экспорт CSV'
+let datatatable_print_text = '<i class="fas fa-print"></i> Печать'
+
 datatable_params = {
   stateSave: true,
   responsive: true,
-  dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-    "<'row'<'col-sm-12'tr>>" +
-    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>" +
-    "<B>",
-  buttons: ['csv', 'print']
+  dom: datatable_dom,
+  buttons: [{
+      extend: 'csv',
+      text: datatatable_csv_text,
+    },
+    {
+      extend: 'print',
+      text: datatatable_print_text,
+      autoPrint: false
+    }
+  ]
 }
 
-var table = $("#datatable").DataTable(datatable_params);
+datatable_params_not_last = {
+  stateSave: true,
+  responsive: true,
+  dom: datatable_dom,
+  buttons: [{
+      extend: 'csv',
+      text: datatatable_csv_text,
+      exportOptions: {
+        columns: ':not(:last-child)',
+      }
+    },
+    {
+      extend: 'print',
+      text: datatatable_print_text,
+      autoPrint: false,
+      exportOptions: {
+        columns: ':not(:last-child)',
+      }
+    }
+  ]
+}
+
+var table = $("#datatable").DataTable(datatable_params_not_last);
+var table_all = $("#datatable_all").DataTable(datatable_params);
 
 
 $('.buttonNext').addClass('btn btn-success');

@@ -33,7 +33,7 @@
     </div>
 </nav>
 <hr/ class = "mt-0 mb-4">
-<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+<table id="datatable_all" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
       <th scope="col"></th>
