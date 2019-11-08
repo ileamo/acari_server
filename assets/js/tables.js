@@ -1,9 +1,12 @@
 //import $ from "jquery"
 //require('jszip')(window, $);
+require('datatables.net')(window, $);
 require('datatables.net-bs4')(window, $);
 require('datatables.net-buttons')(window, $);
+require('datatables.net-buttons-bs4')(window, $);
 require('datatables.net-buttons/js/buttons.html5.js')(window, $);
 require('datatables.net-buttons/js/buttons.print.js')(window, $);
+require('datatables.net-buttons/js/buttons.colVis.js')(window, $);
 
 
 $.extend($.fn.dataTable.defaults, {
@@ -32,10 +35,11 @@ $.extend($.fn.dataTable.defaults, {
 
 });
 
-let datatable_dom = "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+let datatable_dom =
+  "<'mb-2'B>" +
+  "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
   "<'row'<'col-sm-12'tr>>" +
-  "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>" +
-  "<B>"
+  "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
 
 let datatatable_csv_text = '<i class="fas fa-file-csv"></i> Экспорт CSV'
 let datatatable_print_text = '<i class="fas fa-print"></i> Печать'
@@ -44,41 +48,41 @@ datatable_params = {
   stateSave: true,
   responsive: true,
   dom: datatable_dom,
-  buttons: [{
-      extend: 'csv',
-      text: datatatable_csv_text,
-    },
-    {
-      extend: 'print',
-      text: datatatable_print_text,
-      autoPrint: false
+  language: {
+    buttons: {
+      colvisRestore: "Показать все"
     }
-  ]
-}
+  },
 
-datatable_params_not_last = {
-  stateSave: true,
-  responsive: true,
-  dom: datatable_dom,
   buttons: [{
       extend: 'csv',
       text: datatatable_csv_text,
+      className: 'btn btn-outline-secondary',
       exportOptions: {
-        columns: ':not(:last-child)',
+        columns: ':visible:not(.not-export-col)'
       }
     },
     {
       extend: 'print',
       text: datatatable_print_text,
       autoPrint: false,
+      className: 'btn btn-outline-secondary',
       exportOptions: {
-        columns: ':not(:last-child)',
+        columns: ':visible:not(.not-export-col)'
       }
+    },
+    {
+      extend: 'colvis',
+      text: "Столбцы",
+      postfixButtons: ['colvisRestore'],
+      className: 'btn btn-outline-secondary'
     }
   ]
 }
 
-var table = $("#datatable").DataTable(datatable_params_not_last);
+$.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
+
+var table = $("#datatable").DataTable(datatable_params);
 var table_all = $("#datatable_all").DataTable(datatable_params);
 
 
