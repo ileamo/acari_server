@@ -7,8 +7,7 @@
       <th>Автор</th>
       <th>Тема</th>
       <th>Сообщение</th>
-
-      <th></th>
+      <th scope="col" class="not-export-col">Действия</th>
     </tr>
   </thead>
   <tbody>

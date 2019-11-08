@@ -5,8 +5,7 @@
       <th scope="col">Имя</th>
       <th scope="col">Админ</th>
       <th scope="col">Группы</th>
-
-      <th scope="col"></th>
+      <th scope="col" class="not-export-col">Действия</th>
     </tr>
   </thead>
   <tbody>
@@ -21,7 +20,7 @@
           Все
         <% else %>
           <%= AcariServer.GroupManager.groups_list(user) %>
-        <% end %>  
+        <% end %>
       </td>
 
       <td>
