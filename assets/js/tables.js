@@ -48,12 +48,6 @@ datatable_params = {
   stateSave: true,
   responsive: true,
   dom: datatable_dom,
-  language: {
-    buttons: {
-      colvisRestore: "Показать все"
-    }
-  },
-
   buttons: [{
       extend: 'csv',
       text: datatatable_csv_text,
@@ -74,8 +68,19 @@ datatable_params = {
     {
       extend: 'colvis',
       text: "Столбцы",
-      postfixButtons: ['colvisRestore'],
-      className: 'btn btn-outline-secondary'
+      className: 'btn btn-outline-secondary',
+      postfixButtons: [{
+          extend: 'colvisGroup',
+          text: 'Показать все',
+          show: ':hidden',
+          className: "text-secondary"
+        },
+        {
+          extend: 'colvisRestore',
+          text: 'Восстановить',
+          className: "text-secondary"
+        }
+      ]
     }
   ]
 }
