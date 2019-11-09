@@ -10,8 +10,28 @@ defmodule AcariServer.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: [
+        bogatka: [
+          include_executables_for: [:unix],
+          applications: [runtime_tools: :permanent],
+          cookie: "DgZPqZG4H22AZyd_XoZkfdLDqPI4KKeZeI1tJg2yprxm1l4bQ4RJmQ==",
+          steps: [:assemble, &copy_extra_files/1],
+          runtime_config_path: "config/rt.exs"
+        ],
+        bogatka_docker: [
+          include_executables_for: [:unix],
+          applications: [runtime_tools: :permanent],
+          cookie: "eNBXaWYQFXV_UVi0d7vyEpsz9ZYx0p1fX7SisJ5dtLFdbS-4VqW_OQ==",
+          steps: [:assemble, &copy_extra_files/1],
+          runtime_config_path: "config/rt_docker.exs"
+        ]
+      ]
     ]
+  end
+
+  def copy_extra_files(release) do
+    release
   end
 
   # Configuration for the OTP application.
@@ -53,12 +73,12 @@ defmodule AcariServer.MixProject do
       {:bcrypt_elixir, "~> 0.12"},
       {:temp, "~> 0.4"},
       {:erlexec, "~> 1.9"},
-      {:distillery, "~> 2.0.12"},
+      # {:distillery, "~> 2.0.12"},
       {:loggix, "~> 0.0.9"},
       {:httpoison, "~> 1.5"},
       {:sandbox, "~> 0.5"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
-      #{:procket, git: "https://github.com/msantos/procket.git", override: true},
+      # {:procket, git: "https://github.com/msantos/procket.git", override: true},
       {:tunctl, git: "https://github.com/msantos/tunctl.git"},
       {:gen_icmp, git: "https://github.com/msantos/gen_icmp.git"}
     ]
