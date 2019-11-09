@@ -8,7 +8,7 @@
       <th scope="col">Описание</th>
       <th scope="col">Исп.</th>
       <th scope="col">Права</th>
-      <th scope="col"></th>
+      <th scope="col" class="not-export-col">Действия</th>
     </tr>
   </thead>
   <tbody>
