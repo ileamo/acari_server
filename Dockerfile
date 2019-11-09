@@ -7,9 +7,8 @@ COPY mix.exs .
 COPY mix.lock .
 #COPY deps deps
 
-ARG MIX_ENV=docker
 ARG APP_VERSION=0.0.0
-ENV MIX_ENV ${MIX_ENV}
+ENV MIX_ENV prod
 ENV APP_VERSION ${APP_VERSION}
 
 RUN mix deps.get  --only prod
@@ -29,7 +28,7 @@ RUN cd assets && npm install &&  node node_modules/webpack/bin/webpack.js --mode
 RUN mix phx.digest
 
 RUN rm priv/cert/* && mix phx.gen.cert
-RUN mix release --env=${MIX_ENV}
+RUN mix release --overwrite bogatka_docker
 
 ### Minimal run-time image
 FROM alpine:3.10.2
@@ -40,19 +39,17 @@ libcap libcap-dev iproute2 openssh-client su-exec
 
 RUN adduser -D app
 
-ARG MIX_ENV=docker
 ARG APP_VERSION=0.0.0
 
-ENV MIX_ENV ${MIX_ENV}
 ENV APP_VERSION ${APP_VERSION}
 
 WORKDIR /opt/app
 
 # Copy release from build stage
-COPY --from=build /build/_build/${MIX_ENV}/rel/* ./
+COPY --from=build /build/_build/prod/rel/bogatka_docker ./
 COPY priv/cert /etc/ssl/acari
 
-RUN setcap cap_net_admin=ep /opt/app/erts-10.1.1/bin/beam.smp cap_net_admin=ep /sbin/ip
+RUN setcap cap_net_admin=ep /opt/app/erts-10.5.2/bin/beam.smp cap_net_admin=ep /sbin/ip
 
 USER app
 
