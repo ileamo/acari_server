@@ -1,4 +1,4 @@
-FROM bitwalker/alpine-elixir-phoenix:1.8.0 AS build
+FROM bitwalker/alpine-elixir-phoenix:1.9.2 AS build
 RUN apk --no-cache update && apk --no-cache upgrade && apk --no-cache add openssl autoconf automake libtool nasm
 
 WORKDIR /build
@@ -32,7 +32,7 @@ RUN rm priv/cert/* && mix phx.gen.cert
 RUN mix release --env=${MIX_ENV}
 
 ### Minimal run-time image
-FROM alpine:3.8
+FROM alpine:3.10.2
 
 RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \

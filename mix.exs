@@ -58,7 +58,7 @@ defmodule AcariServer.MixProject do
       {:httpoison, "~> 1.5"},
       {:sandbox, "~> 0.5"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
-      {:procket, git: "https://github.com/msantos/procket.git", override: true},
+      #{:procket, git: "https://github.com/msantos/procket.git", override: true},
       {:tunctl, git: "https://github.com/msantos/tunctl.git"},
       {:gen_icmp, git: "https://github.com/msantos/gen_icmp.git"}
     ]
