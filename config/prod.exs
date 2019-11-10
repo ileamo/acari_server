@@ -12,15 +12,16 @@ use Mix.Config
 
 config :acari_server, AcariServerWeb.Endpoint,
   http: [port: 50080],
-  # https: [
-  #   port: 50443,
-  #   keyfile: "/etc/ssl/acari/privkey.pem",
-  #   #cacertfile: "/etc/ssl/acari/chain.pem",
-  #   certfile: "/etc/ssl/acari/cert.pem",
-  #   cipher_suite: :strong,
-  #   #versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
-  # ],
-  # This is critical for ensuring web-sockets properly authorize.
+  https: [
+    port: 50443,
+    keyfile: "/etc/ssl/acari/privkey.pem",
+    #cacertfile: "/etc/ssl/acari/chain.pem",
+    certfile: "/etc/ssl/acari/cert.pem",
+    cipher_suite: :strong,
+    #versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
+  ],
+  
+  #This is critical for ensuring web-sockets properly authorize.
   url: [host: "localhost", port: 50443],
   check_origin: false,
   cache_static_manifest: "priv/static/cache_manifest.json",

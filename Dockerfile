@@ -28,7 +28,9 @@ RUN cd assets && npm install &&  node node_modules/webpack/bin/webpack.js --mode
 RUN mix phx.digest
 
 RUN rm priv/cert/* && mix phx.gen.cert
-RUN mix release --overwrite bogatka_docker
+
+RUN mix release bogatka_docker
+
 
 ### Minimal run-time image
 FROM alpine:3.10.2
@@ -66,7 +68,8 @@ USER root
 
 COPY priv/.ssh /home/app/.ssh
 RUN  chown -R app:app /home/app/.ssh
+RUN  chown -R app:app /opt/app
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["foreground"]
+CMD ["start"]
