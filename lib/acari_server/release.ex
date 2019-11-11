@@ -1,4 +1,4 @@
-defmodule AcariServer.ReleaseTasks do
+defmodule AcariServer.Release do
   @start_apps [
     :crypto,
     :ssl,
@@ -9,7 +9,7 @@ defmodule AcariServer.ReleaseTasks do
 
   @repos Application.get_env(:acari_server, :ecto_repos, [])
 
-  def migrate(_argv) do
+  def migrate() do
     start_services()
 
     run_migrations()
@@ -17,7 +17,7 @@ defmodule AcariServer.ReleaseTasks do
     stop_services()
   end
 
-  def seed(_argv) do
+  def seed() do
     start_services()
 
     run_migrations()
