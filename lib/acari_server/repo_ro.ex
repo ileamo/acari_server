@@ -7,7 +7,7 @@ defmodule AcariServer.RepoRO do
   @params [
     username: "postgres",
     password: "postgres",
-    database: "acari_server_prod",
+    database: "bogatka",
     pool_size: 10
   ]
 

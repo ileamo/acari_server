@@ -44,6 +44,8 @@ defmodule AcariServer.Release do
       %User{}
       |> User.changeset(admin_params)
       |> Repo.insert!()
+
+      IO.puts("User 'admin' with password 'admin' created")
     else
       IO.puts("User 'admin' already exists")
     end

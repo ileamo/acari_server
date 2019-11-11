@@ -6,7 +6,7 @@ defmodule AcariServer.Repo do
   @params [
     username: "postgres",
     password: "postgres",
-    database: "acari_server_prod",
+    database: "bogatka",
     pool_size: 10
   ]
   def init(:runtime, config) do

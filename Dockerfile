@@ -1,5 +1,6 @@
 FROM bitwalker/alpine-elixir-phoenix:1.9.2 AS build
-RUN apk --no-cache update && apk --no-cache upgrade && apk --no-cache add openssl autoconf automake libtool nasm
+RUN apk --no-cache update && apk --no-cache upgrade && \
+apk --no-cache add openssl autoconf automake libtool nasm zlib-dev
 
 WORKDIR /build
 
