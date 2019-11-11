@@ -1,4 +1,7 @@
 defmodule AcariServer.Release do
+  alias AcariServer.Repo
+  alias AcariServer.UserManager.User
+
   @start_apps [
     :crypto,
     :ssl,
@@ -7,76 +10,42 @@ defmodule AcariServer.Release do
     :ecto_sql
   ]
 
-  @repos Application.get_env(:acari_server, :ecto_repos, [])
+  def migrate do
+    Application.load(:acari_server)
 
-  def migrate() do
-    start_services()
+    {:ok, migrated, _} =
+      Ecto.Migrator.with_repo(AcariServer.Repo, &Ecto.Migrator.run(&1, :up, all: true))
 
-    run_migrations()
-
-    stop_services()
-  end
-
-  def seed() do
-    start_services()
-
-    run_migrations()
-
-    run_seeds()
-
-    stop_services()
-  end
-
-  defp start_services do
-    IO.puts("Starting dependencies..")
-    # Start apps necessary for executing migrations
-    Enum.each(@start_apps, &Application.ensure_all_started/1)
-
-    # Start the Repo(s) for app
-    IO.puts("Starting repos..")
-    Enum.each(@repos, & &1.start_link(pool_size: 15))
-  end
-
-  defp stop_services do
-    IO.puts("Success!")
-    :init.stop()
-  end
-
-  defp run_migrations do
-    Enum.each(@repos, &run_migrations_for/1)
-  end
-
-  defp run_migrations_for(repo) do
-    app = Keyword.get(repo.config, :otp_app)
-    IO.puts("Running migrations for #{app}")
-    migrations_path = priv_path_for(repo, "migrations")
-    Ecto.Migrator.run(repo, migrations_path, :up, all: true)
-  end
-
-  defp run_seeds do
-    Enum.each(@repos, &run_seeds_for/1)
-  end
-
-  defp run_seeds_for(repo) do
-    # Run the seed script if it exists
-    seed_script = priv_path_for(repo, "seeds.exs")
-    if File.exists?(seed_script) do
-      IO.puts("Running seed script..")
-      Code.eval_file(seed_script)
+    case migrated do
+      [] -> IO.puts("Already up")
+      list -> list |> Enum.each(fn id -> IO.puts("Migrated #{id}") end)
     end
   end
 
-  defp priv_path_for(repo, filename) do
-    app = Keyword.get(repo.config, :otp_app)
+  def rollback(version) do
+    {:ok, _, _} =
+      Ecto.Migrator.with_repo(AcariServer.Repo, &Ecto.Migrator.run(&1, :down, to: version))
+  end
 
-    repo_underscore =
-      repo
-      |> Module.split()
-      |> List.last()
-      |> Macro.underscore()
+  def seed() do
+    Application.load(:acari_server)
+    Enum.each(@start_apps, &Application.ensure_all_started/1)
 
-    priv_dir = "#{:code.priv_dir(app)}"
+    AcariServer.Repo.start_link()
 
-    Path.join([priv_dir, repo_underscore, filename])
+    admin_params = %{
+      username: "admin",
+      password: "admin",
+      rpt_psw: "admin",
+      is_admin: true
+    }
+
+    unless Repo.get_by(User, username: admin_params[:username]) do
+      %User{}
+      |> User.changeset(admin_params)
+      |> Repo.insert!()
+    else
+      IO.puts("User 'admin' already exists")
+    end
   end
 end
