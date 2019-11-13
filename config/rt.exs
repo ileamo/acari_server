@@ -33,10 +33,10 @@ config :acari_server, AcariServer.RepoManager,
 
 config :acari_server, AcariServer, allow_unconfigured: false
 
-config :acari_server, AcariServer.Listener,
-  port: 50019,
-  keyfile: "/etc/ssl/bogatka/ssl.key",
-  certfile: "/etc/ssl/bogatka/ssl.crt"
+# config :acari_server, AcariServer.Listener,
+#   port: 50019,
+#   keyfile: "/etc/ssl/bogatka/ssl.key",
+#   certfile: "/etc/ssl/bogatka/ssl.crt"
 
 config :acari_server, :zabbix,
   zbx_ext_url: System.get_env("ZBX_EXT_URL"),
