@@ -128,21 +128,20 @@ defmodule AcariServer.UserManager do
     User.changeset(user, %{})
   end
 
-  alias Comeonin.Bcrypt
 
   def authenticate_user(username, plain_text_password) do
     query = from u in User, where: u.username == ^username
 
     case RepoRO.one(query) do
       nil ->
-        Bcrypt.dummy_checkpw()
+        Comeonin.Bcrypt.dummy_checkpw()
         {:error, :invalid_credentials}
 
       %{password_hash: nil} ->
         {:error, :invalid_credentials}
 
       user ->
-        if Bcrypt.checkpw(plain_text_password, user.password_hash) do
+        if Bcrypt.verify_pass(plain_text_password, user.password_hash) do
           {:ok, user}
         else
           {:error, :invalid_credentials}

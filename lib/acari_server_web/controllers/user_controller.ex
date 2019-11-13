@@ -18,7 +18,8 @@ defmodule AcariServerWeb.UserController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"user" => user_params, "rights" => rights}) do
+  def create(conn, %{"user" => user_params} = params) do
+    rights = params["rights"] || %{}
     case UserManager.create_user(user_params, rights) do
       {:ok, user} ->
         conn
@@ -46,7 +47,8 @@ defmodule AcariServerWeb.UserController do
     render(conn, "edit.html", user: user, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params, "rights" => rights}) do
+  def update(conn, %{"id" => id, "user" => user_params} = params) do
+    rights = params["rights"] || %{}
     user = UserManager.get_user!(id, :rw)
 
     case UserManager.update_user(user, user_params, rights) do

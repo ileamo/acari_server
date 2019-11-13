@@ -1,7 +1,6 @@
 defmodule AcariServer.UserManager.User do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Comeonin.Bcrypt
 
   schema "users" do
     field :is_admin, :boolean, default: false
@@ -48,7 +47,7 @@ defmodule AcariServer.UserManager.User do
   defp put_password_hash(
          %Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset
        ) do
-    change(changeset, password_hash: Bcrypt.hashpwsalt(password))
+    change(changeset, password_hash: Bcrypt.hash_pwd_salt(password))
   end
 
   defp put_password_hash(changeset), do: changeset
