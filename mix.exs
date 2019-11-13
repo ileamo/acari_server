@@ -17,7 +17,8 @@ defmodule AcariServer.MixProject do
           applications: [runtime_tools: :permanent],
           cookie: "DgZPqZG4H22AZyd_XoZkfdLDqPI4KKeZeI1tJg2yprxm1l4bQ4RJmQ==",
           steps: [:assemble, &copy_extra_files/1],
-          runtime_config_path: "config/rt.exs"
+          runtime_config_path: "config/rt.exs",
+          include_erts: false
         ],
         bogatka_docker: [
           include_executables_for: [:unix],
