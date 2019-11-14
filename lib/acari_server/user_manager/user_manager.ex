@@ -44,8 +44,9 @@ defmodule AcariServer.UserManager do
   end
 
   def get_user(id) do
+
     RepoRO.get(User, id)
-    |> Repo.preload(:groups_users)
+    |> RepoRO.preload(:groups_users)
   end
 
   @doc """
