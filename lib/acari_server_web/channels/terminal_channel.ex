@@ -34,7 +34,7 @@ defmodule AcariServerWeb.TerminalChannel do
              output_pid: self(),
              tun_name: AcariServer.Mnesia.get_server_name_by_system_name(node()),
              command: '/bin/bash',
-             init_send: "stty echo\nscreen -d -r\n"
+             init_send: "stty echo\nstty rows 48\nscreen -d -r\n"
            }) do
       Process.link(terminal)
       {:ok, assign(socket, :terminal, terminal)}
