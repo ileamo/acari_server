@@ -7,7 +7,7 @@ defmodule AcariServer.Terminal do
   end
 
   @impl true
-  def init(%{output_pid: output_pid, tun_name: name, command: command} = _params) do
+  def init(%{output_pid: output_pid, tun_name: name, command: command} = params) do
     Process.flag(:trap_exit, true)
 
     with send(output_pid, {:output, "Подключение к #{name} \r\n"}),
@@ -18,7 +18,7 @@ defmodule AcariServer.Terminal do
              :stderr,
              :pty
            ]),
-         :exec.send(shell, "stty echo\n") do
+         :exec.send(shell, params[:init_send] || "") do
       {:ok,
        %{
          output_pid: output_pid,

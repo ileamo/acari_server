@@ -11,7 +11,8 @@ defmodule AcariServerWeb.TerminalChannel do
              Terminal.start_child(node, %{
                output_pid: self(),
                tun_name: tun_name,
-               command: 'ssh root@#{dstaddr} -o StrictHostKeyChecking=no'
+               command: 'ssh root@#{dstaddr} -o StrictHostKeyChecking=no',
+               init_send: "stty echo\n"
              }) do
         Process.link(terminal)
         {:ok, assign(socket, :terminal, terminal)}
@@ -32,7 +33,8 @@ defmodule AcariServerWeb.TerminalChannel do
            Terminal.start_child(Node.self(), %{
              output_pid: self(),
              tun_name: AcariServer.Mnesia.get_server_name_by_system_name(node()),
-             command: '/bin/bash'
+             command: '/bin/bash',
+             init_send: "stty echo\nscreen -d -r\n"
            }) do
       Process.link(terminal)
       {:ok, assign(socket, :terminal, terminal)}
