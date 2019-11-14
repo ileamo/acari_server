@@ -47,8 +47,12 @@ defmodule AcariServer.Terminal do
 
   def handle_cast({:input, input}, %{shell: shell} = state) do
     case :exec.send(shell, input) do
-      :ok -> {:noreply, state}
-      _ -> {:noreply, %{state | shell: nil}}
+      :ok ->
+        {:noreply, state}
+
+      _ ->
+        :exec.stop(shell)
+        {:noreply, %{state | shell: nil}}
     end
   end
 
@@ -64,6 +68,8 @@ defmodule AcariServer.Terminal do
   end
 
   def handle_info({:EXIT, _pid, :normal}, state) do
+    :exec.stop(state.shell)
+
     {:noreply, %{state | shell: nil}}
   end
 
