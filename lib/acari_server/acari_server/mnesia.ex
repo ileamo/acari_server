@@ -101,14 +101,27 @@ defmodule AcariServer.Mnesia do
   # server
 
   def update_servers_list() do
-    servers_db = AcariServer.ServerManager.list_servers()
+    servers_db =
+      try do
+        AcariServer.ServerManager.list_servers()
+      rescue
+        _ -> nil
+      end
+
     update_servers_list(servers_db)
   end
 
   def update_servers_list(:delay) do
     Task.start(fn ->
       Process.sleep(1000)
-      servers_db = AcariServer.ServerManager.list_servers()
+
+      servers_db =
+        try do
+          AcariServer.ServerManager.list_servers()
+        rescue
+          _ -> nil
+        end
+
       update_servers_list(servers_db)
     end)
   end
@@ -117,6 +130,8 @@ defmodule AcariServer.Mnesia do
     node_list = [node() | Node.list()]
 
     Mnesia.transaction(fn ->
+      servers_db = servers_db || match_clean(:server)
+
       Mnesia.foldl(
         fn rec, _ ->
           Mnesia.delete_object(rec)
@@ -127,7 +142,8 @@ defmodule AcariServer.Mnesia do
 
       servers_db
       |> Enum.each(fn %{system_name: system_name, name: name} ->
-        system_name = system_name |> String.to_atom()
+        system_name =
+          if is_binary(system_name), do: String.to_atom(system_name), else: system_name
 
         Mnesia.write(
           Rec.server(
@@ -390,7 +406,7 @@ defmodule AcariServer.Mnesia do
                  _ -> Map.put(acc, serv, 1)
                end
              end,
-             match(:server)
+             match_clean(:server)
              |> Enum.map(fn %{system_name: name} -> {name, 0} end)
              |> Enum.into(%{}),
              :tun

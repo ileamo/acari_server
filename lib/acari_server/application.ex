@@ -35,6 +35,11 @@ defmodule AcariServer.Application do
     Supervisor.start_link(children, opts)
   end
 
+  def stop(_state) do
+    IO.puts("Application exited")
+    :init.stop()
+  end
+
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do

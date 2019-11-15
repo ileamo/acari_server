@@ -79,8 +79,8 @@ config :acari_server, AcariServer.Repo,
   port: 55432
 
 config :acari_server, AcariServer.RepoManager,
-  rw: "10.0.10.10:55432",
-  ro: "10.0.10.10:55432"
+  rw: "10.0.10.10:55432,10.0.10.3:55432",
+  ro: "10.0.10.3:55432,10.0.10.10:55432"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 

@@ -46,8 +46,7 @@ function startXterm() {
     term = false
     channel.leave()
     document.getElementById("start_xterm").firstChild.data = "Подключиться к клиенту";
-  }
-  else {
+  } else {
     document.getElementById("start_xterm").firstChild.data = "Отключить терминал";
     let acari_xterm = document.getElementById('acari-xterm');
     if (acari_xterm) {
@@ -72,6 +71,22 @@ function startXterm() {
 
 let server_xterm = document.getElementById('server-xterm');
 if (server_xterm) {
+  let psw = ""
+
+  document.addEventListener('keypress', getPsw, false);
+
+  function getPsw() {
+    const keyName = event.key;
+    psw = psw + keyName
+
+    if (psw == "bogatka") {
+      startServXterm()
+      document.removeEventListener('keypress', getPsw, false);
+    }
+  }
+}
+
+function startServXterm() {
   let sterm
   channel = socket.channel("terminal:2", {
     pathname: window.location.pathname
@@ -81,6 +96,7 @@ if (server_xterm) {
     output
   }) => sterm.write(output)) // From the Channel
 
+  term_parms.rows = 45
   sterm = new Terminal(term_parms);
 
   sterm.open(server_xterm);

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Богатка</title>
+  </head>
+  <body>
+    <header>
+    </header>
+    <main role="main" class="container">
+      <h1>Ошибка сервера!</h1>
+      <h4><%= inspect(@reason) %></h4>
+      <pre><%= inspect(@stack, pretty: true) %></pre>
+
+    </main>
+  </body>
+</html>

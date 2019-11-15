@@ -27,9 +27,8 @@ config :acari_server, AcariServer.Repo,
   port: System.get_env("DB_PORT")
 
 config :acari_server, AcariServer.RepoManager,
-  rw: System.get_env("DB_HOSTS_RW"),
-  ro: System.get_env("DB_HOSTS_RO")
-
+  rw: "10.0.10.10:55432,10.0.10.10:51432",
+  ro: "10.0.10.10:51432,10.0.10.10:55432"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 

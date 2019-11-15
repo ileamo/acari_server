@@ -27,6 +27,7 @@ config :acari_server, AcariServerWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   root: ".",
+  #debug_errors: true,
   version: Application.spec(:acari_server, :vsn)
 
 # Do not print debug messages in production

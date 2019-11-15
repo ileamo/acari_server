@@ -46,7 +46,7 @@ defmodule AcariServerWeb.Router do
 
     get "/", PageController, :index
     get "/zabbix", PageController, :zabbix
-    get "/xterm", PageController, :xterm
+    get "/чеукь", PageController, :xterm
     get "/faq", PageController, :faq
     get "/help", PageController, :help
 
