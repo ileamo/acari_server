@@ -13,7 +13,8 @@
       <h1>Ошибка сервера!</h1>
       <h4><%= inspect(@reason) %></h4>
       <pre><%= inspect(@stack, pretty: true) %></pre>
-
+      <p>Версия <%= {:ok, vsn} = :application.get_key(:acari_server, :vsn); vsn %></p>
+      <p>Сборка <%= Application.get_env(:acari_server, :release_date) %></p>
     </main>
   </body>
 </html>

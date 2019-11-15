@@ -135,7 +135,7 @@ defmodule AcariServer.UserManager do
 
     case RepoRO.one(query) do
       nil ->
-        Comeonin.Bcrypt.dummy_checkpw()
+        Bcrypt.no_user_verify()
         {:error, :invalid_credentials}
 
       %{password_hash: nil} ->
