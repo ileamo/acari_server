@@ -112,6 +112,7 @@
           <div class="modal-body">
             <p>ООО "ЭН-ЭС-ДЖИ" (NSG Ltd.)</p>
             <p>Версия <%= {:ok, vsn} = :application.get_key(:acari_server, :vsn); vsn %></p>
+            <p>Сборка <%= Application.get_env(:acari_server, :release_date) %></p>
           </div>
         </div>
       </div>

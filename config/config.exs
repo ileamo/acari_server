@@ -8,7 +8,8 @@
 use Mix.Config
 
 config :acari_server,
-  ecto_repos: [AcariServer.Repo]
+  ecto_repos: [AcariServer.Repo],
+  release_date: NaiveDateTime.utc_now() |> to_string()
 
 # Configures the endpoint
 config :acari_server, AcariServerWeb.Endpoint,
@@ -28,7 +29,7 @@ config :phoenix, :json_library, Jason
 config :acari_server, AcariServer.UserManager.Guardian,
   issuer: "acari_server",
   ttl: {18 * 60, :minute},
-  #secret_key: "QnnO7bOCfdYvMULODFxFzDJ+75h5Y7t/CV8d36zYSUncM/0oQtib3DejlUgSONb7"
+  # secret_key: "QnnO7bOCfdYvMULODFxFzDJ+75h5Y7t/CV8d36zYSUncM/0oQtib3DejlUgSONb7"
   secret_key: {AcariServer.Application, :get_secret_key, []}
 
 config :acari_server, AcariServerWeb.Gettext, default_locale: "ru"
