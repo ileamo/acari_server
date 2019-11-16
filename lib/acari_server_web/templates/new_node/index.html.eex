@@ -11,21 +11,42 @@
     </tr>
   </thead>
   <tbody>
-<%= for new_node <- @newnodes do %>
-    <tr>
-      <td><%=  AcariServer.db_time_to_local(new_node.inserted_at) %></td>
-      <td>
-        <%= link new_node.name, to: Routes.new_node_path(@conn, :show, new_node) %>
-      </td>
-      <td><%= new_node.ip_addr %></td>
-      <td><%= new_node.source %></td>
+    <%= for new_node <- @newnodes do %>
+        <tr>
+          <td><%=  AcariServer.db_time_to_local(new_node.inserted_at) %></td>
+          <td>
+            <%= link new_node.name, to: Routes.new_node_path(@conn, :show, new_node) %>
+          </td>
+          <td><%= new_node.ip_addr %></td>
+          <td><%= new_node.source %></td>
 
-      <td>
-        <%= link "Зарегистрировать", to: Routes.new_node_path(@conn, :edit, new_node) %>
-        |
-        <%= link "Удалить", to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Вы уверены?"] %>
-      </td>
-    </tr>
-<% end %>
+          <td>
+            <%= link "Зарегистрировать", to: Routes.new_node_path(@conn, :edit, new_node) %>
+            |
+            <%= link "Удалить", to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Вы уверены?"] %>
+          </td>
+        </tr>
+    <% end %>
+
   </tbody>
 </table>
+<hr/>
+
+<h3 class="mt-5">Загрузка из файла</h3>
+<p class="mb-0 mt-2">Выберите файл</p>
+
+<%= form_for @conn, Routes.new_node_path(@conn, :upload),
+[multipart: true], fn f-> %>
+  <div style="max-width:960px">
+    <div class="form-group row">
+      <div class="col-sm-12">
+      <%= file_input f, :upload, class: "form-control p-0", style: "height: 100%" %>
+    </div>
+    </div>
+    <p class="mb-0 mt-2">или вставьте текст</p>
+    <%= textarea f, :text, class: "form-control text-monospace", rows: "6" %>
+    <div class="form-group mt-3">
+      <%= submit "Загрузить" %>
+    </div>
+  </div>
+<% end %>

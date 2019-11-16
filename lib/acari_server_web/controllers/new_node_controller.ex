@@ -101,4 +101,24 @@ defmodule AcariServerWeb.NewNodeController do
     |> put_flash(:info, "New node deleted successfully.")
     |> redirect(to: Routes.new_node_path(conn, :index))
   end
+
+  def upload(conn, params) do
+    IO.inspect(params)
+
+    if upload = params["upload"] do
+      File.read(upload.path)
+      |> add_new_client()
+    end
+
+    if text = params["text"] do
+      add_new_client(text)
+    end
+
+    conn
+    |> redirect(to: Routes.new_node_path(conn, :index))
+  end
+
+  defp add_new_client(text) do
+    IO.puts(text)
+  end
 end
