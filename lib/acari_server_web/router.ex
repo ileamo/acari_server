@@ -65,6 +65,7 @@ defmodule AcariServerWeb.Router do
     resources "/nodes", NodeController
     get "/nodes/:id/toggle_lock", NodeController, :toggle_lock
     resources "/newnodes", NewNodeController
+    post "/newnodes/upload", NewNodeController, :upload
     resources "/scripts", ScriptController
     resources "/templates", TemplateController
     resources "/servers", ServerController
