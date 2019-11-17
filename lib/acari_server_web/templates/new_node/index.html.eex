@@ -44,7 +44,7 @@
     </div>
     </div>
     <p class="mb-0 mt-2">или вставьте текст</p>
-    <%= textarea f, :text, class: "form-control text-monospace", rows: "6" %>
+    <%= textarea f, :text, class: "form-control text-monospace", rows: "16" %>
     <div class="form-group mt-3">
       <%= submit "Загрузить" %>
     </div>
