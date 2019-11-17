@@ -103,7 +103,6 @@ defmodule AcariServerWeb.NewNodeController do
   end
 
   def upload(conn, params) do
-    IO.inspect(params)
 
     if upload = params["upload"] do
       case File.read(upload.path) do

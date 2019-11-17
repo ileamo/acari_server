@@ -76,11 +76,12 @@ config :phoenix, :plug_init_mode, :runtime
 # Configure your database
 config :acari_server, AcariServer.Repo,
   hostname: "10.0.10.10",
-  port: 55432
+  port: 5432
+
 
 config :acari_server, AcariServer.RepoManager,
-  rw: "10.0.10.10:55432,10.0.10.3:55432",
-  ro: "10.0.10.3:55432,10.0.10.10:55432"
+  rw: "localhost",
+  ro: "localhost"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 
@@ -92,7 +93,7 @@ config :acari_server, AcariServer.Listener,
 config :acari_server, :zabbix,
   zbx_ext_url: "https://10.33.33.31:10443",
   zbx_web_port: nil,
-  zbx_api_url: "http://10.0.10.155:4080",
+  #zbx_api_url: "http://10.0.10.155:4080",
   zbx_snd_host: "10.0.10.155",
   zbx_username: "Admin",
   zbx_password: "IMo19-0708"
