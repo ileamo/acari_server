@@ -33,6 +33,13 @@
 <hr/>
 
 <h3 class="mt-5">Загрузка из файла</h3>
+
+<%= if assigns[:err_mes] && assigns.err_mes != "" do %>
+  <pre class="text-danger">
+    <%= assigns[:err_mes] %>
+  </pre>
+<% end %>
+
 <p class="mb-0 mt-2">Выберите файл</p>
 
 <%= form_for @conn, Routes.new_node_path(@conn, :upload),

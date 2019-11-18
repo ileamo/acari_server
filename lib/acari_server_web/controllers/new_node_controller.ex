@@ -5,9 +5,9 @@ defmodule AcariServerWeb.NewNodeController do
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin when action in [:edit, :delete, :new]
 
-  def index(conn, _params) do
+  def index(conn, params) do
     newnodes = NewNodeDiscovery.list_newnodes()
-    render(conn, "index.html", newnodes: newnodes)
+    render(conn, "index.html", newnodes: newnodes, err_mes: params["err_mes"])
   end
 
   def new(conn, params) do
@@ -103,23 +103,87 @@ defmodule AcariServerWeb.NewNodeController do
   end
 
   def upload(conn, params) do
+    mes =
+      cond do
+        upload = params["upload"] ->
+          IO.inspect(upload)
+          case File.read(upload.path) do
+            {:ok, text} ->
+              case add_new_client(text) do
+                {:error, mes} -> mes
+                _ -> ""
+              end
 
-    if upload = params["upload"] do
-      case File.read(upload.path) do
-        {:ok,text} -> add_new_client(text)
-        _ -> nil
+            _ ->
+              "Не могу загрузить файл #{upload.filename}"
+          end
+
+        text = params["text"] ->
+          case add_new_client(text) do
+            {:error, mes} -> mes
+            _ -> ""
+          end
       end
-    end
-
-    if text = params["text"] do
-      add_new_client(text)
-    end
 
     conn
-    |> redirect(to: Routes.new_node_path(conn, :index))
+    |> redirect(to: Routes.new_node_path(conn, :index, err_mes: mes))
   end
 
   defp add_new_client(text) do
-    IO.puts(text)
+    case AcariServer.Parser.client_list(text) do
+      {:ok, res, _, _, _, _} ->
+        res
+        |> Enum.map(fn kv_list ->
+          case kv_list
+               |> Enum.map(fn [k, v] ->
+                 {to_string(k), to_string(v)}
+               end)
+               |> Enum.into(%{})
+               |> find_id() do
+            {:ok, params} ->
+              with env = %{id: id} <- params,
+                   :ok <- new_dev?(id),
+                   {:ok, _} <-
+                     AcariServer.NewNodeDiscovery.insert_or_update_new_node(%{
+                       name: id,
+                       ip_addr: "localhost",
+                       params: env,
+                       source: "upload"
+                     }) do
+                nil
+              else
+                {:error, %{errors: err}} -> {:error, "Ошибка БД: #{inspect(err)}"}
+                {:error, message} -> {:error, "#{kv_list_to_string(kv_list)}: #{message}"}
+              end
+
+            {:error, mes} ->
+              {:error, "#{kv_list_to_string(kv_list)}: #{mes}"}
+          end
+        end)
+        |> Enum.reduce(nil, fn
+          {:error, mes}, acc ->
+            case acc do
+              {:error, message} ->
+                {:error, message <> "\n#{mes}"}
+
+              nil ->
+                {:error, mes}
+            end
+
+          _, acc ->
+            acc
+        end)
+
+      {:error, _mes, rest, _, _, _} ->
+        {:error, "Синтаксическая ошибка около\n...#{rest |> String.slice(0, 128)}"}
+    end
+  end
+
+  defp kv_list_to_string(kv_list) do
+    kv_list
+    |> Enum.map(fn [k, v] ->
+      "#{k}=#{v}"
+    end)
+    |> Enum.join(",")
   end
 end
