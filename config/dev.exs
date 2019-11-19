@@ -80,8 +80,8 @@ config :acari_server, AcariServer.Repo,
 
 
 config :acari_server, AcariServer.RepoManager,
-  rw: "localhost",
-  ro: "localhost"
+  rw: "10.0.10.10:55432,10.0.10.3:55432",
+  ro: "10.0.10.3:55432,10.0.10.10:55432"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 
