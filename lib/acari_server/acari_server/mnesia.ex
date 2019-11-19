@@ -129,6 +129,17 @@ defmodule AcariServer.Mnesia do
   def update_servers_list(servers_db, first \\ nil) do
     node_list = [node() | Node.list()]
 
+    # add ram copies
+    if servers_db do
+      servers_db
+      |> Enum.each(fn %{system_name: system_name} ->
+        Attr.table_list()
+        |> Enum.each(fn tab ->
+          Mnesia.add_table_copy(tab, String.to_atom(system_name), :ram_copies)
+        end)
+      end)
+    end
+
     Mnesia.transaction(fn ->
       servers_db = servers_db || match_clean(:server)
 
