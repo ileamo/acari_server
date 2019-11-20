@@ -1,6 +1,7 @@
 defmodule AcariServer.RepoManager do
   use GenServer
   alias Ecto.Adapters.SQL
+  alias AcariServer.Mnesia
   require Logger
   @reconnect_timeout 5_000
 
@@ -49,6 +50,8 @@ defmodule AcariServer.RepoManager do
       _ -> Process.send_after(self(), {:connect_db, :rw}, @reconnect_timeout)
     end
 
+    Mnesia.server_and_db_alert()
+
     {:noreply, %State{state | rw: state.rw |> Map.merge(%{pid: pid, config: host_port})}}
   end
 
@@ -66,6 +69,8 @@ defmodule AcariServer.RepoManager do
       _ ->
         Process.send_after(self(), {:connect_db, :ro}, @reconnect_timeout)
     end
+
+    Mnesia.server_and_db_alert()
 
     {:noreply, %State{state | ro: state.ro |> Map.merge(%{pid: pid, config: host_port})}}
   end

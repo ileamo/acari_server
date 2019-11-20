@@ -170,6 +170,7 @@ defmodule AcariServer.Mnesia do
     end)
 
     set_tun_distr()
+    server_and_db_alert()
 
     if is_master_server() do
       redistribute_tun()
@@ -178,9 +179,7 @@ defmodule AcariServer.Mnesia do
         Task.start(fn ->
           Process.sleep(1000)
 
-          AcariServerWeb.Endpoint.broadcast!("room:lobby", "link_event", %{
-            reload: true
-          })
+          server_and_db_alert()
         end)
       end
     end
@@ -727,6 +726,17 @@ defmodule AcariServer.Mnesia do
     Endpoint.broadcast!("room:lobby", "link_event", %{
       sessions: sessions_html
     })
+  end
+
+  def server_and_db_alert() do
+    Task.start(fn ->
+      alert_html =
+        Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "alert_server_db.html", [])
+
+      AcariServerWeb.Endpoint.broadcast!("room:lobby", "link_event", %{
+        alert: alert_html
+      })
+    end)
   end
 
   # client_status

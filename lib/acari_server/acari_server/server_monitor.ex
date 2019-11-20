@@ -27,20 +27,12 @@ defmodule AcariServer.ServerMonitor do
     Mnesia.update_servers_list()
     Mnesia.delete_server(node)
 
-    AcariServerWeb.Endpoint.broadcast!("room:lobby", "link_event", %{
-      reload: true
-    })
-
     {:noreply, state}
   end
 
   def handle_info({:nodeup, node}, state) do
     Logger.info("Server monitor: Node #{node} is UP")
     Mnesia.update_servers_list()
-
-    AcariServerWeb.Endpoint.broadcast!("room:lobby", "link_event", %{
-      reload: true
-    })
 
     {:noreply, state}
   end

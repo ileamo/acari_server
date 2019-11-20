@@ -72,6 +72,7 @@ let messagesContainer = document.querySelector("#event-log")
 let statisticsContainer = document.querySelector("#statistics")
 let progressContainer = document.querySelector("#progress")
 let sessionsContainer = document.querySelector("#sessions")
+let alertContainer = document.querySelector("#alert-server-bd")
 
 channel.on("link_event", payload => {
   if (payload.reload) {
@@ -79,6 +80,9 @@ channel.on("link_event", payload => {
   } else if (payload.redraw_chart) {
     make_chart()
   } else {
+    if (alertContainer && ("alert" in payload)) {
+      alertContainer.innerHTML = `${payload.alert}`
+    }
     if (statisticsContainer && payload.statistics) {
       statisticsContainer.innerHTML = `${payload.statistics}`
     }

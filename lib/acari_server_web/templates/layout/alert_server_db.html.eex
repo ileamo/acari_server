@@ -1,0 +1,25 @@
+<% dsl = AcariServer.Mnesia.get_down_servers()
+   usl = AcariServer.Mnesia.get_unregistered_servers()
+   db_conn = AcariServer.RepoManager.get_db_conn()
+%>
+<%= if dsl != [] or usl != [] or db_conn[:rw] == nil or db_conn[:ro] == nil do %>
+  <p class="alert alert-danger" role="alert">
+    <%= if db_conn[:rw] == nil do %>
+      Нет соединения с главной БД</br>
+    <% end %>
+    <%= if db_conn[:ro] == nil do %>
+      Нет соединения с БД для чтения</br>
+    <% end %>
+    <%= if dsl != [] do %>
+      <%= for ser <- dsl do %>
+      Сервер <%= ser %> не работает</br>
+      <% end %>
+      <%= if usl != [] do %>
+        </br>
+      <% end %>
+    <% end %>
+    <%= if usl != [] do %>
+      Обнаружены незарегистртрованные сервера: <%= usl |> Enum.join(", ") %>
+    <% end %>
+  </p>
+<% end %>
