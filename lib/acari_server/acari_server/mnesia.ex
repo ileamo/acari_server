@@ -121,6 +121,8 @@ defmodule AcariServer.Mnesia do
       server_list =
         servers_db
         |> Enum.map(fn %{system_name: system_name} -> String.to_atom(system_name) end)
+        |> Enum.concat([Node.self() | Node.list()])
+        |> Enum.uniq()
         |> IO.inspect(label: "server list")
 
       Attr.table_list()
