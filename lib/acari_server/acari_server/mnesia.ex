@@ -116,28 +116,20 @@ defmodule AcariServer.Mnesia do
 
     # add ram copies
     if servers_db do
-      IO.inspect(Mnesia.info(), label: "Info before")
-
       server_list =
         servers_db
         |> Enum.map(fn %{system_name: system_name} -> String.to_atom(system_name) end)
+        # TODO Надо копировать данные в неизвестный сервер?
         |> Enum.concat([Node.self() | Node.list()])
         |> Enum.uniq()
-        |> IO.inspect(label: "server list")
 
       Attr.table_list()
       |> Enum.each(fn tab ->
-        ram_copies =
-          Mnesia.table_info(tab, :ram_copies)
-          |> IO.inspect(label: "ram_copies: #{tab}")
+        ram_copies = Mnesia.table_info(tab, :ram_copies)
 
-        new =
-          (server_list -- ram_copies)
-          |> IO.inspect(label: "new")
+        new = server_list -- ram_copies
 
-        old =
-          (ram_copies -- server_list)
-          |> IO.inspect(label: "old")
+        old = ram_copies -- server_list
 
         new
         |> Enum.each(fn node ->
@@ -147,11 +139,8 @@ defmodule AcariServer.Mnesia do
         old
         |> Enum.each(fn node ->
           Mnesia.del_table_copy(tab, node)
-          |> IO.inspect()
         end)
       end)
-
-      IO.inspect(Mnesia.info(), label: "Info after")
     end
 
     Mnesia.transaction(fn ->
