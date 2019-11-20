@@ -112,46 +112,47 @@ defmodule AcariServer.Mnesia do
   end
 
   def update_servers_list(servers_db, first \\ nil) do
-    Mnesia.transaction(fn ->
-      node_list = [node() | Node.list()]
+    node_list = [node() | Node.list()]
 
-      # add ram copies
-      if servers_db do
-        IO.inspect(Mnesia.info(), label: "Info before")
+    # add ram copies
+    if servers_db do
+      IO.inspect(Mnesia.info(), label: "Info before")
 
-        server_list =
-          servers_db
-          |> Enum.map(fn %{system_name: system_name} -> String.to_atom(system_name) end)
-          |> IO.inspect(label: "server list")
+      server_list =
+        servers_db
+        |> Enum.map(fn %{system_name: system_name} -> String.to_atom(system_name) end)
+        |> IO.inspect(label: "server list")
 
-        Attr.table_list()
-        |> Enum.each(fn tab ->
-          ram_copies =
-            Mnesia.table_info(tab, :ram_copies)
-            |> IO.inspect(label: "ram_copies: #{tab}")
+      Attr.table_list()
+      |> Enum.each(fn tab ->
+        ram_copies =
+          Mnesia.table_info(tab, :ram_copies)
+          |> IO.inspect(label: "ram_copies: #{tab}")
 
-          new =
-            (server_list -- ram_copies)
-            |> IO.inspect(label: "new")
+        new =
+          (server_list -- ram_copies)
+          |> IO.inspect(label: "new")
 
-          old =
-            (ram_copies -- server_list)
-            |> IO.inspect(label: "old")
+        old =
+          (ram_copies -- server_list)
+          |> IO.inspect(label: "old")
 
-          new
-          |> Enum.each(fn node ->
-            Mnesia.add_table_copy(tab, node, :ram_copies)
-          end)
-
-          old
-          |> Enum.each(fn node ->
-            Mnesia.del_table_copy(tab, node)
-          end)
+        new
+        |> Enum.each(fn node ->
+          Mnesia.add_table_copy(tab, node, :ram_copies)
         end)
 
-        IO.inspect(Mnesia.info(), label: "Info after")
-      end
+        old
+        |> Enum.each(fn node ->
+          Mnesia.del_table_copy(tab, node)
+          |> IO.inspect()
+        end)
+      end)
 
+      IO.inspect(Mnesia.info(), label: "Info after")
+    end
+
+    Mnesia.transaction(fn ->
       servers_db = servers_db || match_clean(:server)
 
       Mnesia.foldl(
