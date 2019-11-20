@@ -111,36 +111,47 @@ defmodule AcariServer.Mnesia do
     update_servers_list(servers_db)
   end
 
-  def update_servers_list(:delay) do
-    Task.start(fn ->
-      Process.sleep(1000)
-
-      servers_db =
-        try do
-          AcariServer.ServerManager.list_servers()
-        rescue
-          _ -> nil
-        end
-
-      update_servers_list(servers_db)
-    end)
-  end
-
   def update_servers_list(servers_db, first \\ nil) do
-    node_list = [node() | Node.list()]
+    Mnesia.transaction(fn ->
+      node_list = [node() | Node.list()]
 
-    # add ram copies
-    if servers_db do
-      servers_db
-      |> Enum.each(fn %{system_name: system_name} ->
+      # add ram copies
+      if servers_db do
+        IO.inspect(Mnesia.info(), label: "Info before")
+
+        server_list =
+          servers_db
+          |> Enum.map(fn %{system_name: system_name} -> String.to_atom(system_name) end)
+          |> IO.inspect(label: "server list")
+
         Attr.table_list()
         |> Enum.each(fn tab ->
-          Mnesia.add_table_copy(tab, String.to_atom(system_name), :ram_copies)
-        end)
-      end)
-    end
+          ram_copies =
+            Mnesia.table_info(tab, :ram_copies)
+            |> IO.inspect(label: "ram_copies: #{tab}")
 
-    Mnesia.transaction(fn ->
+          new =
+            (server_list -- ram_copies)
+            |> IO.inspect(label: "new")
+
+          old =
+            (ram_copies -- server_list)
+            |> IO.inspect(label: "old")
+
+          new
+          |> Enum.each(fn node ->
+            Mnesia.add_table_copy(tab, node, :ram_copies)
+          end)
+
+          old
+          |> Enum.each(fn node ->
+            Mnesia.del_table_copy(tab, node)
+          end)
+        end)
+
+        IO.inspect(Mnesia.info(), label: "Info after")
+      end
+
       servers_db = servers_db || match_clean(:server)
 
       Mnesia.foldl(

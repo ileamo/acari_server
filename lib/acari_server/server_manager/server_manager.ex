@@ -52,10 +52,12 @@ defmodule AcariServer.ServerManager do
 
   """
   def create_server(attrs \\ %{}) do
-    res = %Server{}
-    |> Server.changeset(attrs)
-    |> Repo.insert()
-    Mnesia.update_servers_list(:delay)
+    res =
+      %Server{}
+      |> Server.changeset(attrs)
+      |> Repo.insert()
+
+    Mnesia.update_servers_list(Repo.all(Server))
     res
   end
 
@@ -72,10 +74,12 @@ defmodule AcariServer.ServerManager do
 
   """
   def update_server(%Server{} = server, attrs) do
-    res = server
-    |> Server.changeset(attrs)
-    |> Repo.update()
-    Mnesia.update_servers_list(:delay)
+    res =
+      server
+      |> Server.changeset(attrs)
+      |> Repo.update()
+
+    Mnesia.update_servers_list(Repo.all(Server))
     res
   end
 
@@ -93,7 +97,7 @@ defmodule AcariServer.ServerManager do
   """
   def delete_server(%Server{} = server) do
     res = Repo.delete_wait(server)
-    Mnesia.update_servers_list()
+    Mnesia.update_servers_list(Repo.all(Server))
     res
   end
 
