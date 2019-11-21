@@ -117,7 +117,7 @@ defmodule AcariServer.Master do
   end
 
   defp exec_server_method(state, tun_name, "put.data", %{"id" => script_id, "data" => data}) do
-    #Logger.info("Get script data #{data}")
+    # Logger.info("Get script data #{data}")
     set_script(tun_name, script_id, data)
     state
   end
@@ -139,7 +139,7 @@ defmodule AcariServer.Master do
   end
 
   defp set_sslink_up(tun_name, sslink_name, link_state) do
-    with tun_state = %TunState{} <- :ets.lookup_element(:tuns, tun_name, 4),
+    with [{_, _, _, tun_state = %TunState{}}] <- :ets.lookup(:tuns, tun_name),
          tun_state <-
            tun_state
            |> update_in([Access.key!(:sslinks), sslink_name], fn
@@ -322,10 +322,10 @@ defmodule AcariServer.Master do
            env: env
          ) do
       {data, _code} ->
-          AcariServer.Mnesia.update_tun_srv_state(tun_name, templ_name, Node.self(), %{
-            timestamp: :os.system_time(:second),
-            data: data
-          })
+        AcariServer.Mnesia.update_tun_srv_state(tun_name, templ_name, Node.self(), %{
+          timestamp: :os.system_time(:second),
+          data: data
+        })
 
       _ ->
         nil

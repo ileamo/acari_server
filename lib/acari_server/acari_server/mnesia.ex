@@ -258,7 +258,7 @@ defmodule AcariServer.Mnesia do
              [] ->
                serv = get_best_server()
                kl = kl |> Keyword.put(:server_id, serv)
-               :ok = Mnesia.write(mk_record(:tun, kl))
+               :ok = Mnesia.write(Rec.tun(kl))
                serv
 
              [record] ->
@@ -560,15 +560,12 @@ defmodule AcariServer.Mnesia do
 
         _ ->
           Mnesia.write(
-            mk_record(
-              :client_status,
-              %{
-                name: tun,
-                timestamp: :os.system_time(:microsecond),
-                opts: %{
-                  level: level,
-                  text: mes
-                }
+            Rec.client_status(
+              name: tun,
+              timestamp: :os.system_time(:microsecond),
+              opts: %{
+                level: level,
+                text: mes
               }
             )
           )
@@ -809,15 +806,12 @@ defmodule AcariServer.Mnesia do
 
               _ ->
                 Mnesia.write(
-                  mk_record(
-                    :client_status,
-                    %{
-                      name: tun,
-                      timestamp: Rec.client_status(rec, :timestamp),
-                      opts: %{
-                        level: level,
-                        text: mes
-                      }
+                  Rec.client_status(
+                    name: tun,
+                    timestamp: Rec.client_status(rec, :timestamp),
+                    opts: %{
+                      level: level,
+                      text: mes
                     }
                   )
                 )

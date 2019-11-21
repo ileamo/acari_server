@@ -5,7 +5,7 @@
 # is restricted to this project.
 
 # General application configuration
-use Mix.Config
+import Config
 
 config :acari_server,
   ecto_repos: [AcariServer.Repo],
