@@ -38,7 +38,7 @@
         </div>
         <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
         <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-        <p class="mt-5 mb-3 text-muted">&copy; NSG 2018-2019</p>
+        <p class="mt-5 mb-3 text-muted">&copy; NSG 2018-<%= NaiveDateTime.utc_now().year %></p>
 
       <% end %>
     </dev>
