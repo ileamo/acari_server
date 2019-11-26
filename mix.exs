@@ -31,7 +31,10 @@ defmodule AcariServer.MixProject do
     ]
   end
 
-  def copy_extra_files(release) do
+  defp copy_extra_files(release) do
+    dst = release.path <> "/priv/usr"
+    File.mkdir_p!(dst)
+    File.cp_r!("priv/usr", dst)
     release
   end
 
@@ -80,10 +83,9 @@ defmodule AcariServer.MixProject do
       {:sandbox, "~> 0.5"},
       {:nimble_parsec, "~> 0.5"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
-      #{:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
+      # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
       {:tunctl, git: "https://github.com/msantos/tunctl.git"},
-      {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"
-    }
+      {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"}
     ]
   end
 
