@@ -30,7 +30,7 @@ if (osm) {
     markerColor: 'purple',
     prefix: 'fa',
     extraClasses: 'fas',
-    icon: 'cat',
+    icon: 'paw',
     //icon: 'hdd',
     //icon: 'broadcast-tower',
     //icon: 'money-check-alt',
@@ -47,7 +47,7 @@ if (osm) {
         markerColor: color,
         prefix: 'fa',
         extraClasses: 'fas',
-        icon: 'cat',
+        icon: 'paw',
         iconColor: '#000000',
       }));
   })
