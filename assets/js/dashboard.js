@@ -1,17 +1,15 @@
-
-
-$('#collapseMessages').on('hide.bs.collapse', function () {
+$('#collapseMessages').on('hide.bs.collapse', function() {
   sessionStorage.showMessages = 'hide';
 })
 
-$('#collapseMessages').on('show.bs.collapse', function () {
+$('#collapseMessages').on('show.bs.collapse', function() {
   sessionStorage.showMessages = 'show'
 })
 
 $('#collapseMessages').collapse(sessionStorage.showMessages || 'show')
 
 
-$(function () {
+$(function() {
   $('[data-toggle="popover"]').popover()
 })
 

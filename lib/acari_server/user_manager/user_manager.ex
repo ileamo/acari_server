@@ -44,7 +44,6 @@ defmodule AcariServer.UserManager do
   end
 
   def get_user(id) do
-
     RepoRO.get(User, id)
     |> RepoRO.preload(:groups_users)
   end
@@ -129,7 +128,6 @@ defmodule AcariServer.UserManager do
     User.changeset(user, %{})
   end
 
-
   def authenticate_user(username, plain_text_password) do
     query = from u in User, where: u.username == ^username
 
@@ -157,9 +155,22 @@ defmodule AcariServer.UserManager do
       %AcariServer.UserManager.User{} = user ->
         token = Phoenix.Token.sign(conn, "user token", user.id)
 
+        groups =
+          case user.is_admin do
+            true ->
+              AcariServer.GroupManager.list_groups()
+
+            false ->
+              user
+              |> AcariServer.RepoRO.preload(:groups)
+              |> Map.get(:groups)
+          end
+          |> Enum.sort_by(fn %{name: name} -> name end)
+
         conn
         |> Conn.assign(:current_user, user)
         |> Conn.assign(:user_token, token)
+        |> Conn.assign(:current_user_groups, groups)
 
       _ ->
         conn

@@ -46,7 +46,7 @@
       </div>
     </nav>
 
-    <div class="container-fluid">
+    <div class="container-fluid bogatka-main_container">
 
       <div class="row">
         <nav class="col-md-2 d-none d-md-block sidebar pr-0">
@@ -57,7 +57,7 @@
 
         <div class="col-md-10 ml-sm-auto px-4 bg-light pt-3 pb-3 flex-grow-1">
           <div class="row d-flex flex-wrap-reverse flex-lg-nowrap">
-            <main role="main" class="col-12 col-lg px-0 px-lg-4 mr-1" id="mainPage" style="overflow-x: auto">
+            <main role="main" class="col-12 col-lg px-0 px-lg-4 mr-1" id="mainPage" style="overflow-x: auto; padding-bottom: 600px; margin-bottom: -600px;">
 
               <div id="alert-server-bd">
                 <%= render "alert_server_db.html", assigns %>
