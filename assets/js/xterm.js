@@ -7,6 +7,7 @@ let term_parms = {
   cols: 80,
   rows: 25,
   fontSize: 17,
+  fontFamily: 'monospace',
   theme: {
     //background: '#002B36',
     background: '#073642',

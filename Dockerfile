@@ -40,7 +40,7 @@ RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
 libcap libcap-dev iproute2 openssh-client su-exec screen iputils
 
-RUN adduser -D app
+RUN adduser -D docker
 
 ARG APP_VERSION=0.0.0
 
@@ -54,7 +54,7 @@ COPY --from=build /build/_build/prod/rel/bogatka_docker ./
 #COPY priv/cert /etc/ssl/acari
 #RUN setcap cap_net_admin=ep /opt/app/erts-10.5.2/bin/beam.smp cap_net_admin=ep /sbin/ip
 
-USER app
+USER docker
 
 # Mutable Runtime Environment
 RUN mkdir /tmp/app
@@ -62,14 +62,15 @@ ENV RELEASE_MUTABLE_DIR /tmp/app
 ENV START_ERL_DATA /tmp/app/start_erl.data
 
 ENV SHELL /bin/bash
+COPY docker.bashrc /home/docker/.bashrc
 
 # RUN ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa
 
 USER root
 
-COPY priv/.ssh /home/app/.ssh
-RUN  chown -R app:app /home/app/.ssh
-RUN  chown -R app:app /opt/app
+COPY priv/.ssh /home/docker/.ssh
+RUN  chown -R docker:docker /home/docker/.ssh
+RUN  chown -R docker:docker /opt/app
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
