@@ -70,6 +70,8 @@ USER root
 
 COPY priv/.ssh /home/docker/.ssh
 RUN  chown -R docker:docker /home/docker/.ssh
+RUN  chmod 0600 /home/docker/.ssh/id_rsa
+RUN  chmod 0644 /home/docker/.ssh/id_rsa.pub
 RUN  chown -R docker:docker /opt/app
 
 COPY docker-entrypoint.sh /
