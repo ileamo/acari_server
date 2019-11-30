@@ -57,13 +57,13 @@ function startXterm() {
       channel.join()
       channel.on('output', ({
         output
-      }) => term.write(output)) // From the Channel
+      }) => term.write(Base64.decode(output))) // From the Channel
 
       term = new Terminal(term_parms);
 
       term.open(acari_xterm);
       term.on('data', (data) => channel.push('input', {
-        input: data
+        input: Base64.encode(data)
       })) // To the Channel
 
     }
@@ -95,14 +95,16 @@ function startServXterm() {
   channel.join()
   channel.on('output', ({
     output
-  }) => sterm.write(output)) // From the Channel
+  }) => sterm.write(Base64.decode(output))) // From the Channel
 
   term_parms.rows = 45
   sterm = new Terminal(term_parms);
 
   sterm.open(server_xterm);
-  sterm.on('data', (data) => channel.push('input', {
-    input: data
-  })) // To the Channel
+  sterm.on('data', (data) =>
+    channel.push('input', {
+      input: Base64.encode(data)
+    })
+  ) // To the Channel
 
 }

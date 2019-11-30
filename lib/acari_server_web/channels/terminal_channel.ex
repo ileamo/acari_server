@@ -48,12 +48,13 @@ defmodule AcariServerWeb.TerminalChannel do
   end
 
   def handle_in("input", %{"input" => input}, socket) do
+    {:ok, input} = Base.decode64(input)
     Terminal.send_input(socket.assigns[:terminal], input)
     {:noreply, socket}
   end
 
   def handle_info({:output, output}, socket) do
-    push(socket, "output", %{output: output})
+    push(socket, "output", %{output: Base.encode64(output)})
     {:noreply, socket}
   end
 end

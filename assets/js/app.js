@@ -15,6 +15,7 @@ import "popper.js"
 import "bootstrap/dist/js/bootstrap"
 
 import "chart.js"
+import "js-base64"
 //import "moment/min/moment.min.js"
 
 // Import local files
