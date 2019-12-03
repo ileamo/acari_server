@@ -258,7 +258,7 @@ defmodule AcariServer.Mnesia do
              [] ->
                serv = get_best_server()
                kl = kl |> Keyword.put(:server_id, serv)
-               :ok = Mnesia.write(Rec.tun(kl))
+               :ok = Mnesia.write(mk_record(:tun, kl))
                serv
 
              [record] ->
