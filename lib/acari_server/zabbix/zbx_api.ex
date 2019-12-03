@@ -239,26 +239,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  defp zabbix_sender(state, host, key, value) do
-    Task.start(fn ->
-      case System.cmd("zabbix_sender", [
-             "-z",
-             state.zbx_snd_host,
-             "-p",
-             to_string(state.zbx_snd_port),
-             "-s",
-             host,
-             "-k",
-             key,
-             "-o",
-             to_string(value)
-           ]) do
-        {res, 0} -> Logger.debug("zabbix_sender: #{host}:#{key}=#{value}\n#{res}")
-        {err, code} -> Logger.debug("zabbix_sender exits with code #{code}, output: #{err}")
-      end
-    end)
-  end
-
   @impl true
   def handle_cast({:send, host, key, value}, state) do
     state = add_host_if_not_exists(state, host)
@@ -270,6 +250,28 @@ defmodule AcariServer.Zabbix.ZbxApi do
     zabbix_sender(state, "acari_master", key, value)
     {:noreply, state}
   end
+
+  defp zabbix_sender(state, host, key, value) do
+    value = ZabbixSender.Protocol.value(host, key, value, nil)
+
+    request =
+      ZabbixSender.Protocol.encode_request([value], nil)
+      |> ZabbixSender.Serializer.serialize()
+
+      with {:ok, response} <- ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port),
+      {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
+      {:ok, decoded} <- ZabbixSender.Protocol.decode_response(deserialized) do
+        if decoded.failed == 0 do
+          Logger.debug("zabbix_sender: #{decoded.processed} values processed")
+        else
+          Logger.warn(
+          "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
+          )
+        end
+      else
+        res -> Logger.error("zabbix_sender: #{inspect(res)}")
+      end
+    end
 
   # API
   def zbx_send(host, key, value) do

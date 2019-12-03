@@ -51,4 +51,5 @@
   "temp": {:hex, :temp, "0.4.7", "2c78482cc2294020a4bc0c95950b907ff386523367d4e63308a252feffbea9f2", [:mix], [], "hexpm"},
   "tunctl": {:git, "https://github.com/msantos/tunctl.git", "631bb8e42acbee2a4372dca91bb2e577708f655b", []},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.4.1", "d869e4c68901dd9531385bb0c8c40444ebf624e60b6962d95952775cac5e90cd", [:rebar3], [], "hexpm"},
+  "zabbix_sender": {:hex, :zabbix_sender, "1.0.0", "0d10a027130dc390be109f143b08c80be7dcc6663271053f29a6c3a25b0bb491", [:mix], [{:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm"},
 }

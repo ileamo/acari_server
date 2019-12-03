@@ -91,9 +91,9 @@ config :acari_server, AcariServer.Listener,
   certfile: "priv/cert/selfsigned.pem"
 
 config :acari_server, :zabbix,
-  zbx_ext_url: "https://10.33.33.31:10443",
+  zbx_ext_url: "https://10.0.10.155:4443",
   zbx_web_port: nil,
-  #zbx_api_url: "http://10.0.10.155:4080",
+  zbx_api_url: "http://10.0.10.155:4080",
   zbx_snd_host: "10.0.10.155",
   zbx_username: "Admin",
   zbx_password: "IMo19-0708"
