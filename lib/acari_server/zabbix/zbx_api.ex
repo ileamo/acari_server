@@ -2,6 +2,17 @@ defmodule AcariServer.Zabbix.ZbxApi do
   require Logger
   use GenServer
 
+  @send_max_delay 3_000
+  @send_delay 500
+
+  defmodule Sender do
+    defstruct [
+      :timer_ref,
+      :snd_time,
+      value_list: []
+    ]
+  end
+
   defmodule State do
     defstruct [
       :zbx_api_url,
@@ -12,7 +23,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
       :auth,
       :hostgroup_id,
       :template_id,
-      hosts: %{}
+      hosts: %{},
+      sender: %Sender{}
     ]
   end
 
@@ -243,35 +255,57 @@ defmodule AcariServer.Zabbix.ZbxApi do
   def handle_cast({:send, host, key, value}, state) do
     state = add_host_if_not_exists(state, host)
     zabbix_sender(state, host, key, value)
-    {:noreply, state}
   end
 
   def handle_cast({:send_master, key, value}, state) do
     zabbix_sender(state, "acari_master", key, value)
-    {:noreply, state}
   end
 
-  defp zabbix_sender(state, host, key, value) do
+  @impl true
+  def handle_info(:time_to_send, state) do
+    zabbix_sender(state)
+  end
+
+  defp zabbix_sender(%{sender: sender} = state, host, key, value) do
     value = ZabbixSender.Protocol.value(host, key, value, nil)
 
+    ts =
+      :erlang.system_time(:millisecond)
+
+    snd_time = sender.snd_time || ts + @send_max_delay
+    delay = min(@send_delay, snd_time - ts)
+    delay = (delay < 0 && 0) || delay
+
+    if is_reference(sender.timer_ref), do: Process.cancel_timer(sender.timer_ref)
+
+    ref = Process.send_after(self(), :time_to_send, delay)
+    sender = %Sender{timer_ref: ref, snd_time: snd_time, value_list: [value | sender.value_list]}
+    {:noreply, %State{state | sender: sender}}
+  end
+
+  defp zabbix_sender(%{sender: sender} = state) do
+    :erlang.system_time(:millisecond)
+
     request =
-      ZabbixSender.Protocol.encode_request([value], nil)
+      ZabbixSender.Protocol.encode_request(sender.value_list, nil)
       |> ZabbixSender.Serializer.serialize()
 
-      with {:ok, response} <- ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port),
-      {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
-      {:ok, decoded} <- ZabbixSender.Protocol.decode_response(deserialized) do
-        if decoded.failed == 0 do
-          Logger.debug("zabbix_sender: #{decoded.processed} values processed")
-        else
-          Logger.warn(
-          "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
-          )
-        end
+    with {:ok, response} <- ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port),
+         {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
+         {:ok, decoded} <- ZabbixSender.Protocol.decode_response(deserialized) do
+      if decoded.failed == 0 do
+        Logger.debug("zabbix_sender: #{decoded.processed} values processed")
       else
-        res -> Logger.error("zabbix_sender: #{inspect(res)}")
+        Logger.warn(
+          "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
+        )
       end
+    else
+      res -> Logger.error("zabbix_sender: #{inspect(res)}")
     end
+
+    {:noreply, %State{state | sender: %Sender{}}}
+  end
 
   # API
   def zbx_send(host, key, value) do
