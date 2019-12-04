@@ -70,15 +70,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
          hosts <-
            hosts
            |> Enum.map(fn %{"host" => host_name, "hostid" => host_id} ->
-             {:ok, items} = get_host_items(host_id)
-
-             items =
-               items
-               |> Enum.map(fn %{"key_" => key} = item ->
-                 nil
-                 {key, item}
-               end)
-               |> Enum.into(%{})
+             items = get_host_items(host_id)
 
              {host_name, %{hostid: host_id, items: items}}
            end)
@@ -129,10 +121,21 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defp get_host_items(host_id) do
-    zbx_post(
-      "item.get",
-      %{hostids: host_id, output: ["key_", "value_type"]}
-    )
+    case zbx_post(
+           "item.get",
+           %{hostids: host_id, output: ["key_", "value_type"]}
+         ) do
+      {:ok, items} ->
+        items
+        |> Enum.map(fn %{"key_" => key} = item ->
+          nil
+          {key, item}
+        end)
+        |> Enum.into(%{})
+
+      _ ->
+        %{}
+    end
   end
 
   defp add_host_if_not_exists(state, host_name) do
@@ -140,7 +143,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
       nil ->
         case get_host(host_name) do
           {:ok, [%{"host" => host_name, "hostid" => host_id}]} ->
-            put_in(state, [Access.key(:hosts), host_name], %{hostid: host_id, items: %{}})
+            put_in(state, [Access.key(:hosts), host_name], %{
+              hostid: host_id,
+              items: get_host_items(host_id)
+            })
 
           _ ->
             add_host(state, host_name)
@@ -179,7 +185,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
     case zbx_post("host.create", request) do
       {:ok, %{"hostids" => [host_id]}} ->
-        put_in(state, [Access.key(:hosts), host_name], %{hostid: host_id, items: %{}})
+        put_in(state, [Access.key(:hosts), host_name], %{
+          hostid: host_id,
+          items: get_host_items(host_id)
+        })
 
       _ ->
         state
@@ -213,6 +222,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
           {:ok, %{"hostids" => list}} ->
             hosts
             |> Enum.reject(fn {_name, %{hostid: host_id}} -> Enum.member?(list, host_id) end)
+            |> Enum.into(%{})
 
           {:error, res} ->
             Logger.error("Can't delete unconfigured hosts: #{inspect(res)}")
@@ -250,7 +260,15 @@ defmodule AcariServer.Zabbix.ZbxApi do
   @impl true
   def handle_cast({:send, host, key, value}, state) do
     state = add_host_if_not_exists(state, host)
-    zabbix_sender(state, host, key, value)
+
+    case state.hosts[host][:items][key] do
+      nil ->
+        Logger.warn("Zabbix sender: bad key '#{key}' for host #{host}")
+        {:noreply, state}
+
+      _ ->
+        zabbix_sender(state, host, key, value)
+    end
   end
 
   def handle_cast({:send_master, key, value}, state) do
