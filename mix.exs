@@ -82,6 +82,7 @@ defmodule AcariServer.MixProject do
       {:httpoison, "~> 1.5"},
       {:sandbox, "~> 0.5"},
       {:nimble_parsec, "~> 0.5"},
+      {:zabbix, "~> 0.1.0"},
       {:zabbix_sender, "~> 1.0.0"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},

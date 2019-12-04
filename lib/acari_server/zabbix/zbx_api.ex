@@ -46,7 +46,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
         {:ok,
          %State{
-           zbx_api_url: url <> "/api_jsonrpc.php",
+           zbx_api_url: url,
            zbx_snd_host: zbx_snd_host,
            zbx_snd_port: zbx_snd_port,
            zbx_username: zbx_username,
@@ -61,15 +61,16 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   @impl true
   def handle_continue(:init, state) do
-    with {:ok, auth} <- zbx_auth(state),
+    with :ok <- Zabbix.API.create_client(state.zbx_api_url),
+         {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password),
          state <- %State{state | auth: auth},
-         {:ok, [%{"groupid" => hostgroup_id}]} <- get_hostgroup_id(state),
-         {:ok, [%{"templateid" => template_id}]} <- get_template_id(state),
-         {:ok, hosts} <- get_hosts(state, hostgroup_id),
+         {:ok, [%{"groupid" => hostgroup_id}]} <- get_hostgroup_id(),
+         {:ok, [%{"templateid" => template_id}]} <- get_template_id(),
+         {:ok, hosts} <- get_hosts(hostgroup_id),
          hosts <-
            hosts
            |> Enum.map(fn %{"host" => host_name, "hostid" => host_id} ->
-             {:ok, items} = get_host_items(state, host_id)
+             {:ok, items} = get_host_items(host_id)
 
              items =
                items
@@ -82,6 +83,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
              {host_name, %{hostid: host_id, items: items}}
            end)
            |> Enum.into(%{}) do
+      Logger.info("Zabbix API successfully init")
+      IO.inspect(hosts)
       {:noreply,
        %State{
          state
@@ -92,83 +95,48 @@ defmodule AcariServer.Zabbix.ZbxApi do
        }}
     else
       res ->
-        Logger.error("Can't init zbx_api(#{state.zbx_api_url}): #{inspect(res)}")
+        Logger.error("Can't init zabbix API(#{state.zbx_api_url}): #{inspect(res)}")
         Process.sleep(60_000)
         {:stop, :shutdown, state}
     end
   end
 
-  defp request(method, params, auth) do
-    {:ok, json} =
-      Jason.encode(%{
-        jsonrpc: "2.0",
-        method: method,
-        params: params,
-        id: 1,
-        auth: auth
-      })
-
-    json
+  def get_hostgroup_id() do
+    zbx_post("hostgroup.get", %{output: ["extend"], filter: %{name: ["acari_clients"]}})
   end
 
-  def zbx_auth(state) do
+  def get_template_id() do
     zbx_post(
-      state.zbx_api_url,
-      "user.login",
-      %{user: state.zbx_username, password: state.zbx_password},
-      nil
-    )
-  end
-
-  def get_hostgroup_id(state) do
-    zbx_post(
-      state.zbx_api_url,
-      "hostgroup.get",
-      %{output: ["extend"], filter: %{name: ["acari_clients"]}},
-      state.auth
-    )
-  end
-
-  def get_template_id(state) do
-    zbx_post(
-      state.zbx_api_url,
       "template.get",
-      %{output: ["extend"], filter: %{host: ["acari_client"]}},
-      state.auth
+      %{output: ["extend"], filter: %{host: ["acari_client"]}}
     )
   end
 
-  def get_hosts(state, hostgroup_id) do
+  def get_hosts(hostgroup_id) do
     zbx_post(
-      state.zbx_api_url,
       "host.get",
-      %{output: ["host"], groupids: [hostgroup_id]},
-      state.auth
+      %{output: ["host"], groupids: [hostgroup_id]}
     )
   end
 
-  def get_host(state, host_name) do
+  def get_host(host_name) do
     zbx_post(
-      state.zbx_api_url,
       "host.get",
-      %{output: ["host", "hostid"], filter: %{host: [host_name]}},
-      state.auth
+      %{output: ["host", "hostid"], filter: %{host: [host_name]}}
     )
   end
 
-  def get_host_items(state, host_id) do
+  def get_host_items(host_id) do
     zbx_post(
-      state.zbx_api_url,
       "item.get",
-      %{hostids: host_id, output: ["key_", "value_type"]},
-      state.auth
+      %{hostids: host_id, output: ["key_", "value_type"]}
     )
   end
 
   def add_host_if_not_exists(state, host_name) do
     case state.hosts[host_name] do
       nil ->
-        case get_host(state, host_name) do
+        case get_host(host_name) do
           {:ok, [%{"host" => host_name, "hostid" => host_id}]} ->
             put_in(state, [Access.key(:hosts), host_name], %{hostid: host_id, items: %{}})
 
@@ -207,7 +175,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
       inventory_mode: 1
     }
 
-    case zbx_post(state.zbx_api_url, "host.create", request, state.auth) do
+    case zbx_post("host.create", request) do
       {:ok, %{"hostids" => [host_id]}} ->
         put_in(state, [Access.key(:hosts), host_name], %{hostid: host_id, items: %{}})
 
@@ -216,17 +184,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  defp zbx_post(zbx_api_url, method, params, auth) do
-    with request <- request(method, params, auth),
-         {:ok, %{status_code: 200, body: body_json}} <-
-           HTTPoison.post(
-             zbx_api_url,
-             request,
-             [
-               {"Content-Type", "application/json-rpc"}
-             ]
-           ),
-         {:ok, %{"result" => result}} <- Jason.decode(body_json) do
+  defp zbx_post(method, params) do
+    with {:ok, %{"result" => result}} <- Zabbix.API.call(method, params) do
       {:ok, result}
     else
       {:ok, %{"error" => error}} ->
@@ -269,8 +228,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
   defp zabbix_sender(%{sender: sender} = state, host, key, value) do
     value = ZabbixSender.Protocol.value(host, key, value, nil)
 
-    ts =
-      :erlang.system_time(:millisecond)
+    ts = :erlang.system_time(:millisecond)
 
     snd_time = sender.snd_time || ts + @send_max_delay
     delay = min(@send_delay, snd_time - ts)
