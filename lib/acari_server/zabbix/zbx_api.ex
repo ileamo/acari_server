@@ -84,7 +84,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
            end)
            |> Enum.into(%{}) do
       Logger.info("Zabbix API successfully init")
-      IO.inspect(hosts)
+
+      hosts = del_unconfigured_hosts(hosts)
+
       {:noreply,
        %State{
          state
@@ -101,39 +103,39 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  def get_hostgroup_id() do
+  defp get_hostgroup_id() do
     zbx_post("hostgroup.get", %{output: ["extend"], filter: %{name: ["acari_clients"]}})
   end
 
-  def get_template_id() do
+  defp get_template_id() do
     zbx_post(
       "template.get",
       %{output: ["extend"], filter: %{host: ["acari_client"]}}
     )
   end
 
-  def get_hosts(hostgroup_id) do
+  defp get_hosts(hostgroup_id) do
     zbx_post(
       "host.get",
       %{output: ["host"], groupids: [hostgroup_id]}
     )
   end
 
-  def get_host(host_name) do
+  defp get_host(host_name) do
     zbx_post(
       "host.get",
       %{output: ["host", "hostid"], filter: %{host: [host_name]}}
     )
   end
 
-  def get_host_items(host_id) do
+  defp get_host_items(host_id) do
     zbx_post(
       "item.get",
       %{hostids: host_id, output: ["key_", "value_type"]}
     )
   end
 
-  def add_host_if_not_exists(state, host_name) do
+  defp add_host_if_not_exists(state, host_name) do
     case state.hosts[host_name] do
       nil ->
         case get_host(host_name) do
@@ -149,7 +151,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  def add_host(state, host_name) do
+  defp add_host(state, host_name) do
     request = %{
       host: host_name,
       interfaces: [
@@ -181,6 +183,41 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
       _ ->
         state
+    end
+  end
+
+  defp del_hosts(host_id_list) do
+    zbx_post("host.delete", host_id_list)
+  end
+
+  defp del_unconfigured_hosts(hosts) do
+    node_name_list =
+      AcariServer.NodeManager.list_nodes_wo_preload()
+      |> Enum.map(fn %{name: name} -> name end)
+
+    host_id_list =
+      hosts
+      |> Enum.reduce([], fn {name, %{hostid: host_id}}, acc ->
+        case Enum.member?(node_name_list, name) do
+          false -> [host_id | acc]
+          _ -> acc
+        end
+      end)
+
+    case host_id_list do
+      [] ->
+        hosts
+
+      list ->
+        case del_hosts(list) do
+          {:ok, %{"hostids" => list}} ->
+            hosts
+            |> Enum.reject(fn {_name, %{hostid: host_id}} -> Enum.member?(list, host_id) end)
+
+          {:error, res} ->
+            Logger.error("Can't delete unconfigured hosts: #{inspect(res)}")
+            hosts
+        end
     end
   end
 
@@ -218,6 +255,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def handle_cast({:send_master, key, value}, state) do
     zabbix_sender(state, "acari_master", key, value)
+  end
+
+  def handle_cast(:del_sync, state) do
+    {:noreply, %State{state | hosts: del_unconfigured_hosts(state.hosts)}}
   end
 
   @impl true
@@ -272,5 +313,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_send_master(key, value) do
     GenServer.cast(__MODULE__, {:send_master, key, value})
+  end
+
+  def zbx_sync_deleted_hosts() do
+    GenServer.cast(__MODULE__, :del_sync)
   end
 end

@@ -25,10 +25,11 @@ defmodule AcariServer.NodeManager do
   end
 
   def list_nodes(user) do
-    user = case user do
-      %AcariServer.UserManager.User{} -> user
-      _ -> AcariServer.UserManager.get_user!(user, :clean)
-    end
+    user =
+      case user do
+        %AcariServer.UserManager.User{} -> user
+        _ -> AcariServer.UserManager.get_user!(user, :clean)
+      end
 
     case user.is_admin do
       true ->
@@ -143,7 +144,9 @@ defmodule AcariServer.NodeManager do
 
   """
   def delete_node(%Node{} = node) do
-    Repo.delete_wait(node)
+    res = Repo.delete_wait(node)
+    AcariServer.Zabbix.ZbxApi.zbx_sync_deleted_hosts()
+    res
   end
 
   @doc """
