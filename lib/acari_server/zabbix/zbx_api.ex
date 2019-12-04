@@ -4,6 +4,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   @send_max_delay 3_000
   @send_delay 500
+  @group_prefix "bg."
 
   defmodule Sender do
     defstruct [
@@ -104,6 +105,20 @@ defmodule AcariServer.Zabbix.ZbxApi do
       "template.get",
       %{output: ["extend"], filter: %{host: ["acari_client"]}}
     )
+  end
+
+  defp get_bg_groups() do
+    case zbx_post("hostgroup.get", %{}) do
+      {:ok, list} ->
+        list
+        |> Enum.filter(fn
+          %{"name" => @group_prefix <> _name} -> true
+          _ -> false
+        end)
+
+      _ ->
+        []
+    end
   end
 
   defp get_hosts(hostgroup_id) do
@@ -229,6 +244,39 @@ defmodule AcariServer.Zabbix.ZbxApi do
             hosts
         end
     end
+  end
+
+  def zbx_groups_sync() do
+    groups = AcariServer.GroupManager.list_groups()
+
+    groups_list =
+      groups
+      |> Enum.map(fn %{name: name} -> name end)
+
+    zbx_groups = get_bg_groups()
+
+    zbx_groups_id_del_list =
+      zbx_groups
+      |> Enum.reject(fn %{"name" => @group_prefix <> name} -> Enum.member?(groups_list, name) end)
+      |> Enum.map(fn %{"groupid" => id} -> id end)
+
+    case zbx_groups_id_del_list do
+      [] ->
+        nil
+
+      _ ->
+        zbx_post("hostgroup.delete", zbx_groups_id_del_list)
+    end
+
+    zbx_groups_name_list =
+      zbx_groups
+      |> Enum.map(fn %{"name" => @group_prefix <> name} -> name end)
+
+    groups
+    |> Enum.reject(fn %{name: name} -> Enum.member?(zbx_groups_name_list, name) end)
+    |> Enum.each(fn group ->
+      zbx_post("hostgroup.create", %{name: @group_prefix <> group.name})
+    end)
   end
 
   defp zbx_post(method, params) do

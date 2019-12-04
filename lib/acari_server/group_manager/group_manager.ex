@@ -8,6 +8,7 @@ defmodule AcariServer.GroupManager do
   alias AcariServer.RepoRO
 
   alias AcariServer.GroupManager.Group
+  alias AcariServer.Zabbix.ZbxApi
 
   @doc """
   Returns the list of groups.
@@ -79,9 +80,15 @@ defmodule AcariServer.GroupManager do
 
   """
   def create_group(attrs \\ %{}) do
-    %Group{}
-    |> Group.changeset(attrs)
-    |> Repo.insert()
+    res =
+      %Group{}
+      |> Group.changeset(attrs)
+      |> Repo.insert()
+
+    Task.start(fn ->
+      Process.sleep(1_000)
+      ZbxApi.zbx_groups_sync() end)
+    res
   end
 
   @doc """
@@ -115,7 +122,9 @@ defmodule AcariServer.GroupManager do
 
   """
   def delete_group(%Group{} = group) do
-    Repo.delete_wait(group)
+    res = Repo.delete_wait(group)
+    ZbxApi.zbx_groups_sync()
+    res
   end
 
   @doc """
