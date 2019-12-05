@@ -2,9 +2,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
   require Logger
   use GenServer
 
+  alias AcariServer.Mnesia
+
   @send_max_delay 3_000
   @send_delay 500
   @group_prefix "bg."
+  @main_group "Bogatka_all"
+  @main_template "Bogatka_client"
 
   defmodule Sender do
     defstruct [
@@ -21,7 +25,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
       :zbx_snd_port,
       :zbx_username,
       :zbx_password,
-      :auth,
       :hostgroup_id,
       :template_id,
       hosts: %{},
@@ -63,9 +66,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
   @impl true
   def handle_continue(:init, state) do
     with :ok <- Zabbix.API.create_client(state.zbx_api_url),
-         {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password),
-         state <- %State{state | auth: auth},
-         {:ok, [%{"groupid" => hostgroup_id}]} <- get_hostgroup_id(),
+         {:ok, _auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password),
+         [%{"groupid" => hostgroup_id}] <- get_main_group(),
          {:ok, [%{"templateid" => template_id}]} <- get_template_id(),
          {:ok, hosts} <- get_hosts(hostgroup_id),
          hosts <-
@@ -83,8 +85,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
       {:noreply,
        %State{
          state
-         | auth: auth,
-           hostgroup_id: hostgroup_id,
+         | hostgroup_id: hostgroup_id,
            template_id: template_id,
            hosts: hosts
        }}
@@ -96,19 +97,22 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  defp get_hostgroup_id() do
-    zbx_post("hostgroup.get", %{output: ["extend"], filter: %{name: ["acari_clients"]}})
+  defp get_main_group() do
+    case zbx_post("hostgroup.get", %{output: ["name"], filter: %{name: [@main_group]}}) do
+      {:ok, list} -> list
+      _ -> []
+    end
   end
 
   defp get_template_id() do
     zbx_post(
       "template.get",
-      %{output: ["extend"], filter: %{host: ["acari_client"]}}
+      %{output: ["extend"], filter: %{host: [@main_template]}}
     )
   end
 
   defp get_bg_groups() do
-    case zbx_post("hostgroup.get", %{}) do
+    case zbx_post("hostgroup.get", %{output: ["name"]}) do
       {:ok, list} ->
         list
         |> Enum.filter(fn
@@ -277,9 +281,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
     |> Enum.each(fn group ->
       zbx_post("hostgroup.create", %{name: @group_prefix <> group.name})
     end)
+
+    Mnesia.update_zbx_hostgroup(get_main_group() ++ get_bg_groups())
   end
 
-  defp zbx_post(method, params) do
+  def zbx_post(method, params) do
     with {:ok, %{"result" => result}} <- Zabbix.API.call(method, params) do
       {:ok, result}
     else

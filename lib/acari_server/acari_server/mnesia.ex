@@ -11,10 +11,25 @@ defmodule AcariServer.Mnesia.Attr do
   def client_status(), do: [:name, :timestamp, :opts]
   def stat(), do: [:key, :value]
   def zabbix(), do: [:id, :host, :key, :value, :timestamp]
+  def zbx_hostgroup(), do: [:name, :hostgroupid]
+  def zbx_host(), do: [:name, :hostid, :items]
   def session(), do: [:jti, :params, :activity]
 
   def table_list(),
-    do: [:counter, :server, :db, :tun, :link, :event, :client_status, :stat, :zabbix, :session]
+    do: [
+      :counter,
+      :server,
+      :db,
+      :tun,
+      :link,
+      :event,
+      :client_status,
+      :stat,
+      :zabbix,
+      :zbx_hostgroup,
+      :zbx_host,
+      :session
+    ]
 
   def pattern(tab, field_pattern) do
     mk_record(tab, field_pattern, :_)
@@ -898,6 +913,16 @@ defmodule AcariServer.Mnesia do
 
   def get_zabbix(host) do
     match(:zabbix, %{host: host})
+  end
+
+  def update_zbx_hostgroup(zbx_hostgroup_list) do
+    Mnesia.clear_table(:zbx_hostgroup)
+    Mnesia.transaction(fn ->
+      zbx_hostgroup_list
+      |> Enum.each(fn %{"groupid" => id, "name" => name} ->
+        Mnesia.write(Rec.zbx_hostgroup(name: name, hostgroupid: id))
+      end)
+    end)
   end
 
   # session
