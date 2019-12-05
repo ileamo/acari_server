@@ -25,6 +25,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
       :zbx_snd_port,
       :zbx_username,
       :zbx_password,
+      :auth,
       sender: %Sender{}
     ]
   end
@@ -63,10 +64,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
   @impl true
   def handle_continue(:init, state) do
     with :ok <- Zabbix.API.create_client(state.zbx_api_url),
-         {:ok, _auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password) do
+         {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password) do
+      zbx_hosts_sync()
       Logger.info("Zabbix API successfully init")
 
-      {:noreply, state}
+      {:noreply, %State{state | auth: auth}}
     else
       res ->
         Logger.error("Can't init zabbix API(#{state.zbx_api_url}): #{inspect(res)}")
@@ -83,10 +85,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defp get_template_id() do
-    zbx_post(
-      "template.get",
-      %{output: ["extend"], filter: %{host: [@main_template]}}
-    )
+    case zbx_post(
+           "template.get",
+           %{output: ["extend"], filter: %{host: [@main_template]}}
+         ) do
+      {:ok, list} -> list
+      _ -> []
+    end
   end
 
   defp get_bg_groups() do
@@ -123,7 +128,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  def zbx_groups_sync() do
+  defp groups_sync() do
     # Delete old groups
     groups = AcariServer.GroupManager.list_groups()
 
@@ -160,7 +165,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
     Mnesia.update_zbx_hostgroup(get_main_group() ++ get_bg_groups())
   end
 
-  def zbx_hosts_sync() do
+  defp zbx_hosts_sync() do
+    groups_sync()
     nodes = AcariServer.NodeManager.list_nodes_wo_preload()
     # Delete old hosts
     node_name_list =
@@ -188,11 +194,16 @@ defmodule AcariServer.Zabbix.ZbxApi do
       zbx_hosts
       |> Enum.map(fn %{"host" => host} -> host end)
 
-    {:ok, [%{"templateid" => template_id}]} = get_template_id()
-
     nodes
     |> Enum.reject(fn %{name: name} -> Enum.member?(zbx_hosts_name_list, name) end)
     |> Enum.each(fn node ->
+      add_host(node)
+    end)
+  end
+
+  defp add_host(node) do
+    with [%{"templateid" => template_id}] <- get_template_id(),
+         [%{"groupid" => hostgroup_id}] <- get_main_group() do
       group_list =
         node
         |> AcariServer.Repo.preload(:groups)
@@ -228,7 +239,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
       }
 
       zbx_post("host.create", params)
-    end)
+    end
   end
 
   defp zbx_post(method, params) do
@@ -264,6 +275,21 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def handle_cast({:send_master, key, value}, state) do
     zabbix_sender(state, "acari_master", key, value)
+  end
+
+  def handle_cast(:groups_sync, state) do
+    groups_sync()
+    {:noreply, state}
+  end
+
+  def handle_cast({:add_host, node}, state) do
+    add_host(node)
+    {:noreply, state}
+  end
+
+  def handle_cast({:del_host, name}, state) do
+    del_host(name)
+    {:noreply, state}
   end
 
   @impl true
@@ -318,5 +344,17 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_send_master(key, value) do
     GenServer.cast(__MODULE__, {:send_master, key, value})
+  end
+
+  def zbx_groups_sync() do
+    GenServer.cast(__MODULE__, :groups_sync)
+  end
+
+  def zbx_add_host(node) do
+    GenServer.cast(__MODULE__, {:add_host, node})
+  end
+
+  def zbx_del_host(name) do
+    GenServer.cast(__MODULE__, {:del_host, name})
   end
 end

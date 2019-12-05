@@ -107,10 +107,20 @@ defmodule AcariServer.NodeManager do
 
   """
   def create_node(attrs \\ %{}) do
-    %Node{}
-    |> Node.changeset(attrs)
-    |> AcariServer.GroupManager.Group.put_groups(attrs)
-    |> Repo.insert()
+    res =
+      %Node{}
+      |> Node.changeset(attrs)
+      |> AcariServer.GroupManager.Group.put_groups(attrs)
+      |> Repo.insert()
+
+    case res do
+      {:ok, node = %AcariServer.NodeManager.Node{}} ->
+        ZbxApi.zbx_add_host(node)
+        res
+
+      _ ->
+        res
+    end
   end
 
   @doc """
@@ -146,7 +156,7 @@ defmodule AcariServer.NodeManager do
   """
   def delete_node(%Node{} = node) do
     res = Repo.delete_wait(node)
-    ZbxApi.del_host(node.name)
+    ZbxApi.zbx_del_host(node.name)
     res
   end
 
