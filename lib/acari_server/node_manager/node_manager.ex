@@ -7,6 +7,7 @@ defmodule AcariServer.NodeManager do
   alias AcariServer.Repo
   alias AcariServer.RepoRO
   alias AcariServer.NodeManager.Node
+  alias AcariServer.Zabbix.ZbxApi
 
   @doc """
   Returns the list of nodes.
@@ -145,7 +146,7 @@ defmodule AcariServer.NodeManager do
   """
   def delete_node(%Node{} = node) do
     res = Repo.delete_wait(node)
-    AcariServer.Zabbix.ZbxApi.zbx_sync_deleted_hosts()
+    ZbxApi.del_host(node.name)
     res
   end
 

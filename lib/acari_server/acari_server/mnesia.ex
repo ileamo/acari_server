@@ -917,12 +917,32 @@ defmodule AcariServer.Mnesia do
 
   def update_zbx_hostgroup(zbx_hostgroup_list) do
     Mnesia.clear_table(:zbx_hostgroup)
+
     Mnesia.transaction(fn ->
       zbx_hostgroup_list
       |> Enum.each(fn %{"groupid" => id, "name" => name} ->
         Mnesia.write(Rec.zbx_hostgroup(name: name, hostgroupid: id))
       end)
     end)
+  end
+
+  def get_zbx_hostgroup_id_list(name_list) do
+    res =
+      Mnesia.transaction(fn ->
+        name_list
+        |> Enum.map(fn name ->
+          case Mnesia.read({:zbx_hostgroup, name}) do
+            [rec] -> Rec.zbx_hostgroup(rec, :hostgroupid)
+            _ -> nil
+          end
+        end)
+        |> Enum.filter(& &1)
+      end)
+
+    case res do
+      {:atomic, list} when is_list(list) -> list
+      _ -> []
+    end
   end
 
   # session
