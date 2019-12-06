@@ -65,7 +65,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
   def handle_continue(:init, state) do
     with :ok <- Zabbix.API.create_client(state.zbx_api_url),
          {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password) do
-      zbx_hosts_sync()
+      hosts_sync()
       Logger.info("Zabbix API successfully init")
 
       {:noreply, %State{state | auth: auth}}
@@ -165,7 +165,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
     Mnesia.update_zbx_hostgroup(get_main_group() ++ get_bg_groups())
   end
 
-  defp zbx_hosts_sync() do
+  defp hosts_sync() do
     groups_sync()
     nodes = AcariServer.NodeManager.list_nodes_wo_preload()
     # Delete old hosts
@@ -199,6 +199,22 @@ defmodule AcariServer.Zabbix.ZbxApi do
     |> Enum.each(fn node ->
       add_host(node)
     end)
+
+    nodes
+  end
+
+  def hosts_sync(:update) do
+    Task.start(fn ->
+      hosts_sync()
+      |> hosts_update()
+    end)
+  end
+
+  defp hosts_update(nodes) do
+    nodes
+    |> Enum.each(fn node ->
+      update_host(node, node.name)
+    end)
   end
 
   defp add_host(node) do
@@ -211,7 +227,32 @@ defmodule AcariServer.Zabbix.ZbxApi do
            %{output: ["hostid"], filter: %{host: [old_name]}}
          ) do
       {:ok, [%{"hostid" => id}]} ->
-        add_or_update_host(node, "update", id)
+        node = AcariServer.Repo.preload(node, :groups)
+
+        with true <- old_name == node.name,
+             {:ok, zbx_group_list} <-
+               zbx_post(
+                 "hostgroup.get",
+                 %{output: ["name"], hostids: id}
+               ),
+             zbx_group_list <-
+               zbx_group_list
+               |> Enum.map(fn
+                 %{"name" => @group_prefix <> name} -> name
+                 _ -> nil
+               end)
+               |> Enum.filter(& &1)
+               |> Enum.sort(),
+             group_list <-
+               node.groups
+               |> Enum.map(fn %{name: name} -> name end)
+               |> Enum.sort(),
+             true <- zbx_group_list == group_list do
+          nil
+        else
+          _ ->
+            add_or_update_host(node, "update", id)
+        end
 
       _ ->
         nil
@@ -301,6 +342,16 @@ defmodule AcariServer.Zabbix.ZbxApi do
     {:noreply, state}
   end
 
+  def handle_cast(:hosts_sync, state) do
+    hosts_sync()
+    {:noreply, state}
+  end
+
+  def handle_cast({:hosts_sync, :update}, state) do
+    hosts_sync(:update)
+    {:noreply, state}
+  end
+
   def handle_cast({:add_host, node}, state) do
     add_host(node)
     {:noreply, state}
@@ -372,6 +423,14 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_groups_sync() do
     GenServer.cast(__MODULE__, :groups_sync)
+  end
+
+  def zbx_hosts_sync() do
+    GenServer.cast(__MODULE__, :hosts_sync)
+  end
+
+  def zbx_hosts_sync(:update) do
+    GenServer.cast(__MODULE__, {:hosts_sync, :update})
   end
 
   def zbx_add_host(node) do
