@@ -167,41 +167,44 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defp hosts_sync() do
-    groups_sync()
-    nodes = AcariServer.NodeManager.list_nodes_wo_preload()
-    # Delete old hosts
-    node_name_list =
+    with [%{"groupid" => hostgroup_id}] <- get_main_group() do
+      groups_sync()
+      nodes = AcariServer.NodeManager.list_nodes_wo_preload()
+      # Delete old hosts
+      node_name_list =
+        nodes
+        |> Enum.map(fn %{name: name} -> name end)
+
+      zbx_hosts = get_hosts(hostgroup_id)
+
+      zbx_hostid_del_list =
+        zbx_hosts
+        |> Enum.reject(fn %{"host" => host} -> Enum.member?(node_name_list, host) end)
+        |> Enum.map(fn %{"hostid" => id} -> id end)
+
+      case zbx_hostid_del_list do
+        [] ->
+          nil
+
+        list ->
+          zbx_post("host.delete", list)
+      end
+
+      # Add new hosts
+      zbx_hosts_name_list =
+        zbx_hosts
+        |> Enum.map(fn %{"host" => host} -> host end)
+
       nodes
-      |> Enum.map(fn %{name: name} -> name end)
+      |> Enum.reject(fn %{name: name} -> Enum.member?(zbx_hosts_name_list, name) end)
+      |> Enum.each(fn node ->
+        add_host(node)
+      end)
 
-    [%{"groupid" => hostgroup_id}] = get_main_group()
-    zbx_hosts = get_hosts(hostgroup_id)
-
-    zbx_hostid_del_list =
-      zbx_hosts
-      |> Enum.reject(fn %{"host" => host} -> Enum.member?(node_name_list, host) end)
-      |> Enum.map(fn %{"hostid" => id} -> id end)
-
-    case zbx_hostid_del_list do
-      [] ->
-        nil
-
-      list ->
-        zbx_post("host.delete", list)
+      nodes
+    else
+      _ -> []
     end
-
-    # Add new hosts
-    zbx_hosts_name_list =
-      zbx_hosts
-      |> Enum.map(fn %{"host" => host} -> host end)
-
-    nodes
-    |> Enum.reject(fn %{name: name} -> Enum.member?(zbx_hosts_name_list, name) end)
-    |> Enum.each(fn node ->
-      add_host(node)
-    end)
-
-    nodes
   end
 
   def hosts_sync(:update) do
