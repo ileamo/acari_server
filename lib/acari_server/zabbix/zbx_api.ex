@@ -9,6 +9,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
   @group_prefix "bg."
   @main_group "Bogatka_all"
   @main_template "Bogatka_client"
+  @main_host "Bogatka_master"
 
   defmodule Sender do
     defstruct [
@@ -334,7 +335,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   def handle_cast({:send_master, key, value}, state) do
-    zabbix_sender(state, "acari_master", key, value)
+    zabbix_sender(state, @main_host, key, value)
   end
 
   def handle_cast(:groups_sync, state) do
