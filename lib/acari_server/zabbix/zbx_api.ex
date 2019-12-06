@@ -303,7 +303,53 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  defp zbx_post(method, params) do
+  def create_master_host() do
+    case zbx_post(
+           "host.get",
+           %{output: ["hostid"], filter: %{host: [@main_host]}}
+         ) do
+      {:ok, [%{"hostid" => _id}]} ->
+        nil
+
+      _ ->
+        with {:ok, %{"groupids" => [hostgroup_id]}} <-
+               (case zbx_post("hostgroup.get", %{
+                       output: ["groupid"],
+                       filter: %{name: [@main_host]}
+                     }) do
+                  {:ok, [%{"groupid" => id}]} ->
+                    {:ok, %{"groupids" => [id]}}
+
+                  _ ->
+                    zbx_post("hostgroup.create", %{name: @main_host})
+                    |> IO.inspect()
+                end) do
+          params = %{
+            host: @main_host,
+            interfaces: [
+              %{
+                type: 1,
+                main: 1,
+                useip: 1,
+                ip: "127.0.0.1",
+                dns: "",
+                port: "10050"
+              }
+            ],
+            groups: [
+              %{
+                groupid: hostgroup_id
+              }
+            ],
+            inventory_mode: 1
+          }
+
+          zbx_post("host.create", params)
+        end
+    end
+  end
+
+  def zbx_post(method, params) do
     with {:ok, %{"result" => result}} <- Zabbix.API.call(method, params) do
       {:ok, result}
     else
