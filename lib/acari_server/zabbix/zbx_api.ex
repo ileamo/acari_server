@@ -1,5 +1,12 @@
+defmodule AcariServer.Zabbix.ZbxConst do
+  defmacro client_number_key, do: "bogatka.clients.number"
+  defmacro client_active_key, do: "bogatka.clients.active"
+  defmacro client_active_percent_key, do: "bogatka.clients.active.percent"
+end
+
 defmodule AcariServer.Zabbix.ZbxApi do
   require Logger
+  require AcariServer.Zabbix.ZbxConst, as: ZbxConst
   use GenServer
 
   alias AcariServer.Mnesia
@@ -347,7 +354,59 @@ defmodule AcariServer.Zabbix.ZbxApi do
             inventory_mode: 1
           }
 
-          zbx_post("host.create", params)
+          case zbx_post("host.create", params) do
+            {:ok, %{"hostids" => [hostid]}} ->
+              zbx_post(
+                "item.create",
+                %{
+                  key_: ZbxConst.client_number_key(),
+                  name: "Количество клиентов",
+                  hostid: hostid,
+                  # zabbix trapper
+                  type: 2,
+                  # numeric unsigned
+                  value_type: 3
+                }
+              )
+              |> IO.inspect()
+
+              zbx_post(
+                "item.create",
+                %{
+                  key_: ZbxConst.client_active_key(),
+                  name: "Количество активных клиентов",
+                  hostid: hostid,
+                  # zabbix trapper
+                  type: 2,
+                  # numeric unsigned
+                  value_type: 3
+                }
+              )
+              |> IO.inspect()
+
+              zbx_post(
+                "item.create",
+                %{
+                  key_: ZbxConst.client_active_percent_key(),
+                  name: "Процент активных клиентов",
+                  hostid: hostid,
+                  # Вычисляемый
+                  type: 15,
+                  # с плавающей точкой
+                  value_type: 0,
+                  delay: "30s",
+                  params:
+                    "100*last(\"#{ZbxConst.client_active_key()}\")/last(\"#{
+                      ZbxConst.client_number_key()
+                    }\")",
+                  units: "%"
+                }
+              )
+              |> IO.inspect()
+
+            _ ->
+              nil
+          end
         end
     end
   end

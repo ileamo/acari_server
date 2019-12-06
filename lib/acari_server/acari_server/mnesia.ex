@@ -83,6 +83,7 @@ defmodule AcariServer.Mnesia do
   import AcariServer.Mnesia.Attr, only: [mk_record: 2]
   alias AcariServerWeb.Endpoint
   require Acari.Const
+  require AcariServer.Zabbix.ZbxConst, as: ZbxConst
 
   def init() do
     Mnesia.start()
@@ -703,11 +704,11 @@ defmodule AcariServer.Mnesia do
         })
 
         AcariServer.Zabbix.ZbxApi.zbx_send_master(
-          "acari.clients.number",
+          ZbxConst.client_number_key(),
           to_string(tun_num)
         )
 
-        AcariServer.Zabbix.ZbxApi.zbx_send_master("acari.clients.active", to_string(num))
+        AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_active_key(), to_string(num))
 
       _ ->
         nil
