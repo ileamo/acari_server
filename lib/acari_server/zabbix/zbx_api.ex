@@ -167,41 +167,44 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defp hosts_sync() do
-    groups_sync()
-    nodes = AcariServer.NodeManager.list_nodes_wo_preload()
-    # Delete old hosts
-    node_name_list =
+    with [%{"groupid" => hostgroup_id}] <- get_main_group() do
+      groups_sync()
+      nodes = AcariServer.NodeManager.list_nodes_wo_preload()
+      # Delete old hosts
+      node_name_list =
+        nodes
+        |> Enum.map(fn %{name: name} -> name end)
+
+      zbx_hosts = get_hosts(hostgroup_id)
+
+      zbx_hostid_del_list =
+        zbx_hosts
+        |> Enum.reject(fn %{"host" => host} -> Enum.member?(node_name_list, host) end)
+        |> Enum.map(fn %{"hostid" => id} -> id end)
+
+      case zbx_hostid_del_list do
+        [] ->
+          nil
+
+        list ->
+          zbx_post("host.delete", list)
+      end
+
+      # Add new hosts
+      zbx_hosts_name_list =
+        zbx_hosts
+        |> Enum.map(fn %{"host" => host} -> host end)
+
       nodes
-      |> Enum.map(fn %{name: name} -> name end)
+      |> Enum.reject(fn %{name: name} -> Enum.member?(zbx_hosts_name_list, name) end)
+      |> Enum.each(fn node ->
+        add_host(node)
+      end)
 
-    [%{"groupid" => hostgroup_id}] = get_main_group()
-    zbx_hosts = get_hosts(hostgroup_id)
-
-    zbx_hostid_del_list =
-      zbx_hosts
-      |> Enum.reject(fn %{"host" => host} -> Enum.member?(node_name_list, host) end)
-      |> Enum.map(fn %{"hostid" => id} -> id end)
-
-    case zbx_hostid_del_list do
-      [] ->
-        nil
-
-      list ->
-        zbx_post("host.delete", list)
+      nodes
+    else
+      _ -> []
     end
-
-    # Add new hosts
-    zbx_hosts_name_list =
-      zbx_hosts
-      |> Enum.map(fn %{"host" => host} -> host end)
-
-    nodes
-    |> Enum.reject(fn %{name: name} -> Enum.member?(zbx_hosts_name_list, name) end)
-    |> Enum.each(fn node ->
-      add_host(node)
-    end)
-
-    nodes
   end
 
   def hosts_sync(:update) do
@@ -436,8 +439,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defp zabbix_sender(%{sender: sender} = state) do
-    :erlang.system_time(:millisecond)
-
     request =
       ZabbixSender.Protocol.encode_request(sender.value_list, nil)
       |> ZabbixSender.Serializer.serialize()
@@ -446,11 +447,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
          {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
          {:ok, decoded} <- ZabbixSender.Protocol.decode_response(deserialized) do
       if decoded.failed == 0 do
-        Logger.debug("zabbix_sender: #{decoded.processed} values processed")
+        # Logger.debug("zabbix_sender: #{decoded.processed} values processed")
       else
-        Logger.warn(
-          "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
-        )
+        # Logger.warn(
+        #   "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
+        # )
       end
     else
       res -> Logger.error("zabbix_sender: #{inspect(res)}")
