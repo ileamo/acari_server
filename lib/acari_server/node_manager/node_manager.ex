@@ -136,10 +136,19 @@ defmodule AcariServer.NodeManager do
 
   """
   def update_node(%Node{} = node, attrs) do
-    node
+    res = node
     |> Node.changeset(attrs)
     |> AcariServer.GroupManager.Group.put_groups(attrs)
     |> Repo.update()
+
+    case res do
+      {:ok, updated_node = %AcariServer.NodeManager.Node{}} ->
+        ZbxApi.zbx_update_host(updated_node, node.name)
+        res
+
+      _ ->
+        res
+    end
   end
 
   @doc """

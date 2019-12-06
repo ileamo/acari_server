@@ -18,13 +18,13 @@ defmodule AcariServer.Application do
       AcariServerWeb.Endpoint,
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},
-      AcariServer.Zabbix.ZbxApi,
-      AcariServer.Zabbix.Sup,
       AcariServer.TermSup,
       Acari.Sup,
       AcariServer.TemplateAgent,
       AcariServer.NodeMonitorAgent,
       AcariServer.ServerMonitor,
+      AcariServer.Zabbix.ZbxApi,
+      AcariServer.Zabbix.Sup,
       AcariServer.Sup,
       {Task.Supervisor, name: AcariServer.TaskSup}
     ]

@@ -202,6 +202,23 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defp add_host(node) do
+    add_or_update_host(node, "create")
+  end
+
+  defp update_host(node, old_name) do
+    case zbx_post(
+           "host.get",
+           %{output: ["hostid"], filter: %{host: [old_name]}}
+         ) do
+      {:ok, [%{"hostid" => id}]} ->
+        add_or_update_host(node, "update", id)
+
+      _ ->
+        nil
+    end
+  end
+
+  defp add_or_update_host(node, method, hostid \\ nil) do
     with [%{"templateid" => template_id}] <- get_template_id(),
          [%{"groupid" => hostgroup_id}] <- get_main_group() do
       group_list =
@@ -238,7 +255,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
         inventory_mode: 1
       }
 
-      zbx_post("host.create", params)
+      params = if hostid, do: Map.put(params, :hostid, hostid), else: params
+
+      zbx_post("host." <> method, params)
     end
   end
 
@@ -284,6 +303,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def handle_cast({:add_host, node}, state) do
     add_host(node)
+    {:noreply, state}
+  end
+
+  def handle_cast({:update_host, node, old_name}, state) do
+    update_host(node, old_name)
     {:noreply, state}
   end
 
@@ -352,6 +376,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_add_host(node) do
     GenServer.cast(__MODULE__, {:add_host, node})
+  end
+
+  def zbx_update_host(node, old_name) do
+    GenServer.cast(__MODULE__, {:update_host, node, old_name})
   end
 
   def zbx_del_host(name) do
