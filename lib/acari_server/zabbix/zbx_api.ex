@@ -393,8 +393,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defp zabbix_sender(%{sender: sender} = state) do
-    :erlang.system_time(:millisecond)
-
     request =
       ZabbixSender.Protocol.encode_request(sender.value_list, nil)
       |> ZabbixSender.Serializer.serialize()
@@ -403,11 +401,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
          {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
          {:ok, decoded} <- ZabbixSender.Protocol.decode_response(deserialized) do
       if decoded.failed == 0 do
-        Logger.debug("zabbix_sender: #{decoded.processed} values processed")
+        # Logger.debug("zabbix_sender: #{decoded.processed} values processed")
       else
-        Logger.warn(
-          "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
-        )
+        # Logger.warn(
+        #   "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
+        # )
       end
     else
       res -> Logger.error("zabbix_sender: #{inspect(res)}")
