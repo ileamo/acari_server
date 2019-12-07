@@ -78,6 +78,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
   def handle_continue(:init, state) do
     with :ok <- Zabbix.API.create_client(state.zbx_api_url),
          {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password) do
+      create_master_host()
       hosts_sync()
       Logger.info("Zabbix API successfully init")
 
@@ -220,7 +221,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
       zbx_post("hostgroup.create", %{name: @group_prefix <> group.name})
     end)
 
-    Mnesia.update_zbx_hostgroup(get_main_group() ++ get_bg_groups())
+    Mnesia.update_zbx_hostgroup(get_bg_groups())
   end
 
   defp hosts_sync(opt \\ []) do
@@ -359,7 +360,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  def create_master_host() do
+  defp create_master_host() do
     case zbx_post(
            "host.get",
            %{output: ["hostid"], filter: %{host: [@main_host]}}
@@ -414,7 +415,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
                   value_type: 3
                 }
               )
-              |> IO.inspect()
 
               zbx_post(
                 "item.create",
@@ -428,7 +428,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
                   value_type: 3
                 }
               )
-              |> IO.inspect()
 
               zbx_post(
                 "item.create",
@@ -448,7 +447,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
                   units: "%"
                 }
               )
-              |> IO.inspect()
 
             _ ->
               nil
