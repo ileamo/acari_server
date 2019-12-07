@@ -42,7 +42,12 @@ defmodule AcariServer.Zabbix.ZbxApi do
     GenServer.start_link(__MODULE__, params, name: __MODULE__)
   end
 
-  ## Callbacks
+  #  ██████  █████  ██      ██      ██████   █████   ██████ ██   ██ ███████
+  # ██      ██   ██ ██      ██      ██   ██ ██   ██ ██      ██  ██  ██
+  # ██      ███████ ██      ██      ██████  ███████ ██      █████   ███████
+  # ██      ██   ██ ██      ██      ██   ██ ██   ██ ██      ██  ██       ██
+  #  ██████ ██   ██ ███████ ███████ ██████  ██   ██  ██████ ██   ██ ███████
+
   @impl true
   def init(_params) do
     case Application.get_env(:acari_server, :zabbix)[:zbx_api_url] do
@@ -84,6 +89,51 @@ defmodule AcariServer.Zabbix.ZbxApi do
         {:stop, :shutdown, state}
     end
   end
+
+  @impl true
+  def handle_cast({:send, host, key, value}, state) do
+    zabbix_sender(state, host, key, value)
+  end
+
+  def handle_cast({:send_master, key, value}, state) do
+    zabbix_sender(state, @main_host, key, value)
+  end
+
+  def handle_cast(:groups_sync, state) do
+    groups_sync()
+    {:noreply, state}
+  end
+
+  def handle_cast({:hosts_sync, opts}, state) do
+    hosts_sync(opts)
+    {:noreply, state}
+  end
+
+  def handle_cast({:add_host, node}, state) do
+    add_host(node)
+    {:noreply, state}
+  end
+
+  def handle_cast({:update_host, node, old_name}, state) do
+    update_host(node, old_name)
+    {:noreply, state}
+  end
+
+  def handle_cast({:del_host, name}, state) do
+    del_host(name)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info(:time_to_send, state) do
+    zabbix_sender(state)
+  end
+
+  # ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██
+  # ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██
+  # █████   ██    ██ ██ ██  ██ ██         ██    ██ ██    ██ ██ ██  ██
+  # ██      ██    ██ ██  ██ ██ ██         ██    ██ ██    ██ ██  ██ ██
+  # ██       ██████  ██   ████  ██████    ██    ██  ██████  ██   ████
 
   defp get_main_group() do
     case zbx_post("hostgroup.get", %{output: ["name"], filter: %{name: [@main_group]}}) do
@@ -173,10 +223,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
     Mnesia.update_zbx_hostgroup(get_main_group() ++ get_bg_groups())
   end
 
-  defp hosts_sync() do
-    with [%{"groupid" => hostgroup_id}] <- get_main_group() do
+  defp hosts_sync(opt \\ []) do
+    with [%{"groupid" => hostgroup_id}] <- get_main_group(),
+         nodes = [_ | _] <- AcariServer.NodeManager.list_nodes_wo_preload() do
       groups_sync()
-      nodes = AcariServer.NodeManager.list_nodes_wo_preload()
       # Delete old hosts
       node_name_list =
         nodes
@@ -193,6 +243,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
         [] ->
           nil
 
+        list when length(list) / length(node_name_list) > 0.1 and length(list) > 10 ->
+          Logger.warn("Zabbix: too many hosts to delete")
+
         list ->
           zbx_post("host.delete", list)
       end
@@ -208,17 +261,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
         add_host(node)
       end)
 
-      nodes
+      if opt[:update], do: Task.start(fn -> nodes |> hosts_update() end)
     else
       _ -> []
     end
-  end
-
-  def hosts_sync(:update) do
-    Task.start(fn ->
-      hosts_sync()
-      |> hosts_update()
-    end)
   end
 
   defp hosts_update(nodes) do
@@ -437,49 +483,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  @impl true
-  def handle_cast({:send, host, key, value}, state) do
-    zabbix_sender(state, host, key, value)
-  end
-
-  def handle_cast({:send_master, key, value}, state) do
-    zabbix_sender(state, @main_host, key, value)
-  end
-
-  def handle_cast(:groups_sync, state) do
-    groups_sync()
-    {:noreply, state}
-  end
-
-  def handle_cast(:hosts_sync, state) do
-    hosts_sync()
-    {:noreply, state}
-  end
-
-  def handle_cast({:hosts_sync, :update}, state) do
-    hosts_sync(:update)
-    {:noreply, state}
-  end
-
-  def handle_cast({:add_host, node}, state) do
-    add_host(node)
-    {:noreply, state}
-  end
-
-  def handle_cast({:update_host, node, old_name}, state) do
-    update_host(node, old_name)
-    {:noreply, state}
-  end
-
-  def handle_cast({:del_host, name}, state) do
-    del_host(name)
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_info(:time_to_send, state) do
-    zabbix_sender(state)
-  end
+  # ███████ ███████ ███    ██ ██████  ███████ ██████
+  # ██      ██      ████   ██ ██   ██ ██      ██   ██
+  # ███████ █████   ██ ██  ██ ██   ██ █████   ██████
+  #      ██ ██      ██  ██ ██ ██   ██ ██      ██   ██
+  # ███████ ███████ ██   ████ ██████  ███████ ██   ██
 
   defp zabbix_sender(%{sender: sender} = state, host, key, value) do
     value = ZabbixSender.Protocol.value(host, key, value, nil)
@@ -519,7 +527,12 @@ defmodule AcariServer.Zabbix.ZbxApi do
     {:noreply, %State{state | sender: %Sender{}}}
   end
 
-  # API
+  #  █████  ██████  ██
+  # ██   ██ ██   ██ ██
+  # ███████ ██████  ██
+  # ██   ██ ██      ██
+  # ██   ██ ██      ██
+
   def zbx_send(host, key, value) do
     GenServer.cast(__MODULE__, {:send, host, key, value})
   end
@@ -532,12 +545,8 @@ defmodule AcariServer.Zabbix.ZbxApi do
     GenServer.cast(__MODULE__, :groups_sync)
   end
 
-  def zbx_hosts_sync() do
-    GenServer.cast(__MODULE__, :hosts_sync)
-  end
-
-  def zbx_hosts_sync(:update) do
-    GenServer.cast(__MODULE__, {:hosts_sync, :update})
+  def zbx_hosts_sync(opts \\ []) do
+    GenServer.cast(__MODULE__, {:hosts_sync, opts})
   end
 
   def zbx_add_host(node) do
