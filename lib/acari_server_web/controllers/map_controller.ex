@@ -11,6 +11,7 @@ defmodule AcariServerWeb.MapController do
       |> Enum.map(fn
         %{latitude: lat, longitude: lng, name: name, description: descr} = node ->
           %{
+            name: name,
             lat: lat || 55.777594,
             lng: lng || 37.737926,
             alert: node[:alert] || 0,

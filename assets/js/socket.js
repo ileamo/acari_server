@@ -97,6 +97,10 @@ channel.on("link_event", payload => {
 })
 
 channel.on("link_event_mes", payload => {
+    if (global.osmMap && payload.events) {
+      global.osmMap(payload.events)
+    }
+
     if (messagesBadge && payload.num_of_mes != null) {
       messagesBadge.innerText = `${payload.num_of_mes}`
     }

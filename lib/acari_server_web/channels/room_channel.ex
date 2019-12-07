@@ -12,12 +12,23 @@ defmodule AcariServerWeb.RoomChannel do
   intercept(["link_event_mes"])
 
   def handle_out("link_event_mes", %{mes_list: mes_list}, socket) do
-    mes_list = mes_list |> AcariServer.Mnesia.get_client_status(socket.assigns.current_user_id)
+    mes_list =
+      mes_list
+      |> AcariServer.Mnesia.get_client_status(socket.assigns.current_user_id)
+
+    events =
+      mes_list
+      |> Enum.map(fn %{name: name, opts: %{level: level}} -> %{name: name, level: level} end)
 
     mes_html =
       Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "messages.html", mes_list: mes_list)
 
-    push(socket, "link_event_mes", %{num_of_mes: mes_list |> length(), messages: mes_html})
+    push(socket, "link_event_mes", %{
+      num_of_mes: mes_list |> length(),
+      messages: mes_html,
+      events: events
+    })
+
     {:noreply, socket}
   end
 end

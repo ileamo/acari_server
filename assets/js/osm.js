@@ -53,6 +53,15 @@ if (osm) {
   })
 
   if (osm.dataset.markers) {
+    let myMapMarkers = new Map();
+    global.osmMap = function(events) {
+      for (var i = 0; i < events.length; i++) {
+        let name = events[i].name
+        let level = events[i].level
+        myMapMarkers.get(name).setIcon(markerIcon[level])
+      }
+    }
+
     let markers = JSON.parse(decodeURIComponent(osm.dataset.markers))
     for (var i = 0; i < markers.length; i++) {
       let point = markers[i];
@@ -61,6 +70,7 @@ if (osm) {
       }).addTo(mymap);
 
       marker.bindPopup(point.title)
+      myMapMarkers.set(point.name, marker);
     }
 
     let bounds = JSON.parse(decodeURIComponent(osm.dataset.bounds))
