@@ -570,21 +570,19 @@ defmodule AcariServer.Mnesia do
 
       {level, port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
-      case level do
-        4 ->
-          Mnesia.delete({:client_status, tun})
+      Mnesia.write(
+        Rec.client_status(
+          name: tun,
+          timestamp: :os.system_time(:microsecond),
+          opts: %{
+            level: level,
+            text: mes
+          }
+        )
+      )
 
-        _ ->
-          Mnesia.write(
-            Rec.client_status(
-              name: tun,
-              timestamp: :os.system_time(:microsecond),
-              opts: %{
-                level: level,
-                text: mes
-              }
-            )
-          )
+      if level == 4 do
+        purge_client_status_table()
       end
 
       case up do
@@ -816,21 +814,21 @@ defmodule AcariServer.Mnesia do
           else
             {level, _port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
-            case level do
-              4 ->
-                Mnesia.delete_object(rec)
-
-              _ ->
-                Mnesia.write(
-                  Rec.client_status(
-                    name: tun,
-                    timestamp: Rec.client_status(rec, :timestamp),
-                    opts: %{
-                      level: level,
-                      text: mes
-                    }
-                  )
+            if level == 4 and
+                 :os.system_time(:microsecond) - (rec |> Rec.client_status(:timestamp)) >
+                   60_000_000 do
+              Mnesia.delete_object(rec)
+            else
+              Mnesia.write(
+                Rec.client_status(
+                  name: tun,
+                  timestamp: Rec.client_status(rec, :timestamp),
+                  opts: %{
+                    level: level,
+                    text: mes
+                  }
                 )
+              )
             end
 
             acc
