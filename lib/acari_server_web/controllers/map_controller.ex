@@ -2,11 +2,22 @@ defmodule AcariServerWeb.MapController do
   use AcariServerWeb, :controller
 
   def index(conn, params) do
-    nodes =
-      case params["group_id"] do
-        "" -> AcariServer.NodeManager.list_nodes_wo_preload()
-        n -> AcariServer.GroupManager.get_group!(n).nodes
+    {nodes, group_name} =
+      case params["group_id"] || "" do
+        "" ->
+          {AcariServer.NodeManager.list_nodes_wo_preload(), "Все"}
+
+        n ->
+          group = AcariServer.GroupManager.get_group!(n)
+          {group.nodes, group.name}
       end
+
+    index(conn, params, nodes, group_name)
+  end
+
+  def index(conn, params, nodes, group_name) do
+    nodes =
+      nodes
       |> AcariServer.Mnesia.get_tunnel_list()
       |> Enum.map(fn
         %{latitude: lat, longitude: lng, name: name, description: descr} = node ->
@@ -39,6 +50,8 @@ defmodule AcariServerWeb.MapController do
         {:ok, bounds_json} = Jason.encode(bounds)
 
         render(conn, "index.html",
+          group_id: params["group_id"] || "",
+          group_name: group_name,
           markers: markers_json,
           bounds: bounds_json,
           center_lat: center_lat,

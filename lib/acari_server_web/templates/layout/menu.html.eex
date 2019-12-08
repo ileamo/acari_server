@@ -16,6 +16,10 @@
     <%= link "Система", to: Routes.page_path(@conn, :index), class: "nav-link" %>
   </li>
 
+  <li class="nav-item">
+    <%= link "Карта", to: Routes.map_path(@conn, :index), class: "nav-link" %>
+  </li>
+
 
 <li class="nav-item">
   <%= link "Все клиенты", to: Routes.tunnel_path(@conn, :index), class: "nav-link" %>
