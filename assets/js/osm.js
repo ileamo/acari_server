@@ -4,7 +4,7 @@ import {
   OpenStreetMapProvider,
 } from 'leaflet-geosearch';
 import "leaflet.awesome-markers"
-
+import "leaflet.fullscreen/Control.FullScreen"
 
 let osm = document.getElementById("osm")
 
@@ -79,6 +79,7 @@ if (osm) {
     let bounds = JSON.parse(decodeURIComponent(osm.dataset.bounds))
     mymap.fitBounds(bounds)
 
+    mymap.addControl(new L.Control.FullScreen());
 
   } else {
 

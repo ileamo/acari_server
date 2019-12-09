@@ -71,6 +71,14 @@ module.exports = (env, options) => ({
          "./images/marker-shadow.png$": path.resolve(
              __dirname,
              "./node_modules/leaflet/dist/images/marker-shadow.png"
+         ),
+         "./icon-fullscreen.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.fullscreen/icon-fullscreen.png"
+         ),
+         "./icon-fullscreen-2x.png$": path.resolve(
+             __dirname,
+             "./node_modules/leaflet.fullscreen/icon-fullscreen-2x.png"
          )
      }
   },
