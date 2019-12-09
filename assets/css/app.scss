@@ -13,6 +13,8 @@
 @import "~leaflet-geosearch/assets/css/leaflet";
 @import "~leaflet.awesome-markers/dist/leaflet.awesome-markers";
 @import "~leaflet.fullscreen/Control.FullScreen";
+@import "~leaflet.markercluster/dist/MarkerCluster";
+@import "./markerClusterBogatka.css";
 
 .leaflet-control-geosearch .results {
   width: 300px; }

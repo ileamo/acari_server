@@ -5,6 +5,7 @@ import {
 } from 'leaflet-geosearch';
 import "leaflet.awesome-markers"
 import "leaflet.fullscreen/Control.FullScreen"
+import "leaflet.markercluster/dist/leaflet.markercluster"
 
 let osm = document.getElementById("osm")
 
@@ -65,16 +66,46 @@ if (osm) {
       }
     }
 
+
+    let clusterIconFn = function(cluster) {
+      var childCount = cluster.getChildCount();
+
+      var c = ' marker-cluster-';
+      if (childCount < 5) {
+        c += 'small';
+      } else if (childCount < 10) {
+        c += 'medium';
+      } else {
+        c += 'large';
+      }
+
+      return new L.DivIcon({
+        html: '<div><span>' + childCount + '</span></div>',
+        className: 'marker-cluster' + c,
+        iconSize: new L.Point(40, 40)
+      });
+    }
+
+
+    var markerCluster = L.markerClusterGroup({
+      iconCreateFunction: clusterIconFn
+    });
+
     let markers = JSON.parse(decodeURIComponent(osm.dataset.markers))
     for (var i = 0; i < markers.length; i++) {
       let point = markers[i];
       let marker = L.marker([point.lat, point.lng], {
         icon: markerIcon[point.alert || 0],
-      }).addTo(mymap);
-
+      })
+      //.addTo(mymap);
       marker.bindPopup(point.title)
       myMapMarkers.set(point.name, marker);
+
+      markerCluster.addLayer(marker)
+
     }
+
+    mymap.addLayer(markerCluster)
 
     let bounds = JSON.parse(decodeURIComponent(osm.dataset.bounds))
     mymap.fitBounds(bounds)
