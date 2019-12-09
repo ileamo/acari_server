@@ -57,8 +57,11 @@ if (osm) {
     global.osmMap = function(events) {
       for (var i = 0; i < events.length; i++) {
         let name = events[i].name
-        let level = events[i].level
-        myMapMarkers.get(name).setIcon(markerIcon[level])
+        let marker = myMapMarkers.get(name)
+        if (marker) {
+          let level = events[i].level
+          marker.setIcon(markerIcon[level])
+        }
       }
     }
 

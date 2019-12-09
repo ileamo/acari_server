@@ -1,7 +1,7 @@
 defmodule AcariServerWeb.MapController do
   use AcariServerWeb, :controller
 
-  def index(conn, params) do
+  def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, params) do
     {nodes, group_name} =
       case params["group_id"] || "" do
         "" ->
@@ -15,7 +15,32 @@ defmodule AcariServerWeb.MapController do
     index(conn, params, nodes, group_name)
   end
 
-  def index(conn, params, nodes, group_name) do
+  def index(%{assigns: %{current_user: user}} = conn, params) do
+    groups =
+      user
+      |> AcariServer.RepoRO.preload(groups: :nodes)
+      |> Map.get(:groups)
+
+    {nodes, group_name} =
+      case params["group_id"] || "" do
+        "" ->
+          nodes =
+            groups
+            |> Enum.map(fn %{nodes: nodes} -> nodes end)
+            |> List.flatten()
+            |> Enum.uniq_by(fn %{id: id} -> id end)
+
+          {nodes, "Все"}
+
+        n ->
+          group = AcariServer.GroupManager.get_group!(n)
+          {group.nodes, group.name}
+      end
+
+    index(conn, params, nodes, group_name, groups)
+  end
+
+  def index(conn, params, nodes, group_name, groups \\ nil) do
     nodes =
       nodes
       |> AcariServer.Mnesia.get_tunnel_list()
@@ -52,6 +77,7 @@ defmodule AcariServerWeb.MapController do
         render(conn, "index.html",
           group_id: params["group_id"] || "",
           group_name: group_name,
+          groups: groups,
           markers: markers_json,
           bounds: bounds_json,
           center_lat: center_lat,
