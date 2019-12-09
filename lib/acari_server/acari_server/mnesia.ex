@@ -570,19 +570,23 @@ defmodule AcariServer.Mnesia do
 
       {level, port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
-      Mnesia.write(
-        Rec.client_status(
-          name: tun,
-          timestamp: :os.system_time(:microsecond),
-          opts: %{
-            level: level,
-            text: mes
-          }
-        )
-      )
+      empty = [] == Mnesia.read(:client_status, tun)
 
-      if level == 4 do
-        purge_client_status_table()
+      if not empty or level != 4 do
+        Mnesia.write(
+          Rec.client_status(
+            name: tun,
+            timestamp: :os.system_time(:microsecond),
+            opts: %{
+              level: level,
+              text: mes
+            }
+          )
+        )
+
+        if level == 4 do
+          purge_client_status_table()
+        end
       end
 
       case up do
