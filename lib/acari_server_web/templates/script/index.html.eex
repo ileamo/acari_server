@@ -20,7 +20,8 @@
         <%= link "Редактировать", to: Routes.script_path(@conn, :edit, script),
             class: AcariServer.UserManager.get_disabled(@current_user) %>
         |
-        <%= link "Удалить", to: Routes.script_path(@conn, :delete, script), method: :delete,
+        <%= link "Удалить", to: Routes.script_path(@conn, :delete, script),
+              method: :delete,
               data: [confirm: "Вы уверены?"],
               class: AcariServer.UserManager.get_disabled(@current_user) %>
       </td>

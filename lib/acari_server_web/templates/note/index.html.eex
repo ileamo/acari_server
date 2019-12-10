@@ -25,13 +25,17 @@
       </td>
 
       <td>
-        <%= link "Редактировать", to: Routes.note_path(@conn, :edit, note) %>
+        <%= link "Редактировать", to: Routes.note_path(@conn, :edit, note),
+            class: AcariServer.UserManager.get_disabled(@current_user) %>
         |
-        <%= link "Удалить", to: Routes.note_path(@conn, :delete, note), method: :delete, data: [confirm: "Вы уверены?"] %>
+        <%= link "Удалить", to: Routes.note_path(@conn, :delete, note),
+            method: :delete, data: [confirm: "Вы уверены?"],
+            class: AcariServer.UserManager.get_disabled(@current_user) %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "Новая заметка", to: Routes.note_path(@conn, :new) %></span>
+<span><%= link "Новая заметка", to: Routes.note_path(@conn, :new),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>

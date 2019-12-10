@@ -4,6 +4,9 @@ defmodule AcariServerWeb.NoteController do
   alias AcariServer.NoteManager
   alias AcariServer.NoteManager.Note
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin when action in [:edit, :delete, :new]
+
   def index(conn, _params) do
     notes = NoteManager.list_notes()
     render(conn, "index.html", notes: notes)
