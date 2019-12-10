@@ -82,7 +82,7 @@ if (osm) {
       return new L.DivIcon({
         html: '<div><span>' + childCount + '</span></div>',
         className: 'marker-cluster' + c,
-        iconSize: new L.Point(40, 40)
+        iconSize: new L.Point(50, 50)
       });
     }
 
