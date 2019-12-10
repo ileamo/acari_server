@@ -1,60 +1,83 @@
-.marker-cluster-small {
-	background-color: rgba(181, 226, 140, 0.6);
-	}
-.marker-cluster-small div {
-	background-color: rgba(110, 204, 57, 0.6);
-	}
+.marker-cluster-success {
+  background-color: rgba(44, 184, 76, 0.6);
+}
 
-.marker-cluster-medium {
-	background-color: rgba(241, 211, 87, 0.6);
-	}
-.marker-cluster-medium div {
-	background-color: rgba(240, 194, 12, 0.6);
-	}
+.marker-cluster-success div {
+  background-color: rgba(40, 167, 69, 0.6);
+}
 
-.marker-cluster-large {
-	background-color: rgba(253, 156, 115, 0.6);
-	}
-.marker-cluster-large div {
-	background-color: rgba(241, 128, 23, 0.6);
-	}
+.marker-cluster-info {
+  background-color: rgba(25, 178, 202, 0.6);
+}
 
-	/* IE 6-8 fallback colors */
-.leaflet-oldie .marker-cluster-small {
-	background-color: rgb(181, 226, 140);
-	}
-.leaflet-oldie .marker-cluster-small div {
-	background-color: rgb(110, 204, 57);
-	}
+.marker-cluster-info div {
+  background-color: rgba(23, 162, 184, 0.6);
+}
 
-.leaflet-oldie .marker-cluster-medium {
-	background-color: rgb(241, 211, 87);
-	}
-.leaflet-oldie .marker-cluster-medium div {
-	background-color: rgb(240, 194, 12);
-	}
+.marker-cluster-warning {
+  background-color: rgba(255, 138, 22, 0.6);
+}
 
-.leaflet-oldie .marker-cluster-large {
-	background-color: rgb(253, 156, 115);
-	}
-.leaflet-oldie .marker-cluster-large div {
-	background-color: rgb(241, 128, 23);
+.marker-cluster-warning div {
+  background-color: rgba(253, 126, 20, 0.6);
+}
+
+.marker-cluster-danger {
+  background-color: rgba(242, 58, 76, 0.6);
+}
+
+.marker-cluster-danger div {
+  background-color: rgba(220, 53, 69, 0.6);
+}
+
+/* IE 6-8 fallback colors */
+.leaflet-oldie .marker-cluster-success {
+  background-color: rgb(181, 226, 140);
+}
+
+.leaflet-oldie .marker-cluster-success div {
+  background-color: rgb(110, 204, 57);
+}
+
+.leaflet-oldie .marker-cluster-info {
+  background-color: rgb(241, 211, 87);
+}
+
+.leaflet-oldie .marker-cluster-info div {
+  background-color: rgb(240, 194, 12);
+}
+
+.leaflet-oldie .marker-cluster-warning {
+  background-color: rgb(253, 156, 115);
+}
+
+.leaflet-oldie .marker-cluster-warning div {
+  background-color: rgb(241, 128, 23);
+}
+
+.leaflet-oldie .marker-cluster-danger {
+  background-color: rgb(253, 156, 115);
+}
+
+.leaflet-oldie .marker-cluster-danger div {
+  background-color: rgb(241, 128, 23);
 }
 
 .marker-cluster {
-	background-clip: padding-box;
-	border-radius: 50%;
-	}
-.marker-cluster div {
-	width: 40px;
-	height: 40px;
-	margin-left: 5px;
-	margin-top: 5px;
+  background-clip: padding-box;
+  border-radius: 50%;
+}
 
-	text-align: center;
-	border-radius: 50%;
-	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
-	}
+.marker-cluster div {
+  width: 40px;
+  height: 40px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  border-radius: 50%;
+  font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
 .marker-cluster span {
-	line-height: 40px;
-	}
+  line-height: 40px;
+}

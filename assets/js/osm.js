@@ -72,11 +72,11 @@ if (osm) {
 
       var c = ' marker-cluster-';
       if (childCount < 5) {
-        c += 'small';
+        c += 'success';
       } else if (childCount < 10) {
-        c += 'medium';
+        c += 'info';
       } else {
-        c += 'large';
+        c += 'danger';
       }
 
       return new L.DivIcon({
