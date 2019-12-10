@@ -32,12 +32,6 @@ if (osm) {
     prefix: 'fa',
     extraClasses: 'fas',
     icon: 'paw',
-    //icon: 'hdd',
-    //icon: 'broadcast-tower',
-    //icon: 'money-check-alt',
-    //icon: 'satellite-dish',
-    //icon: 'external-link-alt',
-    //icon: 'linux',
     iconColor: '#000000',
   });
 
@@ -54,6 +48,39 @@ if (osm) {
   })
 
   if (osm.dataset.markers) {
+    let clusterIconFn = function(cluster) {
+      let markerColorMap = new Map();
+      var childCount = cluster.getChildCount();
+      var childMarkers = cluster.getAllChildMarkers();
+      for (var i = 0; i < childMarkers.length; i++) {
+        let mc = childMarkers[i].options.icon.options.markerColor
+        let old = markerColorMap.get(mc)
+        markerColorMap.set(mc, old && old + 1 || 1)
+      }
+
+      let c = ' marker-cluster-';
+      if (markerColorMap.get("red")) {
+        c += 'danger';
+      } else if (markerColorMap.get("orange")) {
+        c += 'warning';
+      } else if (markerColorMap.get("blue")) {
+        c += 'info';
+      } else {
+        c += 'success';
+      }
+
+      return new L.DivIcon({
+        html: '<div><span>' + childCount + '</span></div>',
+        className: 'marker-cluster' + c,
+        iconSize: new L.Point(50, 50)
+      });
+    }
+
+    let markerCluster = L.markerClusterGroup({
+      iconCreateFunction: clusterIconFn
+    });
+
+    let markers;
     let myMapMarkers = new Map();
     global.osmMap = function(events) {
       for (var i = 0; i < events.length; i++) {
@@ -64,34 +91,10 @@ if (osm) {
           marker.setIcon(markerIcon[level])
         }
       }
+      markerCluster.refreshClusters();
     }
 
-
-    let clusterIconFn = function(cluster) {
-      var childCount = cluster.getChildCount();
-
-      var c = ' marker-cluster-';
-      if (childCount < 5) {
-        c += 'success';
-      } else if (childCount < 10) {
-        c += 'info';
-      } else {
-        c += 'danger';
-      }
-
-      return new L.DivIcon({
-        html: '<div><span>' + childCount + '</span></div>',
-        className: 'marker-cluster' + c,
-        iconSize: new L.Point(50, 50)
-      });
-    }
-
-
-    var markerCluster = L.markerClusterGroup({
-      iconCreateFunction: clusterIconFn
-    });
-
-    let markers = JSON.parse(decodeURIComponent(osm.dataset.markers))
+    markers = JSON.parse(decodeURIComponent(osm.dataset.markers))
     for (var i = 0; i < markers.length; i++) {
       let point = markers[i];
       let marker = L.marker([point.lat, point.lng], {
@@ -102,7 +105,6 @@ if (osm) {
       myMapMarkers.set(point.name, marker);
 
       markerCluster.addLayer(marker)
-
     }
 
     mymap.addLayer(markerCluster)
