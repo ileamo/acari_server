@@ -1,3 +1,11 @@
+.marker-cluster-grey {
+  background-color: rgba(119, 129, 138, 0.6);
+}
+
+.marker-cluster-grey div {
+  background-color: rgba(108, 117, 125, 0.6);
+}
+
 .marker-cluster-success {
   background-color: rgba(44, 184, 76, 0.6);
 }
@@ -31,36 +39,44 @@
 }
 
 /* IE 6-8 fallback colors */
+.leaflet-oldie .marker-cluster-grey {
+  background-color: rgb(119, 129, 138);
+}
+
+.leaflet-oldie .marker-cluster-grey div {
+  background-color: rgb(108, 117, 125);
+}
+
 .leaflet-oldie .marker-cluster-success {
-  background-color: rgb(181, 226, 140);
+  background-color: rgb(44, 184, 76);
 }
 
 .leaflet-oldie .marker-cluster-success div {
-  background-color: rgb(110, 204, 57);
+  background-color: rgb(40, 167, 69);
 }
 
 .leaflet-oldie .marker-cluster-info {
-  background-color: rgb(241, 211, 87);
+  background-color: rgb(25, 178, 202);
 }
 
 .leaflet-oldie .marker-cluster-info div {
-  background-color: rgb(240, 194, 12);
+  background-color: rgb(23, 162, 184);
 }
 
 .leaflet-oldie .marker-cluster-warning {
-  background-color: rgb(253, 156, 115);
+  background-color: rgb(255, 138, 22);
 }
 
 .leaflet-oldie .marker-cluster-warning div {
-  background-color: rgb(241, 128, 23);
+  background-color: rgb(253, 126, 20);
 }
 
 .leaflet-oldie .marker-cluster-danger {
-  background-color: rgb(253, 156, 115);
+  background-color: rgb(242, 58, 76);
 }
 
 .leaflet-oldie .marker-cluster-danger div {
-  background-color: rgb(241, 128, 23);
+  background-color: rgb(220, 53, 69);
 }
 
 .marker-cluster {

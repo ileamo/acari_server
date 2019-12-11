@@ -54,6 +54,7 @@ if (osm) {
       var childMarkers = cluster.getAllChildMarkers();
       for (var i = 0; i < childMarkers.length; i++) {
         let mc = childMarkers[i].options.icon.options.markerColor
+        console.log(mc)
         let old = markerColorMap.get(mc)
         markerColorMap.set(mc, old && old + 1 || 1)
       }
@@ -65,8 +66,10 @@ if (osm) {
         c += 'warning';
       } else if (markerColorMap.get("blue")) {
         c += 'info';
-      } else {
+      } else if (markerColorMap.get("green")) {
         c += 'success';
+      } else {
+        c += 'grey';
       }
 
       return new L.DivIcon({
