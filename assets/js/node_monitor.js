@@ -2,18 +2,21 @@ import socket from './socket'
 
 let node_monitor = document.getElementById('node-monitor');
 if (node_monitor) {
+  document.getElementById('mainPage')
+    .setAttribute("style", "padding-bottom: 600px; margin-bottom: -600px;");
+
   let channel = socket.channel("node_monitor:1", {
     pathname: window.location.pathname
   })
   channel.join()
-  .receive("ok", resp => {
-    //console.log("node_monitor: Joined successfully", resp)
-    getLastScript()
-    getLastSrvScript()
-  })
-  .receive("error", resp => {
-    console.log("node_monitor: Unable to join", resp)
-  })
+    .receive("ok", resp => {
+      //console.log("node_monitor: Joined successfully", resp)
+      getLastScript()
+      getLastSrvScript()
+    })
+    .receive("error", resp => {
+      console.log("node_monitor: Unable to join", resp)
+    })
 
   channel.on('output', payload => {
     //console.log("node moniotor get:", payload, payload.id);
@@ -39,9 +42,11 @@ if (node_monitor) {
 
 
   // Remote script
-  var scripts = document.querySelectorAll("#nm-script a")//.addEventListener("click", getScript, false);
+  var scripts = document.querySelectorAll("#nm-script a") //.addEventListener("click", getScript, false);
 
-  scripts.forEach(function(item) {item.addEventListener("click", getScript, false)})
+  scripts.forEach(function(item) {
+    item.addEventListener("click", getScript, false)
+  })
 
   function getScript() {
     sessionStorage.setItem("lastScript" + window.location.pathname, this.id)
@@ -63,7 +68,7 @@ if (node_monitor) {
 
   function updateScript() {
     let id = sessionStorage.getItem("lastScript" + window.location.pathname)
-    let r = confirm("Выполнить скрипт "+id+" на клиенте?")
+    let r = confirm("Выполнить скрипт " + id + " на клиенте?")
     if (r) {
       document.querySelector("#nm-script-field").innerText = "Wait ..."
       channel.push('input', {
@@ -74,9 +79,11 @@ if (node_monitor) {
   }
 
   // Local script
-  var srv_scripts = document.querySelectorAll("#nm-srv-script a")//.addEventListener("click", getScript, false);
+  var srv_scripts = document.querySelectorAll("#nm-srv-script a") //.addEventListener("click", getScript, false);
 
-  srv_scripts.forEach(function(item) {item.addEventListener("click", getSrvScript, false)})
+  srv_scripts.forEach(function(item) {
+    item.addEventListener("click", getSrvScript, false)
+  })
 
   function getSrvScript() {
     sessionStorage.setItem("lastSrvScript" + window.location.pathname, this.id)
@@ -100,7 +107,7 @@ if (node_monitor) {
 
   function updateSrvScript() {
     let id = sessionStorage.getItem("lastSrvScript" + window.location.pathname)
-    let r = confirm("Выполнить скрипт "+id+" на сервере?")
+    let r = confirm("Выполнить скрипт " + id + " на сервере?")
     if (r) {
       document.querySelector("#nm-srv-script-field").innerText = "Нажмите 'Обновить' для просмотра результата"
       channel.push('input', {
