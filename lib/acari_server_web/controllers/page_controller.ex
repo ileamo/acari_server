@@ -8,6 +8,27 @@ defmodule AcariServerWeb.PageController do
     render(conn, "index.html")
   end
 
+  def zabbix(conn = %{assigns: %{current_user: %{is_admin: true}}}, %{"sync" => sync_type, "prev_path" => prev_path}) do
+    mes =
+      case sync_type do
+        "full" ->
+          AcariServer.Zabbix.ZbxApi.zbx_hosts_sync(update: true)
+          "Полная"
+
+        _ ->
+          AcariServer.Zabbix.ZbxApi.zbx_hosts_sync()
+          "Быстрая"
+      end
+
+    conn
+    |> put_flash(:info, "#{mes} синхронизация началась.")
+    |> redirect(to: prev_path)
+  end
+
+  def zabbix(conn, %{"sync" => _, "prev_path" => _} = params) do
+    is_admin(conn, params)
+  end
+
   def zabbix(conn, _params) do
     zbx_url =
       case Application.get_env(:acari_server, :zabbix)[:zbx_ext_url] do

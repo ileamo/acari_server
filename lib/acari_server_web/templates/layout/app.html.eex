@@ -99,6 +99,62 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="ZabbixSync" tabindex="-1" role="dialog"
+         aria-labelledby="ZabbixTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ZabbixTitle">  Синхронизация Zabbix</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              При каждом добавлении, удалении или обновлении конфигурации Клиента
+              происходит автоматическая синхронизация с Zabbix. То есть для данного клитента
+              создается, удаляется или изменяется соответствующий Узел сети в Zabbix.
+              <em>Проводить принудительную синхронизацию обычно
+                <strong>не требуется</strong>.
+              </em>
+            </p>
+            <p>
+              Принудительная синхронизация может потребоваться если были по ошибке внесены
+              изменения на самом Zabbix сервере или был сбой сети во время атоматической
+              синхронизации.
+            </p>
+            <p>
+              <strong>Быстрая синхронизация</strong> просто удаляет несуществующие Узлы сети и
+              добавляет новые.
+            </p>
+            <p>
+              <strong>Полная синхронизация</strong> проводит сначала быструю синхронизацию,
+              а затем для всех узлов корректирует имя, описание и принадлежность к группам</br>
+              <strong>ВНИМАНИЕ:</strong> Полная синхронизация занимает достаточно много времени.
+            </p>
+            <p>
+              Если вы хотите синхронизировать конкретный Узел сети, то достаточно
+              в Богатке зайти в редактирование Клиента и нажать кнопку "Сохранить"
+            </p>
+
+          </div>
+          <div class="modal-footer">
+              <%= link "Быстрая Синхронизация",
+                to: Routes.page_path(@conn, :zabbix, sync: :fast,
+                  prev_path: "#{@conn.request_path}?#{@conn.query_string}"),
+                role: "button", class: "btn btn-info" %>
+              <%= link "Полная Синхронизация",
+                to: Routes.page_path(@conn, :zabbix, sync: :full,
+                  prev_path: "#{@conn.request_path}?#{@conn.query_string}"),
+                  data: [confirm: "Вы уверены что хотите начать полную синхронизацию?"],
+                role: "button", class: "btn btn-warning" %>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <script>window.userToken = "<%= assigns[:user_token] %>"</script>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
