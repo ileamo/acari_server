@@ -282,12 +282,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
   defp update_host(node, old_name) do
     case zbx_post(
            "host.get",
-           %{output: ["hostid"], filter: %{host: [old_name]}}
+           %{output: ["hostid", "name"], filter: %{host: [old_name]}}
          ) do
-      {:ok, [%{"hostid" => id}]} ->
+      {:ok, [%{"hostid" => id, "name" => zbx_name}]} ->
         node = AcariServer.Repo.preload(node, :groups)
 
         with true <- old_name == node.name,
+             true <- zbx_name == node.description,
              {:ok, zbx_group_list} <-
                zbx_post(
                  "hostgroup.get",
@@ -330,6 +331,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
       params = %{
         host: node.name,
+        name: node.description,
         interfaces: [
           %{
             type: 1,
