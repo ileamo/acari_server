@@ -77,7 +77,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
   @impl true
   def handle_continue(:init, state) do
     with :ok <- Zabbix.API.create_client(state.zbx_api_url),
-         {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password) do
+         {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password),
+         {:main_group, [%{"groupid" => _hostgroup_id}]} <- {:main_group, get_main_group()},
+         {:main_template, [%{"templateid" => _template_id}]} <-
+           {:main_template, get_template_id()} do
       create_master_host()
       hosts_sync()
       Logger.info("Zabbix API successfully init")
@@ -167,6 +170,20 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
+  defp get_bg_usrgroups() do
+    case zbx_post("usergroup.get", %{output: ["name"]}) do
+      {:ok, list} ->
+        list
+        |> Enum.filter(fn
+          %{"name" => @group_prefix <> _name} -> true
+          _ -> false
+        end)
+
+      _ ->
+        []
+    end
+  end
+
   defp get_hosts(hostgroup_id) do
     case zbx_post(
            "host.get",
@@ -197,6 +214,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
     zbx_groups = get_bg_groups()
 
+    # Delete groups
     zbx_groups_id_del_list =
       zbx_groups
       |> Enum.reject(fn %{"name" => @group_prefix <> name} -> Enum.member?(groups_list, name) end)
@@ -210,6 +228,22 @@ defmodule AcariServer.Zabbix.ZbxApi do
         zbx_post("hostgroup.delete", zbx_groups_id_del_list)
     end
 
+    # Delete user groups
+    zbx_usrgroups = get_bg_usrgroups()
+
+    zbx_usrgroups_id_del_list =
+      zbx_usrgroups
+      |> Enum.reject(fn %{"name" => @group_prefix <> name} -> Enum.member?(groups_list, name) end)
+      |> Enum.map(fn %{"usrgrpid" => id} -> id end)
+
+    case zbx_usrgroups_id_del_list do
+      [] ->
+        nil
+
+      _ ->
+        zbx_post("usergroup.delete", zbx_usrgroups_id_del_list)
+    end
+
     # Add new groups
     zbx_groups_name_list =
       zbx_groups
@@ -221,7 +255,28 @@ defmodule AcariServer.Zabbix.ZbxApi do
       zbx_post("hostgroup.create", %{name: @group_prefix <> group.name})
     end)
 
-    Mnesia.update_zbx_hostgroup(get_bg_groups())
+    bg_groups = get_bg_groups()
+
+    zbx_usrgroups_name_list =
+      zbx_usrgroups
+      |> Enum.map(fn %{"name" => name} -> name end)
+
+    bg_groups
+    |> Enum.reject(fn %{"name" => name} -> Enum.member?(zbx_usrgroups_name_list, name) end)
+    |> Enum.each(fn %{"groupid" => id, "name" => name} ->
+      zbx_post(
+        "usergroup.create",
+        %{
+          name: name,
+          rights: %{
+            id: id,
+            permission: 2
+          }
+        }
+      )
+    end)
+
+    Mnesia.update_zbx_hostgroup(bg_groups)
   end
 
   defp hosts_sync(opt \\ []) do
@@ -381,7 +436,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
                   _ ->
                     zbx_post("hostgroup.create", %{name: @main_host})
-                    |> IO.inspect()
                 end) do
           params = %{
             host: @main_host,
