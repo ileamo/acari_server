@@ -3,14 +3,8 @@
 
 
     <!-- STATISTIC-->
-    <section class="statistic">
-        <div class="section__content">
-            <div class="container-fluid">
-                <div class="row mb-4 mt-md-4" id="statistics">
-                  <%= render "statistics.html", assigns %>
-                </div>
-            </div>
-        </div>
+    <section class="statistic" id="statistics">
+      <%= render "statistics.html", assigns %>
     </section>
 
     <section>
