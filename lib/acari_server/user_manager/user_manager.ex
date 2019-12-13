@@ -11,6 +11,7 @@ defmodule AcariServer.UserManager do
   alias Plug.Conn
 
   alias AcariServer.GroupUserAssociation
+  alias AcariServer.Zabbix.ZbxApi
 
   @doc """
   Returns the list of users.
@@ -70,6 +71,13 @@ defmodule AcariServer.UserManager do
       {:ok, user} ->
         update_group_user_assoc(user.id, rights)
 
+        Task.start(fn ->
+          Process.sleep(1_000)
+          ZbxApi.zbx_users_sync()
+        end)
+
+        res
+
       _ ->
         nil
     end
@@ -86,6 +94,11 @@ defmodule AcariServer.UserManager do
     case res do
       {:ok, _} ->
         update_group_user_assoc(user.id, rights)
+
+        Task.start(fn ->
+          Process.sleep(1_000)
+          ZbxApi.zbx_users_sync()
+        end)
 
       _ ->
         nil
@@ -112,7 +125,14 @@ defmodule AcariServer.UserManager do
   end
 
   def delete_user(%User{} = user) do
-    Repo.delete_wait(user)
+    res = Repo.delete_wait(user)
+
+    Task.start(fn ->
+      Process.sleep(1_000)
+      ZbxApi.zbx_users_sync()
+    end)
+
+    res
   end
 
   @doc """

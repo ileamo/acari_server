@@ -78,9 +78,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
   def handle_continue(:init, state) do
     with :ok <- Zabbix.API.create_client(state.zbx_api_url),
          {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password),
-         {:main_group, [%{"groupid" => _hostgroup_id}]} <- {:main_group, get_main_group()},
-         {:main_template, [%{"templateid" => _template_id}]} <-
-           {:main_template, get_template_id()} do
+         {:main_group, [%{"groupid" => _}]} <- {:main_group, get_main_group()},
+         {:main_usrgroup, [%{"usrgrpid" => _}]} <- {:main_usrgroup, get_main_usrgroup()},
+         {:main_template, [%{"templateid" => _}]} <- {:main_template, get_template_id()} do
       create_master_host()
       hosts_sync()
       Logger.info("Zabbix API successfully init")
@@ -105,6 +105,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def handle_cast(:groups_sync, state) do
     groups_sync()
+    {:noreply, state}
+  end
+
+  def handle_cast(:users_sync, state) do
+    users_sync()
     {:noreply, state}
   end
 
@@ -141,6 +146,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   defp get_main_group() do
     case zbx_post("hostgroup.get", %{output: ["name"], filter: %{name: [@main_group]}}) do
+      {:ok, list} -> list
+      _ -> []
+    end
+  end
+
+  def get_main_usrgroup() do
+    case zbx_post("usergroup.get", %{output: ["name"], filter: %{name: [@main_group]}}) do
       {:ok, list} -> list
       _ -> []
     end
@@ -277,6 +289,94 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end)
 
     Mnesia.update_zbx_hostgroup(bg_groups)
+  end
+
+  defp get_users(usrgrpid) do
+    case zbx_post(
+           "user.get",
+           %{output: ["alias"], usrgrpids: [usrgrpid]}
+         ) do
+      {:ok, list} -> list
+      _ -> []
+    end
+  end
+
+  defp users_sync() do
+    with [%{"usrgrpid" => usrgrpid}] <- get_main_usrgroup() do
+      users =
+        AcariServer.UserManager.list_users()
+        |> Enum.reject(fn %{is_admin: admin} -> admin end)
+        |> Enum.map(fn %{username: name, groups: groups_list} ->
+          {name, groups_list |> Enum.map(fn %{name: name} -> @group_prefix <> name end)}
+        end)
+        |> Enum.into(%{})
+
+      # Delete
+      users_list =
+        users
+        |> Enum.map(fn {name, _} -> name end)
+
+      zbx_users_list_to_delete =
+        get_users(usrgrpid)
+        |> Enum.reject(fn %{"alias" => name} ->
+          Enum.member?(users_list, name)
+        end)
+        |> Enum.map(fn %{"userid" => userid} -> userid end)
+
+      zbx_post("user.delete", zbx_users_list_to_delete)
+
+      usrgrp_name_id_map =
+        get_bg_usrgroups()
+        |> Enum.map(fn %{"name" => name, "usrgrpid" => usrgrpid} ->
+          {name, usrgrpid}
+        end)
+        |> Enum.into(%{})
+
+      # Update
+      zbx_users = get_users(usrgrpid)
+
+      params =
+        zbx_users
+        |> Enum.map(fn %{"alias" => name, "userid" => userid} ->
+          usrgrpid_list =
+            users[name]
+            |> Enum.map(fn usergroup_name -> %{usrgrpid: usrgrp_name_id_map[usergroup_name]} end)
+
+          %{
+            userid: userid,
+            usrgrps: [%{usrgrpid: usrgrpid} | usrgrpid_list]
+          }
+        end)
+
+      zbx_post("user.update", params)
+
+      # Create
+
+      zbx_users_list =
+        zbx_users
+        |> Enum.map(fn %{"alias" => name} -> name end)
+
+      # params =
+      users
+      |> Enum.reject(fn {name, _} -> Enum.member?(zbx_users_list, name) end)
+      |> Enum.map(fn {name, usrgrp_list} ->
+        usrgrpid_list =
+          usrgrp_list
+          |> Enum.map(fn usergroup_name -> %{usrgrpid: usrgrp_name_id_map[usergroup_name]} end)
+
+        %{
+          alias: name,
+          passwd: :crypto.strong_rand_bytes(12) |> Base.encode64(),
+          lang: "ru_RU", 
+          usrgrps: [%{usrgrpid: usrgrpid} | usrgrpid_list]
+        }
+      end)
+      |> Enum.each(fn params ->
+        zbx_post("user.create", params)
+      end)
+    else
+      _ -> nil
+    end
   end
 
   defp hosts_sync(opt \\ []) do
@@ -597,6 +697,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_groups_sync() do
     GenServer.cast(__MODULE__, :groups_sync)
+  end
+
+  def zbx_users_sync() do
+    GenServer.cast(__MODULE__, :users_sync)
   end
 
   def zbx_hosts_sync(opts \\ []) do
