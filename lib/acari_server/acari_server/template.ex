@@ -1,5 +1,6 @@
 defmodule AcariServer.Template do
   def eval(templ, assigns \\ %{}) do
+    IO.inspect({templ, assigns})
     templ = templ || ""
 
     try do
