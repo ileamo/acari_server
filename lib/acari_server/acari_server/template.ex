@@ -1,6 +1,49 @@
 defmodule AcariServer.Template do
+  defp std_funcs() do
+    %{
+      "path_to" => fn x, _render ->
+        TemplFunc.path_to(x |> String.trim())
+      end
+    }
+  end
+
   def eval(templ, assigns \\ %{}) do
     IO.inspect({templ, assigns})
+    templ = templ || ""
+
+    assigns =
+      assigns
+      |> Enum.map(fn
+        {k, v} when is_atom(k) -> {Atom.to_string(k), v}
+        other -> other
+      end)
+      |> Enum.into(%{})
+      |> IO.inspect()
+
+    try do
+      embed =
+        :bbmustache.render(
+          templ,
+          assigns
+          |> Map.merge(std_funcs()),
+          key_type: :binary,
+          escape_fun: & &1
+        )
+
+      {embed, nil}
+    rescue
+      x ->
+        stack =
+          case __STACKTRACE__ do
+            [{:erlang, func, args, _} | _] -> ": #{func}(#{Enum.join(args, ", ")})"
+            _ -> ""
+          end
+
+        {nil, "#{Exception.message(x)}#{stack}"}
+    end
+  end
+
+  def eval_EEX(templ, assigns \\ %{}) do
     templ = templ || ""
 
     try do
@@ -111,5 +154,24 @@ defmodule AcariServer.Template do
       {k, v} -> {k, v}
     end)
     |> Enum.into(%{})
+  end
+
+  def humanize_lua_err(err) do
+    case err do
+      {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
+        Enum.join(list)
+
+      {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
+        "#{a} #{inspect(s)}"
+
+      {:lua_error, {t, a, b}, _} when is_atom(t) ->
+        "#{t} #{inspect(a)} #{inspect(b)}"
+
+      {:lua_error, {t, a}, _} when is_atom(t) ->
+        "#{t} #{inspect(a)}"
+
+      err ->
+        inspect(err)
+    end
   end
 end

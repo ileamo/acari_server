@@ -16,7 +16,12 @@ defmodule AcariServerWeb.TemplateView do
   end
 
   def eval_template(prefix, templ, test_ass) do
-    templ = (prefix || "") <> templ
+    lua_state =
+      Sandbox.init()
+      |> Sandbox.set!("params", test_ass)
+      |> Sandbox.eval(templ)
+      |> IO.inspect()
+
     AcariServer.Template.eval(templ, test_ass)
   end
 
