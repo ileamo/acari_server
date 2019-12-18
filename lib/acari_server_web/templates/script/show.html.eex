@@ -48,15 +48,19 @@
 
   </li>
 
-  <% {_, prefix_error} = test_ass && eval_prefix(@script, test_ass) || {nil, nil} %>
+  <% {res, prefix_res_txt} = eval_prefix(@script.prefix, test_ass || %{}) %>
 
   <li>
     <strong>Префикс:</strong>
-    <pre class="border rounded bg-white p-2 <%= prefix_error && "mb-0" || "" %>"><code><%=
+    <pre class="border rounded bg-white p-2 <%= (res == :error) && "mb-0" || "" %>"><code><%=
       @script.prefix
     %></code></pre>
-    <%= if prefix_error do %>
-      <p class = "text-danger"><%= prefix_error %><p>
+    <%= if res == :error do %>
+      <p class = "text-danger"><%= prefix_res_txt %><p>
+    <% else %>
+      <p>
+        <%= "Вычисленные параметры:" %></br>
+        <%= "#{inspect(prefix_res_txt)}" %><p>
     <% end %>
   </li>
 
