@@ -26,7 +26,13 @@ defmodule TemplFunc do
     "./#{name}"
   end
 
-  def read_file(path) do
+  def include_file(path) do
+    path =
+      case path do
+        "~/" <> tail -> "#{System.user_home()}/#{tail}"
+        path -> path
+      end
+
     case File.read(path) do
       {:ok, content} -> content
       {:error, reason} -> "Error reading file #{path}: #{inspect(reason)}"

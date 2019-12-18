@@ -3,12 +3,15 @@ defmodule AcariServer.Template do
     %{
       "path_to" => fn x, _render ->
         TemplFunc.path_to(x |> String.trim())
+      end,
+      "include_file" => fn x, _render ->
+        TemplFunc.include_file(x |> String.trim())
+
       end
     }
   end
 
   def eval(templ, assigns \\ %{}) do
-    IO.inspect({templ, assigns})
     templ = templ || ""
 
     assigns =
@@ -18,14 +21,13 @@ defmodule AcariServer.Template do
         other -> other
       end)
       |> Enum.into(%{})
-      |> IO.inspect()
 
     try do
       embed =
         :bbmustache.render(
           templ,
           assigns
-          |> Map.merge(std_funcs()),
+          |> Map.put("fn", std_funcs()),
           key_type: :binary,
           escape_fun: & &1
         )
