@@ -15,7 +15,7 @@ defmodule AcariServerWeb.ScriptView do
              {k, v} when is_binary(k) -> true
              _ -> false
            end) do
-          {:ok, res |> Enum.into(%{})}
+          {:ok, res |> Enum.into(%{}) |> Jason.encode!(pretty: true)}
         else
           {:error, "Результатом вычисления должна быть таблица пар ключ-значение"}
         end

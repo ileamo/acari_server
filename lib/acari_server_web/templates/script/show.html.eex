@@ -52,15 +52,18 @@
 
   <li>
     <strong>Префикс:</strong>
-    <pre class="border rounded bg-white p-2 <%= (res == :error) && "mb-0" || "" %>"><code><%=
+    <pre class="border rounded bg-white p-2 mb-0"><code><%=
       @script.prefix
     %></code></pre>
     <%= if res == :error do %>
       <p class = "text-danger"><%= prefix_res_txt %><p>
     <% else %>
-      <p>
-        <%= "Вычисленные параметры:" %></br>
-        <%= "#{inspect(prefix_res_txt)}" %><p>
+      <p class="mb-0">
+        <%= "Вычисленные параметры:" %>
+      </p>
+      <pre>
+          <%= prefix_res_txt %>
+      </pre>
     <% end %>
   </li>
 
