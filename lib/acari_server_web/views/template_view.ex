@@ -16,13 +16,17 @@ defmodule AcariServerWeb.TemplateView do
   end
 
   def eval_template(prefix, templ, test_ass) do
-    lua_state =
-      Sandbox.init()
-      |> Sandbox.set!("params", test_ass)
-      |> Sandbox.eval(templ)
+    with {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, test_ass) do
+      AcariServer.Template.eval(templ, test_ass |> Map.merge(calculated))
       |> IO.inspect()
+    else
+      {:error, mes} ->
+        {:error, mes}
 
-    AcariServer.Template.eval(templ, test_ass)
+      res ->
+        IO.inspect(res, label: "evel err")
+        {:error, "ERROR"}
+    end
   end
 
   def validate(validator, text) do

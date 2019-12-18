@@ -57,7 +57,7 @@
   </div>
 
   <div class="form-group">
-    <%= label f, "Вычисляемые параметры", class: "control-label" %>
+    <%= label f, "Вычисление параметров", class: "control-label" %>
     <%= textarea f, :prefix, class: "form-control text-monospace", rows: "12" %>
     <%= error_tag f, :prefix %>
   </div>

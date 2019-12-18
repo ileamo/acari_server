@@ -30,8 +30,17 @@ defmodule AcariServer.Template do
           escape_fun: & &1
         )
 
-      {embed, nil}
+      {:ok, embed}
     rescue
+      e in ErlangError ->
+        case e do
+          %ErlangError{original: {err_type, {mes, line}}} ->
+            {:error, "#{err_type}: #{mes}: #{inspect(line)}"}
+
+          _ ->
+            {:error, inspect(e)}
+        end
+
       x ->
         stack =
           case __STACKTRACE__ do
@@ -39,7 +48,7 @@ defmodule AcariServer.Template do
             _ -> ""
           end
 
-        {nil, "#{Exception.message(x)}#{stack}"}
+        {:error, "#{Exception.message(x)}#{stack}"}
     end
   end
 
@@ -172,6 +181,26 @@ defmodule AcariServer.Template do
 
       err ->
         inspect(err)
+    end
+  end
+
+  def eval_prefix(script, test_ass) do
+    case Sandbox.init()
+         |> Sandbox.set!("params", test_ass)
+         |> Sandbox.eval(script) do
+      {:ok, res} ->
+        if res
+           |> Enum.all?(fn
+             {k, _v} when is_binary(k) -> true
+             _ -> false
+           end) do
+          {:ok, res |> Enum.into(%{})}
+        else
+          {:error, "Результатом вычисления должна быть таблица пар ключ-значение"}
+        end
+
+      {:error, err} ->
+        {:error, humanize_lua_err(err)}
     end
   end
 end

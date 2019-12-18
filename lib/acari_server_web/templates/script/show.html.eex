@@ -48,21 +48,22 @@
 
   </li>
 
-  <% {res, prefix_res_txt} = eval_prefix(@script.prefix, test_ass || %{}) %>
+  <% {res, prefix_res} =
+    AcariServer.Template.eval_prefix(@script.prefix, test_ass || %{}) %>
 
   <li>
-    <strong>Префикс:</strong>
+    <strong>Вычисление параметров:</strong>
     <pre class="border rounded bg-white p-2 mb-0"><code><%=
       @script.prefix
     %></code></pre>
     <%= if res == :error do %>
-      <p class = "text-danger"><%= prefix_res_txt %><p>
+      <p class = "text-danger"><%= prefix_res %><p>
     <% else %>
       <p class="mb-0">
         <%= "Вычисленные параметры:" %>
       </p>
       <pre>
-          <%= prefix_res_txt %>
+          <%= prefix_res |> Jason.encode!(pretty: true)%>
       </pre>
     <% end %>
   </li>

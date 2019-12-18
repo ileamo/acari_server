@@ -24,7 +24,7 @@
     </li>
   <% end %>
 
-  <% {template, template_error} = with %{} = script <- @template.script,
+  <% {eval_res, template_txt} = with %{} = script <- @template.script,
           {var, nil} <- AcariServer.Template.get_json(script.definition),
           {tst, nil} <- AcariServer.Template.get_json(script.test),
           test_ass = %{} <- AcariServer.Template.test_assigns(var,
@@ -38,11 +38,11 @@
 
   <li>
     <strong>Шаблон:</strong>
-    <% pretempl = (@template.script && @template.script.prefix || "")<>@template.template %>
-    <%= if template_error do %>
-      <% {head, line, tail} = highlight_line(pretempl, get_line(template_error)) %>
+    <% pretempl = @template.template %>
+    <%= if eval_res == :error do %>
+      <% {head, line, tail} = {pretempl, "", ""} %>
 
-      <p class = "text-danger mt-2"><%= template_error %><p>
+      <p class = "text-danger mt-2"><%= template_txt %><p>
         <pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
     <% else %>
       <pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%=
@@ -80,18 +80,18 @@
 |
 <span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>
 
-<%= if template do %>
+<%= if eval_res == :ok do %>
 <h3 class = "mt-3"> Результат тестирования </h3>
 <ul>
     <li>
       <strong>Параметры для тестирования взяты из класса <%=@template.script.name%></strong>
-      <%= if (res = validate(@template.validator, template)) != :ok do %>
+      <%= if (res = validate(@template.validator, template_txt)) != :ok do %>
         <p class = "text-danger mt-2"><%= res %><p>
-        <% {head, line, tail} = highlight_line(template, get_line(res)) %>
+        <% {head, line, tail} = highlight_line(template_txt, get_line(res)) %>
 
         <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
       <% else %>
-        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template %></code></pre>
+        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template_txt %></code></pre>
       <% end %>
     </li>
 </ul>
