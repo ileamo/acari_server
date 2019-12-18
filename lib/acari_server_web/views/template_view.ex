@@ -18,13 +18,11 @@ defmodule AcariServerWeb.TemplateView do
   def eval_template(prefix, templ, test_ass) do
     with {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, test_ass) do
       AcariServer.Template.eval(templ, test_ass |> Map.merge(calculated))
-      |> IO.inspect()
     else
       {:error, mes} ->
         {:error, mes}
 
       res ->
-        IO.inspect(res, label: "evel err")
         {:error, "ERROR"}
     end
   end

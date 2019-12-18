@@ -7,8 +7,13 @@ defmodule TemplFunc do
         TemplateAgent.add_templ(self(), name)
 
         templ =
-          case AcariServer.TemplateManager.get_template_by_name(name) do
-            %{template: templ} -> AcariServer.Template.eval(prefix <> templ, assigns) |> elem(0)
+          with %{template: templ} <-
+                 AcariServer.TemplateManager.get_template_by_name(name),
+               {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, assigns),
+               {:ok, script} <-
+                 AcariServer.Template.eval(templ, assigns |> Map.merge(calculated)) do
+            script
+          else
             _ -> nil
           end
 
