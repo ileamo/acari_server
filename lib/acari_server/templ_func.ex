@@ -7,7 +7,7 @@ defmodule TemplFunc do
         TemplateAgent.add_templ(self(), name)
 
         templ =
-          with %{template: templ} <-
+          with %AcariServer.TemplateManager.Template{} = templ <-
                  AcariServer.TemplateManager.get_template_by_name(name),
                {:ok, script} <-
                  AcariServer.Template.eval(templ, prefix, assigns) do

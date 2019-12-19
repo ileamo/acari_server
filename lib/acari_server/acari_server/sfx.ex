@@ -18,20 +18,11 @@ defmodule AcariServer.SFX do
            main_templ_name when is_binary(main_templ_name) <-
              (Map.get(script, templ_id) && Map.get(script, templ_id).name) || templ_id,
            prefix <- script.prefix || "",
-           node_params <- %{
-             "class" => script.name,
-             "client" => %{
-               "name" => node.name,
-               "description" => node.description,
-               "latitude" => node.latitude,
-               "longitude" => node.longitude,
-               "lock" => node.lock
-             }
-           },
+           node_params <- AcariServer.Template.get_assignments(node),
            assigns <-
-             req_params
+             node_params
              |> Map.merge(config_params || %{})
-             |> Map.merge(node_params),
+             |> Map.merge(req_params),
            :ok <- TemplateAgent.init_templ_map(self(), assigns, prefix),
            setup_file_name <- TemplFunc.path_to(main_templ_name) do
         templ_map = TemplateAgent.get_templ_map(self())

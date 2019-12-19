@@ -17,21 +17,34 @@ defmodule AcariServer.Template do
     end
   end
 
-  def eval(templ, prefix, assigns \\ %{}) do
-    templ = templ || ""
+  def eval(template, prefix, assigns \\ %{}) do
+    templ =
+      case template do
+        %{template: templ} -> templ
+        _ -> ""
+      end
+
+    # assigns =
+    #   assigns
+    #   |> Enum.map(fn
+    #     {k, v} when is_atom(k) ->
+    #       # TODO
+    #       raise "eval Atom: #{k}"
+    #       {Atom.to_string(k), v}
+    #
+    #     other ->
+    #       other
+    #   end)
+    #   |> Enum.into(%{})
 
     assigns =
       assigns
-      |> Enum.map(fn
-        {k, v} when is_atom(k) ->
-          # TODO
-          raise "eval Atom: #{k}"
-          {Atom.to_string(k), v}
-
-        other ->
-          other
-      end)
-      |> Enum.into(%{})
+      |> Map.put("template", %{
+        "name" => template.name,
+        "description" => template.description,
+        "rights" => template.rights,
+        "executable" => template.executable
+      })
 
     with {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, assigns) do
       try do
@@ -204,4 +217,40 @@ defmodule AcariServer.Template do
         {:error, humanize_lua_err(err)}
     end
   end
+
+  def get_assignments(%AcariServer.NodeManager.Node{} = node) do
+    class = node.script
+
+    %{
+      "class" => %{
+        "name" => class.name,
+        "description" => class.description
+      },
+      "client" => %{
+        "name" => node.name,
+        "description" => node.description,
+        "latitude" => node.latitude,
+        "longitude" => node.longitude,
+        "lock" => node.lock
+      }
+    }
+  end
+
+  def get_assignments(%AcariServer.ScriptManager.Script{} = class) do
+    %{
+      "class" => %{
+        "name" => class.name,
+        "description" => class.description
+      },
+      "client" => %{
+        "name" => "CLIENT_NAME",
+        "description" => "CLIENT_DESCRIPTION",
+        "latitude" => "0.0",
+        "longitude" => "0.0",
+        "lock" => false
+      }
+    }
+  end
+
+  def get_assignments(_), do: %{}
 end

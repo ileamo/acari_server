@@ -25,11 +25,12 @@
   <% end %>
 
   <% {eval_res, template_txt} = with %{} = script <- @template.script,
+          base_assigns <- AcariServer.Template.get_assignments(script),
           {var, nil} <- AcariServer.Template.get_json(script.definition),
           {tst, nil} <- AcariServer.Template.get_json(script.test),
-          test_ass = %{} <- AcariServer.Template.test_assigns(var,
-                            tst |> Map.merge(%{"class" => script_name(@template)})) do
-        test_ass && eval_template(script.prefix, @template.template, test_ass) || {nil, nil}
+          test_ass = %{} <- AcariServer.Template.test_assigns(var, tst) do
+        test_ass && eval_template(script.prefix, @template,
+              base_assigns |> Map.merge(test_ass)) || {nil, nil}
       else
         _ -> {nil, nil}
       end
