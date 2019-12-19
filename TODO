@@ -19,12 +19,13 @@ sudo apt-get -y install build-essential autoconf m4 libncurses5-dev libgl1-mesa-
 
 
 ---------
-Bad closing tag parsing?
+Wrong parsing when closing tag is on separate line.
+
 
 When rendering template I get unexpected result:
 
 
 
-Function receive argument with extra chars.
-Is there a bad parsing?
+Function receives argument with extra chars.
+It seems it's a wrong parsing when closing tag is on a separate line.
 
