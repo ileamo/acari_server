@@ -17,63 +17,57 @@ defmodule AcariServer.Template do
     end
   end
 
-  def eval(templ, assigns \\ %{}) do
+  def eval(templ, prefix, assigns \\ %{}) do
     templ = templ || ""
 
     assigns =
       assigns
       |> Enum.map(fn
-        {k, v} when is_atom(k) -> {Atom.to_string(k), v}
-        other -> other
+        {k, v} when is_atom(k) ->
+          # TODO
+          raise "eval Atom: #{k}"
+          {Atom.to_string(k), v}
+
+        other ->
+          other
       end)
       |> Enum.into(%{})
 
-    try do
-      embed =
-        :bbmustache.render(
-          templ,
-          assigns
-          |> Map.put("fn", std_funcs()),
-          key_type: :binary,
-          escape_fun: & &1
-        )
+    with {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, assigns) do
+      try do
+        embed =
+          :bbmustache.render(
+            templ,
+            assigns
+            |> Map.merge(calculated)
+            |> Map.put("fn", std_funcs()),
+            key_type: :binary,
+            escape_fun: & &1
+          )
 
-      {:ok, embed}
-    rescue
-      e in ErlangError ->
-        case e do
-          %ErlangError{original: {err_type, {mes, line}}} ->
-            {:error, "#{err_type}: #{mes}: #{inspect(line)}"}
+        {:ok, embed}
+      rescue
+        e in ErlangError ->
+          case e do
+            %ErlangError{original: {err_type, {mes, line}}} ->
+              {:error, "#{err_type}: #{mes}: #{inspect(line)}"}
 
-          _ ->
-            {:error, inspect(e)}
-        end
-
-      x ->
-        stack =
-          case __STACKTRACE__ do
-            [{:erlang, func, args, _} | _] -> ": #{func}(#{Enum.join(args, ", ")})"
-            _ -> ""
+            _ ->
+              {:error, inspect(e)}
           end
 
-        {:error, "#{Exception.message(x)}#{stack}"}
-    end
-  end
+        x ->
+          stack =
+            case __STACKTRACE__ do
+              [{:erlang, func, args, _} | _] -> ": #{func}(#{Enum.join(args, ", ")})"
+              _ -> ""
+            end
 
-  def eval_EEX(templ, assigns \\ %{}) do
-    templ = templ || ""
-
-    try do
-      {EEx.eval_string(templ, assigns: assigns), nil}
-    rescue
-      x ->
-        stack =
-          case __STACKTRACE__ do
-            [{:erlang, func, args, _} | _] -> ": #{func}(#{Enum.join(args, ", ")})"
-            _ -> ""
-          end
-
-        {nil, "#{Exception.message(x)}#{stack}"}
+          {:error, "#{Exception.message(x)}#{stack}"}
+      end
+    else
+      {:error, mes} -> {:error, "Ошибка вычисления параметров: #{mes}"}
+      res -> res
     end
   end
 
@@ -83,7 +77,6 @@ defmodule AcariServer.Template do
     var
     |> Map.merge(tst)
     |> get_only_value()
-    |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
     |> Enum.into(%{})
   end
 

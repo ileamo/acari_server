@@ -9,9 +9,8 @@ defmodule TemplFunc do
         templ =
           with %{template: templ} <-
                  AcariServer.TemplateManager.get_template_by_name(name),
-               {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, assigns),
                {:ok, script} <-
-                 AcariServer.Template.eval(templ, assigns |> Map.merge(calculated)) do
+                 AcariServer.Template.eval(templ, prefix, assigns) do
             script
           else
             _ -> nil

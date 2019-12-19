@@ -16,15 +16,7 @@ defmodule AcariServerWeb.TemplateView do
   end
 
   def eval_template(prefix, templ, test_ass) do
-    with {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, test_ass) do
-      AcariServer.Template.eval(templ, test_ass |> Map.merge(calculated))
-    else
-      {:error, mes} ->
-        {:error, mes}
-
-      res ->
-        {:error, "ERROR"}
-    end
+    AcariServer.Template.eval(templ, prefix, test_ass)
   end
 
   def validate(validator, text) do
