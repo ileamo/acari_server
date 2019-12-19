@@ -2,13 +2,19 @@ defmodule AcariServer.Template do
   defp std_funcs() do
     %{
       "path_to" => fn x, _render ->
-        TemplFunc.path_to(x |> String.trim())
+        TemplFunc.path_to(x |> get_first_word())
       end,
       "include_file" => fn x, _render ->
-        TemplFunc.include_file(x |> String.trim())
-
+        TemplFunc.include_file(x |> get_first_word())
       end
     }
+  end
+
+  defp get_first_word(s) do
+    case String.split(s) do
+      [arg | _] -> arg
+      _ -> ""
+    end
   end
 
   def eval(templ, assigns \\ %{}) do
