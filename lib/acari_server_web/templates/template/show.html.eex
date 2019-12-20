@@ -30,7 +30,7 @@
               } = client} <-
                 {:client,
                   AcariServer.NodeManager.get_node_with_class(
-                    String.trim(@template.test_client_name))},
+                    String.trim(@template.test_client_name || ""))},
             base_assigns <- AcariServer.Template.get_assignments(client) do
 
         eval_template(class.prefix, @template, base_assigns)
