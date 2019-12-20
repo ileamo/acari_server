@@ -48,8 +48,13 @@
 
   </li>
 
-  <% {res, prefix_res} =
-    AcariServer.Template.eval_prefix(@script.prefix, test_ass || %{}) %>
+  <%
+
+    {res, prefix_res} =
+      AcariServer.Template.eval_prefix(
+        @script.prefix, AcariServer.Template.get_assignments(@script)
+      )
+  %>
 
   <li>
     <strong>Вычисление параметров:</strong>
@@ -60,7 +65,7 @@
       <p class = "text-danger"><%= prefix_res %><p>
     <% else %>
       <p class="mb-0">
-        <%= "Вычисленные параметры:" %>
+        Вычисленные параметры(на примере клиента '<%= @script.test_client_name %>'):
       </p>
       <pre>
           <%= prefix_res |> Jason.encode!(pretty: true)%>
@@ -68,7 +73,7 @@
     <% end %>
   </li>
 
-  <li>
+  <!-- <li>
     <strong>Значения для тестирования:</strong>
       <%= if tst_error do %>
         <% {head, char, tail} = AcariServer.Template.highlight_char(@script.test, tst_error.position) %>
@@ -77,7 +82,7 @@
       <% else %>
         <pre class="border rounded bg-white pl-2 p-2"><code><%= @script.test %></code></pre>
       <% end %>
-  </li>
+  </li> -->
 
   <li>
     <strong>Создан:</strong>

@@ -93,6 +93,16 @@ defmodule AcariServer.Template do
     |> Enum.into(%{})
   end
 
+  def get_only_value(var) do
+    var
+    |> normalize_vars()
+    |> Enum.map(fn
+      {k, [v | _]} -> {k, v}
+      {k, v} -> {k, v}
+    end)
+    |> Enum.into(%{})
+  end
+
   def highlight_char(text, n) do
     n = min(n, byte_size(text) - 1)
     <<head::binary-size(n), tail::binary>> = text
@@ -169,16 +179,6 @@ defmodule AcariServer.Template do
 
   defp check_var(_), do: nil
 
-  def get_only_value(var) do
-    var
-    |> normalize_vars()
-    |> Enum.map(fn
-      {k, [v | _]} -> {k, v}
-      {k, v} -> {k, v}
-    end)
-    |> Enum.into(%{})
-  end
-
   def humanize_lua_err(err) do
     case err do
       {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
@@ -245,20 +245,49 @@ defmodule AcariServer.Template do
     }
   end
 
-  def get_assignments(%AcariServer.ScriptManager.Script{} = class) do
-    %{
-      "class" => %{
-        "name" => class.name,
-        "description" => class.description
-      },
-      "client" => %{
-        "name" => "CLIENT_NAME",
-        "description" => "CLIENT_DESCRIPTION",
-        "latitude" => "0.0",
-        "longitude" => "0.0",
-        "lock" => false
-      }
-    }
+  def get_assignments(%AcariServer.ScriptManager.Script{id: class_id} = class) do
+    client_name = String.trim(class.test_client_name || "")
+
+    with %AcariServer.NodeManager.Node{script: %{id: ^class_id}} = client <-
+           AcariServer.NodeManager.get_node_with_class(client_name) do
+      get_assignments(client)
+    else
+      _ ->
+        client_name =
+          case client_name do
+            "" -> "DEVICE_2001001234"
+            n -> n
+          end
+
+        params =
+          case Jason.decode(class.definition) do
+            {:ok, params_definition} -> get_only_value(params_definition)
+            _ -> %{}
+          end
+
+        %{
+          "id" => client_name,
+          "class" => %{
+            "name" => class.name,
+            "description" => class.description
+          },
+          "client" => %{
+            "name" => client_name,
+            "description" => "CLIENT_DESCRIPTION",
+            "latitude" => "0.0",
+            "longitude" => "0.0",
+            "lock" => false,
+            "params" => params
+          }
+        }
+    end
+    |> Map.put("template", %{
+      "name" => "TEMPLATE_NAME",
+      "description" => "TEMPLATE_DESCRIPTION",
+      "rights" => "TEMPLATE_RIGHTS",
+      "executable" => true
+    })
+    |> IO.inspect()
   end
 
   def get_assignments(_), do: %{}

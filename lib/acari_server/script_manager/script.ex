@@ -11,6 +11,7 @@ defmodule AcariServer.ScriptManager.Script do
     field :prefix, :string
     field :test, :string
     field :templates_list, {:array, :integer}, virtual: true
+    field :test_client_name, :string
 
     belongs_to :local, AcariServer.TemplateManager.Template
     belongs_to :remote, AcariServer.TemplateManager.Template
@@ -34,7 +35,8 @@ defmodule AcariServer.ScriptManager.Script do
       :remote_id,
       :definition,
       :prefix,
-      :test
+      :test,
+      :test_client_name
     ])
     |> foreign_key_constraint(:local_id)
     |> foreign_key_constraint(:remote_id)
