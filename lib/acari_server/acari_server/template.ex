@@ -200,7 +200,7 @@ defmodule AcariServer.Template do
 
   def eval_prefix(script, test_ass) do
     case Sandbox.init()
-         |> Sandbox.set!("params", test_ass)
+         |> set_each(test_ass)
          |> Sandbox.eval(script) do
       {:ok, res} ->
         if res
@@ -218,21 +218,29 @@ defmodule AcariServer.Template do
     end
   end
 
-  def get_assignments(%AcariServer.NodeManager.Node{} = node) do
-    class = node.script
+  defp set_each(lua_state, assigns) do
+    assigns
+    |> Enum.reduce(lua_state, fn {var, value}, lua_state ->
+      Sandbox.set!(lua_state, var, value)
+    end)
+  end
+
+  def get_assignments(%AcariServer.NodeManager.Node{} = client) do
+    class = client.script
 
     %{
-      "id" => node.name,
+      "id" => client.name,
       "class" => %{
         "name" => class.name,
         "description" => class.description
       },
       "client" => %{
-        "name" => node.name,
-        "description" => node.description,
-        "latitude" => node.latitude,
-        "longitude" => node.longitude,
-        "lock" => node.lock
+        "name" => client.name,
+        "description" => client.description,
+        "latitude" => client.latitude,
+        "longitude" => client.longitude,
+        "lock" => client.lock,
+        "params" => client.params || %{}
       }
     }
   end

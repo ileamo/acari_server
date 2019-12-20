@@ -14,15 +14,14 @@ defmodule AcariServer.SFX do
 
   def create_sfx(templ_id, node, req_params) do
     res =
-      with %{params: config_params, script: %{} = script} <- node,
+      with %{script: %{} = script} <- node,
            main_templ_name when is_binary(main_templ_name) <-
              (Map.get(script, templ_id) && Map.get(script, templ_id).name) || templ_id,
            prefix <- script.prefix || "",
            node_params <- AcariServer.Template.get_assignments(node),
            assigns <-
              node_params
-             |> Map.merge(config_params || %{})
-             |> Map.merge(req_params),
+             |> Map.put("request", %{"params" => req_params}),
            :ok <- TemplateAgent.init_templ_map(self(), assigns, prefix),
            setup_file_name <- TemplFunc.path_to(main_templ_name) do
         templ_map = TemplateAgent.get_templ_map(self())
