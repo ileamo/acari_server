@@ -24,15 +24,20 @@
     </li>
   <% end %>
 
-  <% {eval_res, template_txt} = with %{} = script <- @template.script,
-          base_assigns <- AcariServer.Template.get_assignments(script),
-          {var, nil} <- AcariServer.Template.get_json(script.definition),
-          {tst, nil} <- AcariServer.Template.get_json(script.test),
-          test_ass = %{} <- AcariServer.Template.test_assigns(var, tst) do
-        test_ass && eval_template(script.prefix, @template,
-              base_assigns |> Map.merge(test_ass)) || {nil, nil}
+  <% {eval_res, template_txt} =
+      with  {:client, %AcariServer.NodeManager.Node{
+              script: %AcariServer.ScriptManager.Script{} = class
+              } = client} <-
+                {:client,
+                  AcariServer.NodeManager.get_node_with_class(
+                    String.trim(@template.test_client_name))},
+            base_assigns <- AcariServer.Template.get_assignments(client) do
+
+        eval_template(class.prefix, @template, base_assigns)
       else
-        _ -> {nil, nil}
+        {:client, nil} -> {:error, :no_client}
+        {:client, %{script: nil}} -> {:error, :no_class}
+        res -> {:error, inspect(res)}
       end
 
   %>
@@ -40,7 +45,7 @@
   <li>
     <strong>Шаблон:</strong>
     <% pretempl = @template.template %>
-    <%= if eval_res == :error do %>
+    <%= if eval_res == :error and is_binary(template_txt) do %>
       <% {head, line, tail} = {pretempl, "", ""} %>
 
       <p class = "text-danger mt-2"><%= template_txt %><p>
@@ -53,13 +58,13 @@
   </li>
 
   <li>
-    <strong>Класс:</strong>
-    <%= script_name(@template) %>
+    <strong>Валидатор:</strong>
+    <%= @template.validator %>
   </li>
 
   <li>
-    <strong>Валидатор:</strong>
-    <%= @template.validator %>
+    <strong>Клиент для тестирования:</strong>
+    <%= @template.test_client_name %>
   </li>
 
   <li>
@@ -81,19 +86,30 @@
 |
 <span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>
 
-<%= if eval_res == :ok do %>
-<h3 class = "mt-3"> Результат тестирования </h3>
-<ul>
-    <li>
-      <strong>Параметры для тестирования взяты из класса <%=@template.script.name%></strong>
-      <%= if (res = validate(@template.validator, template_txt)) != :ok do %>
-        <p class = "text-danger mt-2"><%= res %><p>
-        <% {head, line, tail} = highlight_line(template_txt, get_line(res)) %>
+<h3 class = "mt-3"> Результат тестирования для клиента <%= @template.test_client_name %></h3>
+  <%= if eval_res == :ok do %>
+  <ul>
+        <%= if (res = validate(@template.validator, template_txt)) != :ok do %>
+          <p class = "text-danger mt-2"><%= res %><p>
+          <% {head, line, tail} = highlight_line(template_txt, get_line(res)) %>
 
-        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
-      <% else %>
-        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template_txt %></code></pre>
-      <% end %>
-    </li>
-</ul>
+          <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
+        <% else %>
+          <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template_txt %></code></pre>
+        <% end %>
+  </ul>
+<% else %>
+  <%= if is_atom(template_txt) do %>
+    <p class = "text-danger mt-2">
+      <%=
+        case String.trim(@template.test_client_name) do
+          "" -> "Клиент для тестирования не задан"
+          _ -> case template_txt do
+            :no_client -> "Нет клиента с таким именем"
+            :no_class -> "Клиенту не назначен класс"
+          end
+        end
+      %>
+    </p>
+  <% end %>
 <% end %>

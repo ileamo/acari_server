@@ -73,11 +73,10 @@
   </div>
 
   <div class="form-group row">
-    <%= label f, "Параметры для тестирования брать из класса", class: "col-sm-6 col-form-label" %>
-    <div class="col-sm-6">
-      <% scripts_list = script_name_id_pairs_list() %>
-      <%= select f, :script_id, scripts_list, class: "form-control" %>
-      <%= error_tag f, :script_id %>
+    <%= label f, "Имя клиента для тестирования", class: "col-sm-4 col-form-label" %>
+    <div class="col-sm-8">
+      <%= text_input f, :test_client_name, class: "form-control" %>
+      <%= error_tag f, :test_client_name %>
     </div>
   </div>
 

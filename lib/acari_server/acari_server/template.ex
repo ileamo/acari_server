@@ -222,6 +222,7 @@ defmodule AcariServer.Template do
     class = node.script
 
     %{
+      "id" => node.name,
       "class" => %{
         "name" => class.name,
         "description" => class.description
