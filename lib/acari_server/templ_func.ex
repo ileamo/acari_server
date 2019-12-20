@@ -1,5 +1,6 @@
 defmodule TemplFunc do
   alias AcariServer.TemplateAgent
+  alias AcariServer.Template
 
   def path_to(name) do
     case TemplateAgent.add_templ?(self(), name) do
@@ -10,7 +11,7 @@ defmodule TemplFunc do
           with %AcariServer.TemplateManager.Template{} = templ <-
                  AcariServer.TemplateManager.get_template_by_name(name),
                {:ok, script} <-
-                 AcariServer.Template.eval(templ, prefix, assigns) do
+                 Template.eval(templ, prefix, assigns) do
             script
           else
             _ -> nil
@@ -39,4 +40,13 @@ defmodule TemplFunc do
   end
 
   def home_dir(), do: System.user_home()
+
+  def lua(body, render) do
+    case Sandbox.init()
+         |> Sandbox.eval(render.(body)) do
+      {:ok, res} when is_binary(res)-> res
+      {:ok, res} -> inspect(res, pretty: true)
+      {:error, err} -> "Lua eror: #{Template.humanize_lua_err(err)}"
+    end
+  end
 end

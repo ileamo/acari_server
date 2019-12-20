@@ -6,7 +6,8 @@ defmodule AcariServer.Template do
       end,
       "include_file" => fn x, _render ->
         TemplFunc.include_file(x |> get_first_word())
-      end
+      end,
+      "Lua" => &TemplFunc.lua/2
     }
   end
 
@@ -46,7 +47,7 @@ defmodule AcariServer.Template do
         "executable" => template.executable
       })
 
-    with {:ok, calculated} <- AcariServer.Template.eval_prefix(prefix, assigns) do
+    with {:ok, calculated} <- eval_class_assigns(prefix, assigns) do
       try do
         embed =
           :bbmustache.render(
@@ -198,9 +199,9 @@ defmodule AcariServer.Template do
     end
   end
 
-  def eval_prefix(script, test_ass) do
+  def eval_class_assigns(script, assigns \\ %{}) do
     case Sandbox.init()
-         |> set_each(test_ass)
+         |> set_each(assigns)
          |> Sandbox.eval(script) do
       {:ok, res} ->
         if res
