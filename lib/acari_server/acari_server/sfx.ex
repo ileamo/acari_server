@@ -21,7 +21,7 @@ defmodule AcariServer.SFX do
            node_params <- AcariServer.Template.get_assignments(node),
            assigns <-
              node_params
-             |> Map.put("request", %{"params" => req_params}),
+             |> Map.put("params", req_params),
            :ok <- TemplateAgent.init_templ_map(self(), assigns, prefix),
            setup_file_name <- TemplFunc.path_to(main_templ_name) do
         templ_map = TemplateAgent.get_templ_map(self())

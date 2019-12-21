@@ -47,7 +47,9 @@ defmodule AcariServer.Template do
         "executable" => template.executable
       })
 
-    with {:ok, calculated} <- eval_class_assigns(prefix, assigns) do
+
+    with {:ok, calculated} <-
+           eval_class_assigns(prefix, assigns) do
       try do
         embed =
           :bbmustache.render(
@@ -199,23 +201,33 @@ defmodule AcariServer.Template do
     end
   end
 
-  def eval_class_assigns(script, assigns \\ %{}) do
-    case Sandbox.init()
-         |> set_each(assigns)
-         |> Sandbox.eval(script) do
-      {:ok, res} ->
-        if res
-           |> Enum.all?(fn
-             {k, _v} when is_binary(k) -> true
-             _ -> false
-           end) do
-          {:ok, res |> Enum.into(%{})}
-        else
-          {:error, "Результатом вычисления должна быть таблица пар ключ-значение"}
-        end
+  def eval_class_assigns(script, assigns \\ %{})
 
-      {:error, err} ->
-        {:error, humanize_lua_err(err)}
+  def eval_class_assigns(nil, _) do
+    {:ok, %{}}
+  end
+
+  def eval_class_assigns(script, assigns) do
+    if String.trim(script) == "" do
+      {:ok, %{}}
+    else
+      with {:ok, res} when is_map(res) <-
+             Sandbox.init()
+             |> set_each(assigns)
+             |> Sandbox.eval(script),
+           true <-
+             Enum.all?(res, fn
+               {k, _v} when is_binary(k) -> true
+               _ -> false
+             end) do
+        {:ok, res |> Enum.into(%{})}
+      else
+        {:ok, _} ->
+          {:error, "Результатом вычисления должна быть таблица пар ключ-значение"}
+
+        {:error, err} ->
+          {:error, humanize_lua_err(err)}
+      end
     end
   end
 
@@ -261,7 +273,7 @@ defmodule AcariServer.Template do
           end
 
         params =
-          case Jason.decode(class.definition) do
+          case Jason.decode(class.definition || "") do
             {:ok, params_definition} -> get_only_value(params_definition)
             _ -> %{}
           end
@@ -288,7 +300,6 @@ defmodule AcariServer.Template do
       "rights" => "TEMPLATE_RIGHTS",
       "executable" => true
     })
-    |> IO.inspect()
   end
 
   def get_assignments(_), do: %{}

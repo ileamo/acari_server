@@ -10,6 +10,7 @@ defmodule AcariServer.TemplateManager.Template do
     field :validator, :string
     field :rights, :string, default: "rw"
     field :test_client_name, :string
+    field :test_params, :string
     belongs_to :script, AcariServer.ScriptManager.Script
 
     # many_to_many :scripts, AcariServer.ScriptManager.Script,
@@ -29,7 +30,8 @@ defmodule AcariServer.TemplateManager.Template do
       :executable,
       :validator,
       :rights,
-      :test_client_name
+      :test_client_name,
+      :test_params
     ])
     |> validate_required([:name, :description, :template])
     |> validate_change(:name, &validate_templ_name/2)

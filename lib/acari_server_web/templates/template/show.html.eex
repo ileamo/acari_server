@@ -24,6 +24,8 @@
     </li>
   <% end %>
 
+  <% {test_params, test_params_error} = AcariServer.Template.get_json(@template.test_params)
+  %>
   <% {eval_res, template_txt} =
       with  {:client, %AcariServer.NodeManager.Node{
               script: %AcariServer.ScriptManager.Script{} = class
@@ -31,7 +33,8 @@
                 {:client,
                   AcariServer.NodeManager.get_node_with_class(
                     String.trim(@template.test_client_name || ""))},
-            base_assigns <- AcariServer.Template.get_assignments(client) do
+            base_assigns <- AcariServer.Template.get_assignments(client)
+                            |> Map.put("params", test_params || %{})  do
 
         eval_template(class.prefix, @template, base_assigns)
       else
@@ -55,6 +58,19 @@
       pretempl
       %></code></pre>
     <% end %>
+  </li>
+
+  <li>
+    <strong>Дополнительные параметры для тестирования:</strong>
+
+      <%= if test_params_error do %>
+        <% {head, char, tail} = AcariServer.Template.highlight_char(@template.test_params, test_params_error.position) %>
+        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"><%= char %></span><%= tail %></code></pre>
+        <p class = "text-danger">Ошибка декодирования JSON<p>
+      <% else %>
+        <pre class="border rounded bg-white pl-2 p-2"><code><%= @template.test_params %></code></pre>
+      <% end %>
+
   </li>
 
   <li>
@@ -102,7 +118,7 @@
   <%= if is_atom(template_txt) do %>
     <p class = "text-danger mt-2">
       <%=
-        case String.trim(@template.test_client_name) do
+        case String.trim(@template.test_client_name || "") do
           "" -> "Клиент для тестирования не задан"
           _ -> case template_txt do
             :no_client -> "Нет клиента с таким именем"
