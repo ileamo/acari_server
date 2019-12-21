@@ -220,7 +220,7 @@ defmodule AcariServer.Master do
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 
-  defp get_tun_params(tun_name) do
+  def get_tun_params(tun_name) do
     with [{_, params, peer_params, _}] <- :ets.lookup(:tuns, tun_name) do
       peer_params
       |> Enum.map(fn {k, v} -> {"peer_" <> k, v} end)

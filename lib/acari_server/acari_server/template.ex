@@ -1,20 +1,28 @@
 defmodule AcariServer.Template do
-  defp std_funcs() do
-    %{
-      "path_to" => fn x, _render ->
-        TemplFunc.path_to(x |> get_first_word())
-      end,
-      "include_file" => fn x, _render ->
-        TemplFunc.include_file(x |> get_first_word())
-      end,
-      "Lua" => &TemplFunc.lua/2
-    }
-  end
+  alias AcariServer.NodeManager
+  alias AcariServer.NodeManager.Node
 
-  defp get_first_word(s) do
-    case String.split(s) do
-      [arg | _] -> arg
-      _ -> ""
+  def eval_template(template, test_params) do
+    case NodeManager.get_node_with_class(String.trim(template.test_client_name || "")) do
+      %Node{script: %AcariServer.ScriptManager.Script{} = class} = client ->
+        base_assigns =
+          AcariServer.Template.get_assignments(client)
+          |> Map.put(
+            "params",
+            AcariServer.Master.get_tun_params(client.name)
+            |> Map.merge(test_params || %{})
+          )
+
+        AcariServer.Template.eval(template, class.prefix, base_assigns)
+
+      nil ->
+        {:error, :no_client}
+
+      %{script: nil} ->
+        {:error, :no_class}
+
+      res ->
+        {:error, inspect(res)}
     end
   end
 
@@ -24,19 +32,6 @@ defmodule AcariServer.Template do
         %{template: templ} -> templ
         _ -> ""
       end
-
-    # assigns =
-    #   assigns
-    #   |> Enum.map(fn
-    #     {k, v} when is_atom(k) ->
-    #       # TODO
-    #       raise "eval Atom: #{k}"
-    #       {Atom.to_string(k), v}
-    #
-    #     other ->
-    #       other
-    #   end)
-    #   |> Enum.into(%{})
 
     assigns =
       assigns
@@ -55,7 +50,7 @@ defmodule AcariServer.Template do
             templ,
             assigns
             |> Map.merge(calculated)
-            |> Map.put("fn", std_funcs()),
+            |> Map.put("fn", TemplFunc.std_funcs()),
             key_type: :binary,
             escape_fun: & &1
           )
@@ -66,6 +61,9 @@ defmodule AcariServer.Template do
           case e do
             %ErlangError{original: {err_type, {mes, line}}} ->
               {:error, "#{err_type}: #{mes}: #{inspect(line)}"}
+
+            %ErlangError{original: {err_type, mes}} ->
+              {:error, "#{err_type}: #{mes}"}
 
             _ ->
               {:error, inspect(e)}
@@ -237,7 +235,7 @@ defmodule AcariServer.Template do
     end)
   end
 
-  def get_assignments(%AcariServer.NodeManager.Node{} = client) do
+  def get_assignments(%Node{} = client) do
     class = client.script
 
     %{
@@ -260,8 +258,8 @@ defmodule AcariServer.Template do
   def get_assignments(%AcariServer.ScriptManager.Script{id: class_id} = class) do
     client_name = String.trim(class.test_client_name || "")
 
-    with %AcariServer.NodeManager.Node{script: %{id: ^class_id}} = client <-
-           AcariServer.NodeManager.get_node_with_class(client_name) do
+    with %Node{script: %{id: ^class_id}} = client <-
+           NodeManager.get_node_with_class(client_name) do
       get_assignments(client)
     else
       _ ->
