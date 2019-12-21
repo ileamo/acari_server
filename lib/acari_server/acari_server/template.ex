@@ -47,7 +47,6 @@ defmodule AcariServer.Template do
         "executable" => template.executable
       })
 
-
     with {:ok, calculated} <-
            eval_class_assigns(prefix, assigns) do
       try do
@@ -211,7 +210,7 @@ defmodule AcariServer.Template do
     if String.trim(script) == "" do
       {:ok, %{}}
     else
-      with {:ok, res} when is_map(res) <-
+      with {:ok, res} when is_list(res) <-
              Sandbox.init()
              |> set_each(assigns)
              |> Sandbox.eval(script),
