@@ -82,6 +82,11 @@
 
   <div class="form-group">
     <%= label f, "Дополнительные параметры для тестирования", class: "control-label" %>
+
+    <a href="#" data-toggle="modal" data-target="#DataStruct">
+      <i class="fas fa-info-circle"></i>
+    </a>
+
     <%= textarea f, :test_params, class: "form-control text-monospace", rows: "3" %>
     <%= error_tag f, :test_params %>
   </div>
@@ -132,6 +137,24 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="DataStruct" tabindex="-1" role="dialog" aria-labelledby="AllTemplatesTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header text-center">
+            <h5 class="modal-title w-100" id="AllTemplatesTitle">Структура данных шаблона</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            
+          </div>
+
         </div>
       </div>
     </div>

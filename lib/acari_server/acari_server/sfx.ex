@@ -1,8 +1,9 @@
 defmodule AcariServer.SFX do
   alias AcariServer.TemplateAgent
+  alias AcariServer.NodeManager
 
   def get_script(node_name, templ_id, params \\ %{}) do
-    case AcariServer.NodeManager.get_node_with_class(node_name, [:local, :remote]) do
+    case NodeManager.get_node_with_class(node_name, [:local, :remote]) do
       %{script: class} = node ->
         {create_sfx(templ_id, node, Map.put(params, "id", node_name)),
          (class && Map.get(class, templ_id) && Map.get(class, templ_id).name) || templ_id}
@@ -27,7 +28,7 @@ defmodule AcariServer.SFX do
         templ_map = TemplateAgent.get_templ_map(self())
         makeself(templ_map, setup_file_name)
       else
-        %AcariServer.NodeManager.Node{script: nil, name: name} ->
+        %NodeManager.Node{script: nil, name: name} ->
           create_setup("Клиенту #{name} не назначен класс")
 
         res ->

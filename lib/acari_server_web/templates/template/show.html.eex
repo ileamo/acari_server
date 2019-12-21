@@ -24,25 +24,9 @@
     </li>
   <% end %>
 
-  <% {test_params, test_params_error} = AcariServer.Template.get_json(@template.test_params)
-  %>
-  <% {eval_res, template_txt} =
-      with  {:client, %AcariServer.NodeManager.Node{
-              script: %AcariServer.ScriptManager.Script{} = class
-              } = client} <-
-                {:client,
-                  AcariServer.NodeManager.get_node_with_class(
-                    String.trim(@template.test_client_name || ""))},
-            base_assigns <- AcariServer.Template.get_assignments(client)
-                            |> Map.put("params", test_params || %{})  do
-
-        eval_template(class.prefix, @template, base_assigns)
-      else
-        {:client, nil} -> {:error, :no_client}
-        {:client, %{script: nil}} -> {:error, :no_class}
-        res -> {:error, inspect(res)}
-      end
-
+  <%
+    {test_params, test_params_error} = AcariServer.Template.get_json(@template.test_params)
+    {eval_res, template_txt} = AcariServer.Template.eval_template(@template, test_params)
   %>
 
   <li>
