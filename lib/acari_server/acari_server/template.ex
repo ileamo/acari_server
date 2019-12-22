@@ -1,13 +1,18 @@
 defmodule AcariServer.Template do
   alias AcariServer.NodeManager
   alias AcariServer.NodeManager.Node
+  alias AcariServer.ScriptManager.Script
+  alias AcariServer.TemplateManager.Template
 
-  def eval_template(template, test_params) do
+  def test_eval(%Template{} = template, extra_params) do
     case NodeManager.get_node_with_class(String.trim(template.test_client_name || "")) do
-      %Node{script: %AcariServer.ScriptManager.Script{} = class} = client ->
-        base_assigns = AcariServer.Template.get_assignments(client, test_params)
+      %Node{script: %Script{} = class} = client ->
+        assigns = get_assignments(client, params: extra_params)
 
-        AcariServer.Template.eval(template, class.prefix, base_assigns)
+        case eval(template, class.prefix, assigns) do
+          {:ok, script} -> {:ok, {script, assigns}}
+          other -> other
+        end
 
       nil ->
         {:error, :no_client}
@@ -19,6 +24,8 @@ defmodule AcariServer.Template do
         {:error, inspect(res)}
     end
   end
+
+  def test_eval(_, _, _), do: {:error, :no_template}
 
   def eval(template, prefix, assigns \\ %{}) do
     templ =
@@ -44,6 +51,7 @@ defmodule AcariServer.Template do
             templ,
             assigns
             |> Map.merge(calculated)
+            |> nil_to_empty_string()
             |> Map.put("fn", TemplFunc.std_funcs()),
             key_type: :binary,
             escape_fun: & &1
@@ -76,6 +84,16 @@ defmodule AcariServer.Template do
       {:error, mes} -> {:error, "Ошибка вычисления параметров: #{mes}"}
       res -> res
     end
+  end
+
+  defp nil_to_empty_string(assigns) do
+    assigns
+    |> Enum.map(fn
+      {k, nil} -> {k, ""}
+      {k, v} when is_map(v) -> {k, nil_to_empty_string(v)}
+      other -> other
+    end)
+    |> Enum.into(%{})
   end
 
   def test_assigns(var, tst) when not (is_map(var) and is_map(tst)), do: nil
@@ -218,7 +236,9 @@ defmodule AcariServer.Template do
              end) do
         {:ok, res |> Enum.into(%{})}
       else
-        false -> {:error, "Значением ключа должна быть строка, число, true или false"}
+        false ->
+          {:error, "Значением ключа должна быть строка, число, true или false"}
+
         {:ok, _} ->
           {:error, "Результатом вычисления должна быть таблица пар ключ-значение"}
 
@@ -235,7 +255,9 @@ defmodule AcariServer.Template do
     end)
   end
 
-  def get_assignments(%Node{} = client, params) do
+  def get_assignments(client, opts \\ [])
+
+  def get_assignments(%Node{} = client, opts) do
     class = client.script
 
     %{
@@ -254,16 +276,16 @@ defmodule AcariServer.Template do
       },
       "params" =>
         AcariServer.Master.get_tun_params(client.name)
-        |> Map.merge(params)
+        |> Map.merge(opts[:params] || %{})
     }
   end
 
-  def get_assignments(%AcariServer.ScriptManager.Script{id: class_id} = class) do
+  def get_assignments(%Script{id: class_id} = class, _opts) do
     client_name = String.trim(class.test_client_name || "")
 
     with %Node{script: %{id: ^class_id}} = client <-
            NodeManager.get_node_with_class(client_name) do
-      get_assignments(client, %{})
+      get_assignments(client)
     else
       _ ->
         client_name =
@@ -302,5 +324,5 @@ defmodule AcariServer.Template do
     })
   end
 
-  def get_assignments(_), do: %{}
+  def get_assignments(_, _), do: %{}
 end
