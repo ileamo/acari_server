@@ -5,13 +5,7 @@ defmodule AcariServer.Template do
   def eval_template(template, test_params) do
     case NodeManager.get_node_with_class(String.trim(template.test_client_name || "")) do
       %Node{script: %AcariServer.ScriptManager.Script{} = class} = client ->
-        base_assigns =
-          AcariServer.Template.get_assignments(client)
-          |> Map.put(
-            "params",
-            AcariServer.Master.get_tun_params(client.name)
-            |> Map.merge(test_params || %{})
-          )
+        base_assigns = AcariServer.Template.get_assignments(client, test_params)
 
         AcariServer.Template.eval(template, class.prefix, base_assigns)
 
@@ -214,11 +208,17 @@ defmodule AcariServer.Template do
              |> Sandbox.eval(script),
            true <-
              Enum.all?(res, fn
-               {k, _v} when is_binary(k) -> true
-               _ -> false
+               {k, v}
+               when is_binary(k) and
+                      (is_binary(v) or is_boolean(v) or is_integer(v) or is_float(v)) ->
+                 true
+
+               _ ->
+                 false
              end) do
         {:ok, res |> Enum.into(%{})}
       else
+        false -> {:error, "Значением ключа должна быть строка, число, true или false"}
         {:ok, _} ->
           {:error, "Результатом вычисления должна быть таблица пар ключ-значение"}
 
@@ -235,7 +235,7 @@ defmodule AcariServer.Template do
     end)
   end
 
-  def get_assignments(%Node{} = client) do
+  def get_assignments(%Node{} = client, params) do
     class = client.script
 
     %{
@@ -251,7 +251,10 @@ defmodule AcariServer.Template do
         "longitude" => client.longitude,
         "lock" => client.lock,
         "params" => client.params || %{}
-      }
+      },
+      "params" =>
+        AcariServer.Master.get_tun_params(client.name)
+        |> Map.merge(params)
     }
   end
 
@@ -260,7 +263,7 @@ defmodule AcariServer.Template do
 
     with %Node{script: %{id: ^class_id}} = client <-
            NodeManager.get_node_with_class(client_name) do
-      get_assignments(client)
+      get_assignments(client, %{})
     else
       _ ->
         client_name =

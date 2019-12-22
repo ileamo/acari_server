@@ -202,7 +202,7 @@ defmodule AcariServer.Master do
     }
 
     {script, _} =
-      AcariServer.SFX.get_script(tun_name, :remote, get_tun_params(tun_name) |> Map.merge(params))
+      AcariServer.SFX.get_script(tun_name, :remote, params)
 
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
@@ -216,7 +216,7 @@ defmodule AcariServer.Master do
       }
     }
 
-    {script, _} = AcariServer.SFX.get_script(tun_name, templ, get_tun_params(tun_name))
+    {script, _} = AcariServer.SFX.get_script(tun_name, templ, %{})
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 
@@ -315,7 +315,7 @@ defmodule AcariServer.Master do
 
   def exec_sh(tun_name, template, env \\ []) do
     {script, templ_name} =
-      AcariServer.SFX.get_script(tun_name, template, get_tun_params(tun_name))
+      AcariServer.SFX.get_script(tun_name, template, %{})
 
     case System.cmd("sh", ["-c", script |> String.replace("\r\n", "\n")],
            stderr_to_stdout: true,
