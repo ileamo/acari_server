@@ -9,8 +9,8 @@ defmodule AcariServer.Template do
       %Node{script: %Script{} = class} = client ->
         assigns = get_assignments(client, params: extra_params)
 
-        case eval(template, class.prefix, assigns) do
-          {:ok, script} -> {:ok, {script, assigns}}
+        case eval(template, class.prefix, assigns, with_assigns: true) do
+          {:ok, res} -> {:ok, res}
           other -> other
         end
 
@@ -27,7 +27,7 @@ defmodule AcariServer.Template do
 
   def test_eval(_, _, _), do: {:error, :no_template}
 
-  def eval(template, prefix, assigns \\ %{}) do
+  def eval(template, prefix, assigns \\ %{}, opts \\ []) do
     templ =
       case template do
         %{template: templ} -> templ
@@ -46,18 +46,25 @@ defmodule AcariServer.Template do
     with {:ok, calculated} <-
            eval_class_assigns(prefix, assigns) do
       try do
+        assigns =
+          assigns
+          |> Map.merge(calculated)
+          |> nil_to_empty_string()
+
         embed =
           :bbmustache.render(
             templ,
             assigns
-            |> Map.merge(calculated)
-            |> nil_to_empty_string()
             |> Map.put("fn", TemplFunc.std_funcs()),
             key_type: :binary,
             escape_fun: & &1
           )
 
-        {:ok, embed}
+        {:ok,
+         case opts[:with_assigns] do
+           true -> {embed, assigns}
+           _ -> embed
+         end}
       rescue
         e in ErlangError ->
           case e do
