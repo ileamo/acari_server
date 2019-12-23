@@ -561,20 +561,20 @@ defmodule AcariServerWeb.GrpOperChannel do
               end
 
             {:error, res} ->
-              res =
-                case res do
-                  {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
-                    Enum.join(list)
-
-                  {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
-                    "#{a} #{inspect(s)}"
-
-                  {:lua_error, {t, a, b}, _} when is_atom(t) ->
-                    "#{t} #{inspect(a)} #{inspect(b)}"
-
-                  res ->
-                    inspect(res)
-                end
+              res = AcariServer.Template.humanize_lua_err(res)
+                # case res do
+                #   {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
+                #     Enum.join(list)
+                #
+                #   {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
+                #     "#{a} #{inspect(s)}"
+                #
+                #   {:lua_error, {t, a, b}, _} when is_atom(t) ->
+                #     "#{t} #{inspect(a)} #{inspect(b)}"
+                #
+                #   res ->
+                #     inspect(res)
+                # end
 
               raise(res)
           end

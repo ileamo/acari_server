@@ -1,8 +1,9 @@
 defmodule AcariServer.SFX do
   alias AcariServer.TemplateAgent
+  alias AcariServer.NodeManager
 
   def get_script(node_name, templ_id, params \\ %{}) do
-    case AcariServer.NodeManager.get_node_with_class(node_name, [:local, :remote]) do
+    case NodeManager.get_node_with_class(node_name, [:local, :remote]) do
       %{script: class} = node ->
         {create_sfx(templ_id, node, Map.put(params, "id", node_name)),
          (class && Map.get(class, templ_id) && Map.get(class, templ_id).name) || templ_id}
@@ -14,29 +15,17 @@ defmodule AcariServer.SFX do
 
   def create_sfx(templ_id, node, req_params) do
     res =
-      with %{params: config_params, script: %{} = script} <- node,
+      with %{script: %{} = script} <- node,
            main_templ_name when is_binary(main_templ_name) <-
              (Map.get(script, templ_id) && Map.get(script, templ_id).name) || templ_id,
            prefix <- script.prefix || "",
-           node_params <- [
-             class: script.name,
-             client_name: node.name,
-             client_description: node.description,
-             client_latitude: node.latitude,
-             client_longitude: node.longitude,
-             client_lock: node.lock
-           ],
-           assigns <-
-             req_params
-             |> Map.merge(config_params || %{})
-             |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
-             |> Keyword.merge(node_params),
+           assigns <- AcariServer.Template.get_assignments(node, params: req_params),
            :ok <- TemplateAgent.init_templ_map(self(), assigns, prefix),
            setup_file_name <- TemplFunc.path_to(main_templ_name) do
         templ_map = TemplateAgent.get_templ_map(self())
         makeself(templ_map, setup_file_name)
       else
-        %AcariServer.NodeManager.Node{script: nil, name: name} ->
+        %NodeManager.Node{script: nil, name: name} ->
           create_setup("Клиенту #{name} не назначен класс")
 
         res ->

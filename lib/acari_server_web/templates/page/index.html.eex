@@ -34,7 +34,7 @@
             </div>
         </div>
     </section>
-    <div id="sessions" class="d-none d-md-block mt-3">
+    <div id="sessions" class="d-none <%= @current_user.is_admin && "d-md-block" || "" %> mt-3">
       <%= render "session.html", assigns %>
     </div>
 </div>

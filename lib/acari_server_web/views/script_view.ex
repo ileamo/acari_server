@@ -3,10 +3,6 @@ defmodule AcariServerWeb.ScriptView do
 
   defdelegate get_script_with_prefix(script, templ), to: AcariServer.Template
 
-  def eval_prefix(script, test_ass) do
-    AcariServer.Template.eval(script.prefix, test_ass)
-  end
-
   def templates_list(script) do
     script.templates
     |> Enum.map(fn %{name: name} -> name end)
@@ -21,5 +17,4 @@ defmodule AcariServerWeb.ScriptView do
     script.templates
     |> Enum.map(fn %{id: id} -> id end)
   end
-
 end

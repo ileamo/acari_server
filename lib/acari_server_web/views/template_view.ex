@@ -15,11 +15,6 @@ defmodule AcariServerWeb.TemplateView do
     end
   end
 
-  def eval_template(prefix, templ, test_ass) do
-    templ = (prefix || "") <> templ
-    AcariServer.Template.eval(templ, test_ass)
-  end
-
   def validate(validator, text) do
     with val_fn when is_function(val_fn) <- Validator.validators()[validator] do
       val_fn.(text)

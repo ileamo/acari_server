@@ -73,13 +73,20 @@
   </div>
 
   <div class="form-group row">
-    <%= label f, "Параметры для тестирования брать из класса", class: "col-sm-6 col-form-label" %>
-    <div class="col-sm-6">
-      <% scripts_list = script_name_id_pairs_list() %>
-      <%= select f, :script_id, scripts_list, class: "form-control" %>
-      <%= error_tag f, :script_id %>
+    <%= label f, "Имя клиента для тестирования", class: "col-sm-5 col-form-label" %>
+    <div class="col-sm-7">
+      <%= text_input f, :test_client_name, class: "form-control" %>
+      <%= error_tag f, :test_client_name %>
     </div>
   </div>
+
+  <div class="form-group">
+    <%= label f, "Дополнительные параметры для тестирования", class: "control-label" %>
+    <%= textarea f, :test_params, class: "form-control text-monospace", rows: "2" %>
+    <%= error_tag f, :test_params %>
+  </div>
+
+
 
   <div class="form-group row">
     <%= label f, "Валидатор", class: "col-sm-2 col-form-label" %>
