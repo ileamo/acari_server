@@ -62,12 +62,15 @@
     <%= if res == :error do %>
       <p class = "text-danger"><%= prefix_res %><p>
     <% else %>
-      <p class="mb-0">
-        Вычисленные параметры(на примере клиента '<%= @script.test_client_name %>'):
-      </p>
-      <pre>
-          <%= prefix_res |> Jason.encode!(pretty: true)%>
-      </pre>
+      <%= if @current_user.is_admin do %>
+        <p class="mb-0">
+          Вычисленные параметры(на примере клиента '<%= @script.test_client_name %>'):
+        </p>
+        <pre>
+            <%= prefix_res |> Jason.encode!(pretty: true)%>
+        </pre>
+      <% end %>
+
     <% end %>
   </li>
 

@@ -86,10 +86,36 @@
 |
 <span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>
 
-<h4 class = "mt-3"> Результат тестирования для клиента <%= @template.test_client_name %></h4>
-  <%= if eval_res == :ok do %>
-  <% {script, data_struct} = eval_txt %>
+<%= if eval_res == :ok or is_atom(eval_txt) do %>
+  <h4 class = "mt-3"> Результат тестирования для клиента <%= @template.test_client_name %>
+    <%= if eval_res == :ok  and @current_user.is_admin do %>
+      <a class="" data-toggle="collapse" href="#collapseDataStruct" role="button"
+      aria-expanded="false" aria-controls="collapseDataStruct">
+        <i class="fas fa-info-circle"></i>
+      </a>
+    <% end %>
+  </h4>
+<% end %>
+
+<%= if eval_res == :ok do %>
   <ul>
+    <% {script, data_struct} = eval_txt %>
+    <div class="collapse" id="collapseDataStruct">
+      <a href="http://mustache.github.io/mustache.5.html" target="_blank">Шаблонизатор mustache</a>
+      <h5>Структура данных шаблона для данного клиента:</h5>
+      <pre>
+        <%=
+          {_, mes} = Jason.encode(
+          data_struct |> Map.put(
+          "fn",
+          TemplFunc.std_funcs()
+          |> Enum.map(fn {k, _} -> {k, "#Function #{k}"} end)
+          |> Enum.into(%{})),
+          pretty: true)
+          mes
+          %>
+        </pre>
+      </div>
         <%= if (res = validate(@template.validator, script)) != :ok do %>
           <p class = "text-danger mt-2"><%= res %><p>
           <% {head, line, tail} = highlight_line(script, get_line(res)) %>
@@ -98,13 +124,6 @@
         <% else %>
           <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= script %></code></pre>
         <% end %>
-        <h5>Структура данных шаблона для данного клиента:</h5>
-        <pre>
-          <%=
-            {_, mes} = Jason.encode(data_struct, pretty: true)
-            mes
-          %>
-        </pre>
   </ul>
 
 <% else %>
