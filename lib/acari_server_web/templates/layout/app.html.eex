@@ -15,6 +15,11 @@
     <nav class="navbar navbar-expand navbar-dark flex-sm-nowrap p-0 justify-content-between"
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="http://www.nsg.ru">NSG</a>
+      <a class="navbar-brand col col-md-2 text-center" href="#">
+        <i class="fas fa-paw text-secondary"></i>
+          <span class="text-warning">С Новым Годом!</span>
+        <i class="fas fa-paw text-secondary"></i>
+      </a>
       <div class="navbar-nav px-3 d-flex flex-wrap">
         <span class="d-none d-md-block navbar-text pr-3">
           <%= AcariServer.Mnesia.get_server_name_by_system_name(node()) %>
