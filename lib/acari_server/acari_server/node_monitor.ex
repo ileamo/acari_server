@@ -123,7 +123,7 @@ defmodule AcariServer.NodeMonitor do
   def script_to_string(id, data) do
     case data do
       %{timestamp: ts, data: data} ->
-        "#{AcariServer.get_local_time(ts)}  #{id}\n\n#{data}"
+        "#{AcariServer.get_local_date(ts)}  #{id}\n\n#{data}"
 
       _ ->
         "Нет данных"
