@@ -41,6 +41,12 @@ let datatable_dom =
   "<'row'<'col-sm-12'tr>>" +
   "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
 
+let datatable_dom_wo_find =
+  "<'mb-2'B>" +
+  "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'>>" +
+  "<'row'<'col-sm-12'tr>>" +
+  "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+
 let datatatable_csv_text = '<i class="fas fa-file-csv"></i> Экспорт CSV'
 let datatatable_print_text = '<i class="fas fa-print"></i> Печать'
 
@@ -84,6 +90,9 @@ datatable_params = {
     }
   ]
 }
+
+datatable_params_wo_find = Object.assign({}, datatable_params)
+datatable_params_wo_find.dom = datatable_dom_wo_find
 
 $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
 
