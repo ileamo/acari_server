@@ -662,10 +662,17 @@ defmodule AcariServer.Mnesia do
     |> alert_mes()
   end
 
-  @max_items 25
-  def update_active_tun_chart(bad) do
+  @max_items 32
+  defp update_active_tun_chart(bad) do
     tun_num = get_tunnels_num()
     num = tun_num - bad
+
+    AcariServer.Zabbix.ZbxApi.zbx_send_master(
+      ZbxConst.client_number_key(),
+      to_string(tun_num)
+    )
+
+    AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_active_key(), to_string(num))
 
     tran =
       Mnesia.transaction(fn ->
@@ -704,13 +711,6 @@ defmodule AcariServer.Mnesia do
         Endpoint.broadcast!("room:lobby", "link_event", %{
           redraw_chart: true
         })
-
-        AcariServer.Zabbix.ZbxApi.zbx_send_master(
-          ZbxConst.client_number_key(),
-          to_string(tun_num)
-        )
-
-        AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_active_key(), to_string(num))
 
       _ ->
         nil
