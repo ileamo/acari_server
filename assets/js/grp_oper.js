@@ -220,12 +220,11 @@ if (grp_oper) {
         }
         document.querySelector("#go-script-field").innerHTML = `${payload.data}`
         if (!payload.opt) {
-          $("#datatable-filter").DataTable(datatable_params);
-
+          $("#datatable-filter").DataTable(datatable_params_wo_find);
         } else if (sessionStorage.getItem("grp_oper_script_type") == "server") {
-          $("#datatable-srv").DataTable(datatable_params);
+          $("#datatable-srv").DataTable(datatable_params_wo_find);
         } else {
-          $("#datatable").DataTable(datatable_params);
+          $("#datatable").DataTable(datatable_params_wo_find);
         }
 
         $('#grp-script-res').on('show.bs.modal', function(event) {

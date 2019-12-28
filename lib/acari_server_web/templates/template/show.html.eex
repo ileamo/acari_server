@@ -24,25 +24,18 @@
     </li>
   <% end %>
 
-  <% {template, template_error} = with %{} = script <- @template.script,
-          {var, nil} <- AcariServer.Template.get_json(script.definition),
-          {tst, nil} <- AcariServer.Template.get_json(script.test),
-          test_ass = %{} <- AcariServer.Template.test_assigns(var,
-                            tst |> Map.merge(%{"class" => script_name(@template)})) do
-        test_ass && eval_template(script.prefix, @template.template, test_ass) || {nil, nil}
-      else
-        _ -> {nil, nil}
-      end
-
+  <%
+    {test_params, test_params_error} = AcariServer.Template.get_json(@template.test_params)
+    {eval_res, eval_txt} = AcariServer.Template.test_eval(@template, test_params)
   %>
 
   <li>
     <strong>Шаблон:</strong>
-    <% pretempl = (@template.script && @template.script.prefix || "")<>@template.template %>
-    <%= if template_error do %>
-      <% {head, line, tail} = highlight_line(pretempl, get_line(template_error)) %>
+    <% pretempl = @template.template %>
+    <%= if eval_res == :error and is_binary(eval_txt) do %>
+      <% {head, line, tail} = {pretempl, "", ""} %>
 
-      <p class = "text-danger mt-2"><%= template_error %><p>
+      <p class = "text-danger mt-2"><%= eval_txt %><p>
         <pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
     <% else %>
       <pre class="border rounded bg-white p-2" style="resize: vertical; height: 340px"><code><%=
@@ -52,13 +45,26 @@
   </li>
 
   <li>
-    <strong>Класс:</strong>
-    <%= script_name(@template) %>
+    <strong>Дополнительные параметры для тестирования:</strong>
+
+      <%= if test_params_error do %>
+        <% {head, char, tail} = AcariServer.Template.highlight_char(@template.test_params, test_params_error.position) %>
+        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"><%= char %></span><%= tail %></code></pre>
+        <p class = "text-danger">Ошибка декодирования JSON<p>
+      <% else %>
+        <pre class="border rounded bg-white pl-2 p-2"><code><%= @template.test_params %></code></pre>
+      <% end %>
+
   </li>
 
   <li>
     <strong>Валидатор:</strong>
     <%= @template.validator %>
+  </li>
+
+  <li>
+    <strong>Клиент для тестирования:</strong>
+    <%= @template.test_client_name %>
   </li>
 
   <li>
@@ -80,19 +86,58 @@
 |
 <span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>
 
-<%= if template do %>
-<h3 class = "mt-3"> Результат тестирования </h3>
-<ul>
-    <li>
-      <strong>Параметры для тестирования взяты из класса <%=@template.script.name%></strong>
-      <%= if (res = validate(@template.validator, template)) != :ok do %>
-        <p class = "text-danger mt-2"><%= res %><p>
-        <% {head, line, tail} = highlight_line(template, get_line(res)) %>
+<%= if eval_res == :ok or is_atom(eval_txt) do %>
+  <h4 class = "mt-3"> Результат тестирования для клиента <%= @template.test_client_name %>
+    <%= if eval_res == :ok  and @current_user.is_admin do %>
+      <a class="" data-toggle="collapse" href="#collapseDataStruct" role="button"
+      aria-expanded="false" aria-controls="collapseDataStruct">
+        <i class="fas fa-info-circle"></i>
+      </a>
+    <% end %>
+  </h4>
+<% end %>
 
-        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
-      <% else %>
-        <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= template %></code></pre>
-      <% end %>
-    </li>
-</ul>
+<%= if eval_res == :ok do %>
+  <ul>
+    <% {script, data_struct} = eval_txt %>
+    <div class="collapse" id="collapseDataStruct">
+      <a href="http://mustache.github.io/mustache.5.html" target="_blank">Шаблонизатор mustache</a>
+      <h5>Структура данных шаблона для данного клиента:</h5>
+      <pre>
+        <%=
+          {_, mes} = Jason.encode(
+          data_struct |> Map.put(
+          "fn",
+          TemplFunc.std_funcs()
+          |> Enum.map(fn {k, _} -> {k, "#Function #{k}"} end)
+          |> Enum.into(%{})),
+          pretty: true)
+          mes
+          %>
+        </pre>
+      </div>
+        <%= if (res = validate(@template.validator, script)) != :ok do %>
+          <p class = "text-danger mt-2"><%= res %><p>
+          <% {head, line, tail} = highlight_line(script, get_line(res)) %>
+
+          <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= head %><span class="text-danger bg-white"><%= line %></span><%= tail %></code></pre>
+        <% else %>
+          <pre class="border rounded bg-white p-2" style="resize: vertical; height:340px"><code><%= script %></code></pre>
+        <% end %>
+  </ul>
+
+<% else %>
+  <%= if is_atom(eval_txt) do %>
+    <p class = "text-danger mt-2">
+      <%=
+        case String.trim(@template.test_client_name || "") do
+          "" -> "Клиент для тестирования не задан"
+          _ -> case eval_txt do
+            :no_client -> "Нет клиента с таким именем"
+            :no_class -> "Клиенту не назначен класс"
+          end
+        end
+      %>
+    </p>
+  <% end %>
 <% end %>

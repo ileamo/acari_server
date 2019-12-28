@@ -30,9 +30,7 @@
 
 
 
-  <% {var, error} = AcariServer.Template.get_json(@script.definition)
-     {tst, tst_error} = AcariServer.Template.get_json(@script.test)
-      test_ass = AcariServer.Template.test_assigns(var, tst)
+  <% {_var, error} = AcariServer.Template.get_json(@script.definition)
   %>
 
   <li>
@@ -48,31 +46,32 @@
 
   </li>
 
-  <% {res, prefix_res_txt} = eval_prefix(@script.prefix, test_ass || %{}) %>
+  <%
+
+    {res, prefix_res} =
+      AcariServer.Template.eval_class_assigns(
+        @script.prefix, AcariServer.Template.get_assignments(@script)
+      )
+  %>
 
   <li>
-    <strong>Префикс:</strong>
-    <pre class="border rounded bg-white p-2 <%= (res == :error) && "mb-0" || "" %>"><code><%=
+    <strong>Вычисление параметров:</strong>
+    <pre class="border rounded bg-white p-2 mb-0"><code><%=
       @script.prefix
     %></code></pre>
     <%= if res == :error do %>
-      <p class = "text-danger"><%= prefix_res_txt %><p>
+      <p class = "text-danger"><%= prefix_res %><p>
     <% else %>
-      <p>
-        <%= "Вычисленные параметры:" %></br>
-        <%= "#{inspect(prefix_res_txt)}" %><p>
-    <% end %>
-  </li>
-
-  <li>
-    <strong>Значения для тестирования:</strong>
-      <%= if tst_error do %>
-        <% {head, char, tail} = AcariServer.Template.highlight_char(@script.test, tst_error.position) %>
-        <pre class="border rounded bg-white pl-2 p-2 mb-0"><code><%= head %><span class="text-white bg-danger"><%= char %></span><%= tail %></code></pre>
-        <p class = "text-danger">Ошибка декодирования JSON<p>
-      <% else %>
-        <pre class="border rounded bg-white pl-2 p-2"><code><%= @script.test %></code></pre>
+      <%= if @current_user.is_admin do %>
+        <p class="mb-0">
+          Вычисленные параметры(на примере клиента '<%= @script.test_client_name %>'):
+        </p>
+        <pre>
+            <%= prefix_res |> Jason.encode!(pretty: true)%>
+        </pre>
       <% end %>
+
+    <% end %>
   </li>
 
   <li>
