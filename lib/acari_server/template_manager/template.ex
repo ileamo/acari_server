@@ -34,9 +34,14 @@ defmodule AcariServer.TemplateManager.Template do
       :test_params
     ])
     |> validate_required([:name, :description, :template])
-    |> validate_change(:name, &validate_templ_name/2)
     |> foreign_key_constraint(:script_id)
     |> unique_constraint(:name)
+    |> validate_change(:name, &validate_templ_name/2)
+  end
+
+  def update_changeset(template, attrs) do
+    changeset(template, attrs)
+    |> validate_change(:name, &validate_update_templ_name/2)
   end
 
   defp validate_templ_name(:name, "setup"), do: [name: "Имя шаблона не может быть 'setup'"]
@@ -50,4 +55,7 @@ defmodule AcariServer.TemplateManager.Template do
         [name: "Имя шаблона должно состоять из латинских букв, цифр и символов '_', '.'"]
     end
   end
+
+  defp validate_update_templ_name(:name, _), do: [name: "Имя шаблона не может быть изменено"]
+
 end

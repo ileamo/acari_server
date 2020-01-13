@@ -126,7 +126,7 @@ defmodule AcariServer.TemplateManager do
   """
   def update_template(%Template{} = template, attrs) do
     template
-    |> Template.changeset(attrs)
+    |> Template.update_changeset(attrs)
     |> Repo.update()
   end
 
