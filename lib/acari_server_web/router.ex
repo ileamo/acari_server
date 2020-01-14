@@ -68,6 +68,7 @@ defmodule AcariServerWeb.Router do
     post "/newnodes/upload", NewNodeController, :upload
     resources "/scripts", ScriptController
     resources "/templates", TemplateController
+    get "/templates_diff/:id", TemplateController, :diff
     resources "/servers", ServerController
     resources "/notes", NoteController
 

@@ -5,6 +5,7 @@ defmodule AcariServer.TemplateEventManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.TemplateEventManager.TemplateEvent
 
@@ -36,6 +37,48 @@ defmodule AcariServer.TemplateEventManager do
 
   """
   def get_template_event!(id), do: Repo.get!(TemplateEvent, id)
+
+  def get_template_event_by_name(name) do
+    from(te in TemplateEvent,
+      where: te.template_name == ^name,
+      order_by: te.inserted_at
+    )
+    |> RepoRO.all()
+  end
+
+  def get_template_events_diff(name) do
+    [%{description: nil, template: nil} | get_template_event_by_name(name)]
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.map(fn [prev, next] ->
+      diff =
+        List.myers_difference(
+          prev.template && String.split(prev.template, "\n") || [],
+          String.split(next.template, "\n"),
+          &String.myers_difference/2
+        )
+
+      diff_count =
+        diff
+        |> Enum.reduce([0, 0, 0], fn
+          {:ins, list}, [ins, del, diff] -> [ins + length(list), del, diff]
+          {:del, list}, [ins, del, diff] -> [ins, del + length(list), diff]
+          {:diff, _}, [ins, del, diff] -> [ins, del, diff + 1]
+          _, acc -> acc
+        end)
+
+      diff_count = Enum.zip([:ins, :del, :diff], diff_count)
+
+      %{
+        date: next.inserted_at,
+        username: next.username,
+        diff: diff,
+        diff_count: diff_count,
+        prev_templ: prev.template,
+        next_templ: next.template,
+      }
+    end)
+    |> Enum.reverse()
+  end
 
   @doc """
   Creates a template_event.

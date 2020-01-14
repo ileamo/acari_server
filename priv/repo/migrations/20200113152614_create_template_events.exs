@@ -3,13 +3,14 @@ defmodule AcariServer.Repo.Migrations.CreateTemplateEvents do
 
   def change do
     create table(:template_events) do
-      add :template_name, :string
-      add :username, :string
-      add :template, :text
-      add :description, :string
+      add(:template_name, :string)
+      add(:username, :string)
+      add(:template, :text)
+      add(:description, :string)
 
       timestamps()
     end
 
+    create(index(:template_events, [:template_name]))
   end
 end

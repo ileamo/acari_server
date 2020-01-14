@@ -1,0 +1,7 @@
+<h2>Истоия изменений шаблона
+  <%= link @template.name, to: Routes.template_path(@conn, :show, @template) %>
+</h2>
+
+<pre>
+<%= inspect(@diff, pretty: true) %>
+</pre>

@@ -85,6 +85,9 @@
             class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
 <span><%= link "К списку", to: Routes.template_path(@conn, :index) %></span>
+|
+<%= link "История изменений", to: Routes.template_path(@conn, :diff, @template) %>
+
 
 <%= if eval_res == :ok or is_atom(eval_txt) do %>
   <h4 class = "mt-3"> Результат тестирования для клиента <%= @template.test_client_name %>

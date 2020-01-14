@@ -3,6 +3,7 @@ defmodule AcariServerWeb.TemplateController do
 
   alias AcariServer.TemplateManager
   alias AcariServer.TemplateManager.Template
+  alias AcariServer.TemplateEventManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin when action in [:edit, :delete, :new]
@@ -25,12 +26,24 @@ defmodule AcariServerWeb.TemplateController do
     render(conn, "new.html", changeset: changeset)
   end
 
+  defp create_template_event(conn, template_params) do
+    TemplateEventManager.create_template_event(%{
+      username: conn.assigns.current_user.username,
+      template_name: template_params["name"],
+      description: template_params["description"],
+      template: template_params["template"]
+    })
+
+    conn
+  end
+
   def create(conn, %{"template" => template_params}) do
     case TemplateManager.create_template(template_params) do
       {:ok, template} ->
         conn
         |> put_flash(:info, "Шаблон создан.")
         |> redirect(to: Routes.template_path(conn, :show, template))
+        |> create_template_event(template_params)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -56,6 +69,7 @@ defmodule AcariServerWeb.TemplateController do
         conn
         |> put_flash(:info, "Шаблон отредактирован.")
         |> redirect(to: Routes.template_path(conn, :show, template))
+        |> create_template_event(template_params)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", template: template, changeset: changeset)
@@ -69,5 +83,11 @@ defmodule AcariServerWeb.TemplateController do
     conn
     |> put_flash(:info, "Шаблон удален.")
     |> redirect(to: Routes.template_path(conn, :index))
+  end
+
+  def diff(conn, %{"id" => id}) do
+    template = TemplateManager.get_template!(id)
+    diff = AcariServer.TemplateEventManager.get_template_events_diff(template.name)
+    render(conn, "diff.html", template: template, diff: diff)
   end
 end
