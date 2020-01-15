@@ -1,0 +1,14 @@
+<pre><code>
+  <%= for {tag, list} <- @diff do %>
+    <%= case tag do %>
+    <%
+    :eq -> %><%=
+      for str <- list do %><%= str<>"\n" %><% end %><%
+    :ins -> %><%=
+      for str <- list do %><span class="text-success"><%= str<>"\n" %></span><%end%><%
+    :del -> %><%=
+      for str <- list do %><span class="text-danger"><%= str<>"\n" %></span><% end %><%
+    _ ->  %>UNKNOWN TAG
+    <% end %>
+  <% end %>
+</code></pre>

@@ -1,7 +1,52 @@
-<h2>Истоия изменений шаблона
+<h2>История изменений шаблона
   <%= link @template.name, to: Routes.template_path(@conn, :show, @template) %>
 </h2>
 
-<pre>
-<%= inspect(@diff, pretty: true) %>
-</pre>
+<table class="table display table-striped table-bordered table-sm w-100" >
+  <thead>
+    <tr>
+      <th scope="col">Дата изменения</th>
+      <th scope="col">Пользователь</th>
+      <th scope="col">Изменения</th>
+
+    </tr>
+  </thead>
+  <tbody>
+<%= for %{date: date, username: username, diff: diff, diff_count: diff_count,
+          template: template} <- @diff do %>
+    <% date_txt = AcariServer.db_time_to_local(date) %>
+    <tr>
+      <td><%= date_txt %></td>
+      <td><%= username %></td>
+      <td>
+        <a href="#" data-toggle="modal" data-target="#template-diff"
+          data-content="<%= diff_to_html(diff) %>"
+          data-name="<%= "Изменения в шаблоне #{@template.name} от #{date_txt}" %>">
+
+          <%= diff_count_to_str(diff_count) %>
+
+        </a>
+      </td>
+
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="template-diff" tabindex="-1" role="dialog"
+        aria-labelledby="DiffTitle" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="DiffTitle">Шаблон</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        отличия
+      </div>
+    </div>
+  </div>
+</div>

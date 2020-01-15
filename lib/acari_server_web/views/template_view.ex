@@ -31,6 +31,19 @@ defmodule AcariServerWeb.TemplateView do
     end
   end
 
+  def diff_count_to_str(diff_count) do
+    diff_count
+    |> Enum.reduce("Строк ", fn
+      {:ins, n}, acc -> acc <> "добавлено: #{n}, "
+      {:del, n}, acc -> acc <> "удалено: #{n}, "
+      _, acc -> acc
+    end)
+  end
+
+  def diff_to_html(diff) do
+    Phoenix.View.render_to_string(AcariServerWeb.TemplateView, "diff_modal.html", diff: diff)
+  end
+
   defdelegate highlight_line(s, n), to: AcariServer.Template
   defdelegate get_line(n), to: AcariServer.Template
 end

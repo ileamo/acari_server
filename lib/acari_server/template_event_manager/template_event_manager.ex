@@ -53,8 +53,7 @@ defmodule AcariServer.TemplateEventManager do
       diff =
         List.myers_difference(
           prev.template && String.split(prev.template, "\n") || [],
-          String.split(next.template, "\n"),
-          &String.myers_difference/2
+          String.split(next.template, "\n")
         )
 
       diff_count =
@@ -73,8 +72,7 @@ defmodule AcariServer.TemplateEventManager do
         username: next.username,
         diff: diff,
         diff_count: diff_count,
-        prev_templ: prev.template,
-        next_templ: next.template,
+        template: next.template,
       }
     end)
     |> Enum.reverse()

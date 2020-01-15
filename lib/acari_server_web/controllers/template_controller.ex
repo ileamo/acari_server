@@ -26,13 +26,15 @@ defmodule AcariServerWeb.TemplateController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  defp create_template_event(conn, template_params) do
-    TemplateEventManager.create_template_event(%{
-      username: conn.assigns.current_user.username,
-      template_name: template_params["name"],
-      description: template_params["description"],
-      template: template_params["template"]
-    })
+  defp create_template_event(conn, template_params, template) do
+    if template_params["template"] != template.template do
+      TemplateEventManager.create_template_event(%{
+        username: conn.assigns.current_user.username,
+        template_name: template_params["name"],
+        description: template_params["description"],
+        template: template_params["template"]
+      })
+    end
 
     conn
   end
@@ -43,7 +45,7 @@ defmodule AcariServerWeb.TemplateController do
         conn
         |> put_flash(:info, "Шаблон создан.")
         |> redirect(to: Routes.template_path(conn, :show, template))
-        |> create_template_event(template_params)
+        |> create_template_event(template_params, %{template: ""})
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -65,11 +67,11 @@ defmodule AcariServerWeb.TemplateController do
     template = TemplateManager.get_template!(id)
 
     case TemplateManager.update_template(template, template_params) do
-      {:ok, template} ->
+      {:ok, templ} ->
         conn
         |> put_flash(:info, "Шаблон отредактирован.")
-        |> redirect(to: Routes.template_path(conn, :show, template))
-        |> create_template_event(template_params)
+        |> redirect(to: Routes.template_path(conn, :show, templ))
+        |> create_template_event(template_params, template)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", template: template, changeset: changeset)
