@@ -7,6 +7,8 @@ require('datatables.net-buttons-bs4')(window, $);
 require('datatables.net-buttons/js/buttons.html5.js')(window, $);
 require('datatables.net-buttons/js/buttons.print.js')(window, $);
 require('datatables.net-buttons/js/buttons.colVis.js')(window, $);
+require('datatables.net-select')(window, $);
+require('datatables.net-select-bs4')(window, $);
 
 
 $.extend($.fn.dataTable.defaults, {
@@ -51,6 +53,7 @@ let datatatable_csv_text = '<i class="fas fa-file-csv"></i> Экспорт CSV'
 let datatatable_print_text = '<i class="fas fa-print"></i> Печать'
 
 datatable_params = {
+  select: true,
   stateSave: true,
   responsive: true,
   dom: datatable_dom,
@@ -98,6 +101,7 @@ $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
 
 var table = $("#datatable").DataTable(datatable_params);
 var table_all = $("#datatable_all").DataTable(datatable_params);
+
 
 
 $('.buttonNext').addClass('btn btn-success');
