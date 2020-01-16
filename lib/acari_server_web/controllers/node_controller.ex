@@ -115,4 +115,11 @@ defmodule AcariServerWeb.NodeController do
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
     |> redirect(to: Routes.node_path(conn, :index))
   end
+
+  def delete_selected(conn, params) do
+    IO.inspect(params)
+    conn
+    |> redirect(to: Routes.node_path(conn, :index))
+  end
+
 end

@@ -3,6 +3,7 @@
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
+      <th style="display:none;"></th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Класс</th>
@@ -17,6 +18,7 @@
     <% bg_disabled = AcariServer.UserManager.get_disabled(@current_user, node.id)
     %>
     <tr>
+      <td style="display:none;"><%= node.id %></td>
       <td>
       <%= link node.name, to: Routes.node_path(@conn, :show, node) %>
       </td>
@@ -53,3 +55,11 @@
 <span><%= link "Новый клиент", to: Routes.node_path(@conn, :new),
             class: AcariServer.UserManager.get_disabled(@current_user)
 %></span>
+
+<%= form_for @conn, Routes.node_path(@conn, :delete_selected), [method: "delete"], fn f -> %>
+  <%= text_input f, :clients_list,  id: "delete-selected-clients",
+                                    type: "hidden",
+                                    value: "0"
+  %>
+  <%= submit "Удалить выделенные", onclick: "delete_selected_clients()" %>
+<% end %>
