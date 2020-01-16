@@ -40,8 +40,11 @@ defmodule AcariServerWeb.TemplateView do
     end)
   end
 
-  def diff_to_html(diff) do
-    Phoenix.View.render_to_string(AcariServerWeb.TemplateView, "diff_modal.html", diff: diff)
+  def diff_to_html(template, diff) do
+    Phoenix.View.render_to_string(AcariServerWeb.TemplateView, "diff_modal.html",
+      template: template,
+      diff: diff
+    )
   end
 
   defdelegate highlight_line(s, n), to: AcariServer.Template

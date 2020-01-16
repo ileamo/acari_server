@@ -20,7 +20,7 @@
       <td><%= username %></td>
       <td>
         <a href="#" data-toggle="modal" data-target="#template-diff"
-          data-content="<%= diff_to_html(diff) %>"
+          data-content="<%= diff_to_html(template, diff) %>"
           data-name="<%= "Изменения в шаблоне #{@template.name} от #{date_txt}" %>">
 
           <%= diff_count_to_str(diff_count) %>

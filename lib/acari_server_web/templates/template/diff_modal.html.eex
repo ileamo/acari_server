@@ -1,14 +1,23 @@
-<pre><code>
-  <%= for {tag, list} <- @diff do %>
-    <%= case tag do %>
-    <%
-    :eq -> %><%=
-      for str <- list do %><%= str<>"\n" %><% end %><%
-    :ins -> %><%=
-      for str <- list do %><span class="text-success"><%= str<>"\n" %></span><%end%><%
-    :del -> %><%=
-      for str <- list do %><span class="text-danger"><%= str<>"\n" %></span><% end %><%
-    _ ->  %>UNKNOWN TAG
+<h5><a data-toggle="collapse" href="#diff-modal-diff" aria-expanded="false" aria-controls="diff-modal-diff">
+  Изменения
+</a></h5>
+
+<pre class="collapse show bg-light" id="diff-modal-diff"><code><%=
+  for {tag, list} <- @diff do %><%=
+    case tag do %><%
+      :eq -> %><%=
+        for str <- list do %><%= "  #{str}\n" %><% end %><%
+      :ins -> %><%=
+        for str <- list do %><span class="text-success"><%= "+ #{str}\n" %></span><%end%><%
+      :del -> %><%=
+        for str <- list do %><span class="text-danger"><%= "- #{str}\n" %></span><% end %><%
+      _ ->  %>UNKNOWN TAG
     <% end %>
   <% end %>
 </code></pre>
+
+<h5><a data-toggle="collapse" href="#diff-modal-template" aria-expanded="false">
+  Шаблон
+</a></h5>
+
+<pre class="collapse bg-light" id="diff-modal-template"><code><%= @template %></code></pre>
