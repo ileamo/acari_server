@@ -64,6 +64,7 @@ defmodule AcariServerWeb.Router do
     get "/groups/:id/oper", GroupController, :oper
     resources "/nodes", NodeController
     get "/nodes/:id/toggle_lock", NodeController, :toggle_lock
+    delete "/nodes", NodeController, :delete_selected
     resources "/newnodes", NewNodeController
     post "/newnodes/upload", NewNodeController, :upload
     resources "/scripts", ScriptController

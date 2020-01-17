@@ -107,3 +107,11 @@ var table_all = $("#datatable_all").DataTable(datatable_params);
 $('.buttonNext').addClass('btn btn-success');
 $('.buttonPrevious').addClass('btn btn-primary');
 $('.buttonFinish').addClass('btn btn-default');
+
+
+
+
+window.delete_selected_clients = function() {
+  document.getElementById("delete-selected-clients").value = '["1","2","3,7"]'
+  return true
+}
