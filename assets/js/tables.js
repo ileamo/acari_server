@@ -102,16 +102,37 @@ $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
 var table = $("#datatable").DataTable(datatable_params);
 var table_all = $("#datatable_all").DataTable(datatable_params);
 
-
-
 $('.buttonNext').addClass('btn btn-success');
 $('.buttonPrevious').addClass('btn btn-primary');
 $('.buttonFinish').addClass('btn btn-default');
 
 
+if (document.getElementById("delete-selected-clients")) {
+  let is_selected
+  $('#delete-selected-clients').on('show.bs.modal', function(event) {
+    let selected = table.rows('.selected').data()
+    let num = selected.length
+    if (num > 0) {
+      is_selected = true
+      let names = selected.map(function(x) {
+        return x[1]
+      }).join(', ')
+      let ids = selected.map(function(x) {
+        return x[0]
+      }).join(',')
+      $(this).find('.modal-body #delete-selected-clients-list').text(names)
+      $(this).find('.modal-body #delete-selected-clients-num').text(num)
+      document.getElementById('delete-selected-clients-id-list').value = ids
+    } else {
+      is_selected = false
+      $(this).find('.modal-body #delete-selected-clients-list').text('')
+    }
+  })
 
-
-window.delete_selected_clients = function() {
-  document.getElementById("delete-selected-clients").value = '["1","2","3,7"]'
-  return true
+  $('#delete-selected-clients').on('shown.bs.modal', function(event) {
+    if (!is_selected) {
+      $(this).modal('hide')
+      setTimeout(alert, 100, 'Не выделена ни одна строка в таблице')
+    }
+  })
 }

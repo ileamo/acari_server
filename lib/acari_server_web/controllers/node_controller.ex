@@ -6,7 +6,7 @@ defmodule AcariServerWeb.NodeController do
 
   import AcariServer.UserManager, only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2]
 
-  plug :is_admin when action in [:new]
+  plug :is_admin when action in [:new, :delete_selected]
   plug :is_user_node_rw, :node when action in [:edit, :delete]
   plug :is_user_node_ro, :node when action in [:show]
 
@@ -90,10 +90,14 @@ defmodule AcariServerWeb.NodeController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
+  defp delete_node_and_tunnel(id) do
     node = NodeManager.get_node!(id)
     {:ok, _node} = NodeManager.delete_node(node)
     AcariServer.Master.delete_tunnel(node.name)
+  end
+
+  def delete(conn, %{"id" => id}) do
+    delete_node_and_tunnel(id)
 
     conn
     |> put_flash(:info, "Клиент удален.")
@@ -116,10 +120,11 @@ defmodule AcariServerWeb.NodeController do
     |> redirect(to: Routes.node_path(conn, :index))
   end
 
-  def delete_selected(conn, params) do
-    IO.inspect(params)
+  def delete_selected(conn, %{"clients_list" => ids}) do
+    String.split(ids, ",")
+    |> Enum.each(fn id -> delete_node_and_tunnel(id) end)
+
     conn
     |> redirect(to: Routes.node_path(conn, :index))
   end
-
 end

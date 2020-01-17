@@ -4,6 +4,7 @@
   <thead>
     <tr>
       <th style="display:none;"></th>
+      <th style="display:none;"></th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Класс</th>
@@ -19,6 +20,7 @@
     %>
     <tr>
       <td style="display:none;"><%= node.id %></td>
+      <td style="display:none;"><%= node.name %></td>
       <td>
       <%= link node.name, to: Routes.node_path(@conn, :show, node) %>
       </td>
@@ -55,11 +57,48 @@
 <span><%= link "Новый клиент", to: Routes.node_path(@conn, :new),
             class: AcariServer.UserManager.get_disabled(@current_user)
 %></span>
+|
+<span><a href="#" data-toggle="modal" data-target="#delete-selected-clients"
+  class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
+    Удалить выделенные
+</a></span>
 
-<%= form_for @conn, Routes.node_path(@conn, :delete_selected), [method: "delete"], fn f -> %>
-  <%= text_input f, :clients_list,  id: "delete-selected-clients",
-                                    type: "hidden",
-                                    value: "0"
-  %>
-  <%= submit "Удалить выделенные", onclick: "delete_selected_clients()" %>
-<% end %>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="delete-selected-clients" tabindex="-1" role="dialog"
+        aria-labelledby="delete-selected-client-title" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="delete-selected-client-title">Удаление клиентов</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Будут удалены следующие клиенты(<span id = "delete-selected-clients-num"></span>):
+        </p>
+        <p id="delete-selected-clients-list"><p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Отмена
+        </button>
+
+        <%= form_for @conn, Routes.node_path(@conn, :delete_selected), [method: "delete"], fn f -> %>
+          <%= text_input f, :clients_list,  id: "delete-selected-clients-id-list",
+                                            type: "hidden",
+                                            value: "0,2,55"
+          %>
+          <%= submit "Удалить выделенные",
+                data: [confirm: "Вы уверены что хотите удалить выбранных клиентов?"],
+                role: "button", class: "btn btn-danger"%>
+        <% end %>
+      </div>
+
+    </div>
+  </div>
+</div>

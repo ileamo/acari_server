@@ -22,6 +22,4 @@ if (template__diff) {
     modal.find('.modal-title').text('' + name)
     modal.find('.modal-body').html(content)
   })
-
-
 }
