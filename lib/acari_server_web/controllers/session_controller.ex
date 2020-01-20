@@ -1,5 +1,6 @@
 defmodule AcariServerWeb.SessionController do
   use AcariServerWeb, :controller
+  require Logger
 
   alias AcariServer.{UserManager, UserManager.User, UserManager.Guardian}
 
@@ -27,16 +28,28 @@ defmodule AcariServerWeb.SessionController do
         "user" => %{"username" => username, "password" => password, "prev_path" => prev_path}
       }) do
     UserManager.authenticate_user(username, password)
-    |> login_reply(conn, prev_path)
+    |> login_reply(conn, prev_path, username)
   end
 
   def logout(conn, _) do
+    username =
+      get_in(conn, [
+        Access.key(:private, %{}),
+        Access.key(:guardian_default_resource, %{}),
+        Access.key(:username)
+      ])
+
+      Logger.info("User #{username} logged out")
+
     conn
     |> Guardian.Plug.sign_out()
     |> redirect(to: "/login")
   end
 
-  defp login_reply({:ok, user}, conn, prev_path) do
+  defp login_reply({:ok, user}, conn, prev_path, username) do
+    Logger.info("User #{username} logged in")
+
+
     conn
     |> put_flash(:success, "Welcome back!")
     |> Guardian.Plug.sign_in(%{
@@ -47,7 +60,9 @@ defmodule AcariServerWeb.SessionController do
     |> redirect(to: prev_path)
   end
 
-  defp login_reply({:error, _reason}, conn, _prev_path) do
+  defp login_reply({:error, _reason}, conn, _prev_path, username) do
+    Logger.info("User #{username} is not logged in")
+
     conn
     |> put_flash(:error, "Неверный пароль")
     |> new(%{})
