@@ -26,7 +26,9 @@ defmodule AcariServer.Application do
       AcariServer.Zabbix.ZbxApi,
       AcariServer.Zabbix.Sup,
       AcariServer.Sup,
-      {Task.Supervisor, name: AcariServer.TaskSup}
+      {Task.Supervisor, name: AcariServer.TaskSup},
+
+      AcariServer.Scheduler
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

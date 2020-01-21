@@ -84,6 +84,8 @@ defmodule AcariServer.MixProject do
       {:zabbix, "~> 0.1.0"},
       {:zabbix_sender, "~> 1.0.0"},
       {:bbmustache, "~> 1.8"},
+      {:quantum, "~> 2.3"},
+      {:timex, "~> 3.0"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
       {:tunctl, git: "https://github.com/msantos/tunctl.git"},

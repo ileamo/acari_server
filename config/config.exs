@@ -37,6 +37,15 @@ config :acari_server, AcariServerWeb.Gettext, default_locale: "ru"
 config :acari,
   server: true
 
+  config :acari_server, AcariServer.Scheduler,
+  debug_logging: false,
+  global: true,
+  timezone: "Europe/Moscow",
+  jobs: [
+    # Every minute
+    {"* * * * *",      {IO, :puts, ["Scheduler OK"]}}
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
