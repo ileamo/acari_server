@@ -667,6 +667,7 @@ defmodule AcariServer.Mnesia do
     tun_num = get_tunnels_num()
     num = tun_num - bad
 
+    set_stat(:clients_number, {tun_num, num})
     AcariServer.Zabbix.ZbxApi.zbx_send_master(
       ZbxConst.client_number_key(),
       to_string(tun_num)
@@ -995,6 +996,13 @@ defmodule AcariServer.Mnesia do
   end
 
   # API
+
+  def get_clients_number() do
+    case Mnesia.transaction(fn -> Mnesia.read({:stat, :clients_number}) end) do
+      {:atomic, [{:stat, :clients_number, numbers}]} -> numbers
+      _ -> {0,0}
+    end
+  end
 
   def get_active_tun_chart() do
     case Mnesia.transaction(fn -> Mnesia.read({:stat, :active_tun}) end) do

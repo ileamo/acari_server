@@ -43,7 +43,7 @@ config :acari,
   timezone: "Europe/Moscow",
   jobs: [
     # Every minute
-    {"* * * * *",      {IO, :puts, ["Scheduler OK"]}}
+    {"* * * * *",      {AcariServer.Scheduler, :send_clients_number_to_zabbix, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom
