@@ -11,6 +11,8 @@ defmodule AcariServer.TemplateManager.Template do
     field :rights, :string, default: "rw"
     field :test_client_name, :string
     field :test_params, :string
+    field :zabbix_send, :boolean, default: false
+    field :zabbix_key, :string
     belongs_to :script, AcariServer.ScriptManager.Script
 
     # many_to_many :scripts, AcariServer.ScriptManager.Script,
@@ -31,7 +33,9 @@ defmodule AcariServer.TemplateManager.Template do
       :validator,
       :rights,
       :test_client_name,
-      :test_params
+      :test_params,
+      :zabbix_send,
+      :zabbix_key
     ])
     |> validate_required([:name, :description, :template])
     |> foreign_key_constraint(:script_id)

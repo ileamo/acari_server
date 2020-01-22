@@ -22,6 +22,16 @@
       <strong>Требуемые права:</strong>
       <%= rights_descr(@template.rights) %>
     </li>
+
+    <li>
+      <strong>Посылать результат в Zabbix:</strong>
+      <%= @template.zabbix_send && "Да" || "Нет" %>
+    </li>
+
+    <li>
+      <strong>Ключ для элемента данных Zabbix:</strong>
+      <%= @template.zabbix_key %>
+    </li>
   <% end %>
 
   <%
