@@ -367,7 +367,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
         %{
           alias: name,
           passwd: :crypto.strong_rand_bytes(12) |> Base.encode64(),
-          lang: "ru_RU", 
+          lang: "ru_RU",
           usrgrps: [%{usrgrpid: usrgrpid} | usrgrpid_list]
         }
       end)

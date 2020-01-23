@@ -310,6 +310,17 @@ defmodule AcariServer.Mnesia do
 
   def update_tun_script(name, tag, data) do
     update_tun_state(name, tag, data)
+    send_to_zabbix(name, tag, data)
+  end
+
+  defp send_to_zabbix(host, templ_name, data) do
+    with %{data: data} <- data,
+         %AcariServer.TemplateManager.Template{zabbix_send: true, zabbix_key: key}
+         when is_binary(key) <-
+           AcariServer.TemplateManager.get_template_by_name(templ_name),
+         true <- String.trim(key) != "" do
+      AcariServer.Zabbix.ZbxApi.zbx_send(host, key, data)
+    end
   end
 
   def update_tun_state(name, tag, data) do
@@ -668,6 +679,7 @@ defmodule AcariServer.Mnesia do
     num = tun_num - bad
 
     set_stat(:clients_number, {tun_num, num})
+
     AcariServer.Zabbix.ZbxApi.zbx_send_master(
       ZbxConst.client_number_key(),
       to_string(tun_num)
@@ -1000,7 +1012,7 @@ defmodule AcariServer.Mnesia do
   def get_clients_number() do
     case Mnesia.transaction(fn -> Mnesia.read({:stat, :clients_number}) end) do
       {:atomic, [{:stat, :clients_number, numbers}]} -> numbers
-      _ -> {0,0}
+      _ -> {0, 0}
     end
   end
 
