@@ -41,6 +41,11 @@ defmodule AcariServer.GroupManager do
     |> Enum.sort_by(&elem(&1, 0))
   end
 
+  def group_name_id_pairs_list(all) do
+    group_name_id_pairs_list()
+    |> List.insert_at(0, {all, nil})
+  end
+
   @doc """
   Gets a single group.
 
@@ -87,7 +92,9 @@ defmodule AcariServer.GroupManager do
 
     Task.start(fn ->
       Process.sleep(1_000)
-      ZbxApi.zbx_groups_sync() end)
+      ZbxApi.zbx_groups_sync()
+    end)
+
     res
   end
 

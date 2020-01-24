@@ -1,26 +1,40 @@
-<h1>Listing Schedules</h1>
+<h1>Список Расписаний</h1>
 
-<table>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+
   <thead>
     <tr>
-      <th>Schedule</th>
+      <th>Описание</th>
+      <th>Скрипт</th>
+      <th>Расписание</th>
+      <th>Группа</th>
+      <th>Класс</th>
 
-      <th></th>
+      <th scope="col" class="not-export-col">Действия</th>
+
     </tr>
   </thead>
   <tbody>
 <%= for schedule <- @schedules do %>
     <tr>
+      <td><%= schedule.description %></td>
+      <td><%= template_name(schedule) %></td>
       <td><%= schedule.schedule %></td>
+      <td><%= group_name(schedule) %></td>
+      <td><%= class_name(schedule) %></td>
 
       <td>
-        <%= link "Show", to: Routes.schedule_path(@conn, :show, schedule) %>
-        <%= link "Edit", to: Routes.schedule_path(@conn, :edit, schedule) %>
-        <%= link "Delete", to: Routes.schedule_path(@conn, :delete, schedule), method: :delete, data: [confirm: "Are you sure?"] %>
+        <%= link "Редактировать", to: Routes.schedule_path(@conn, :edit, schedule),
+            class: AcariServer.UserManager.get_disabled(@current_user) %>
+            |
+        <%= link "Удалить", to: Routes.schedule_path(@conn, :delete, schedule), method: :delete,
+              data: [confirm: "Вы уверены?"],
+              class: AcariServer.UserManager.get_disabled(@current_user) %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New Schedule", to: Routes.schedule_path(@conn, :new) %></span>
+<span><%= link "Новое расписание", to: Routes.schedule_path(@conn, :new),
+            class: AcariServer.UserManager.get_disabled(@current_user) %></span>

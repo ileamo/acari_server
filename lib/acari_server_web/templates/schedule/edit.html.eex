@@ -1,5 +1,5 @@
-<h1>Edit Schedule</h1>
+<h1>Редактировать Расписание</h1>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.schedule_path(@conn, :update, @schedule)) %>
 
-<span><%= link "Back", to: Routes.schedule_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.schedule_path(@conn, :index) %></span>

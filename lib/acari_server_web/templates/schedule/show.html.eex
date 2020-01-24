@@ -1,13 +1,36 @@
-<h1>Show Schedule</h1>
+<h1>Расписание</h1>
 
 <ul>
 
   <li>
-    <strong>Schedule:</strong>
+    <strong>Описание:</strong>
+    <%= @schedule.description %>
+  </li>
+
+  <li>
+    <strong>Скрипт:</strong>
+    <%= template_name(@schedule) %>
+  </li>
+
+  <li>
+    <strong>Расписание:</strong>
     <%= @schedule.schedule %>
   </li>
 
+  <li>
+    <strong>Группа:</strong>
+    <%= group_name(@schedule) %>
+  </li>
+
+  <li>
+    <strong>Класс:</strong>
+    <%= class_name(@schedule) %>
+  </li>
+
+
+
 </ul>
 
-<span><%= link "Edit", to: Routes.schedule_path(@conn, :edit, @schedule) %></span>
-<span><%= link "Back", to: Routes.schedule_path(@conn, :index) %></span>
+<span><%= link "Редактировать", to: Routes.schedule_path(@conn, :edit, @schedule) %></span>
+|
+<span><%= link "К списку", to: Routes.schedule_path(@conn, :index) %></span>

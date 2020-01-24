@@ -5,9 +5,48 @@
     </div>
   <% end %>
 
-  <%= label f, :schedule %>
-  <%= text_input f, :schedule %>
-  <%= error_tag f, :schedule %>
+  <div class="form-group row">
+    <%= label f, "Описание", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <%= text_input f, :description, class: "form-control" %>
+      <%= error_tag f, :description %>
+    </div>
+  </div>
+
+
+  <div class="form-group row">
+    <%= label f, "Скрипт", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-4">
+      <% templ_id_pair_list = AcariServer.TemplateManager.templ_name_id_pairs_list() %>
+      <%= select f, :template_id, templ_id_pair_list, class: "custom-select" %>
+      <%= error_tag f, :template_id %>
+    </div>
+
+    <%= label f, "Расписание", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-4">
+      <%= text_input f, :schedule, class: "form-control" %>
+      <%= error_tag f, :schedule %>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <%= label f, "Группа", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-4">
+      <% groups_list = AcariServer.GroupManager.group_name_id_pairs_list("Все") %>
+      <%= select f, :group_id, groups_list, class: "custom-select", id: "class-form-select" %>
+      <%= error_tag f, :group_id %>
+    </div>
+
+    <%= label f, "Класс", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-4">
+      <% scripts_list = AcariServer.ScriptManager.script_name_id_pairs_list("Все") %>
+      <%= select f, :script_id, scripts_list, class: "custom-select", id: "class-form-select" %>
+      <%= error_tag f, :script_id %>
+    </div>
+  </div>
+
+
+
 
   <div>
     <%= submit "Сохранить" %>
