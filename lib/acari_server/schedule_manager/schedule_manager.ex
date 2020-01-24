@@ -46,6 +46,13 @@ defmodule AcariServer.ScheduleManager do
     |> RepoRO.preload(:script)
   end
 
+  def get_schedule(id) do
+    RepoRO.get(Schedule, id)
+    |> RepoRO.preload(:template)
+    |> RepoRO.preload(:group)
+    |> RepoRO.preload(:script)
+  end
+
   @doc """
   Creates a schedule.
 
@@ -59,9 +66,19 @@ defmodule AcariServer.ScheduleManager do
 
   """
   def create_schedule(attrs \\ %{}) do
-    %Schedule{}
-    |> Schedule.changeset(attrs)
-    |> Repo.insert()
+    res =
+      %Schedule{}
+      |> Schedule.changeset(attrs)
+      |> Repo.insert()
+
+    case res do
+      {:ok, schedule} ->
+        AcariServer.Scheduler.Api.add_job(schedule)
+        res
+
+      _ ->
+        res
+    end
   end
 
   @doc """
