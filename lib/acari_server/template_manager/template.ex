@@ -14,6 +14,8 @@ defmodule AcariServer.TemplateManager.Template do
     field :zabbix_send, :boolean, default: false
     field :zabbix_key, :string
     belongs_to :script, AcariServer.ScriptManager.Script
+    has_many :schedules, AcariServer.ScheduleManager.Schedule
+
 
     # many_to_many :scripts, AcariServer.ScriptManager.Script,
     #  join_through: AcariServer.ScriptTemplateAssociation.ScriptTemplateNode

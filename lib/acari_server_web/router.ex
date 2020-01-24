@@ -72,6 +72,7 @@ defmodule AcariServerWeb.Router do
     get "/templates_diff/:id", TemplateController, :diff
     resources "/servers", ServerController
     resources "/notes", NoteController
+    resources "/schedules", ScheduleController
 
     get "/secret", PageController, :secret
   end

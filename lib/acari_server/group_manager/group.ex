@@ -12,6 +12,8 @@ defmodule AcariServer.GroupManager.Group do
     many_to_many :users, AcariServer.UserManager.User,
       join_through: AcariServer.GroupUserAssociation.GroupUser
 
+    has_many :schedules, AcariServer.ScheduleManager.Schedule
+
     timestamps()
   end
 
@@ -41,5 +43,4 @@ defmodule AcariServer.GroupManager.Group do
   defp parse_groups(_) do
     []
   end
-
 end

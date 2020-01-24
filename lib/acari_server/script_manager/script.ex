@@ -3,10 +3,10 @@ defmodule AcariServer.ScriptManager.Script do
   import Ecto.Changeset
 
   schema "scripts" do
-    #field :local, :string
+    # field :local, :string
     field :description, :string
     field :name, :string
-    #field :remote, :string
+    # field :remote, :string
     field :definition, :string
     field :prefix, :string
     field :test, :string
@@ -17,6 +17,7 @@ defmodule AcariServer.ScriptManager.Script do
     belongs_to :remote, AcariServer.TemplateManager.Template
 
     has_many :nodes, AcariServer.NodeManager.Node
+    has_many :schedules, AcariServer.ScheduleManager.Schedule
 
     many_to_many :templates, AcariServer.TemplateManager.Template,
       join_through: AcariServer.ScriptTemplateAssociation.ScriptTemplate,
@@ -58,5 +59,4 @@ defmodule AcariServer.ScriptManager.Script do
   defp parse_templates(_) do
     []
   end
-
 end

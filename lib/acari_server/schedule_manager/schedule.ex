@@ -4,9 +4,9 @@ defmodule AcariServer.ScheduleManager.Schedule do
 
   schema "schedules" do
     field :schedule, :string
-    field :template_id, :id
-    field :group_id, :id
-    field :script_id, :id
+    belongs_to :template, AcariServer.TemplateManager.Template
+    belongs_to :group, AcariServer.GroupManager.Group
+    belongs_to :script, AcariServer.ScriptManager.Script
 
     timestamps()
   end
