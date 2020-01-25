@@ -36,19 +36,19 @@
       %>
       <td>
         <%= link to: Routes.node_path(@conn, :edit, node), class: bg_disabled do %>
-          <i class="fas fa-edit mr-2"></i>
+          <i class="fas fa-edit mr-1"></i>
         <% end %>
 
         <%= link to: Routes.node_path(@conn, :delete, node),
         method: :delete, data: [confirm: "Вы уверены, что хотите удалить клиента?"],
         class: bg_disabled do %>
-          <i class="fas fa-trash-alt mr-2"></i>
+          <i class="fas fa-trash-alt mx-1"></i>
         <% end %>
 
         <span class="<%=color%>">
         <%= link to: Routes.node_path(@conn, :toggle_lock, node, lock: !node.lock),
                   class: color, data: [confirm: confirm] do %>
-          <i class="fas fa-toggle-<%= text %>"></i>
+          <i class="fas fa-toggle-<%= text %> ml-1"></i>
         <% end %>
       </span>
       </td>
