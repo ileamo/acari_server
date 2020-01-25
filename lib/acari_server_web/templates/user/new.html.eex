@@ -1,4 +1,4 @@
-<h2>Новый Пользователь</h2>
+<h2>Новый пользователь</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.user_path(@conn, :create)) %>
 

@@ -1,4 +1,4 @@
-<h2>Список Пользователей</h2>
+<h2>Список пользователей</h2>
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>

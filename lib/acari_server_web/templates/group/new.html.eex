@@ -1,4 +1,4 @@
-<h2>Новая Группа</h2>
+<h2>Новая группа</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.group_path(@conn, :create)) %>
 

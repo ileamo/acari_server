@@ -1,4 +1,4 @@
-<h1>Список Расписаний</h1>
+<h1>Список расписаний</h1>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
 

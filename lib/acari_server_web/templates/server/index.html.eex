@@ -1,4 +1,4 @@
-<h2>Список Cерверов</h2>
+<h2>Список серверов</h2>
 
 <% node_list = [node() | Node.list()] |> Enum.map(&to_string/1)%>
 

@@ -1,4 +1,4 @@
-<h2>Редактировать Шаблон</h2>
+<h2>Редактировать шаблон</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.template_path(@conn, :update, @template)) %>
 
