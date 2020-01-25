@@ -10,7 +10,7 @@
       <th scope="col">Описание</th>
       <th scope="col">Статус</th>
       <th scope="col">База Данных</th>
-      <th scope="col">БД(readonly)</th>
+      <th scope="col">БД (readonly)</th>
       <th scope="col" class="not-export-col">Действия</th>
     </tr>
   </thead>
