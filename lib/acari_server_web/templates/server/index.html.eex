@@ -41,12 +41,16 @@
       <td class="<%= db_conn[:ro] && "" || "text-danger" %>"><%= db_conn[:ro] || "Отключена" %></td>
 
       <td>
-        <%= link "Редактировать", to: Routes.server_path(@conn, :edit, server),
-            class: AcariServer.UserManager.get_disabled(@current_user) %>
-        |
-        <%= link "Удалить", to: Routes.server_path(@conn, :delete, server), method: :delete,
-              data: [confirm: "Вы уверены?"],
-              class: AcariServer.UserManager.get_disabled(@current_user) %>
+        <%= link to: Routes.server_path(@conn, :edit, server),
+            class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="fas fa-edit mr-1"></i>
+        <% end %>
+        <%= link to: Routes.server_path(@conn, :delete, server), method: :delete,
+              data: [confirm: "Вы уверены, что хотите удалить сервер '#{server.name}'?"],
+              class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="fas fa-trash-alt ml-1"></i>
+        <% end %>
+
       </td>
     </tr>
 <% end %>

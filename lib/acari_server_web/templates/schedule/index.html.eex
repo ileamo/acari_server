@@ -24,12 +24,15 @@
       <td><%= class_name(schedule) %></td>
 
       <td>
-        <%= link "Редактировать", to: Routes.schedule_path(@conn, :edit, schedule),
-            class: AcariServer.UserManager.get_disabled(@current_user) %>
-            |
-        <%= link "Удалить", to: Routes.schedule_path(@conn, :delete, schedule), method: :delete,
-              data: [confirm: "Вы уверены?"],
-              class: AcariServer.UserManager.get_disabled(@current_user) %>
+        <%= link to: Routes.schedule_path(@conn, :edit, schedule),
+            class: AcariServer.UserManager.get_disabled(@current_user) do %>
+            <i class="fas fa-edit mr-1"></i>
+        <% end %>
+        <%= link to: Routes.schedule_path(@conn, :delete, schedule), method: :delete,
+              data: [confirm: "Вы уверены, что хотите удалить расписание?"],
+              class: AcariServer.UserManager.get_disabled(@current_user) do %>
+              <i class="fas fa-trash-alt ml-1"></i>
+        <% end %>
       </td>
     </tr>
 <% end %>

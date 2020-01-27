@@ -49,9 +49,13 @@
   <%
 
     {res, prefix_res} =
-      AcariServer.Template.eval_class_assigns(
-        @script.prefix, AcariServer.Template.get_assignments(@script)
-      )
+      case !is_binary(@script.test_client_name) or String.trim(@script.test_client_name) == "" do
+        true -> {:error, "Клиент для тестирования не задан"}
+        _ ->
+          AcariServer.Template.eval_class_assigns(
+            @script.prefix, AcariServer.Template.get_assignments(@script)
+          )
+    end
   %>
 
   <li>
@@ -59,12 +63,13 @@
     <pre class="border rounded bg-white p-2 mb-0"><code><%=
       @script.prefix
     %></code></pre>
+
     <%= if res == :error do %>
       <p class = "text-danger"><%= prefix_res %><p>
     <% else %>
       <%= if @current_user.is_admin do %>
         <p class="mb-0">
-          Вычисленные параметры(на примере клиента '<%= @script.test_client_name %>'):
+          Вычисленные параметры (на примере клиента '<%= @script.test_client_name %>'):
         </p>
         <pre>
             <%= prefix_res |> Jason.encode!(pretty: true)%>

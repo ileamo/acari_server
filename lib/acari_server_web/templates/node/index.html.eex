@@ -40,8 +40,9 @@
         <% end %>
 
         <%= link to: Routes.node_path(@conn, :delete, node),
-        method: :delete, data: [confirm: "Вы уверены, что хотите удалить клиента?"],
-        class: bg_disabled do %>
+              method: :delete,
+              data: [confirm: "Вы уверены, что хотите удалить клиента '#{node.name}'?"],
+              class: bg_disabled do %>
           <i class="fas fa-trash-alt mx-1"></i>
         <% end %>
 

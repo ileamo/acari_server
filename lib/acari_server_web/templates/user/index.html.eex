@@ -24,9 +24,16 @@
       </td>
 
       <td>
-        <%= link "Редактировать", to: Routes.user_path(@conn, :edit, user) %>
-        |
-        <%= link "Удалить", to: Routes.user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"] %>
+        <%= link to: Routes.user_path(@conn, :edit, user)  do %>
+          <i class="fas fa-edit mr-1"></i>
+        <% end %>
+
+        <%= link to: Routes.user_path(@conn, :delete, user), method: :delete,
+              data: [confirm: "Вы уверены, что хотите удалить пользователя '#{user.username}'?"]
+              do %>
+          <i class="fas fa-trash-alt ml-1"></i>
+        <% end %>
+
       </td>
     </tr>
 <% end %>

@@ -17,12 +17,15 @@
       <td><%= group.description %></td>
 
       <td>
-        <%= link "Редактировать", to: Routes.group_path(@conn, :edit, group),
-              class: AcariServer.UserManager.get_disabled(@current_user) %>
-        |
-        <%= link "Удалить", to: Routes.group_path(@conn, :delete, group), method: :delete,
-              data: [confirm: "Вы уверены?"],
-              class: AcariServer.UserManager.get_disabled(@current_user) %>
+        <%= link to: Routes.group_path(@conn, :edit, group),
+              class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="fas fa-edit mr-1"></i>
+        <% end %>
+        <%= link to: Routes.group_path(@conn, :delete, group), method: :delete,
+              data: [confirm: "Вы уверены, что хотите удалить группу '#{group.name}'?"],
+              class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="fas fa-trash-alt ml-1"></i>
+        <% end %>
       </td>
     </tr>
 <% end %>

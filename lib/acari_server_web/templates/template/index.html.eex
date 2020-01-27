@@ -21,11 +21,15 @@
       <td><%= template.executable && "Да" || "Нет" %></td>
       <td><%= template.executable && rights_descr(template.rights) || "" %></td>
       <td>
-        <%= link "Редактировать", to: Routes.template_path(@conn, :edit, template),
-            class: AcariServer.UserManager.get_disabled(@current_user) %>
-        |
-        <%= link "Удалить", to: Routes.template_path(@conn, :delete, template), method: :delete, data: [confirm: "Вы уверены?"],
-            class: AcariServer.UserManager.get_disabled(@current_user) %>
+        <%= link to: Routes.template_path(@conn, :edit, template),
+            class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="fas fa-edit mr-1"></i>
+        <% end %>
+        <%= link to: Routes.template_path(@conn, :delete, template), method: :delete,
+            data: [confirm: "Вы уверены, что хотите удалить шаблон '#{template.name}'?"],
+            class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="fas fa-trash-alt ml-1"></i>  
+        <% end %>
       </td>
     </tr>
 <% end %>
