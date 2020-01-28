@@ -5,7 +5,6 @@ defmodule AcariServer.ScheduleManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
-  alias AcariServer.RepoRO
 
   alias AcariServer.ScheduleManager.Schedule
 
@@ -19,10 +18,10 @@ defmodule AcariServer.ScheduleManager do
 
   """
   def list_schedules do
-    RepoRO.all(Schedule)
-    |> RepoRO.preload(:template)
-    |> RepoRO.preload(:group)
-    |> RepoRO.preload(:script)
+    Repo.all(Schedule)
+    |> Repo.preload(:template)
+    |> Repo.preload(:group)
+    |> Repo.preload(:script)
   end
 
   @doc """
@@ -40,17 +39,17 @@ defmodule AcariServer.ScheduleManager do
 
   """
   def get_schedule!(id) do
-    RepoRO.get!(Schedule, id)
-    |> RepoRO.preload(:template)
-    |> RepoRO.preload(:group)
-    |> RepoRO.preload(:script)
+    Repo.get!(Schedule, id)
+    |> Repo.preload(:template)
+    |> Repo.preload(:group)
+    |> Repo.preload(:script)
   end
 
   def get_schedule(id) do
-    RepoRO.get(Schedule, id)
-    |> RepoRO.preload(:template)
-    |> RepoRO.preload(:group)
-    |> RepoRO.preload(:script)
+    Repo.get(Schedule, id)
+    |> Repo.preload(:template)
+    |> Repo.preload(:group)
+    |> Repo.preload(:script)
   end
 
   @doc """

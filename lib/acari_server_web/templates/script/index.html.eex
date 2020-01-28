@@ -19,13 +19,13 @@
       <td>
         <%= link to: Routes.script_path(@conn, :edit, script),
             class: AcariServer.UserManager.get_disabled(@current_user) do %>
-          <i class="fas fa-edit mr-1"></i>
+          <i class="far fa-edit mr-1"></i>
         <% end %>
         <%= link to: Routes.script_path(@conn, :delete, script),
               method: :delete,
               data: [confirm: "Вы уверены, что хотите удалить класс '#{script.name}'?"],
               class: AcariServer.UserManager.get_disabled(@current_user) do %>
-          <i class="fas fa-trash-alt ml-1"></i>
+          <i class="far fa-trash-alt ml-1"></i>
         <% end %>
       </td>
     </tr>

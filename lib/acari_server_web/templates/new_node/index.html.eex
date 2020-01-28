@@ -25,7 +25,7 @@
               <i class="fas fa-plus mr-1"></i>
             <% end %>
             <%= link to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Вы уверены, что хотите удалить клиента '#{new_node.name}'?"] do %>
-              <i class="fas fa-trash-alt ml-1"></i>
+              <i class="far fa-trash-alt ml-1"></i>
             <% end %>
           </td>
         </tr>
