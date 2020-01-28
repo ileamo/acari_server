@@ -49,7 +49,6 @@ defmodule AcariServer.ScheduleManager do
     Repo.get(Schedule, id)
     |> Repo.preload(:template)
     |> Repo.preload(:group)
-    |> Repo.preload(:script)
   end
 
   @doc """
