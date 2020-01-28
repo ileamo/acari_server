@@ -131,6 +131,8 @@ defmodule AcariServer.GroupManager do
   def delete_group(%Group{} = group) do
     res = Repo.delete_wait(group)
     ZbxApi.zbx_groups_sync()
+    AcariServer.Scheduler.Api.update_script_jobs()
+
     res
   end
 

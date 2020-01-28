@@ -143,7 +143,9 @@ defmodule AcariServer.TemplateManager do
 
   """
   def delete_template(%Template{} = template) do
-    Repo.delete_wait(template)
+    res = Repo.delete_wait(template)
+    AcariServer.Scheduler.Api.update_script_jobs()
+    res
   end
 
   @doc """

@@ -3,9 +3,16 @@ defmodule AcariServer.Scheduler do
     otp_app: :acari_server
 
   def init(config) do
-    IO.inspect(config, label: "Quantum")
+
+    Task.start(__MODULE__, :init_task, [self()])
 
     config
+  end
+
+  def init_task(master_pid) do
+    Process.sleep(1_000)
+    IO.inspect(Process.info(master_pid, :status))
+    AcariServer.Scheduler.Api.update_script_jobs()
   end
 end
 
@@ -24,7 +31,7 @@ defmodule AcariServer.Scheduler.Api do
   def exec_script_on_schedule(shedule_id) do
     with %AcariServer.ScheduleManager.Schedule{} = schedule <-
            AcariServer.ScheduleManager.get_schedule(shedule_id) do
-      IO.inspect({NaiveDateTime.utc_now(), schedule.id, schedule.description}, label: "JOB")
+      IO.inspect({NaiveDateTime.utc_now(), schedule}, label: "JOB")
     else
       _ -> Logger.error("Scheduler: No Schedule ##{shedule_id}")
     end
@@ -52,7 +59,6 @@ defmodule AcariServer.Scheduler.Api do
 
     schedule_list = AcariServer.ScheduleManager.list_schedules()
     schedule_id_list = schedule_list |> Enum.map(fn %{id: n} -> n end)
-
 
     # Del Jobs
     job_list

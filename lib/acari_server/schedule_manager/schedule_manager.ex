@@ -111,7 +111,9 @@ defmodule AcariServer.ScheduleManager do
 
   """
   def delete_schedule(%Schedule{} = schedule) do
-    Repo.delete(schedule)
+    res = Repo.delete(schedule)
+    AcariServer.Scheduler.Api.update_script_jobs()
+    res
   end
 
   @doc """
