@@ -16,10 +16,10 @@ defmodule AcariServerWeb.ScheduleController do
 
   def create(conn, %{"schedule" => schedule_params}) do
     case ScheduleManager.create_schedule(schedule_params) do
-      {:ok, schedule} ->
+      {:ok, _schedule} ->
         conn
         |> put_flash(:info, "Расписание создано успешно.")
-        |> redirect(to: Routes.schedule_path(conn, :show, schedule))
+        |> redirect(to: Routes.schedule_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -41,10 +41,10 @@ defmodule AcariServerWeb.ScheduleController do
     schedule = ScheduleManager.get_schedule!(id)
 
     case ScheduleManager.update_schedule(schedule, schedule_params) do
-      {:ok, schedule} ->
+      {:ok, _schedule} ->
         conn
         |> put_flash(:info, "Расписание изменено успешно.")
-        |> redirect(to: Routes.schedule_path(conn, :show, schedule))
+        |> redirect(to: Routes.schedule_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", schedule: schedule, changeset: changeset)

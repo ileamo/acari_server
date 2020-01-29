@@ -92,9 +92,20 @@ defmodule AcariServer.ScheduleManager do
 
   """
   def update_schedule(%Schedule{} = schedule, attrs) do
-    schedule
-    |> Schedule.changeset(attrs)
-    |> Repo.update()
+    res =
+      schedule
+      |> Schedule.changeset(attrs)
+      |> Repo.update()
+
+    case res do
+      {:ok, updated_schedule} ->
+        AcariServer.Scheduler.Api.update_job(updated_schedule)
+
+        res
+
+      _ ->
+        res
+    end
   end
 
   @doc """

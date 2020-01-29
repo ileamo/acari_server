@@ -97,6 +97,27 @@ defmodule AcariServer.Scheduler.Api do
     end
   end
 
+  def update_job(schedule) do
+    case find_job(schedule.id) do
+      nil -> nil
+      ref -> Scheduler.delete_job(ref)
+    end
+
+    add_job(schedule)
+  end
+
+  defp find_job(id) do
+    Scheduler.jobs()
+    |> Enum.reduce_while(nil, fn
+      {ref, %Quantum.Job{task: {AcariServer.Scheduler.Api, :exec_script_on_schedule, [^id]}}},
+      _ ->
+        {:halt, ref}
+
+      _, _ ->
+        {:cont, nil}
+    end)
+  end
+
   def update_script_jobs() do
     job_list =
       Scheduler.jobs()

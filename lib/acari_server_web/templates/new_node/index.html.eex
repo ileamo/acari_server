@@ -1,4 +1,4 @@
-<h2>Список обнаруженных клиентов</h2>
+<h2>Список новых клиентов</h2>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
@@ -35,7 +35,7 @@
 </table>
 <hr/>
 
-<h3 class="mt-5">Загрузка из файла</h3>
+<h3 class="mt-5">Загрузка новых клиентов</h3>
 
 <%= if assigns[:err_mes] && assigns.err_mes != "" do %>
   <pre class="text-danger">

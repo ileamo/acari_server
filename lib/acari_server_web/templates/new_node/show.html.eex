@@ -64,6 +64,6 @@
 
 <span><%= link "Зарегистрировать", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
 |
-<span><%= link "К списку обнаруженных", to: Routes.new_node_path(@conn, :index) %></span>
+<span><%= link "К списку новых клиентов", to: Routes.new_node_path(@conn, :index) %></span>
 
 <% end %>
