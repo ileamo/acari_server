@@ -1,5 +1,3 @@
-<div style="max-width:960px">
-
 <%= form_for @changeset, @action, fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
@@ -81,5 +79,3 @@
     <%= submit "Сохранить" %>
   </div>
 <% end %>
-
-<div>
