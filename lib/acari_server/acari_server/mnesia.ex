@@ -731,7 +731,7 @@ defmodule AcariServer.Mnesia do
   end
 
   def broadcast_link_event() do
-    mes_list = AcariServer.Mnesia.get_client_status()
+    mes_list = get_client_status()
 
     statistics_html =
       Phoenix.View.render_to_string(AcariServerWeb.PageView, "statistics.html", [])
@@ -857,7 +857,7 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
-  defp purge_stat() do
+  def purge_stat() do
     purge_link_table()
     purge_client_status_table()
 
