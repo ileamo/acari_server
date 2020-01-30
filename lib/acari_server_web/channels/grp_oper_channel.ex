@@ -225,21 +225,25 @@ defmodule AcariServerWeb.GrpOperChannel do
         end
 
       "create_group" ->
-        descr =
-          "#{get_group_name_by_id(params["group_id"])} \\ #{
-            get_class_name_by_id(params["class_id"])
-          } \\ #{params["filter"]}"
-
         res =
-          case get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
-               |> create_tmp_group(descr) do
-            {:ok, group} ->
-              Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "new_group.html",
-                group: group
-              )
+          if socket.assigns.user.is_admin do
+            descr =
+              "#{get_group_name_by_id(params["group_id"])} \\ #{
+                get_class_name_by_id(params["class_id"])
+              } \\ #{params["filter"]}"
 
-            {:error, res} ->
-              "Ошибка при создании группы #{inspect(res)}"
+            case get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
+                 |> create_tmp_group(descr) do
+              {:ok, group} ->
+                Phoenix.View.render_to_string(AcariServerWeb.GrpOperView, "new_group.html",
+                  group: group
+                )
+
+              {:error, res} ->
+                "<h5 class=\"text-danger\">Ошибка при создании группы #{inspect(res)}</h5>"
+            end
+          else
+            "<h5 class=\"text-danger\">Для создания группы нужны права администратора</h5>"
           end
 
         push(socket, "output", %{
@@ -562,19 +566,19 @@ defmodule AcariServerWeb.GrpOperChannel do
 
             {:error, res} ->
               res = AcariServer.Template.humanize_lua_err(res)
-                # case res do
-                #   {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
-                #     Enum.join(list)
-                #
-                #   {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
-                #     "#{a} #{inspect(s)}"
-                #
-                #   {:lua_error, {t, a, b}, _} when is_atom(t) ->
-                #     "#{t} #{inspect(a)} #{inspect(b)}"
-                #
-                #   res ->
-                #     inspect(res)
-                # end
+              # case res do
+              #   {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
+              #     Enum.join(list)
+              #
+              #   {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
+              #     "#{a} #{inspect(s)}"
+              #
+              #   {:lua_error, {t, a, b}, _} when is_atom(t) ->
+              #     "#{t} #{inspect(a)} #{inspect(b)}"
+              #
+              #   res ->
+              #     inspect(res)
+              # end
 
               raise(res)
           end

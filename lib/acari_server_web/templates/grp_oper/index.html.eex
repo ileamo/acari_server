@@ -85,7 +85,10 @@
     <h3 id="go-script-name" class="mt-5">Скрипт</h3>
     <div id="go-script-field">Нет данных</div>
 
-    <button class="btn btn-outline-secondary mt-3" type="button" id="grp-oper-new-group">
+    <button
+      class="btn btn-outline-secondary mt-3 <%= @current_user.is_admin && "" || "d-none" %>"
+      type="button" id="grp-oper-new-group">
+      
       Создать новую группу на основе фильтра
     </button>
     <div class="mt-3" id="grp-oper-new-group-edit"></div>
