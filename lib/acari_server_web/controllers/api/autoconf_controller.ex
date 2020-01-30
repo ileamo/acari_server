@@ -43,8 +43,11 @@ defmodule AcariServerWeb.Api.AutoconfController do
           |> AcariServer.NodeManager.update_node(%{latitude: lat, longitude: lng})
         end
 
+
+        templ_name = node.script && node.script.remote && node.script.remote.name
+
         conn
-        |> assign(:sfx, SFX.create_sfx(:remote, node, params))
+        |> assign(:sfx, SFX.create_sfx(templ_name, node, params))
 
       _ ->
         conn

@@ -1,24 +1,32 @@
 defmodule AcariServer.SFX do
   alias AcariServer.TemplateAgent
   alias AcariServer.NodeManager
+  alias AcariServer.ScriptManager.Script
 
-  def get_script(node_name, templ_id, params \\ %{}) do
-    case NodeManager.get_node_with_class(node_name, [:local, :remote]) do
-      %{script: class} = node ->
-        {create_sfx(templ_id, node, Map.put(params, "id", node_name)),
-         (class && Map.get(class, templ_id) && Map.get(class, templ_id).name) || templ_id}
+
+  def create_script_from_template(node_name, templ_id, params \\ %{}) do
+    case NodeManager.get_node_with_class(node_name) do
+      %NodeManager.Node{script: %Script{} = class} = node ->
+        templ_id =
+          case templ_id do
+            templ_id when is_binary(templ_id) -> templ_id
+            :local -> (class = AcariServer.RepoRO.preload(class, :local)) && class.local.name
+            :remote -> (class = AcariServer.RepoRO.preload(class, :remote)) && class.remote.name
+            _ -> nil
+          end
+
+        {create_sfx(templ_id, node, Map.put(params, "id", node_name)), templ_id}
 
       _ ->
-        {create_setup("No node #{node_name}"), nil}
+        {create_setup("Нет клиента #{node_name} или ему не назначен класс"), nil}
     end
   end
 
   def create_sfx(templ_id, node, req_params) do
     res =
-      with %{script: %{} = script} <- node,
-           main_templ_name when is_binary(main_templ_name) <-
-             (Map.get(script, templ_id) && Map.get(script, templ_id).name) || templ_id,
-           prefix <- script.prefix || "",
+      with main_templ_name when is_binary(main_templ_name) <- templ_id,
+           %{script: %{} = class} <- node,
+           prefix <- class.prefix || "",
            assigns <- AcariServer.Template.get_assignments(node, params: req_params),
            :ok <- TemplateAgent.init_templ_map(self(), assigns, prefix),
            setup_file_name <- TemplFunc.path_to(main_templ_name) do
