@@ -88,7 +88,7 @@ defmodule AcariServer.MixProject do
       {:timex, "~> 3.0"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
-      {:tunctl, git: "https://github.com/msantos/tunctl.git"},
+      {:tunctl, git: "https://github.com/ileamo/tunctl.git"},
       {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"}
     ]
   end

@@ -45,3 +45,5 @@ config :acari_server, :zabbix,
   zbx_snd_port: System.get_env("ZBX_SND_PORT"),
   zbx_username: System.get_env("ZBX_USERNAME"),
   zbx_password: System.get_env("ZBX_PASSWORD")
+
+  config :acari_server, :openstreetmap, provider_url: System.get_env("MAP_PROVIDER_URL")

@@ -674,7 +674,7 @@ defmodule AcariServer.Mnesia do
   end
 
   @max_items 32
-  defp update_active_tun_chart(bad) do
+  defp update_active_tun_chart(bad) when is_integer(bad) do
     tun_num = get_tunnels_num()
     num = tun_num - bad
 
@@ -729,6 +729,7 @@ defmodule AcariServer.Mnesia do
         nil
     end
   end
+  defp update_active_tun_chart(_bad), do: nil
 
   def broadcast_link_event() do
     mes_list = get_client_status()

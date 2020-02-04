@@ -163,6 +163,16 @@
       </div>
     </div>
 
+    <script>
+      window.acari_server_env = {
+        tileLayerProvider: <%=
+          case  Application.get_env(:acari_server, :openstreetmap)[:provider_url] do
+            url when is_binary(url) -> raw("\"#{String.trim(url)}\"")
+            _ ->  false
+          end %>
+      }
+    </script>
+
     <script>window.userToken = "<%= assigns[:user_token] %>"</script>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>

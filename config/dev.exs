@@ -96,3 +96,7 @@ config :acari_server, :zabbix,
   zbx_snd_host: "84.253.109.155",
   zbx_username: "Admin",
   zbx_password: "IMo19-0708"
+
+config :acari_server, :openstreetmap,
+  #provider_url: nil
+  provider_url: "http://localhost:8080/styles/klokantech-basic/{z}/{x}/{y}.png"
