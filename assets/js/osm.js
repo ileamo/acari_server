@@ -16,24 +16,52 @@ if (osm) {
     lng: osm.dataset.longitude
   }
 
+  const mapboxId = "mapbox"
+  const customId = "custom"
+
+
+  let mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaWxlYW1vIiwiYSI6ImNqeDRwMDF6djAxZ2I0NW82aWY0cnRyNmkifQ.KHGb6ZXaBpVWPsFJb3f5IQ', {
+    maxZoom: 18,
+    mymapindex: mapboxId,
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+      'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    id: 'mapbox.streets'
+  })
+
   const mymap = L.map('osm').setView([prevPos.lat, prevPos.lng], 13);
 
-  console.log("PROVIDER", window.acari_server_env.tileLayerProvider)
 
   if (window.acari_server_env.tileLayerProvider) {
-    L.tileLayer(
+    let custom = L.tileLayer(
       window.acari_server_env.tileLayerProvider, {
-        maxZoom: 18
-      }).addTo(mymap);
+        mymapindex: customId,
+        maxZoom: 18,
+        attribution: window.acari_server_env.tileLayerProvider
+      })
+
+    var baseLayers = {
+      "Mapbox": mapbox,
+      "Custom": custom
+    };
+
+    L.control.layers(baseLayers).addTo(mymap);
+    if (localStorage.getItem("mapProvider") == customId) {
+      custom.addTo(mymap);
+      localStorage.setItem("mapProvider", customId)
+    } else {
+      mapbox.addTo(mymap);
+      localStorage.setItem("mapProvider", mapboxId)
+    }
   } else {
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaWxlYW1vIiwiYSI6ImNqeDRwMDF6djAxZ2I0NW82aWY0cnRyNmkifQ.KHGb6ZXaBpVWPsFJb3f5IQ', {
-      maxZoom: 18,
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-      id: 'mapbox.streets'
-    }).addTo(mymap);
+    mapbox.addTo(mymap);
+    localStorage.setItem("mapProvider", mapboxId)
   }
+
+  mymap.on('baselayerchange', function(e) {
+    console.log(e.layer.options.mymapindex);
+    localStorage.setItem("mapProvider", e.layer.options.mymapindex)
+  });
 
   mymap.attributionControl.setPrefix(false);
   let markerIconConf = L.AwesomeMarkers.icon({
@@ -63,7 +91,6 @@ if (osm) {
       var childMarkers = cluster.getAllChildMarkers();
       for (var i = 0; i < childMarkers.length; i++) {
         let mc = childMarkers[i].options.icon.options.markerColor
-        console.log(mc)
         let old = markerColorMap.get(mc)
         markerColorMap.set(mc, old && old + 1 || 1)
       }

@@ -99,4 +99,4 @@ config :acari_server, :zabbix,
 
 config :acari_server, :openstreetmap,
   #provider_url: nil
-  provider_url: "http://localhost:8080/styles/klokantech-basic/{z}/{x}/{y}.png"
+  provider_url: "http://10.33.33.32:8080/styles/klokantech-basic/{z}/{x}/{y}.png"
