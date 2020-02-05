@@ -24,6 +24,7 @@ if (osm) {
   let mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaWxlYW1vIiwiYSI6ImNqeDRwMDF6djAxZ2I0NW82aWY0cnRyNmkifQ.KHGb6ZXaBpVWPsFJb3f5IQ', {
     maxZoom: 18,
     mymapindex: mapboxId,
+    errorTileUrl: '/images/bogatka-o.png',
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
       'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -34,6 +35,7 @@ if (osm) {
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       mymapindex: osmId,
+      errorTileUrl: '/images/bogatka-o.png',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     })
 
@@ -50,6 +52,7 @@ if (osm) {
       window.acari_server_env.tileLayerProvider, {
         mymapindex: customId,
         maxZoom: 18,
+        errorTileUrl: '/images/bogatka-o.png',
         attribution: window.acari_server_env.tileLayerProvider
       })
     baseLayers["Custom"] = custom;
