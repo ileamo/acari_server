@@ -1,10 +1,10 @@
-<h1>Список расписаний</h1>
+<h1>Планировщик задач</h1>
 
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
 
   <thead>
     <tr>
-      <th>Описание</th>
+      <th>Задача</th>
       <th>Скрипт</th>
       <th>Расписание</th>
       <th>Группа</th>
@@ -29,7 +29,7 @@
             <i class="far fa-edit mr-1"></i>
         <% end %>
         <%= link to: Routes.schedule_path(@conn, :delete, schedule), method: :delete,
-              data: [confirm: "Вы уверены, что хотите удалить расписание?"],
+              data: [confirm: "Вы уверены, что хотите удалить задачу?"],
               class: AcariServer.UserManager.get_disabled(@current_user) do %>
               <i class="far fa-trash-alt ml-1"></i>
         <% end %>
@@ -39,5 +39,5 @@
   </tbody>
 </table>
 
-<span><%= link "Новое расписание", to: Routes.schedule_path(@conn, :new),
+<span><%= link "Новая задача", to: Routes.schedule_path(@conn, :new),
             class: AcariServer.UserManager.get_disabled(@current_user) %></span>

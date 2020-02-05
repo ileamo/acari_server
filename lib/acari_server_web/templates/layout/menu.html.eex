@@ -93,7 +93,7 @@
     <%= link "Регистрация клиентов", to: Routes.new_node_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Расписание", to: Routes.schedule_path(@conn, :index), class: "nav-link" %>
+    <%= link "Планировщик задач", to: Routes.schedule_path(@conn, :index), class: "nav-link" %>
   </li>
   <h6 class="sidebar-heading d-flex justify-content-between align-items-center mt-4 mb-1 font-weight-bold text-muted">
     <span>Разное</span>

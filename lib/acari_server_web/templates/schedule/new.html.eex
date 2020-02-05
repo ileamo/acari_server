@@ -1,4 +1,4 @@
-<h1>Новое расписание</h1>
+<h1>Новая задача</h1>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.schedule_path(@conn, :create)) %>
 
