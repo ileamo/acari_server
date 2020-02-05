@@ -8,7 +8,10 @@ defmodule AcariServerWeb.PageController do
     render(conn, "index.html")
   end
 
-  def zabbix(conn = %{assigns: %{current_user: %{is_admin: true}}}, %{"sync" => sync_type, "prev_path" => prev_path}) do
+  def zabbix(conn = %{assigns: %{current_user: %{is_admin: true}}}, %{
+        "sync" => sync_type,
+        "prev_path" => prev_path
+      }) do
     mes =
       case sync_type do
         "full" ->
@@ -44,8 +47,8 @@ defmodule AcariServerWeb.PageController do
     redirect(conn, external: zbx_url)
   end
 
-  def xterm(conn, _params) do
-    render(conn, "xterm.html")
+  def xterm(conn, params) do
+    render(conn, "xterm.html", err_mes: params["err_mes"])
   end
 
   def help(conn, _params) do
@@ -73,5 +76,21 @@ defmodule AcariServerWeb.PageController do
       "attachment; filename=\"setup.sh\""
     )
     |> send_resp(200, "echo OK\n")
+  end
+
+  def upload(conn, params) do
+    mes =
+      with %{path: path, filename: filename} <- params["upload"],
+           home when is_binary(home) <- System.user_home(),
+           target_dir <- home <> "/downloads/",
+           {_, 0} <- System.cmd("mkdir", ["-p", target_dir]),
+           :ok <- File.cp(path, target_dir <> filename) do
+        "OK"
+      else
+        res -> inspect(res)
+      end
+
+    conn
+    |> redirect(to: Routes.page_path(conn, :xterm, err_mes: mes))
   end
 end

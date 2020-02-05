@@ -1,1 +1,25 @@
-<div id="server-xterm"></div>
+<div id="server-xterm">
+</div>
+
+<div class="mt-5">
+  <%= form_for @conn, Routes.page_path(@conn, :upload),
+  [multipart: true], fn f-> %>
+    <div style="max-width:960px">
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <%= file_input f, :upload, class: "form-control p-0", style: "height: 100%" %>
+        </div>
+      </div>
+
+      <div class="form-group mt-3">
+        <%= submit "Загрузить" %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= if assigns[:err_mes] && assigns.err_mes != "" do %>
+  <pre class="text-danger">
+    <%= assigns[:err_mes] %>
+  </pre>
+<% end %>
