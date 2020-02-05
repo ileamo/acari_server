@@ -17,6 +17,7 @@ if (osm) {
   }
 
   const mapboxId = "mapbox"
+  const osmId = "openstreetmap"
   const customId = "custom"
 
 
@@ -29,30 +30,39 @@ if (osm) {
     id: 'mapbox.streets'
   })
 
+  let openstreetmap = L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      mymapindex: osmId,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    })
+
   const mymap = L.map('osm').setView([prevPos.lat, prevPos.lng], 13);
 
+  var baseLayers = {
+    "Mapbox": mapbox,
+    "OpenStreetMap": openstreetmap
+  };
 
+  let custom = false;
   if (window.acari_server_env.tileLayerProvider) {
-    let custom = L.tileLayer(
+    custom = L.tileLayer(
       window.acari_server_env.tileLayerProvider, {
         mymapindex: customId,
         maxZoom: 18,
         attribution: window.acari_server_env.tileLayerProvider
       })
+    baseLayers["Custom"] = custom;
+  }
 
-    var baseLayers = {
-      "Mapbox": mapbox,
-      "Custom": custom
-    };
+  L.control.layers(baseLayers).addTo(mymap);
 
-    L.control.layers(baseLayers).addTo(mymap);
-    if (localStorage.getItem("mapProvider") == customId) {
-      custom.addTo(mymap);
-      localStorage.setItem("mapProvider", customId)
-    } else {
-      mapbox.addTo(mymap);
-      localStorage.setItem("mapProvider", mapboxId)
-    }
+  if (custom && localStorage.getItem("mapProvider") == customId) {
+    custom.addTo(mymap);
+    localStorage.setItem("mapProvider", customId)
+  } else if (localStorage.getItem("mapProvider") == osmId) {
+    openstreetmap.addTo(mymap);
+    localStorage.setItem("mapProvider", osmId)
   } else {
     mapbox.addTo(mymap);
     localStorage.setItem("mapProvider", mapboxId)
