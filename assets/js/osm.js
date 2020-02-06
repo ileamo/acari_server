@@ -18,6 +18,7 @@ if (osm) {
 
   const mapboxId = "mapbox"
   const osmId = "openstreetmap"
+  const satelliteId = "satellite"
   const customId = "custom"
 
 
@@ -39,11 +40,25 @@ if (osm) {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     })
 
+
+  let satellite_mapLink =
+    '<a href="http://www.esri.com/">Esri</a>';
+  let satellite_wholink =
+    'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+  let satellite = L.tileLayer(
+    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; ' + satellite_mapLink + ', ' + satellite_wholink,
+      mymapindex: satelliteId,
+      errorTileUrl: '/images/bogatka-o.png',
+      maxZoom: 18
+    })
+
   const mymap = L.map('osm').setView([prevPos.lat, prevPos.lng], 13);
 
   var baseLayers = {
     "Mapbox": mapbox,
-    "OpenStreetMap": openstreetmap
+    "OpenStreetMap": openstreetmap,
+    "Satellite": satellite
   };
 
   let custom = false;
@@ -66,6 +81,9 @@ if (osm) {
   } else if (localStorage.getItem("mapProvider") == osmId) {
     openstreetmap.addTo(mymap);
     localStorage.setItem("mapProvider", osmId)
+  } else if (localStorage.getItem("mapProvider") == satelliteId) {
+    satellite.addTo(mymap);
+    localStorage.setItem("mapProvider", satelliteId)
   } else {
     mapbox.addTo(mymap);
     localStorage.setItem("mapProvider", mapboxId)
