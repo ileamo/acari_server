@@ -541,6 +541,7 @@ defmodule AcariServerWeb.GrpOperChannel do
               return not not string.find(s, '^'..string.gsub(r, '*', '.*')..'$')
             end
             """)
+            |> Sandbox.let_elixir_eval!("vercmp", &vercmp/2)
             |> Sandbox.set!("script", script)
             |> Sandbox.set!(
               "client",
@@ -594,6 +595,30 @@ defmodule AcariServerWeb.GrpOperChannel do
         node_list
     end
   end
+
+  @regex_ver ~r/[\d\.]+/
+  defp ver_to_list(ver) do
+    with [ver] when is_binary(ver) <- Regex.run(@regex_ver, ver) do
+      String.split(ver, ".")
+      |> Enum.take_while(fn x -> x != "" end)
+      |> Enum.map(fn x -> String.to_integer(x) end)
+    else
+      _ -> []
+    end
+  end
+
+  defp vercmp(_, [ver1, ver2]) when is_binary(ver1) and is_binary(ver2) do
+    v1 = ver_to_list(ver1)
+    v2 = ver_to_list(ver2)
+
+    cond do
+      v1 > v2 -> "gt"
+      v1 < v2 -> "lt"
+      true -> "eq"
+    end
+  end
+
+  defp vercmp(_, _), do: nil
 
   defp push_filter_error(socket, data) do
     push(socket, "output", %{
