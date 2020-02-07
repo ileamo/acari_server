@@ -62,6 +62,7 @@
   "tunctl": {:git, "https://github.com/ileamo/tunctl.git", "f81814a19055adf74ee7f172456b774ac7aba14f", []},
   "tzdata": {:hex, :tzdata, "1.0.3", "73470ad29dde46e350c60a66e6b360d3b99d2d18b74c4c349dbebbc27a09a3eb", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, repo: "hexpm", optional: false]}], "hexpm"},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.4.1", "d869e4c68901dd9531385bb0c8c40444ebf624e60b6962d95952775cac5e90cd", [:rebar3], [], "hexpm"},
+  "wild": {:hex, :wild, "1.0.0-rc.3", "33823ac5d4d80db306f0d2cc5d0a0970f0ebaba7cb15436297ec4179b88f0f6d", [:mix], [], "hexpm"},
   "zabbix": {:hex, :zabbix, "0.1.0", "081091ce9cb1806f5a166990b565eef19cf23fa3d4f8d07f0490e2d04b15c4c1", [:mix], [{:hackney, "~> 1.15.1", [hex: :hackney, repo: "hexpm", optional: false]}, {:jason, "~> 1.1", [hex: :jason, repo: "hexpm", optional: false]}, {:tesla, "~> 1.2.1", [hex: :tesla, repo: "hexpm", optional: false]}], "hexpm"},
   "zabbix_sender": {:hex, :zabbix_sender, "1.0.0", "0d10a027130dc390be109f143b08c80be7dcc6663271053f29a6c3a25b0bb491", [:mix], [{:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm"},
 }

@@ -535,12 +535,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
           lua_state =
             Sandbox.init()
-            |> Sandbox.play!("""
-            match = function(s, r)
-              s = type(s) == "string" and s or ""
-              return not not string.find(s, '^'..string.gsub(r, '*', '.*')..'$')
-            end
-            """)
+            |> Sandbox.let_elixir_eval!("match", &match/2)
             |> Sandbox.let_elixir_eval!("vercmp", &vercmp/2)
             |> Sandbox.set!("script", script)
             |> Sandbox.set!(
@@ -595,6 +590,12 @@ defmodule AcariServerWeb.GrpOperChannel do
         node_list
     end
   end
+
+  defp match(_, [str, pattern]) when is_binary(str) and is_binary(pattern) do
+    Wild.match?(str, pattern)
+  end
+
+  defp match(_, _), do: false
 
   @regex_ver ~r/[\d\.]+/
   defp ver_to_list(ver) do

@@ -86,6 +86,7 @@ defmodule AcariServer.MixProject do
       {:bbmustache, "~> 1.8"},
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
+      {:wild, "~> 1.0.0-rc.3"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
       {:tunctl, git: "https://github.com/ileamo/tunctl.git"},
