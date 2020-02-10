@@ -1,0 +1,23 @@
+<h1>Show Filter</h1>
+
+<ul>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @filter.description %>
+  </li>
+
+  <li>
+    <strong>Filter:</strong>
+    <%= @filter.filter %>
+  </li>
+
+  <li>
+    <strong>Common:</strong>
+    <%= @filter.common %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.filter_path(@conn, :edit, @filter) %></span>
+<span><%= link "Back", to: Routes.filter_path(@conn, :index) %></span>
