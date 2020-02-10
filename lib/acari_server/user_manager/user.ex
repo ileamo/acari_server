@@ -17,6 +17,7 @@ defmodule AcariServer.UserManager.User do
       on_replace: :delete
 
     has_many :groups_users, AcariServer.GroupUserAssociation.GroupUser
+    has_many :filters, AcariServer.FilterManager.Filter
 
     timestamps()
   end

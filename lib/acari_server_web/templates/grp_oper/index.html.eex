@@ -32,19 +32,25 @@
         <label class="input-group-text">Фильтр</label>
       </div>
       <div class="input-group-prepend">
-        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter-list">
-          <span><i class="fas fa-list ml-1"></i></span>
-        </button>
-      </div>
-      <div class="input-group-prepend">
         <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter-save">
           <span><i class="far fa-save ml-1"></i></span>
         </button>
       </div>
-      <input type="text" class="form-control" id="grp-oper-filter-text">
-      <div class="input-group-prepend">
-        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter-clean">
-          <span><i class="fas fa-snowplow ml-1"></i></span>
+
+      <input type="text" class="form-control border-right-0 border-left-0" id="grp-oper-filter-text">
+      
+      <div class="input-group-prepend bg-white">
+        <button class="btn btn-outline-secondary border-right-0 border-left-0"  style="border-color: #d0d0d0"
+          type="button" id="grp-oper-filter-list">
+          <span><i class="fas fa-angle-down ml-1"></i></span>
+        </button>
+      </div>
+
+
+      <div class="input-group-append bg-white">
+        <button class="btn btn-outline-secondary border-left-0"
+            style="border-color: #d0d0d0"  type="button" id="grp-oper-filter-clean">
+          <span><i class="fas fa-times  ml-1"></i></span>
         </button>
       </div>
       <div class="input-group-prepend">

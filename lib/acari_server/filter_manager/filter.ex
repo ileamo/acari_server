@@ -6,7 +6,7 @@ defmodule AcariServer.FilterManager.Filter do
     field :common, :boolean, default: false
     field :description, :string
     field :filter, :string
-    field :user_id, :id
+    belongs_to :user, AcariServer.UserManager.User
 
     timestamps()
   end
@@ -14,7 +14,8 @@ defmodule AcariServer.FilterManager.Filter do
   @doc false
   def changeset(filter, attrs) do
     filter
-    |> cast(attrs, [:description, :filter, :common])
-    |> validate_required([:description, :filter, :common])
+    |> cast(attrs, [:description, :filter, :common, :user_id])
+    |> validate_required([:filter])
+    |> foreign_key_constraint(:user_id)
   end
 end

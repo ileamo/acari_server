@@ -14,8 +14,8 @@ defmodule AcariServerWeb.FilterController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"filter" => filter_params}) do
-    case FilterManager.create_filter(filter_params) do
+  def create(%{assigns: %{current_user: %{id: user_id}}} = conn, %{"filter" => filter_params}) do
+    case FilterManager.create_filter(filter_params |> Map.put("user_id", user_id)) do
       {:ok, filter} ->
         conn
         |> put_flash(:info, "Filter created successfully.")
