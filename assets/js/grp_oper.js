@@ -81,6 +81,16 @@ if (grp_oper) {
     grp_oper_filter_clean.addEventListener("click", filterClean, false);
   }
 
+  let grp_oper_filter_list = document.querySelectorAll("#grp-oper-filter-list a")
+  if (grp_oper_filter_list) {
+    grp_oper_filter_list.forEach(function(item) {
+      item.addEventListener("click", filterList, false);
+    })
+  }
+
+
+
+
   let grp_oper_client_script = document.getElementById("grp-oper-client-script")
   let grp_oper_server_script = document.getElementById("grp-oper-server-script")
   if (grp_oper_client_script && grp_oper_server_script) {
@@ -127,6 +137,15 @@ if (grp_oper) {
   function filterClean() {
     grp_oper_filter_text.value = "";
     sessionStorage.setItem("grp_oper_filter", "")
+
+    if (!filter_blinking) {
+      filter_blinking = setInterval(blinker, 1000);
+    }
+  }
+
+  function filterList() {
+    grp_oper_filter_text.value = this.id;
+    sessionStorage.setItem("grp_oper_filter", this.id)
 
     if (!filter_blinking) {
       filter_blinking = setInterval(blinker, 1000);

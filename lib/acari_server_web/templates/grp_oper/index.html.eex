@@ -38,14 +38,20 @@
       </div>
 
       <input type="text" class="form-control border-right-0 border-left-0" id="grp-oper-filter-text">
-      
-      <div class="input-group-prepend bg-white">
-        <button class="btn btn-outline-secondary border-right-0 border-left-0"  style="border-color: #d0d0d0"
-          type="button" id="grp-oper-filter-list">
-          <span><i class="fas fa-angle-down ml-1"></i></span>
-        </button>
-      </div>
 
+      <div class="input-group-append bg-white">
+        <button
+          class="btn btn-outline-secondary border-right-0 border-left-0  dropdown-toggle"
+          style="border-color: #d0d0d0"
+          type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        </button>
+        <div class="dropdown-menu" id="grp-oper-filter-list" style="max-width:400px;">
+          <% filters = AcariServer.FilterManager.list_filrers() %>
+          <%= for filter <- filters do %>
+            <a class="dropdown-item" href="#" id="<%= filter.filter %>"><%= filter.description %>: <%= filter.filter %></a>
+          <% end %>
+        </div>
+      </div>
 
       <div class="input-group-append bg-white">
         <button class="btn btn-outline-secondary border-left-0"
