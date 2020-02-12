@@ -1,4 +1,4 @@
-<% st = :erlang.system_time(:second) %>
+<% st = :os.system_time(:second) %>
 <div class="table-responsive">
   <table class="table table-sm table-borderless">
     <tr>
