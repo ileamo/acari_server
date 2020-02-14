@@ -8,9 +8,7 @@ COPY mix.exs .
 COPY mix.lock .
 #COPY deps deps
 
-ARG APP_VERSION=0.0.0
 ENV MIX_ENV prod
-ENV APP_VERSION ${APP_VERSION}
 
 RUN mix deps.get  --only prod
 
@@ -41,18 +39,17 @@ apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstd
 libcap libcap-dev iproute2 openssh-client su-exec screen iputils
 
 RUN adduser -D docker
-
-ARG APP_VERSION=0.0.0
-
-ENV APP_VERSION ${APP_VERSION}
-
-WORKDIR /opt/app
+ARG CWD=/opt/app
+WORKDIR ${CWD}
 
 # Copy release from build stage
 COPY --from=build /build/_build/prod/rel/bogatka_docker ./
 
 #COPY priv/cert /etc/ssl/acari
 #RUN setcap cap_net_admin=ep /opt/app/erts-10.5.2/bin/beam.smp cap_net_admin=ep /sbin/ip
+
+RUN mkdir -p download
+RUN ln -s ${CWD}/download ${CWD}/lib/acari_server-*/priv/static
 
 USER docker
 
