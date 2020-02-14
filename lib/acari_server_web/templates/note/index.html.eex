@@ -25,12 +25,15 @@
       </td>
 
       <td>
-        <%= link "Редактировать", to: Routes.note_path(@conn, :edit, note),
-            class: AcariServer.UserManager.get_disabled(@current_user) %>
-        |
-        <%= link "Удалить", to: Routes.note_path(@conn, :delete, note),
+        <%= link to: Routes.note_path(@conn, :edit, note),
+            class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="far fa-edit mr-1"></i>
+        <% end %>
+        <%= link to: Routes.note_path(@conn, :delete, note),
             method: :delete, data: [confirm: "Вы уверены?"],
-            class: AcariServer.UserManager.get_disabled(@current_user) %>
+            class: AcariServer.UserManager.get_disabled(@current_user) do %>
+          <i class="far fa-trash-alt mx-1"></i>
+        <% end %>
       </td>
     </tr>
 <% end %>

@@ -18,7 +18,7 @@ defmodule AcariServerWeb.ScheduleController do
     case ScheduleManager.create_schedule(schedule_params) do
       {:ok, _schedule} ->
         conn
-        |> put_flash(:info, "Расписание создано успешно.")
+        |> put_flash(:info, "Задача создана успешно.")
         |> redirect(to: Routes.schedule_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -43,7 +43,7 @@ defmodule AcariServerWeb.ScheduleController do
     case ScheduleManager.update_schedule(schedule, schedule_params) do
       {:ok, _schedule} ->
         conn
-        |> put_flash(:info, "Расписание изменено успешно.")
+        |> put_flash(:info, "Задача изменена успешно.")
         |> redirect(to: Routes.schedule_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -56,7 +56,7 @@ defmodule AcariServerWeb.ScheduleController do
     {:ok, _schedule} = ScheduleManager.delete_schedule(schedule)
 
     conn
-    |> put_flash(:info, "Расписание удалено успешно.")
+    |> put_flash(:info, "Задача удалена успешно.")
     |> redirect(to: Routes.schedule_path(conn, :index))
   end
 end
