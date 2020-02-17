@@ -5,6 +5,7 @@ defmodule AcariServer.NodeManager.Node do
   schema "nodes" do
     field :name, :string
     field :description, :string
+    field :address, :string
     field :params, :map
     field :latitude, :float, default: 55.777594
     field :longitude, :float, default: 37.737926
@@ -23,7 +24,16 @@ defmodule AcariServer.NodeManager.Node do
   @doc false
   def changeset(node, attrs) do
     node
-    |> cast(attrs, [:name, :description, :params, :script_id, :latitude, :longitude, :lock])
+    |> cast(attrs, [
+      :name,
+      :description,
+      :address,
+      :params,
+      :script_id,
+      :latitude,
+      :longitude,
+      :lock
+    ])
     |> validate_required([:name])
     |> foreign_key_constraint(:script_id)
     |> unique_constraint(:name)

@@ -7,6 +7,7 @@
       <th style="display:none;"></th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Адрес</th>
       <th scope="col">Класс</th>
       <th scope="col">Параметры</th>
       <th scope="col">Группы</th>
@@ -25,6 +26,7 @@
       <%= link node.name, to: Routes.node_path(@conn, :show, node) %>
       </td>
       <td><%= node.description %></td>
+      <td><%= node.address %></td>
       <td><%= script_name(node) %></td>
       <td><%= param_list(node.params) %></td>
       <td><%= AcariServer.GroupManager.groups_list(node) %></td>

@@ -17,6 +17,11 @@
   </li>
 
   <li>
+    <strong>Адрес:</strong>
+    <%= @node.address %>
+  </li>
+
+  <li>
     <strong>Группы:</strong>
     <%= AcariServer.GroupManager.groups_list(@node) %>
   </li>
