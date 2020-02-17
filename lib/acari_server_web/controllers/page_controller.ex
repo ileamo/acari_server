@@ -82,7 +82,7 @@ defmodule AcariServerWeb.PageController do
     mes =
       with %{path: path, filename: filename} <- params["upload"],
            home when is_binary(home) <- System.user_home(),
-           target_dir <- home <> "/downloads/",
+           target_dir <- home <> "/uploads/",
            {_, 0} <- System.cmd("mkdir", ["-p", target_dir]),
            :ok <- File.cp(path, target_dir <> filename) do
         "OK"

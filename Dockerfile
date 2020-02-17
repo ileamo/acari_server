@@ -50,6 +50,7 @@ COPY --from=build /build/_build/prod/rel/bogatka_docker ./
 
 RUN mkdir -p download
 RUN ln -s ${CWD}/download ${CWD}/lib/acari_server-*/priv/static
+RUN ln -s ${CWD}/download /home/docker/uploads
 
 USER docker
 
