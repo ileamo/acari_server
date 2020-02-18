@@ -43,6 +43,7 @@ defmodule AcariServerWeb.MapController do
   def index(conn, params, nodes, group_name, groups \\ nil) do
     nodes =
       nodes
+      |> Enum.reject(fn %{lock: lock} -> lock end)
       |> AcariServer.Mnesia.get_tunnel_list()
       |> Enum.map(fn
         %{latitude: lat, longitude: lng, name: name, description: descr} = node ->

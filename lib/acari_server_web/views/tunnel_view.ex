@@ -68,4 +68,9 @@ defmodule AcariServerWeb.TunnelView do
     end)
     |> Enum.sort_by(fn %{name_srv: ns} -> ns end)
   end
+
+  def reject_locked_nodes(nodes) do
+    nodes
+    |> Enum.reject(fn %{lock: lock} -> lock end)
+  end
 end

@@ -50,7 +50,8 @@ defmodule AcariServerWeb.NewNodeController do
   defp find_id(_), do: {:error, "Не удалось найти значение идентификатора"}
 
   defp new_dev?(id) do
-    (AcariServer.NodeManager.get_node_by_name(id) && {:error, "Устройство уже зарегистрировано"}) ||
+    (AcariServer.NodeManager.get_node_by_name(id) &&
+       {:error, "Клиент уже зарегистрирован"}) ||
       :ok
   end
 
@@ -140,7 +141,6 @@ defmodule AcariServerWeb.NewNodeController do
                |> Enum.into(%{})
                |> find_id() do
             {:ok, params} ->
-
               with env = %{"id" => id} <- params,
                    :ok <- new_dev?(id),
                    {:ok, _} <-

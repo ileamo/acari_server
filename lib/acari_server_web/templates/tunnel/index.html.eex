@@ -46,7 +46,7 @@
     </tr>
   </thead>
   <tbody>
-<%= for tunnel <- AcariServer.Mnesia.get_tunnel_list(@nodes) do %>
+<%= for tunnel <- AcariServer.Mnesia.get_tunnel_list(@nodes |> reject_locked_nodes())  do %>
 <% al = case tunnel[:alert] do
         1 -> "table-danger"
         2 -> "table-warning"
