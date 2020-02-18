@@ -12,7 +12,7 @@ defmodule AcariServerWeb.NewNodeController do
 
   def new(conn, params) do
     {new_node, res} =
-      with {:ok, env = %{id: id}} <- get_env(params),
+      with {:ok, env = %{"id" => id}} <- get_env(params),
            :ok <- new_dev?(id),
            {:ok, nn} <-
              AcariServer.NewNodeDiscovery.insert_or_update_new_node(%{
@@ -42,10 +42,10 @@ defmodule AcariServerWeb.NewNodeController do
 
   defp get_env(_), do: {:error, "Содержимое QR кода должно быть передано в параметре text"}
 
-  defp find_id(parms = %{"id" => id}), do: {:ok, parms |> Map.put(:id, id)}
+  defp find_id(parms = %{"id" => id}), do: {:ok, parms |> Map.put("id", id)}
 
   defp find_id(parms = %{"dev" => dev, "sn" => sn}),
-    do: {:ok, parms |> Map.put(:id, "#{dev}_#{sn}")}
+    do: {:ok, parms |> Map.put("id", "#{dev}_#{sn}")}
 
   defp find_id(_), do: {:error, "Не удалось найти значение идентификатора"}
 
@@ -106,10 +106,9 @@ defmodule AcariServerWeb.NewNodeController do
     mes =
       cond do
         upload = params["upload"] ->
-          IO.inspect(upload)
           case File.read(upload.path) do
             {:ok, text} ->
-              case add_new_client(text) do
+              case add_new_client(text, params) do
                 {:error, mes} -> mes
                 _ -> ""
               end
@@ -119,7 +118,7 @@ defmodule AcariServerWeb.NewNodeController do
           end
 
         text = params["text"] ->
-          case add_new_client(text) do
+          case add_new_client(text, params) do
             {:error, mes} -> mes
             _ -> ""
           end
@@ -129,7 +128,7 @@ defmodule AcariServerWeb.NewNodeController do
     |> redirect(to: Routes.new_node_path(conn, :index, err_mes: mes))
   end
 
-  defp add_new_client(text) do
+  defp add_new_client(text, client_params) do
     case AcariServer.Parser.client_list(text) do
       {:ok, res, _, _, _, _} ->
         res
@@ -141,19 +140,22 @@ defmodule AcariServerWeb.NewNodeController do
                |> Enum.into(%{})
                |> find_id() do
             {:ok, params} ->
-              with env = %{id: id} <- params,
+
+              with env = %{"id" => id} <- params,
                    :ok <- new_dev?(id),
                    {:ok, _} <-
-                     AcariServer.NewNodeDiscovery.insert_or_update_new_node(%{
-                       name: id,
-                       ip_addr: "localhost",
-                       params: env,
-                       source: "upload"
-                     }) do
+                     AcariServer.NodeManager.create_node(
+                       env
+                       |> Map.merge(client_params)
+                       |> Map.merge(%{"name" => id, "lock" => true})
+                     ) do
                 nil
               else
-                {:error, %{errors: err}} -> {:error, "Ошибка БД: #{inspect(err)}"}
-                {:error, message} -> {:error, "#{kv_list_to_string(kv_list)}: #{message}"}
+                {:error, %{errors: err}} ->
+                  {:error, "#{kv_list_to_string(kv_list)}: Ошибка БД: #{inspect(err)}"}
+
+                {:error, message} ->
+                  {:error, "#{kv_list_to_string(kv_list)}: #{message}"}
               end
 
             {:error, mes} ->
