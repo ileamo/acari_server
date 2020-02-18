@@ -104,7 +104,7 @@ defmodule AcariServerWeb.NewNodeController do
   end
 
   def upload(conn, params) do
-    mes =
+    err_mes =
       cond do
         upload = params["upload"] ->
           case File.read(upload.path) do
@@ -125,8 +125,11 @@ defmodule AcariServerWeb.NewNodeController do
           end
       end
 
-    conn
-    |> redirect(to: Routes.new_node_path(conn, :index, err_mes: mes))
+    case err_mes do
+      "" -> put_flash(conn, :info, "Клиенты зарегистрированы")
+      _ -> put_flash(conn, :error, "Ошибки при регистрации клиентов")
+    end
+    |> redirect(to: Routes.new_node_path(conn, :index, err_mes: err_mes))
   end
 
   defp add_new_client(text, client_params) do
