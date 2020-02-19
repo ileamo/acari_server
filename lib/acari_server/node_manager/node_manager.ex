@@ -94,6 +94,17 @@ defmodule AcariServer.NodeManager do
     |> RepoRO.preload(script: script_assoc)
   end
 
+  # TODO Cache
+  def get_client_description_by_name(name) do
+    with %Node{} = node <- get_node_by_name(name),
+         descr when is_binary(descr) <- node.description,
+         true <- String.trim(descr) != "" do
+      descr
+    else
+      _ -> nil
+    end
+  end
+
   @doc """
   Creates a node.
 
@@ -136,10 +147,11 @@ defmodule AcariServer.NodeManager do
 
   """
   def update_node(%Node{} = node, attrs) do
-    res = node
-    |> Node.changeset(attrs)
-    |> AcariServer.GroupManager.Group.put_groups(attrs)
-    |> Repo.update()
+    res =
+      node
+      |> Node.changeset(attrs)
+      |> AcariServer.GroupManager.Group.put_groups(attrs)
+      |> Repo.update()
 
     case res do
       {:ok, updated_node = %AcariServer.NodeManager.Node{}} ->

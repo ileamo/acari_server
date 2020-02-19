@@ -1,5 +1,5 @@
 <% current_time = :os.system_time(:microsecond) %>
-<%= for %{name: hd, timestamp: ts, opts: %{level: lv, text: body}} <- @mes_list do %>
+<%= for %{name: name, timestamp: ts, opts: opts = %{level: lv, text: body}} <- @mes_list do %>
   <% alert =
         case lv do
           1 -> "danger"
@@ -8,10 +8,11 @@
           4 -> "success"
           _ -> "secondary"
         end
+        name = opts[:description] || name
   %>
   <li class="list-group-item list-group-item-<%= alert %> p-1">
     <p>
-      <strong><%= "#{get_local_time(ts, current_time)} #{hd}" %></br></strong>
+      <strong><%= "#{get_local_time(ts, current_time)} #{name}" %></br></strong>
       <%= body %>
     </p>
   </li>

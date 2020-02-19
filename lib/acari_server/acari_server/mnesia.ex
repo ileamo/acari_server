@@ -581,7 +581,7 @@ defmodule AcariServer.Mnesia do
 
       {level, port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
-      empty = [] == Mnesia.read(:client_status, tun)
+      empty = [] == (rec = Mnesia.read(:client_status, tun))
 
       if not empty or level != 4 do
         Mnesia.write(
@@ -590,7 +590,10 @@ defmodule AcariServer.Mnesia do
             timestamp: :os.system_time(:microsecond),
             opts: %{
               level: level,
-              text: mes
+              text: mes,
+              description:
+                (rec != [] && Rec.client_status(rec, :opts)[:description]) ||
+                  AcariServer.NodeManager.get_client_description_by_name(tun)
             }
           )
         )
@@ -729,6 +732,7 @@ defmodule AcariServer.Mnesia do
         nil
     end
   end
+
   defp update_active_tun_chart(_bad), do: nil
 
   def broadcast_link_event() do
@@ -843,7 +847,8 @@ defmodule AcariServer.Mnesia do
                   timestamp: Rec.client_status(rec, :timestamp),
                   opts: %{
                     level: level,
-                    text: mes
+                    text: mes,
+                    description: Rec.client_status(rec, :opts)[:description]
                   }
                 )
               )
