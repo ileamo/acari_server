@@ -1,2 +1,4 @@
+<%= render "header.html", assigns %>
+
 <div id="osm" data-latitude="<%= @center_lat %>" data-longitude="<%= @center_lng %>"
 class="my-3" style="height:90vh"></div>

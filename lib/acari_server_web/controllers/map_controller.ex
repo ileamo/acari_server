@@ -59,6 +59,9 @@ defmodule AcariServerWeb.MapController do
     case nodes do
       [] ->
         render(conn, "index0.html",
+          group_id: params["group_id"] || "",
+          group_name: group_name,
+          groups: groups,
           center_lat: 55.777594,
           center_lng: 37.737926
         )

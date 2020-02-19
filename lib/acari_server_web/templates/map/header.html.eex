@@ -1,0 +1,37 @@
+<nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
+
+    <div class="navbar p-0">
+      <%= link "Карта", to: Routes.tunnel_path(@conn, :index), class: "navbar-brand pr-5" %>
+      <span class="navbar-brand">Группа "<%= @group_name %>"</span>
+    </div>
+    <div class="navbar">
+
+      <ul class="navbar-nav mr-auto pr-3">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Группы
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <%= link "Все", to: Routes.map_path(@conn, :index), class: "dropdown-item" %>
+            <div class="dropdown-divider"></div>
+            <% groups = assigns[:groups] || list_groups() %>
+            <%= for %{name: name} = group <- groups do %>
+              <%= link name, to: Routes.map_path(@conn, :index, group_id: group.id), class: "dropdown-item" %>
+            <% end %>
+          </div>
+        </li>
+      </ul>
+
+      <%= if @group_id == "" do %>
+        <%= link "Таблица", to: Routes.tunnel_path(@conn, :index),
+              class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2" %>
+      <% else %>
+        <%= link "Таблица", to: Routes.tunnel_path(@conn, :grp, @group_id),
+              class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2" %>
+      <% end %>
+
+      <%= link "Восстановить", to: Routes.map_path(@conn, :index, group_id: @group_id),
+            class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
+
+    </div>
+</nav>
