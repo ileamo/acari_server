@@ -3,12 +3,15 @@ defmodule AcariServerWeb.NodeController do
 
   alias AcariServer.NodeManager
   alias AcariServer.NodeManager.Node
+  alias AcariServer.RepoRO
 
-  import AcariServer.UserManager, only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2]
+  import AcariServer.UserManager,
+    only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2, is_user_in_group: 2]
 
   plug :is_admin when action in [:new, :delete_selected]
   plug :is_user_node_rw, :node when action in [:edit, :delete]
   plug :is_user_node_ro, :node when action in [:show]
+  plug :is_user_in_group when action in [:client_grp]
 
   def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, _params) do
     nodes = NodeManager.list_nodes()
@@ -23,7 +26,16 @@ defmodule AcariServerWeb.NodeController do
       |> Enum.map(fn %{nodes: nodes} -> nodes end)
       |> List.flatten()
       |> Enum.uniq_by(fn %{id: id} -> id end)
-      |> AcariServer.RepoRO.preload([:groups, :script])
+      |> RepoRO.preload([:groups, :script])
+
+    render(conn, "index.html", nodes: nodes)
+  end
+
+  def client_grp(conn, %{"id" => group_id}) do
+    nodes =
+      AcariServer.GroupManager.get_group!(group_id)
+      |> Map.get(:nodes)
+      |> RepoRO.preload([:script, :groups])
 
     render(conn, "index.html", nodes: nodes)
   end

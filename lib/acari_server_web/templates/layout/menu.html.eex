@@ -86,9 +86,24 @@
   <li class="nav-item">
     <%= link "Шаблоны", to: Routes.template_path(@conn, :index), class: "nav-link" %>
   </li>
+
   <li class="nav-item">
-    <%= link "Клиенты", to: Routes.node_path(@conn, :index), class: "nav-link" %>
-  </li>
+    <a class="nav-link" data-toggle="collapse" href="#clientsByGroupsConf" role="button" aria-expanded="false" aria-controls="clientsByGroupsConf">
+    <i class="fas fa-arrow-down"></i>Клиенты
+  </a></li>
+  <div class="collapse" id="clientsByGroupsConf">
+    <%  groups = @current_user_groups
+    %>
+    <%= for %{name: name} = group <- groups do %>
+      <li class="nav-item"><em>
+        <%= link "- "<>name, to: Routes.node_path(@conn, :client_grp, group), class: "nav-link" %>
+      </em></li>
+    <% end %>
+    <li class="nav-item"><em>
+      <%= link "- Все", to: Routes.node_path(@conn, :index), class: "nav-link" %>
+    </em></li>
+  </div>
+
   <li class="nav-item">
     <%= link "Регистрация клиентов", to: Routes.new_node_path(@conn, :index), class: "nav-link" %>
   </li>
