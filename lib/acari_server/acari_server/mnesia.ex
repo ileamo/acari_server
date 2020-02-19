@@ -581,7 +581,7 @@ defmodule AcariServer.Mnesia do
 
       {level, port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
-      empty = [] == (rec = Mnesia.read(:client_status, tun))
+      empty = [] == (rec_list = Mnesia.read(:client_status, tun))
 
       if not empty or level != 4 do
         Mnesia.write(
@@ -592,7 +592,7 @@ defmodule AcariServer.Mnesia do
               level: level,
               text: mes,
               description:
-                (rec != [] && Rec.client_status(rec, :opts)[:description]) ||
+                (rec_list != [] && Rec.client_status(hd(rec_list), :opts)[:description]) ||
                   AcariServer.NodeManager.get_client_description_by_name(tun)
             }
           )
