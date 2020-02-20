@@ -1,5 +1,6 @@
 defmodule AcariServerWeb.NodeController do
   use AcariServerWeb, :controller
+  require Logger
 
   alias AcariServer.NodeManager
   alias AcariServer.NodeManager.Node
@@ -8,7 +9,7 @@ defmodule AcariServerWeb.NodeController do
   import AcariServer.UserManager,
     only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2, is_user_in_group: 2]
 
-  plug :is_admin when action in [:new, :delete_selected]
+  plug :is_admin when action in [:new, :exec_selected]
   plug :is_user_node_rw, :node when action in [:edit, :delete]
   plug :is_user_node_ro, :node when action in [:show]
   plug :is_user_in_group when action in [:client_grp]
@@ -132,9 +133,26 @@ defmodule AcariServerWeb.NodeController do
     |> redirect(to: Routes.node_path(conn, :index))
   end
 
-  def delete_selected(conn, %{"clients_list" => ids}) do
+  def exec_selected(conn, %{"clients_list" => ids, "operation" => operation}) do
     String.split(ids, ",")
-    |> Enum.each(fn id -> delete_node_and_tunnel(id) end)
+    |> Enum.each(fn id ->
+      case operation do
+        "delete" ->
+          delete_node_and_tunnel(id)
+
+        "lock" ->
+          node = NodeManager.get_node_rw!(id)
+          {:ok, node} = NodeManager.update_node(node, %{"lock" => true, "groups_list" => false})
+          AcariServer.Master.delete_tunnel(node.name)
+
+        "unlock" ->
+          NodeManager.get_node_rw!(id)
+          |> NodeManager.update_node(%{"lock" => false, "groups_list" => false})
+
+        op ->
+          Logger.error("Bad mass-operation: #{op}")
+      end
+    end)
 
     conn
     |> redirect(to: Routes.node_path(conn, :index))

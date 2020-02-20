@@ -63,30 +63,44 @@
 <span><%= link "Новый клиент", to: Routes.node_path(@conn, :new),
             class: AcariServer.UserManager.get_disabled(@current_user)
 %></span>
-|
-<span><a href="#" data-toggle="modal" data-target="#delete-selected-clients"
+
+<h6 class="mt-2 mb-0">Операции с выделенными клиентами</h6>
+<span><a href="#" data-toggle="modal" data-target="#exec-selected-clients"
+  data-operation="delete"
   class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
-    Удалить выделенные
+    Удалить
+</a></span>
+|
+<span><a href="#" data-toggle="modal" data-target="#exec-selected-clients"
+  data-operation="lock"
+  class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
+    Заблокировать
+</a></span>
+|
+<span><a href="#" data-toggle="modal" data-target="#exec-selected-clients"
+  data-operation="unlock"
+  class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
+    Разблокировать
 </a></span>
 
 
 
 
 <!-- Modal -->
-<div class="modal fade" id="delete-selected-clients" tabindex="-1" role="dialog"
-        aria-labelledby="delete-selected-client-title" aria-hidden="true">
+<div class="modal fade" id="exec-selected-clients" tabindex="-1" role="dialog"
+        aria-labelledby="exec-selected-client-title" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="delete-selected-client-title">Удаление клиентов</h5>
+        <h5 class="modal-title" id="exec-selected-clients-title"></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p>Будут удалены следующие клиенты(<span id = "delete-selected-clients-num"></span>):
+        <p><span id = "exec-selected-clients-text"></span>(<span id = "exec-selected-clients-num"></span>):
         </p>
-        <p id="delete-selected-clients-list"><p>
+        <p id="exec-selected-clients-list"><p>
       </div>
 
       <div class="modal-footer">
@@ -94,13 +108,18 @@
           Отмена
         </button>
 
-        <%= form_for @conn, Routes.node_path(@conn, :delete_selected), [method: "delete"], fn f -> %>
-          <%= text_input f, :clients_list,  id: "delete-selected-clients-id-list",
+        <%= form_for @conn, Routes.node_path(@conn, :exec_selected), [method: "delete"], fn f -> %>
+          <%= text_input f, :clients_list,  id: "exec-selected-clients-id-list",
                                             type: "hidden",
-                                            value: "0,2,55"
+                                            value: ""
+          %>
+          <%= text_input f, :operation,  id: "exec-selected-clients-operation",
+                                            type: "hidden",
+                                            value: ""
           %>
           <%= submit "Удалить выделенные",
-                data: [confirm: "Вы уверены что хотите удалить выбранных клиентов?"],
+                id: "exec-selected-clients-action",
+                data: [confirm: "Вы уверены что хотите завершить операцию с выделенными клиентами?"],
                 role: "button", class: "btn btn-danger"%>
         <% end %>
       </div>

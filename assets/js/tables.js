@@ -66,7 +66,23 @@ datatable_params = {
   stateSave: true,
   responsive: true,
   dom: datatable_dom,
-  buttons: [{
+  buttons: [
+
+    {
+      text: 'Select all',
+      className: 'btn btn-outline-secondary',
+      action: function() {
+        table.rows().select();
+      }
+    },
+    {
+      text: 'Select none',
+      className: 'btn btn-outline-secondary',
+      action: function() {
+        table.rows().deselect();
+      }
+    },
+    {
       extend: 'csv',
       text: datatatable_csv_text,
       className: 'btn btn-outline-secondary',
@@ -116,9 +132,37 @@ $('.buttonPrevious').addClass('btn btn-primary');
 $('.buttonFinish').addClass('btn btn-default');
 
 
-if (document.getElementById("delete-selected-clients")) {
+if (document.getElementById("exec-selected-clients")) {
+  let content = {
+    "delete": {
+      title: "Удаление клиентов",
+      text: "Будут удалены следующие клиенты",
+      action: "Удалить клиентов",
+      confirm: "Вы уверены что хотите удалить выбранных клиентов?"
+
+    },
+    "lock": {
+      title: "Блокировка клиентов",
+      text: "Будут заблокированы следующие клиенты",
+      action: "Заблокировать клиентов",
+      confirm: "Вы уверены что хотите заблокировать выбранных клиентов?"
+
+    },
+    "unlock": {
+      title: "Разлокировка клиентов",
+      text: "Будут разблокированы следующие клиенты",
+      action: "Разблокировать клиентов",
+      confirm: "Вы уверены что хотите разблокировать выбранных клиентов?"
+
+    }
+  }
   let is_selected
-  $('#delete-selected-clients').on('show.bs.modal', function(event) {
+
+  $('#exec-selected-clients').on('show.bs.modal', function(event) {
+    let data_field = $(event.relatedTarget)
+    console.log("OPERATION", data_field.data('operation'))
+    operation = data_field.data('operation')
+
     let selected = table.rows('.selected').data()
     let num = selected.length
     if (num > 0) {
@@ -129,16 +173,26 @@ if (document.getElementById("delete-selected-clients")) {
       let ids = selected.map(function(x) {
         return x[0]
       }).join(',')
-      $(this).find('.modal-body #delete-selected-clients-list').text(names)
-      $(this).find('.modal-body #delete-selected-clients-num').text(num)
-      document.getElementById('delete-selected-clients-id-list').value = ids
+      $(this).find('.modal-header #exec-selected-clients-title')
+        .text(content[operation].title)
+      $(this).find('.modal-body #exec-selected-clients-text')
+        .text(content[operation].text)
+      $(this).find('.modal-body #exec-selected-clients-list').text(names)
+      $(this).find('.modal-body #exec-selected-clients-num').text(num)
+      document.getElementById('exec-selected-clients-id-list').value = ids
+      document.getElementById('exec-selected-clients-operation').value = operation
+      $(this).find('.modal-footer #exec-selected-clients-action')
+        .text(content[operation].action)
+      // $(this).find('.modal-footer #exec-selected-clients-action')
+      //   .data('confirm', 77)
+
     } else {
       is_selected = false
-      $(this).find('.modal-body #delete-selected-clients-list').text('')
+      $(this).find('.modal-body #exec-selected-clients-list').text('')
     }
   })
 
-  $('#delete-selected-clients').on('shown.bs.modal', function(event) {
+  $('#exec-selected-clients').on('shown.bs.modal', function(event) {
     if (!is_selected) {
       $(this).modal('hide')
       setTimeout(alert, 100, 'Не выделена ни одна строка в таблице')
