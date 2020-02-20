@@ -99,10 +99,12 @@ defmodule AcariServer.NewNodeDiscovery do
     Repo.delete_wait(new_node)
   end
 
-  def delete_new_node_by_name(name) do
-    case NewNode |> Repo.get_by(name: name) do
-      nil -> nil
-      newnode -> Repo.delete(newnode)
+  def sync_new_node(node) do
+    if node.lock == false do
+      case NewNode |> Repo.get_by(name: node.name) do
+        nil -> nil
+        newnode -> Repo.delete(newnode)
+      end
     end
   end
 

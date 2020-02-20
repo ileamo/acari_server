@@ -1,6 +1,7 @@
 defmodule AcariServerWeb.NewNodeController do
   use AcariServerWeb, :controller
   alias AcariServer.NewNodeDiscovery
+  alias AcariServer.NodeManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin when action in [:edit, :delete, :new]
@@ -50,7 +51,7 @@ defmodule AcariServerWeb.NewNodeController do
   defp find_id(_), do: {:error, "Не удалось найти значение идентификатора"}
 
   defp new_dev?(id) do
-    (AcariServer.NodeManager.get_node_by_name(id) &&
+    (NodeManager.get_node_by_name(id) &&
        {:error, "Клиент уже зарегистрирован"}) ||
       :ok
   end
@@ -92,6 +93,16 @@ defmodule AcariServerWeb.NewNodeController do
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", new_node: new_node, changeset: changeset)
     end
+  end
+
+  def unlock(conn, %{"id" => id}) do
+    new_node = NewNodeDiscovery.get_new_node!(id)
+    node = NodeManager.get_node_by_name(new_node.name)
+    node_params = %{"lock" => false, "groups_list" => false}
+    NodeManager.update_node(node, node_params)
+
+    conn
+    |> redirect(to: Routes.new_node_path(conn, :index))
   end
 
   def delete(conn, %{"id" => id}) do
@@ -147,7 +158,7 @@ defmodule AcariServerWeb.NewNodeController do
               with env = %{"id" => id} <- params,
                    :ok <- new_dev?(id),
                    {:ok, _} <-
-                     AcariServer.NodeManager.create_node(
+                     NodeManager.create_node(
                        env
                        |> Map.merge(client_params)
                        |> Map.merge(%{"name" => id, "lock" => true})

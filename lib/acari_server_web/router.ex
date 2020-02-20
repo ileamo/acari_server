@@ -69,6 +69,8 @@ defmodule AcariServerWeb.Router do
     get "/nodes/grp/:id", NodeController, :client_grp
     resources "/newnodes", NewNodeController
     post "/newnodes/upload", NewNodeController, :upload
+    get "/nodes/:id/unlock", NewNodeController, :unlock
+
     resources "/scripts", ScriptController
     resources "/templates", TemplateController
     get "/templates_diff/:id", TemplateController, :diff

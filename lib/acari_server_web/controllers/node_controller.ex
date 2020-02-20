@@ -66,7 +66,7 @@ defmodule AcariServerWeb.NodeController do
 
     case NodeManager.create_node(node_params) do
       {:ok, node} ->
-        AcariServer.NewNodeDiscovery.delete_new_node_by_name(node.name)
+        AcariServer.NewNodeDiscovery.sync_new_node(node)
 
         conn
         |> put_flash(:info, "Клиент создан.")
@@ -95,6 +95,8 @@ defmodule AcariServerWeb.NodeController do
 
     case NodeManager.update_node(old_node, node_params) do
       {:ok, node} ->
+        AcariServer.NewNodeDiscovery.sync_new_node(node)
+
         conn
         |> put_flash(:info, "Клиент отредактирован.")
         |> redirect(to: Routes.node_path(conn, :show, node))
@@ -125,6 +127,8 @@ defmodule AcariServerWeb.NodeController do
 
     if node.lock do
       AcariServer.Master.delete_tunnel(node.name)
+    else
+      AcariServer.NewNodeDiscovery.sync_new_node(node)
     end
 
     Process.sleep(1000)

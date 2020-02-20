@@ -1,6 +1,7 @@
 defmodule AcariServerWeb.Api.AutoconfController do
   use AcariServerWeb, :controller
   alias AcariServer.SFX
+  alias AcariServer.NodeManager
 
   action_fallback(AcariWeb.FallbackController)
 
@@ -34,13 +35,13 @@ defmodule AcariServerWeb.Api.AutoconfController do
          },
          _
        ) do
-    case AcariServer.NodeManager.get_node_with_class(node_name, [:remote]) do
+    case NodeManager.get_node_with_class(node_name, [:remote]) do
       %{lock: false} = node ->
         with {lat, _} <- Float.parse(params["latitude"] |> to_string()),
              {lng, _} <- Float.parse(params["longitude"] |> to_string()) do
           node
           |> AcariServer.RepoRO.preload(:groups)
-          |> AcariServer.NodeManager.update_node(%{latitude: lat, longitude: lng})
+          |> NodeManager.update_node(%{latitude: lat, longitude: lng})
         end
 
 
