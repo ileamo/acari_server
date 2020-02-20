@@ -62,27 +62,11 @@ let datatatable_csv_text = '<i class="fas fa-file-csv"></i> Экспорт CSV'
 let datatatable_print_text = '<i class="fas fa-print"></i> Печать'
 
 datatable_params = {
-  select: true,
+  select: false,
   stateSave: true,
   responsive: true,
   dom: datatable_dom,
-  buttons: [
-
-    {
-      text: 'Select all',
-      className: 'btn btn-outline-secondary',
-      action: function() {
-        table.rows().select();
-      }
-    },
-    {
-      text: 'Select none',
-      className: 'btn btn-outline-secondary',
-      action: function() {
-        table.rows().deselect();
-      }
-    },
-    {
+  buttons: [{
       extend: 'csv',
       text: datatatable_csv_text,
       className: 'btn btn-outline-secondary',
@@ -119,13 +103,33 @@ datatable_params = {
   ]
 }
 
+let select_buttons = [{
+  text: 'Отметить все',
+  className: 'btn btn-outline-secondary',
+  action: function() {
+    table_select.rows().select();
+  }
+}, {
+  text: 'Снять выделение',
+  className: 'btn btn-outline-secondary',
+  action: function() {
+    table_select.rows().deselect();
+  }
+}]
+
 datatable_params_wo_find = Object.assign({}, datatable_params)
 datatable_params_wo_find.dom = datatable_dom_wo_find
+
+datatable_params_with_select = Object.assign({}, datatable_params)
+datatable_params_with_select.select = true
+datatable_params_with_select.buttons =
+  select_buttons.concat(datatable_params_with_select.buttons)
 
 $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
 
 var table = $("#datatable").DataTable(datatable_params);
 var table_all = $("#datatable_all").DataTable(datatable_params);
+var table_select = $("#datatable_select").DataTable(datatable_params_with_select);
 
 $('.buttonNext').addClass('btn btn-success');
 $('.buttonPrevious').addClass('btn btn-primary');
@@ -139,21 +143,30 @@ if (document.getElementById("exec-selected-clients")) {
       text: "Будут удалены следующие клиенты",
       action: "Удалить клиентов",
       confirm: "Вы уверены что хотите удалить выбранных клиентов?"
-
     },
     "lock": {
       title: "Блокировка клиентов",
       text: "Будут заблокированы следующие клиенты",
       action: "Заблокировать клиентов",
       confirm: "Вы уверены что хотите заблокировать выбранных клиентов?"
-
     },
     "unlock": {
       title: "Разлокировка клиентов",
       text: "Будут разблокированы следующие клиенты",
       action: "Разблокировать клиентов",
       confirm: "Вы уверены что хотите разблокировать выбранных клиентов?"
-
+    },
+    "class": {
+      title: "Назначение класса",
+      text: "Новый класс будет назначен следующим клиентам",
+      action: "Назначить новый класс",
+      confirm: "Вы уверены что хотите назначить новый класс выбранным клиентам?"
+    },
+    "groups": {
+      title: "Назначение групп",
+      text: "Новые группы будут назначены следующим клиентам",
+      action: "Назначить новые группы",
+      confirm: "Вы уверены что хотите назначить новые группы выбранным клиентам?"
     }
   }
   let is_selected
@@ -163,7 +176,7 @@ if (document.getElementById("exec-selected-clients")) {
     console.log("OPERATION", data_field.data('operation'))
     operation = data_field.data('operation')
 
-    let selected = table.rows('.selected').data()
+    let selected = table_select.rows('.selected').data()
     let num = selected.length
     if (num > 0) {
       is_selected = true
@@ -181,10 +194,17 @@ if (document.getElementById("exec-selected-clients")) {
       $(this).find('.modal-body #exec-selected-clients-num').text(num)
       document.getElementById('exec-selected-clients-id-list').value = ids
       document.getElementById('exec-selected-clients-operation').value = operation
-      $(this).find('.modal-footer #exec-selected-clients-action')
+      $(this).find('.modal-body #exec-selected-clients-action')
         .text(content[operation].action)
-      // $(this).find('.modal-footer #exec-selected-clients-action')
-      //   .data('confirm', 77)
+
+      if (operation == "class") {
+        $(this).find('.modal-body #exec-selected-clients-class-form')
+          .removeClass("d-none");
+      } else if (operation == "groups") {
+        $(this).find('.modal-body #exec-selected-clients-groups-form')
+          .removeClass("d-none");
+      }
+
 
     } else {
       is_selected = false

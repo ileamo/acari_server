@@ -5,6 +5,7 @@ defmodule AcariServerWeb.NodeController do
   alias AcariServer.NodeManager
   alias AcariServer.NodeManager.Node
   alias AcariServer.RepoRO
+  alias AcariServer.Repo
 
   import AcariServer.UserManager,
     only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2, is_user_in_group: 2]
@@ -133,7 +134,7 @@ defmodule AcariServerWeb.NodeController do
     |> redirect(to: Routes.node_path(conn, :index))
   end
 
-  def exec_selected(conn, %{"clients_list" => ids, "operation" => operation}) do
+  def exec_selected(conn, params = %{"clients_list" => ids, "operation" => operation}) do
     String.split(ids, ",")
     |> Enum.each(fn id ->
       case operation do
@@ -148,6 +149,15 @@ defmodule AcariServerWeb.NodeController do
         "unlock" ->
           NodeManager.get_node_rw!(id)
           |> NodeManager.update_node(%{"lock" => false, "groups_list" => false})
+
+        "class" ->
+          NodeManager.get_node_rw!(id)
+          |> NodeManager.update_node(%{"script_id" => params["script_id"], "groups_list" => false})
+
+        "groups" ->
+          NodeManager.get_node_rw!(id)
+          |> Repo.preload(:groups)
+          |> NodeManager.update_node(%{"groups_list" => params["groups_list"]})
 
         op ->
           Logger.error("Bad mass-operation: #{op}")

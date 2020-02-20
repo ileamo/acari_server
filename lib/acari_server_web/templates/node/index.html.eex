@@ -1,6 +1,6 @@
 <h2>Список клиентов</h2>
 
-<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+<table id="datatable_select" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
       <th style="display:none;"></th>
@@ -82,6 +82,18 @@
   class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
     Разблокировать
 </a></span>
+|
+<span><a href="#" data-toggle="modal" data-target="#exec-selected-clients"
+  data-operation="class"
+  class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
+    Назначить класс
+</a></span>
+|
+<span><a href="#" data-toggle="modal" data-target="#exec-selected-clients"
+  data-operation="groups"
+  class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
+    Назначить группы
+</a></span>
 
 
 
@@ -101,27 +113,48 @@
         <p><span id = "exec-selected-clients-text"></span>(<span id = "exec-selected-clients-num"></span>):
         </p>
         <p id="exec-selected-clients-list"><p>
-      </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Отмена
-        </button>
+
 
         <%= form_for @conn, Routes.node_path(@conn, :exec_selected), [method: "delete"], fn f -> %>
-          <%= text_input f, :clients_list,  id: "exec-selected-clients-id-list",
-                                            type: "hidden",
-                                            value: ""
-          %>
-          <%= text_input f, :operation,  id: "exec-selected-clients-operation",
-                                            type: "hidden",
-                                            value: ""
-          %>
+
+          <div class="form-group row">
+            <%= text_input f, :clients_list,  id: "exec-selected-clients-id-list",
+                                              type: "hidden",
+                                              value: ""
+            %>
+            <%= text_input f, :operation,  id: "exec-selected-clients-operation",
+                                              type: "hidden",
+                                              value: ""
+            %>
+          </div>
+
+          <div class="form-group row d-none" id="exec-selected-clients-class-form">
+            <%= label f, "Класс", class: "col-sm-2 col-form-label" %>
+            <div class="col-sm-10">
+              <% scripts_list = script_name_id_pairs_list() %>
+              <%= select f, :script_id, scripts_list, class: "custom-select", id: "exec-selected-clients-class" %>
+            </div>
+          </div>
+
+          <div class="form-group row d-none" id="exec-selected-clients-groups-form">
+            <%= label f, "Группы", class: "col-sm-2 col-form-label" %>
+            <div class="col-sm-10">
+              <% select_list = group_name_id_pairs_list() %>
+              <%= multiple_select f, :groups_list, select_list, selected: AcariServer.GroupManager.group_id_list(assigns[:node]), class: "form-control", size: min(length(select_list), 16) %>
+            </div>
+          </div>
+
+
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Отмена
+          </button>
           <%= submit "Удалить выделенные",
                 id: "exec-selected-clients-action",
                 data: [confirm: "Вы уверены что хотите завершить операцию с выделенными клиентами?"],
                 role: "button", class: "btn btn-danger"%>
         <% end %>
+
       </div>
 
     </div>
