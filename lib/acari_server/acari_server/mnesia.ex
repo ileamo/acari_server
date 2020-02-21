@@ -406,6 +406,7 @@ defmodule AcariServer.Mnesia do
           id: node.id,
           name: name,
           description: node.description,
+          address: node.address,
           server:
             record
             |> Rec.tun(:server_id)
@@ -417,6 +418,7 @@ defmodule AcariServer.Mnesia do
           id: node.id,
           name: name,
           description: node.description,
+          address: node.address,
           server: nil
         }
     end
@@ -1063,11 +1065,12 @@ defmodule AcariServer.Mnesia do
       |> link_list_to_map()
 
     nodes
-    |> Enum.map(fn %{id: id, name: name, description: descr, latitude: lat, longitude: lng} ->
+    |> Enum.map(fn %{id: id, name: name, description: descr, address: address, latitude: lat, longitude: lng} ->
       %{
         id: id,
         name: name,
         description: descr,
+        address: address,
         latitude: lat,
         longitude: lng,
         server: node_to_name[name_to_server[name]]

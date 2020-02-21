@@ -39,6 +39,7 @@
       <th scope="col">!</th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Адрес</th>
       <th scope="col">Сервер</th>
       <th scope="col">Link UP</th>
       <th scope="col">Link DOWN</th>
@@ -62,6 +63,7 @@
         %>
       </td>
       <td><%= tunnel[:description] %></td>
+      <td><%= tunnel[:address] %></td>
       <td><%= tunnel[:server] %></td>
       <td><%= tunnel[:links_up] %></td>
       <td><%= tunnel[:links_down] %></td>

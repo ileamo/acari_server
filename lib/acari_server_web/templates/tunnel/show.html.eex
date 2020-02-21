@@ -10,6 +10,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 </nav>
 <%= if tun && links_state do %>
 <h6><%= tun.description %></h6>
+<h6><%= tun.address %></h6>
 <strong>Основной сервер:</strong> <%= tun.server %>
 <hr/>
   <div id="node-monitor">

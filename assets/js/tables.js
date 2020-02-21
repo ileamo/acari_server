@@ -110,7 +110,7 @@ let select_buttons = [{
     table_select.rows().select();
   }
 }, {
-  text: 'Снять выделение',
+  text: 'Снять отметки',
   className: 'btn btn-outline-secondary',
   action: function() {
     table_select.rows().deselect();
