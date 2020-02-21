@@ -4,7 +4,7 @@ defmodule AcariServerWeb.NewNodeController do
   alias AcariServer.NodeManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
-  plug :is_admin when action in [:edit, :delete, :new]
+  plug :is_admin when action in [:edit, :delete, :new, :upload]
 
   def index(conn, params) do
     newnodes = NewNodeDiscovery.list_newnodes()
