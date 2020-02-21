@@ -27,11 +27,12 @@
           <td><%= new_node.source %></td>
 
           <td>
-            <%= link to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Вы уверены, что хотите удалить клиента '#{new_node.name}'?"] do %>
+            <%= link to: Routes.new_node_path(@conn, :delete, new_node), method: :delete, data: [confirm: "Вы уверены, что хотите удалить '#{new_node.name}' из списка обнаруженных клиентов?"] do %>
             <i class="far fa-trash-alt mr-1"></i>
             <% end %>
             <%= if lock do %>
-            <%= link to: Routes.new_node_path(@conn, :unlock, new_node) do %>
+            <%= link to: Routes.new_node_path(@conn, :unlock, new_node),
+                      class: "text-muted", data: [confirm: "Разблокировать клиента?"] do %>
               <i class="fas fa-toggle-off ml-1"></i>
             <% end %>
             <% else %>

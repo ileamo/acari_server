@@ -8,6 +8,7 @@ defmodule AcariServer.NodeManager do
   alias AcariServer.RepoRO
   alias AcariServer.NodeManager.Node
   alias AcariServer.Zabbix.ZbxApi
+  alias AcariServer.NewNodeDiscovery
 
   @doc """
   Returns the list of nodes.
@@ -126,6 +127,7 @@ defmodule AcariServer.NodeManager do
 
     case res do
       {:ok, node = %AcariServer.NodeManager.Node{}} ->
+        NewNodeDiscovery.sync_new_node(node)
         ZbxApi.zbx_add_host(node)
         res
 
@@ -155,6 +157,7 @@ defmodule AcariServer.NodeManager do
 
     case res do
       {:ok, updated_node = %AcariServer.NodeManager.Node{}} ->
+        NewNodeDiscovery.sync_new_node(updated_node)
         ZbxApi.zbx_update_host(updated_node, node.name)
         res
 
