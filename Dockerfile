@@ -48,9 +48,9 @@ COPY --from=build /build/_build/prod/rel/bogatka_docker ./
 #COPY priv/cert /etc/ssl/acari
 #RUN setcap cap_net_admin=ep /opt/app/erts-10.5.2/bin/beam.smp cap_net_admin=ep /sbin/ip
 
-RUN mkdir -p download
+RUN mkdir -p download/uploads
 RUN ln -s ${CWD}/download ${CWD}/lib/acari_server-*/priv/static
-RUN ln -s ${CWD}/download /home/docker/uploads
+RUN ln -s ${CWD}/download/uploads /home/docker/uploads
 
 USER docker
 
