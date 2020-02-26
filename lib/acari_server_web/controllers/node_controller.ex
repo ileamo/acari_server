@@ -34,12 +34,14 @@ defmodule AcariServerWeb.NodeController do
   end
 
   def client_grp(conn, %{"id" => group_id}) do
+    group = AcariServer.GroupManager.get_group!(group_id)
+
     nodes =
-      AcariServer.GroupManager.get_group!(group_id)
+      group
       |> Map.get(:nodes)
       |> RepoRO.preload([:script, :groups])
 
-    render(conn, "index.html", nodes: nodes)
+    render(conn, "index.html", nodes: nodes, group: group)
   end
 
   def new(conn, %{"node_id" => id}) do
@@ -113,7 +115,7 @@ defmodule AcariServerWeb.NodeController do
 
     conn
     |> put_flash(:info, "Клиент удален.")
-    |> redirect(to: Routes.node_path(conn, :index))
+    |> redirect_to_index_or_client_grp()
   end
 
   def toggle_lock(conn, %{"id" => id, "lock" => lock}) do
@@ -129,7 +131,7 @@ defmodule AcariServerWeb.NodeController do
 
     conn
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
-    |> redirect(to: Routes.node_path(conn, :index))
+    |> redirect_to_index_or_client_grp()
   end
 
   def exec_selected(conn, params = %{"clients_list" => ids, "operation" => operation}) do
@@ -163,6 +165,16 @@ defmodule AcariServerWeb.NodeController do
     end)
 
     conn
-    |> redirect(to: Routes.node_path(conn, :index))
+    |> redirect_to_index_or_client_grp()
+  end
+
+  def redirect_to_index_or_client_grp(conn) do
+    conn
+    |> redirect(
+      to:
+        NavigationHistory.last_paths(conn)
+        |> Enum.find(fn x -> String.match?(x, ~r{/nodes/grp/\d+}) end) ||
+          Routes.node_path(conn, :index)
+    )
   end
 end

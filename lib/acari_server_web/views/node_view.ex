@@ -22,4 +22,10 @@ defmodule AcariServerWeb.NodeView do
     |> Enum.map(fn {k, v} -> "#{k}=#{v}" end)
     |> Enum.join(", ")
   end
+
+  def redirect_path(conn) do
+    NavigationHistory.last_paths(conn)
+    |> Enum.find(fn x -> String.match?(x, ~r{/nodes/grp/\d+}) end) ||
+      Routes.node_path(@conn, :index)
+  end
 end

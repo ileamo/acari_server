@@ -59,4 +59,4 @@ class="my-3" style="height:480px; max-width:640px"></div>
 |
 <span><%= link "Мониторить", to: Routes.tunnel_path(@conn, :show, @node.name) %></span>
 |
-<span><%= link "К списку", to: Routes.node_path(@conn, :index) %></span>
+<span><%= link "К списку", to: redirect_path(@conn)%></span>

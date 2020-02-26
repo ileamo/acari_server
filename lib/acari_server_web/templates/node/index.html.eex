@@ -1,4 +1,4 @@
-<h2>Список клиентов</h2>
+<h2>Список клиентов<%=  assigns[:group] && ". Группа #{@group.name}" || "" %></h2>
 
 <table id="datatable_select" class="table display table-striped table-bordered table-sm w-100">
   <thead>

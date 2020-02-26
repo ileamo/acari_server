@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.node_path(@conn, :create)) %>
 
-<span><%= link "К списку", to: Routes.node_path(@conn, :index) %></span>
+<span><%= link "К списку", to: redirect_path(@conn)%></span>
