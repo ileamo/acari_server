@@ -9,8 +9,7 @@ defmodule AcariServerWeb.PageController do
   end
 
   def zabbix(conn = %{assigns: %{current_user: %{is_admin: true}}}, %{
-        "sync" => sync_type,
-        "prev_path" => prev_path
+        "sync" => sync_type
       }) do
     mes =
       case sync_type do
@@ -25,10 +24,10 @@ defmodule AcariServerWeb.PageController do
 
     conn
     |> put_flash(:info, "#{mes} синхронизация началась.")
-    |> redirect(to: prev_path)
+    |> redirect(to: NavigationHistory.last_path(conn, default: "/"))
   end
 
-  def zabbix(conn, %{"sync" => _, "prev_path" => _} = params) do
+  def zabbix(conn, %{"sync" => _} = params) do
     is_admin(conn, params)
   end
 

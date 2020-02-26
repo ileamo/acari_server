@@ -8,7 +8,7 @@ defmodule AcariServerWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug NavigationHistory.Tracker, history_size: 3
+    plug NavigationHistory.Tracker, history_size: 3, excluded_paths: [~r(/login.*), ~r(/zabbix.*)]
   end
 
   pipeline :api do

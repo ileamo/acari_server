@@ -149,12 +149,10 @@
           </div>
           <div class="modal-footer">
               <%= link "Быстрая Синхронизация",
-                to: Routes.page_path(@conn, :zabbix, sync: :fast,
-                  prev_path: "#{@conn.request_path}?#{@conn.query_string}"),
+                to: Routes.page_path(@conn, :zabbix, sync: :fast),
                 role: "button", class: "btn btn-info" %>
               <%= link "Полная Синхронизация",
-                to: Routes.page_path(@conn, :zabbix, sync: :full,
-                  prev_path: "#{@conn.request_path}?#{@conn.query_string}"),
+                to: Routes.page_path(@conn, :zabbix, sync: :full),
                   data: [confirm: "Вы уверены что хотите начать полную синхронизацию?"],
                 role: "button", class: "btn btn-warning" %>
           </div>
