@@ -26,6 +26,6 @@ defmodule AcariServerWeb.NodeView do
   def redirect_path(conn) do
     NavigationHistory.last_paths(conn)
     |> Enum.find(fn x -> String.match?(x, ~r{/nodes/grp/\d+}) end) ||
-      Routes.node_path(@conn, :index)
+      Routes.node_path(conn, :index)
   end
 end
