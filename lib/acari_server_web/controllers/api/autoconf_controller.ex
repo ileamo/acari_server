@@ -2,6 +2,7 @@ defmodule AcariServerWeb.Api.AutoconfController do
   use AcariServerWeb, :controller
   alias AcariServer.SFX
   alias AcariServer.NodeManager
+  require Logger
 
   action_fallback(AcariWeb.FallbackController)
 
@@ -43,7 +44,6 @@ defmodule AcariServerWeb.Api.AutoconfController do
           |> AcariServer.RepoRO.preload(:groups)
           |> NodeManager.update_node(%{latitude: lat, longitude: lng})
         end
-
 
         templ_name = node.script && node.script.remote && node.script.remote.name
 
@@ -109,15 +109,13 @@ defmodule AcariServerWeb.Api.AutoconfController do
     # render(conn, "error.json", %{id: id, error: mes})
   end
 
-  #  defp request_log(%{remote_ip: ip, params: %{"params" => params}}, mes) do
-  #    RequestLog.create_request(%{
-  #      from: ip |> :inet.ntoa() |> to_string(),
-  #      request: params,
-  #      response: mes
-  #    })
-  #  end
+  defp request_log(%{remote_ip: ip, params: %{"params" => params}}, mes) do
+    from = ip |> :inet.ntoa() |> to_string()
+    Logger.info("Conf request from #{from}, params = #{inspect(params)}: #{mes}")
+  end
 
-  defp request_log(_, _) do
+  defp request_log(_, mes) do
+    Logger.info("Conf request: #{mes} ")
   end
 
   defp add_discovery(
