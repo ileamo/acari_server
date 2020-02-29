@@ -32,7 +32,8 @@
         <label class="input-group-text">Фильтр</label>
       </div>
       <div class="input-group-prepend">
-        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter-save">
+        <button class="btn btn-outline-secondary" type="button" id="grp-oper-filter-save"
+                data-toggle="modal" data-target="#user-filters">
           <span><i class="far fa-save ml-1"></i></span>
         </button>
       </div>
@@ -157,6 +158,53 @@
       <div class="modal-body">
           Таблица фильтров
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="user-filters" tabindex="-1" role="dialog"
+        aria-labelledby="exec-selected-client-title" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"> Сохранить фильтр </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form_for @conn, Routes.filter_path(@conn, :create), [as: :filter], fn f -> %>
+          <div class="form-group row">
+            <%= label f, "Описание", class: "col-sm-2 col-form-label" %>
+            <div class="col-sm-10">
+              <%= text_input f, :description, class: "form-control" %>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <%= label f, "Фильтр", class: "control-label" %>
+            <%= textarea f, :filter, class: "form-control text-monospace", rows: "6",
+                  id: "user-filters-filter" %>
+          </div>
+
+          <%= link "Управление фильтрами", to: Routes.filter_path(@conn, :index),
+                role: "button", class: "btn btn-outline-secondary"
+          %>
+
+          <div class="float-right">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Отмена
+            </button>
+            <%= submit "Сохранить",
+                  id: "user-filters-action",
+                  role: "button", class: "btn btn-info"%>
+          </div>
+          <% end %>
+
+      </div>
+
     </div>
   </div>
 </div>

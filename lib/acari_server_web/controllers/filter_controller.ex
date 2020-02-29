@@ -16,10 +16,10 @@ defmodule AcariServerWeb.FilterController do
 
   def create(%{assigns: %{current_user: %{id: user_id}}} = conn, %{"filter" => filter_params}) do
     case FilterManager.create_filter(filter_params |> Map.put("user_id", user_id)) do
-      {:ok, filter} ->
+      {:ok, _filter} ->
         conn
         |> put_flash(:info, "Filter created successfully.")
-        |> redirect(to: Routes.filter_path(conn, :index))
+        |> redirect(to: Routes.grp_oper_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)

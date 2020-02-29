@@ -34,3 +34,5 @@
 <% end %>
   </tbody>
 </table>
+
+<span><%= link "К групповым операциям", to: Routes.grp_oper_path(@conn, :index) %></span>

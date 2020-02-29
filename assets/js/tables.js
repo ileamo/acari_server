@@ -173,7 +173,6 @@ if (document.getElementById("exec-selected-clients")) {
 
   $('#exec-selected-clients').on('show.bs.modal', function(event) {
     let data_field = $(event.relatedTarget)
-    console.log("OPERATION", data_field.data('operation'))
     operation = data_field.data('operation')
 
     let selected = table_select.rows('.selected').data()
