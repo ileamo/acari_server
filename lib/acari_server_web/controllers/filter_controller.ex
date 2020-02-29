@@ -19,7 +19,7 @@ defmodule AcariServerWeb.FilterController do
       {:ok, filter} ->
         conn
         |> put_flash(:info, "Filter created successfully.")
-        |> redirect(to: Routes.filter_path(conn, :show, filter))
+        |> redirect(to: Routes.filter_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -44,7 +44,7 @@ defmodule AcariServerWeb.FilterController do
       {:ok, filter} ->
         conn
         |> put_flash(:info, "Filter updated successfully.")
-        |> redirect(to: Routes.filter_path(conn, :show, filter))
+        |> redirect(to: Routes.filter_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", filter: filter, changeset: changeset)

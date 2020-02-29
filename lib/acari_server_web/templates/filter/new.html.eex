@@ -1,4 +1,4 @@
-<h1>Новый фильтр</h1>
+<h2>Новый фильтр</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.filter_path(@conn, :create)) %>
 

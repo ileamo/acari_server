@@ -5,19 +5,31 @@
     </div>
   <% end %>
 
-  <%= label f, :description %>
-  <%= text_input f, :description %>
-  <%= error_tag f, :description %>
+  <div class="form-group row">
+    <%= label f, "Описание", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <%= text_input f, :description, class: "form-control" %>
+      <%= error_tag f, :description %>
+    </div>
+  </div>
 
-  <%= label f, :filter %>
-  <%= textarea f, :filter %>
-  <%= error_tag f, :filter %>
+  <div class="form-group">
+    <%= label f, "Фильтр", class: "control-label" %>
+    <%= textarea f, :filter, class: "form-control text-monospace", rows: "6" %>
+    <%= error_tag f, :filter %>
+  </div>
 
-  <%= label f, :common %>
-  <%= checkbox f, :common %>
-  <%= error_tag f, :common %>
+  <div class="form-group row">
+    <%= label f, "Публичный", class: "col-2 form-check-label" %>
+    <div class="col10">
+      <div class="form-check ml-3">
+        <%= checkbox f, :common, class: "form-check-input", id: "template-form-exec" %>
+        <%= error_tag f, :common %>
+      </div>
+    </div>
+  </div>
 
   <div>
-    <%= submit "Save" %>
+    <%= submit "Сохранить" %>
   </div>
 <% end %>

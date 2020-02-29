@@ -48,7 +48,11 @@
         <div class="dropdown-menu" id="grp-oper-filter-list" style="max-width:400px;">
           <% filters = AcariServer.FilterManager.list_filrers() %>
           <%= for filter <- filters do %>
-            <a class="dropdown-item" href="#" id="<%= filter.filter %>"><%= filter.description %>: <%= filter.filter %></a>
+            <a class="dropdown-item" href="#" id="<%= filter.filter %>">
+            <%= if is_binary(filter.description) && String.trim(filter.description) != "" do %>
+              <strong><%= filter.description %>:</strong>
+            <% end %>
+            <%= filter.filter %></a>
           <% end %>
         </div>
       </div>

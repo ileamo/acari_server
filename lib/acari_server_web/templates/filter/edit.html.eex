@@ -1,5 +1,5 @@
-<h1>Edit Filter</h1>
+<h2>Edit Filter</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.filter_path(@conn, :update, @filter)) %>
 
-<span><%= link "Back", to: Routes.filter_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.filter_path(@conn, :index) %></span>

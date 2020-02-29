@@ -1,23 +1,28 @@
-<h1>Show Filter</h1>
-
+<h2>Фильтр</h2>
 <ul>
-
   <li>
-    <strong>Description:</strong>
+    <strong>Описание:</strong>
     <%= @filter.description %>
   </li>
 
   <li>
-    <strong>Filter:</strong>
-    <%= @filter.filter %>
+    <strong>Пользователь:</strong>
+    <%= @filter.user.username %>
   </li>
 
   <li>
-    <strong>Common:</strong>
-    <%= @filter.common %>
+    <strong>Публичный:</strong>
+    <%= @filter.common && "Да" || "Нет"  %>
   </li>
 
+  <li>
+    <strong>Фильтр:</strong>
+    <pre class="border rounded bg-white p-2" style="resize: vertical; height: 150px"><code><%=
+      @filter.filter
+    %></code></pre>
+  </li>
 </ul>
 
-<span><%= link "Edit", to: Routes.filter_path(@conn, :edit, @filter) %></span>
-<span><%= link "Back", to: Routes.filter_path(@conn, :index) %></span>
+<span><%= link "Редактировать", to: Routes.filter_path(@conn, :edit, @filter) %></span>
+|
+<span><%= link "К списку", to: Routes.filter_path(@conn, :index) %></span>

@@ -1,11 +1,12 @@
-<h1>Listing Filrers</h1>
+<h2>Список фильтров</h2>
 
-<table>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
-      <th>Description</th>
-      <th>Filter</th>
-      <th>Common</th>
+      <th>Описание</th>
+      <th>Пользователь</th>
+      <th>Публичный</th>
+      <th>Фильтр</th>
 
       <th></th>
     </tr>
@@ -14,17 +15,22 @@
 <%= for filter <- @filrers do %>
     <tr>
       <td><%= filter.description %></td>
+      <td><%= filter.user.username %></td>
+      <td><%= filter.common && "Да" || "Нет" %></td>
       <td><%= filter.filter %></td>
-      <td><%= filter.common %></td>
-
       <td>
-        <span><%= link "Show", to: Routes.filter_path(@conn, :show, filter) %></span>
-        <span><%= link "Edit", to: Routes.filter_path(@conn, :edit, filter) %></span>
-        <span><%= link "Delete", to: Routes.filter_path(@conn, :delete, filter), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <span><%= link to: Routes.filter_path(@conn, :edit, filter) do %>
+            <i class="far fa-edit mr-1"></i>
+          <% end %>
+        </span>
+        <span><%= link to: Routes.filter_path(@conn, :delete, filter),
+                    method: :delete,
+                    data: [confirm: "Вы уверены?"] do %>
+            <i class="far fa-trash-alt ml-1"></i>
+          <% end %>
+        </span>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
-
-<span><%= link "New Filter", to: Routes.filter_path(@conn, :new) %></span>

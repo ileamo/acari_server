@@ -19,6 +19,7 @@ defmodule AcariServer.FilterManager do
   """
   def list_filrers do
     Repo.all(Filter)
+    |> Repo.preload(:user)
   end
 
   @doc """
@@ -35,7 +36,10 @@ defmodule AcariServer.FilterManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_filter!(id), do: Repo.get!(Filter, id)
+  def get_filter!(id) do
+    Repo.get!(Filter, id)
+    |> Repo.preload(:user)
+  end
 
   @doc """
   Creates a filter.
