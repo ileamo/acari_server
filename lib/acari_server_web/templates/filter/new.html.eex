@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.filter_path(@conn, :create)) %>
 
-<span><%= link "К списку", to: Routes.filter_path(@conn, :index) %></span>
+<span><%= link "К групповым операциям", to: Routes.grp_oper_path(@conn, :index) %></span>

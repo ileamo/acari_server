@@ -4,8 +4,29 @@ defmodule AcariServerWeb.FilterController do
   alias AcariServer.FilterManager
   alias AcariServer.FilterManager.Filter
 
-  def index(conn, _params) do
+  plug :is_user_owner when action in [:edit, :delete]
+
+  def is_user_owner(
+        conn = %{assigns: %{current_user: %{id: user_id}}, params: %{"id" => filter_id}},
+        _opts
+      ) do
+    if FilterManager.get_filter!(filter_id).user_id == user_id do
+      conn
+    else
+      AcariServer.UserManager.no_auth(conn, "Этот фильтр принадлежит другому пользователю")
+    end
+  end
+
+  def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, _params) do
     filrers = FilterManager.list_filrers()
+    render(conn, "index.html", filrers: filrers)
+  end
+
+  def index(%{assigns: %{current_user: %{id: user_id}}} = conn, _params) do
+    filrers =
+      FilterManager.list_filrers()
+      |> Enum.filter(fn %{user_id: id} -> id == user_id end)
+
     render(conn, "index.html", filrers: filrers)
   end
 
@@ -37,11 +58,20 @@ defmodule AcariServerWeb.FilterController do
     render(conn, "edit.html", filter: filter, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "filter" => filter_params}) do
+  def update(conn = %{assigns: %{current_user: %{is_admin: is_admin}}}, %{
+        "id" => id,
+        "filter" => filter_params
+      }) do
     filter = FilterManager.get_filter!(id)
 
+    filter_params =
+      case is_admin do
+        true -> filter_params
+        _ -> filter_params |> Map.put("common", "false")
+      end
+
     case FilterManager.update_filter(filter, filter_params) do
-      {:ok, filter} ->
+      {:ok, _filter} ->
         conn
         |> put_flash(:info, "Filter updated successfully.")
         |> redirect(to: Routes.filter_path(conn, :index))
