@@ -4,9 +4,17 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
     <div class="navbar p-0">
       <span class="navbar-brand">Клиент <%= @name %></span>
+      <span>
+        <%= link to: "#", data: [toggle: "modal", target: "#client-notes"],
+          class: "bg-disabled" do %>
+            <i class="far fa-comment-dots ml-1"></i>
+        <% end %>
+      </spsn>
 
     </div>
-    <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2"><%= link "Конфигурация клиента", to: Routes.node_path(@conn, :show, tun.id) %></button>
+    <%= link "Конфигурация клиента", to: Routes.node_path(@conn, :show, tun.id),
+          role: "button",
+          class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
 </nav>
 <%= if tun && links_state do %>
 <h6><%= tun.description %></h6>
