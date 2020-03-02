@@ -173,7 +173,6 @@ if (document.getElementById("exec-selected-clients")) {
 
   $('#exec-selected-clients').on('show.bs.modal', function(event) {
     let data_field = $(event.relatedTarget)
-    console.log("OPERATION", data_field.data('operation'))
     operation = data_field.data('operation')
 
     let selected = table_select.rows('.selected').data()
@@ -198,9 +197,13 @@ if (document.getElementById("exec-selected-clients")) {
         .text(content[operation].action)
 
       if (operation == "class") {
+        $(this).find('.modal-body #exec-selected-clients-groups-form')
+        .addClass("d-none");
         $(this).find('.modal-body #exec-selected-clients-class-form')
           .removeClass("d-none");
       } else if (operation == "groups") {
+        $(this).find('.modal-body #exec-selected-clients-class-form')
+          .addClass("d-none");
         $(this).find('.modal-body #exec-selected-clients-groups-form')
           .removeClass("d-none");
       }

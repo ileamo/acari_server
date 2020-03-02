@@ -186,7 +186,7 @@ if (grp_oper) {
   selectElement();
 
   channel.on('output', payload => {
-    console.log("grp_oper get:", payload.id);
+    //console.log("grp_oper get:", payload.id);
     switch (payload.id) {
       case "filter_error":
         let grp_oper_filter_error = document.getElementById("grp-oper-filter-error")
@@ -404,5 +404,12 @@ if (grp_oper) {
         })
       }
     }
+  }
+
+  if (document.getElementById("user-filters")) {
+    $('#user-filters').on('show.bs.modal', function(event) {
+      document.getElementById('user-filters-filter').value =
+        document.getElementById("grp-oper-filter-text").value
+    })
   }
 }

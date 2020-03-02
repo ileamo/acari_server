@@ -51,9 +51,15 @@
         <span class="<%=color%>">
         <%= link to: Routes.node_path(@conn, :toggle_lock, node, lock: !node.lock),
                   class: color, data: [confirm: confirm] do %>
-          <i class="fas fa-toggle-<%= text %> ml-1"></i>
+          <i class="fas fa-toggle-<%= text %> mx-1"></i>
         <% end %>
-      </span>
+        </span>
+
+        <%= link to: "#", data: [toggle: "modal", target: "#client-notes"],
+        class: "bg-disabled" do %>
+        <i class="far fa-comment-dots ml-1"></i>
+        <% end %>
+
       </td>
     </tr>
 <% end %>
@@ -145,14 +151,17 @@
             </div>
           </div>
 
+          <div class="float-right">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Отмена
+            </button>
 
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Отмена
-          </button>
-          <%= submit "Удалить выделенные",
-                id: "exec-selected-clients-action",
-                data: [confirm: "Вы уверены что хотите завершить операцию с выделенными клиентами?"],
-                role: "button", class: "btn btn-danger"%>
+            <%= submit "Удалить выделенные",
+                  id: "exec-selected-clients-action",
+                  data: [confirm: "Вы уверены что хотите завершить операцию с выделенными клиентами?"],
+                  role: "button", class: "btn btn-danger"%>
+          </div>
+
         <% end %>
 
       </div>

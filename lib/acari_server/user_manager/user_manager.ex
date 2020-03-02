@@ -241,7 +241,7 @@ defmodule AcariServer.UserManager do
     end
   end
 
-  defp no_auth(conn, mes) do
+  def no_auth(conn, mes) do
     conn
     |> Phoenix.Controller.redirect(
       to: AcariServerWeb.Router.Helpers.page_path(conn, :noauth, message: mes)

@@ -17,8 +17,14 @@ defmodule AcariServer.FilterManager do
       [%Filter{}, ...]
 
   """
-  def list_filrers do
+  def list_filrers() do
     Repo.all(Filter)
+    |> Repo.preload(:user)
+  end
+
+  def list_filrers(user) do
+    Repo.all(Filter)
+    |> Enum.filter(fn %{user_id: user_id, common: common} -> common or user.id == user_id end)
   end
 
   @doc """
@@ -35,7 +41,14 @@ defmodule AcariServer.FilterManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_filter!(id), do: Repo.get!(Filter, id)
+  def get_filter!(id) do
+    Repo.get!(Filter, id)
+    |> Repo.preload(:user)
+  end
+
+  def get_filter!(id) do
+    Repo.get!(Filter, id)
+  end
 
   @doc """
   Creates a filter.

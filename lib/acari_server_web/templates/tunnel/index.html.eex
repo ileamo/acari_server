@@ -43,6 +43,7 @@
       <th scope="col">Сервер</th>
       <th scope="col">Link UP</th>
       <th scope="col">Link DOWN</th>
+      <th scope="col" class="not-export-col"></th>
 
     </tr>
   </thead>
@@ -67,6 +68,12 @@
       <td><%= tunnel[:server] %></td>
       <td><%= tunnel[:links_up] %></td>
       <td><%= tunnel[:links_down] %></td>
+      <td>
+        <%= link to: "#", data: [toggle: "modal", target: "#client-notes"],
+          class: "bg-disabled" do %>
+            <i class="far fa-comment-dots ml-1"></i>
+        <% end %>
+      </td>
 
     </tr>
 <% end %>
