@@ -13,7 +13,9 @@
   <tbody>
     <%= for %{id: id, description: descr, data_list: data_list} <- @script_res_multi do %>
       <tr>
-        <td><%= id %></td>
+        <td>
+          <%= link id, to: Routes.tunnel_path(AcariServerWeb.Endpoint, :show, id) %>
+        </td>
         <td><%= descr %></td>
 
         <%= for {_tag, data} <- data_list do  %>

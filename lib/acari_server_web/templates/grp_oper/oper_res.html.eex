@@ -49,7 +49,7 @@
               rights: rights} = params <- @script_res_list do %>
       <tr class="<%= rights && "" || "table-info" %>">
         <td>
-          <%= name %>
+          <%= link name, to: Routes.tunnel_path(AcariServerWeb.Endpoint, :show, name) %>
         </td>
         <td><%= descr %></td>
         <td><%= case reqv_ts do

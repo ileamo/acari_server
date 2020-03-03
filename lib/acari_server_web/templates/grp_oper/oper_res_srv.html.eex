@@ -37,7 +37,10 @@
     <%= for %{id: id, description: descr, data: data, rights: rights} <- @script_res_list do %>
       <% color_class = rights && "" || "table-info" %>
       <tr class="<%= color_class %>">
-        <td><%= id %></td>
+        <td>
+          <%= link id, to: Routes.tunnel_path(AcariServerWeb.Endpoint, :show, id) %>
+        </td>
+
         <td><%= descr %></td>
         <td class="p-0">
                 <%= render "oper_srv_data.html", id: id, data: data, color: color_class %>
