@@ -33,14 +33,14 @@
     <%= label f, "Группа", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-4">
       <% groups_list = AcariServer.GroupManager.group_name_id_pairs_list("Все") %>
-      <%= select f, :group_id, groups_list, class: "custom-select", id: "class-form-select" %>
+      <%= select f, :group_id, groups_list, class: "custom-select" %>
       <%= error_tag f, :group_id %>
     </div>
 
     <%= label f, "Класс", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-4">
       <% scripts_list = AcariServer.ScriptManager.script_name_id_pairs_list("Все") %>
-      <%= select f, :script_id, scripts_list, class: "custom-select", id: "class-form-select" %>
+      <%= select f, :script_id, scripts_list, class: "custom-select" %>
       <%= error_tag f, :script_id %>
     </div>
   </div>

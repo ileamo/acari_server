@@ -149,6 +149,20 @@ defmodule AcariServer.NodeManager do
 
   """
   def update_node(%Node{} = node, attrs) do
+    IO.inspect({node, attrs})
+
+    if is_binary(class = attrs["script_id"]) and String.to_integer(class) != node.script_id do
+      with %{definition: def} = AcariServer.ScriptManager.get_script(class) do
+        AcariServer.Template.get_vars(def)
+        |> Enum.map(fn
+          {key, value} when is_list(value) -> {key, hd(value)}
+          {key, value} -> {key, value}
+        end)
+        |> Enum.into(%{})
+        |> IO.inspect()
+      end
+    end
+
     res =
       node
       |> Node.changeset(attrs)
