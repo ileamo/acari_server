@@ -10,7 +10,7 @@ defmodule AcariServerWeb.FilterController do
         conn = %{assigns: %{current_user: %{id: user_id}}, params: %{"id" => filter_id}},
         _opts
       ) do
-    if FilterManager.get_filter!(filter_id).user_id == user_id do
+    if FilterManager.get_filter_wo_user!(filter_id).user_id == user_id do
       conn
     else
       AcariServer.UserManager.no_auth(conn, "Этот фильтр принадлежит другому пользователю")

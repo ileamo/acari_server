@@ -46,7 +46,7 @@ defmodule AcariServer.FilterManager do
     |> Repo.preload(:user)
   end
 
-  def get_filter!(id) do
+  def get_filter_wo_user!(id) do
     Repo.get!(Filter, id)
   end
 
