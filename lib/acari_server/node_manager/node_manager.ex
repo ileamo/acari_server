@@ -118,9 +118,12 @@ defmodule AcariServer.NodeManager do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_node(attrs \\ %{}) do
+  def create_node(attrs \\ %{}, var_def \\ nil) do
+    node = %Node{}
+    attrs = update_attrs(node, attrs, var_def)
+
     res =
-      %Node{}
+      node
       |> Node.changeset(attrs)
       |> AcariServer.GroupManager.Group.put_groups(attrs)
       |> Repo.insert()
@@ -149,37 +152,7 @@ defmodule AcariServer.NodeManager do
 
   """
   def update_node(%Node{} = node, attrs, var_def \\ nil) do
-    attrs =
-      with nil <- attrs["params"],
-           class when is_binary(class) <- attrs["script_id"],
-           {class_id, ""} <- Integer.parse(class) do
-        var_def =
-          case var_def do
-            nil ->
-              %{definition: def} = AcariServer.ScriptManager.get_script(class_id)
-              AcariServer.Template.get_vars(def)
-
-            _ ->
-              var_def
-          end
-
-        old_params = node.params || %{}
-
-        params =
-          var_def
-          |> Enum.map(fn
-            {key, value_list} when is_list(value_list) ->
-              {key, (Enum.member?(value_list, val = old_params[key]) && val) || hd(value_list)}
-
-            {key, value} ->
-              {key, old_params[key] || value}
-          end)
-          |> Enum.into(%{})
-
-        Map.put(attrs, "params", params)
-      else
-        _ -> attrs
-      end
+    attrs = update_attrs(node, attrs, var_def)
 
     res =
       node
@@ -195,6 +168,39 @@ defmodule AcariServer.NodeManager do
 
       _ ->
         res
+    end
+  end
+
+  defp update_attrs(node, attrs, var_def) do
+    with nil <- attrs["params"],
+         class when is_binary(class) <- attrs["script_id"],
+         {class_id, ""} <- Integer.parse(class) do
+      var_def =
+        case var_def do
+          nil ->
+            %{definition: def} = AcariServer.ScriptManager.get_script(class_id)
+            AcariServer.Template.get_vars(def)
+
+          _ ->
+            var_def
+        end
+
+      old_params = node.params || %{}
+
+      params =
+        var_def
+        |> Enum.map(fn
+          {key, value_list} when is_list(value_list) ->
+            {key, (Enum.member?(value_list, val = old_params[key]) && val) || hd(value_list)}
+
+          {key, value} ->
+            {key, old_params[key] || value}
+        end)
+        |> Enum.into(%{})
+
+      Map.put(attrs, "params", params)
+    else
+      _ -> attrs
     end
   end
 

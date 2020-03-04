@@ -24,8 +24,7 @@ defmodule AcariServerWeb.ClassChangeChannel do
       with class_id when is_integer(class_id) <- class_id,
            node_id when is_integer(node_id) <- socket.assigns[:node_id],
            node = %AcariServer.NodeManager.Node{} <- AcariServer.NodeManager.get_node!(node_id),
-           script_id when is_integer(script_id) <- node.script_id,
-           true <- script_id == class_id do
+           script_id when is_integer(script_id) <- node.script_id do
         node.params
       else
         _ ->

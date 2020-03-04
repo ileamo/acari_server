@@ -144,6 +144,16 @@ defmodule AcariServerWeb.NewNodeController do
   end
 
   defp add_new_client(text, client_params) do
+    var_def =
+      with class when is_binary(class) <- client_params["script_id"],
+           {class_id, ""} <- Integer.parse(class),
+           %{definition: def} <- AcariServer.ScriptManager.get_script(class_id) do
+        AcariServer.Template.get_vars(def)
+      else
+        _ ->
+          nil
+      end
+
     case AcariServer.Parser.client_list(text) do
       {:ok, res, _, _, _, _} ->
         res
@@ -161,7 +171,8 @@ defmodule AcariServerWeb.NewNodeController do
                      NodeManager.create_node(
                        env
                        |> Map.merge(client_params)
-                       |> Map.merge(%{"name" => id, "lock" => true})
+                       |> Map.merge(%{"name" => id, "lock" => true}),
+                       var_def
                      ) do
                 nil
               else

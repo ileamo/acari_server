@@ -4,7 +4,13 @@
   <%= for  {k, v}  <-  @vars  do %>
     <div class="form-group row">
       <%= label :node, k, k, class: "col-sm-2 col-form-label" %>
-      <% value = @node_params && @node_params[k] %>
+      <% value = @node_params &&
+        case v do
+          value_list when is_list(value_list) ->
+            Enum.member?(value_list, val = @node_params[k]) && val
+          _ ->   @node_params[k]
+        end
+      %>
       <% opts = [class: "form-control", onfocus: "this.style.color='#000'"] ++
       (value && [value: value] || [value: is_binary(v) && v || Enum.at(v, 0), style: "color: #AAA"]) %>
 
