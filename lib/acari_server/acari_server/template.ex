@@ -177,7 +177,7 @@ defmodule AcariServer.Template do
     end
   end
 
-  defp normalize_vars(var) do
+  def normalize_vars(var) do
     var
     |> Enum.map(&check_var/1)
     |> Enum.reject(fn x -> x == nil end)

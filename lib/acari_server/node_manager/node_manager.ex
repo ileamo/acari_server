@@ -148,16 +148,25 @@ defmodule AcariServer.NodeManager do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_node(%Node{} = node, attrs) do
+  def update_node(%Node{} = node, attrs, var_def \\ nil) do
     attrs =
       with nil <- attrs["params"],
            class when is_binary(class) <- attrs["script_id"],
-           {class_id, ""} <- Integer.parse(class),
-           %{definition: def} <- AcariServer.ScriptManager.get_script(class_id) do
+           {class_id, ""} <- Integer.parse(class) do
+        var_def =
+          case var_def do
+            nil ->
+              %{definition: def} = AcariServer.ScriptManager.get_script(class_id)
+              AcariServer.Template.get_vars(def)
+
+            _ ->
+              var_def
+          end
+
         old_params = node.params || %{}
 
         params =
-          AcariServer.Template.get_vars(def)
+          var_def
           |> Enum.map(fn
             {key, value_list} when is_list(value_list) ->
               {key, (Enum.member?(value_list, val = old_params[key]) && val) || hd(value_list)}

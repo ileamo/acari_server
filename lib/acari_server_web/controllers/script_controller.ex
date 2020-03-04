@@ -57,10 +57,12 @@ defmodule AcariServerWeb.ScriptController do
           with {old, nil} <- AcariServer.Template.get_json(old_definition),
                {new, nil} <- AcariServer.Template.get_json(script.definition),
                false <- Map.equal?(old, new) do
+            var_def = AcariServer.Template.normalize_vars(new)
+
             script
             |> AcariServer.ScriptManager.get_clients_of_class()
             |> Enum.each(fn client ->
-              update_client_params(client, AcariServer.Template.get_only_value(new))
+              update_client_params(script.id, client, var_def)
             end)
           end
         end
@@ -74,17 +76,13 @@ defmodule AcariServerWeb.ScriptController do
     end
   end
 
-  defp update_client_params(client, defaults) do
-    p = client.params || %{}
-
-    params =
-      defaults
-      |> Enum.map(fn {k, v} -> if Map.has_key?(p, k), do: {k, p[k]}, else: {k, v} end)
-      |> Enum.into(%{})
-
+  defp update_client_params(script_id, client, var_def) do
     client
     |> AcariServer.RepoRO.preload(:groups)
-    |> AcariServer.NodeManager.update_node(%{"params" => params, "groups_list" => false})
+    |> AcariServer.NodeManager.update_node(
+      %{"script_id" => to_string(script_id), "groups_list" => false},
+      var_def
+    )
   end
 
   def delete(conn, %{"id" => id}) do
