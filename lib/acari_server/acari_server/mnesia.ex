@@ -567,13 +567,13 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn ->
       state =
         case Mnesia.wread({:link, id}) do
-          [] -> %{down_count: 0, tm_start: tm, tm_down: 0, tm_down_start: tm}
+          [] -> %{down_count: 0, tm_start: tm, tm_down: 0, tm_down_start: tm, tm_up_start: tm}
           [record] -> record |> Rec.link(:state)
         end
 
       state =
         case up do
-          true -> %{state | tm_down: state.tm_down + tm - state.tm_down_start}
+          true -> %{state | tm_down: state.tm_down + tm - state.tm_down_start, tm_up_start: tm}
           _ -> %{state | down_count: state.down_count + 1, tm_down_start: tm}
         end
 

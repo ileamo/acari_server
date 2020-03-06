@@ -16,8 +16,9 @@ defmodule AcariServerWeb.TunnelView do
       end
 
     last_down_tm = if up, do: 0, else: tm - state.tm_down_start
+    last_up_tm = if up, do: tm - state.tm_up_start, else: 0
     down = state.tm_down + last_down_tm
-    {interval_to_text(last_down_tm), down * 100 / total}
+    {interval_to_text(last_up_tm), interval_to_text(last_down_tm), down * 100 / total}
   end
 
   defp interval_to_text(tm) do
