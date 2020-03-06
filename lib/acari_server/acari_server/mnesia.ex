@@ -1065,7 +1065,14 @@ defmodule AcariServer.Mnesia do
       |> link_list_to_map()
 
     nodes
-    |> Enum.map(fn %{id: id, name: name, description: descr, address: address, latitude: lat, longitude: lng} ->
+    |> Enum.map(fn %{
+                     id: id,
+                     name: name,
+                     description: descr,
+                     address: address,
+                     latitude: lat,
+                     longitude: lng
+                   } ->
       %{
         id: id,
         name: name,
@@ -1077,8 +1084,14 @@ defmodule AcariServer.Mnesia do
       }
       |> Map.merge(
         case status[name] do
-          nil -> %{}
-          link_list -> link_list |> reduce_link_list(node_to_name) |> alert()
+          nil ->
+            %{}
+
+          link_list ->
+            link_list
+            |> reduce_link_list(node_to_name)
+            |> alert()
+            |> Map.put(:links_number, length(link_list))
         end
       )
     end)
