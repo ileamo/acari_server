@@ -11,7 +11,7 @@ if (grp_oper) {
 
   channel.join()
     .receive("ok", resp => {
-      console.log("grp_oper: Joined successfully", resp)
+      //console.log("grp_oper: Joined successfully", resp)
       //getLastScript()
     })
     .receive("error", resp => {
@@ -49,7 +49,31 @@ if (grp_oper) {
     }
   }
 
+  let grp_oper_show_all = document.getElementById("grp-oper-show-all")
+  if (grp_oper_show_all) {
+    grp_oper_show_all.addEventListener("change", showAll, false);
 
+  }
+
+  function showAll() {
+    let checked = grp_oper_show_all.checked
+    if (checked) {
+      for (var i = 0; i < grp_oper_script.options.length; i++) {
+        grp_oper_script.options[i].hidden = false
+      }
+
+    } else {
+      for (var i = 0; i < grp_oper_script.options.length; i++) {
+        if (grp_oper_script.options[i].value[0] == '.') {
+          grp_oper_script.options[i].hidden = true
+        }
+      }
+      let selected_option = grp_oper_script.options[grp_oper_script.selectedIndex]
+      if (selected_option && selected_option.hidden) {
+        grp_oper_script.selectedIndex = -1
+      }
+    }
+  }
 
   let grp_oper_class = document.getElementById("grp-oper-class")
   if (grp_oper_class) {
@@ -219,6 +243,7 @@ if (grp_oper) {
           if (grp_oper_script.selectedIndex < 0) {
             grp_oper_script.selectedIndex = "0";
           }
+          showAll(grp_oper_show_all)
         }
 
         if (grp_oper_script_multi) {
@@ -357,6 +382,8 @@ if (grp_oper) {
           filter: sessionStorage.getItem("grp_oper_filter"),
           script_type: sessionStorage.getItem("grp_oper_script_type")
         })
+        grp_oper_show_all.checked = false
+        showAll()
       }
     }
   }
