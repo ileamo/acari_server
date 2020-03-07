@@ -12,9 +12,13 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
       </spsn>
 
     </div>
+    <div class="navbar">
     <%= link "Конфигурация клиента", to: Routes.node_path(@conn, :show, tun.id),
           role: "button",
-          class: "btn btn-outline-primary btn-sm navbar-text py-1 px-2" %>
+          class: "nav-link py-1 px-2 mr-2" %>
+    <%= link "К списку", to: redirect_path(@conn),
+          class: "nav-link py-1 px-2" %>
+    </div>
 </nav>
 <%= if tun && links_state do %>
 <h6><%= tun.description %></h6>
@@ -29,7 +33,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           <span class="navbar-brand">Состояние соединений</span>
         </div>
         <div class="navbar">
-            <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+            <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
               href="#nm-links-state" role="button" aria-expanded="true" aria-controls="nm-links-state">
               Скрыть/Показать
             </button>
@@ -63,7 +67,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           </li>
         </ul>
         <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
             href="#nm-script-field" role="button" aria-expanded="false" aria-controls="nm-script-field">
             Скрыть/Показать
           </button>
@@ -95,7 +99,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           </li>
         </ul>
         <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
             href="#nm-srv-script-field-collapse" role="button" aria-expanded="false" aria-controls="nm-srv-script-field-collapse">
             Скрыть/Показать
           </button>
@@ -119,7 +123,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           <span class="navbar-brand">Датчики</span>
         </div>
         <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-3"  data-toggle="collapse"
+          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
             href="#nm-sensors" role="button" aria-expanded="false" aria-controls="nm-sensors">
             Скрыть/Показать
           </button>
