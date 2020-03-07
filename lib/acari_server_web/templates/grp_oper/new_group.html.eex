@@ -2,6 +2,6 @@
   Создана новая группа <%= @group.name %> </br>
   <%= @group.description %>
 </p>
-<span><%= link "Редактироать группу",
+<span><%= link "Редактировать группу",
 to: Routes.group_path(AcariServerWeb.Endpoint, :edit, @group) %>
 </span>
