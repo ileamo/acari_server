@@ -5,7 +5,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
     <div class="navbar p-0">
       <span class="navbar-brand">Клиент <%= @name %></span>
       <span>
-        <%= link to: "#", data: [toggle: "modal", target: "#client-notes"],
+        <%= link to: "#", data: [toggle: "modal", target: "#client-comments", client_id: tun.id],
           class: "bg-disabled" do %>
             <i class="far fa-comment-dots ml-1"></i>
         <% end %>

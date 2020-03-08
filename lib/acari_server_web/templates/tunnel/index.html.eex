@@ -71,7 +71,7 @@
       <td><%= tunnel[:links_down] %></td>
       <td><%= tunnel[:links_number] %></td>
       <td>
-        <%= link to: "#", data: [toggle: "modal", target: "#client-notes"],
+        <%= link to: "#", data: [toggle: "modal", target: "#client-comments", client_id: tunnel.id],
           class: "bg-disabled" do %>
             <i class="far fa-comment-dots ml-1"></i>
         <% end %>

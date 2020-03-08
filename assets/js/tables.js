@@ -198,7 +198,7 @@ if (document.getElementById("exec-selected-clients")) {
 
       if (operation == "class") {
         $(this).find('.modal-body #exec-selected-clients-groups-form')
-        .addClass("d-none");
+          .addClass("d-none");
         $(this).find('.modal-body #exec-selected-clients-class-form')
           .removeClass("d-none");
       } else if (operation == "groups") {
@@ -220,5 +220,16 @@ if (document.getElementById("exec-selected-clients")) {
       $(this).modal('hide')
       setTimeout(alert, 100, 'Не выделена ни одна строка в таблице')
     }
+  })
+}
+
+
+if (document.getElementById("client-comments")) {
+  $('#client-comments').on('show.bs.modal', function(event) {
+    let data_field = $(event.relatedTarget)
+    console.log('DATA FIELD',data_field)
+    $(this).find('.modal-body #client-comments-other-users').html(data_field.data('other-users'))
+    document.getElementById('client-comments-user-id').value = data_field.data('user-id')
+    document.getElementById('client-comments-client-id').value = data_field.data('client-id')
   })
 }

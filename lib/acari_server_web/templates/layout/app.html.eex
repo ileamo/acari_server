@@ -161,19 +161,45 @@
       </div>
     </div>
 
-    <div class="modal fade" id="client-notes" tabindex="-1" role="dialog"
-            aria-labelledby="client-notes-title" aria-hidden="true">
+    <div class="modal fade" id="client-comments" tabindex="-1" role="dialog"
+            aria-labelledby="client-comments-title" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title"> Зметки </h5>
+            <h5 class="modal-title"> Комментарии </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-              В разработке
+            <div id="client-comments-other-users"></div>
+            <%= form_for @conn, Routes.node_path(@conn, :client_comment_new), [method: "post"], fn f -> %>
 
+              <div class="form-group row">
+                <%= text_input f, :user_id,  id: "client-comments-user-id",
+                                                  type: "hidden",
+                                                  value: ""
+                %>
+                <%= text_input f, :node_id,  id: "client-comments-client-id",
+                                                  type: "hidden",
+                                                  value: ""
+                %>
+              </div>
+
+              <div class="form-group" id="client-comments-content">
+                <%= textarea f, :comment, class: "form-control", rows: "6" %>
+              </div>
+
+              <div class="float-right">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                  Отмена
+                </button>
+
+                <%= submit "Сохранить",
+                      data: [confirm: "Сохранить комментарий?"],
+                      role: "button", class: "btn btn-danger"%>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>

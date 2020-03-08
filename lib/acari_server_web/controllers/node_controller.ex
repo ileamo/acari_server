@@ -177,4 +177,11 @@ defmodule AcariServerWeb.NodeController do
           Routes.node_path(conn, :index)
     )
   end
+
+  def client_comment_new(conn, params) do
+    IO.inspect(params)
+
+    conn
+    |> redirect(to: NavigationHistory.last_path(conn))
+  end
 end

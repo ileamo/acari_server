@@ -68,6 +68,8 @@ defmodule AcariServerWeb.Router do
     get "/nodes/:id/toggle_lock", NodeController, :toggle_lock
     delete "/nodes", NodeController, :exec_selected
     get "/nodes/grp/:id", NodeController, :client_grp
+    post "/client_comment/new", NodeController, :client_comment_new
+
     resources "/newnodes", NewNodeController
     post "/newnodes/upload", NewNodeController, :upload
     get "/nodes/:id/unlock", NewNodeController, :unlock
