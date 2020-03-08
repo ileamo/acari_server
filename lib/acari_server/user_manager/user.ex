@@ -19,6 +19,7 @@ defmodule AcariServer.UserManager.User do
 
     has_many :groups_users, AcariServer.GroupUserAssociation.GroupUser
     has_many :filters, AcariServer.FilterManager.Filter
+    has_many :client_comments, AcariServer.ClientCommentManager.ClientComment
 
     timestamps()
   end

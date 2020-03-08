@@ -18,6 +18,8 @@ defmodule AcariServer.NodeManager.Node do
       join_through: AcariServer.GroupNodeAssociation.GroupNode,
       on_replace: :delete
 
+    has_many :client_comments, AcariServer.ClientCommentManager.ClientComment
+
     timestamps()
   end
 
