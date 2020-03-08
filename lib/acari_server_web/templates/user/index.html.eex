@@ -3,6 +3,7 @@
   <thead>
     <tr>
       <th scope="col">Имя</th>
+      <th scope="col">Подразделение</th>
       <th scope="col">Админ</th>
       <th scope="col">Группы</th>
       <th scope="col" class="not-export-col">Действия</th>
@@ -13,6 +14,9 @@
     <tr>
       <td>
         <%= link user.username, to: Routes.user_path(@conn, :show, user) %>
+      </td>
+      <td>
+        <%= user.description %>
       </td>
       <td><%= if user.is_admin, do: "Да", else: "Нет" %></td>
       <td>

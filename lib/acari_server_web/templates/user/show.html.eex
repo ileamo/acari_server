@@ -8,6 +8,11 @@
   </li>
 
   <li>
+    <strong>Подразделение:</strong>
+    <%= @user.description %>
+  </li>
+
+  <li>
     <strong>Хэш пароля:</strong>
     <%= @user.password_hash %>
   </li>
