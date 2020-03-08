@@ -20,6 +20,7 @@ COPY src src
 
 # Uncomment line below if you have assets in the priv dir
 COPY priv priv
+RUN rm -fr priv/static
 
 # Build Phoenix assets
 COPY assets assets
