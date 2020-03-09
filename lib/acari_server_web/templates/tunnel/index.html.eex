@@ -49,7 +49,7 @@
     </tr>
   </thead>
   <tbody>
-<%= for tunnel <- AcariServer.Mnesia.get_tunnel_list(@nodes |> reject_locked_nodes())  do %>
+<%= for tunnel <- AcariServer.Mnesia.get_tunnel_list(@nodes) do %>
 <% al = case tunnel[:alert] do
         1 -> "table-danger"
         2 -> "table-warning"
@@ -71,12 +71,9 @@
       <td><%= tunnel[:links_down] %></td>
       <td><%= tunnel[:links_number] %></td>
       <td>
-        <%= link to: "#", data: [toggle: "modal", target: "#client-comments", client_id: tunnel.id],
-          class: "bg-disabled" do %>
-            <i class="far fa-comment-dots ml-1"></i>
-        <% end %>
+        <%= render AcariServerWeb.NodeView, "client_comments.html",
+              current_user: @current_user, node: tunnel %>
       </td>
-
     </tr>
 <% end %>
   </tbody>

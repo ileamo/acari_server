@@ -70,11 +70,6 @@ defmodule AcariServerWeb.TunnelView do
     |> Enum.sort_by(fn %{name_srv: ns} -> ns end)
   end
 
-  def reject_locked_nodes(nodes) do
-    nodes
-    |> Enum.reject(fn %{lock: lock} -> lock end)
-  end
-
   def redirect_path(conn) do
     NavigationHistory.last_paths(conn)
     |> Enum.find(fn x -> String.match?(x, ~r{^/tunnels($|/\d+$)}) end) ||

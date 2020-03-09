@@ -186,8 +186,10 @@
                 %>
               </div>
 
-              <div class="form-group" id="client-comments-content">
-                <%= textarea f, :comment, class: "form-control", rows: "6" %>
+              <div class="form-group">
+                <%= textarea f, :comment, class: "form-control",
+                                          rows: "6",
+                                          id: "client-comments-content" %>
               </div>
 
               <div class="float-right">

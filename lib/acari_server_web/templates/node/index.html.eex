@@ -54,17 +54,7 @@
           <i class="fas fa-toggle-<%= text %> mx-1"></i>
         <% end %>
         </span>
-
-        <%= link to: "#", data: [ toggle: "modal",
-                                  target: "#client-comments",
-                                  client_id: node.id,
-                                  user_id: @current_user.id,
-                                  other_users: raw("<strong>ivanov</strong></br> текст комментария")
-                                ],
-        class: "bg-disabled" do %>
-        <i class="far fa-comment-dots ml-1"></i>
-        <% end %>
-
+          <%= render "client_comments.html", current_user: @current_user, node: node %>
       </td>
     </tr>
 <% end %>

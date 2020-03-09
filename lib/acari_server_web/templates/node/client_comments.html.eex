@@ -1,0 +1,13 @@
+<%
+  {is_com?, list, user_comment} =
+  AcariServer.ClientCommentManager.parse_comments(@node.client_comments, @current_user.id)
+%>
+<%= link to: "#", data: [ toggle: "modal",
+                          target: "#client-comments",
+                          client_id: @node.id,
+                          user_id: @current_user.id,
+                          other_users: raw(list),
+                          user_comment: user_comment
+                        ] do %>
+      <i class="<%= is_com? && "fas" || "far" %> fa-comment-dots ml-1"></i>
+<% end %>

@@ -17,6 +17,8 @@ defmodule AcariServerWeb.NodeController do
 
   def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, _params) do
     nodes = NodeManager.list_nodes()
+    |> RepoRO.preload(client_comments: :user)
+
     render(conn, "index.html", nodes: nodes)
   end
 
@@ -28,7 +30,7 @@ defmodule AcariServerWeb.NodeController do
       |> Enum.map(fn %{nodes: nodes} -> nodes end)
       |> List.flatten()
       |> Enum.uniq_by(fn %{id: id} -> id end)
-      |> RepoRO.preload([:groups, :script])
+      |> RepoRO.preload([:groups, :script, client_comments: :user])
 
     render(conn, "index.html", nodes: nodes)
   end
@@ -39,7 +41,7 @@ defmodule AcariServerWeb.NodeController do
     nodes =
       group
       |> Map.get(:nodes)
-      |> RepoRO.preload([:script, :groups])
+      |> RepoRO.preload([:script, :groups, client_comments: :user])
 
     render(conn, "index.html", nodes: nodes, group: group)
   end
@@ -181,7 +183,15 @@ defmodule AcariServerWeb.NodeController do
   def client_comment_new(conn, params) do
     IO.inspect(params)
 
-    conn
+    case AcariServer.ClientCommentManager.create_client_comment(params) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Комментарий добавлен")
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        conn
+        |> put_flash(:error, "Ошибка при добавлении комментария: #{inspect(changeset.errors)}")
+    end
     |> redirect(to: NavigationHistory.last_path(conn))
   end
 end

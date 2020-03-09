@@ -1071,7 +1071,8 @@ defmodule AcariServer.Mnesia do
                      description: descr,
                      address: address,
                      latitude: lat,
-                     longitude: lng
+                     longitude: lng,
+                     client_comments: client_comments
                    } ->
       %{
         id: id,
@@ -1080,6 +1081,7 @@ defmodule AcariServer.Mnesia do
         address: address,
         latitude: lat,
         longitude: lng,
+        client_comments: client_comments,
         server: node_to_name[name_to_server[name]]
       }
       |> Map.merge(

@@ -12,5 +12,6 @@ defmodule AcariServer.Repo.Migrations.CreateClientComments do
 
     create index(:client_comments, [:user_id])
     create index(:client_comments, [:node_id])
+    create unique_index(:client_comments, [:user_id, :node_id], name: :user_id_node_id_index)
   end
 end

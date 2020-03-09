@@ -5,10 +5,8 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
     <div class="navbar p-0">
       <span class="navbar-brand">Клиент <%= @name %></span>
       <span>
-        <%= link to: "#", data: [toggle: "modal", target: "#client-comments", client_id: tun.id],
-          class: "bg-disabled" do %>
-            <i class="far fa-comment-dots ml-1"></i>
-        <% end %>
+        <%= render AcariServerWeb.NodeView, "client_comments.html",
+              current_user: @current_user, node: @node %>
       </spsn>
 
     </div>
@@ -23,7 +21,13 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 <%= if tun && links_state do %>
 <h6><%= tun.description %></h6>
 <h6><%= tun.address %></h6>
-<h6><strong>Класс:</strong> <%= @node.script.name %>. <%= @node.script.description %></h6>
+<h6><strong>Класс:</strong>
+  <%= if @node.script do %>
+    <%= @node.script.name %>. <%= @node.script.description %>
+  <% else %>
+    Не назначен
+  <% end %>
+</h6>
 <h6><strong>Основной сервер:</strong> <%= tun.server %></h6>
 <hr/>
   <div id="node-monitor">

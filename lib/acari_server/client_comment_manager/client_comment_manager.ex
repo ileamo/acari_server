@@ -101,4 +101,44 @@ defmodule AcariServer.ClientCommentManager do
   def change_client_comment(%ClientComment{} = client_comment) do
     ClientComment.changeset(client_comment, %{})
   end
+
+  def parse_comments(comments_list, user_id) do
+    case comments_list do
+      [_ | _] = comments ->
+        {user_comment_list, list} =
+          comments
+          |> Enum.split_with(fn %{user_id: uid} -> uid == user_id end)
+
+        user_comment =
+          case user_comment_list do
+            [user_comment] -> user_comment
+            _ -> %{comment: "", updated_at: nil}
+          end
+
+        list =
+          list
+          |> Enum.map(fn %{user: %{username: username}, comment: comment, updated_at: tm} ->
+            "<h6><strong>#{AcariServer.db_time_to_local(tm)} #{username}:</strong></h6><p>#{
+              comment
+            }</p>"
+          end)
+          |> Kernel.++([
+            case user_comment.updated_at do
+              nil ->
+                "<h6><strong>Введите комментарий:</strong></h6>"
+
+              _ ->
+                "<h6><strong>#{AcariServer.db_time_to_local(user_comment.updated_at)} #{
+                  user_comment.user.username
+                }:</strong></h6>"
+            end
+          ])
+          |> Enum.join("<hr/>")
+
+        {true, list, user_comment.comment}
+
+      _ ->
+        {nil, "<h6><strong>Введите комментарий:</strong></h6>", nil}
+    end
+  end
 end

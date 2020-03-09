@@ -17,5 +17,6 @@ defmodule AcariServer.ClientCommentManager.ClientComment do
     |> validate_required([:comment])
     |> Ecto.Changeset.foreign_key_constraint(:user_id)
     |> Ecto.Changeset.foreign_key_constraint(:node_id)
+    |> Ecto.Changeset.unique_constraint(:user_comment, name: :user_id_node_id_index)
   end
 end
