@@ -97,7 +97,7 @@ function startServXterm() {
     output
   }) => sterm.write(Base64.decode(output))) // From the Channel
 
-  term_parms.rows = 45
+  term_parms.rows = 40
   sterm = new Terminal(term_parms);
 
   sterm.open(server_xterm);

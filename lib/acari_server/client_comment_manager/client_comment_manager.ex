@@ -118,8 +118,8 @@ defmodule AcariServer.ClientCommentManager do
         list =
           list
           |> Enum.map(fn %{user: %{username: username}, comment: comment, updated_at: tm} ->
-            "<h6><strong>#{AcariServer.db_time_to_local(tm)} #{username}:</strong></h6><p>#{
-              comment
+            "<h6><strong>#{AcariServer.db_time_to_local(tm)} #{username |> html_escape()}:</strong></h6><p>#{
+              comment |> text_to_html()
             }</p>"
           end)
           |> Kernel.++([
@@ -129,7 +129,7 @@ defmodule AcariServer.ClientCommentManager do
 
               _ ->
                 "<h6><strong>#{AcariServer.db_time_to_local(user_comment.updated_at)} #{
-                  user_comment.user.username
+                  user_comment.user.username |> html_escape()
                 }:</strong></h6>"
             end
           ])
@@ -140,5 +140,17 @@ defmodule AcariServer.ClientCommentManager do
       _ ->
         {nil, "<h6><strong>Введите комментарий:</strong></h6>", nil, nil}
     end
+  end
+
+  defp text_to_html(text) do
+    text
+    |> Phoenix.HTML.Format.text_to_html()
+    |> Phoenix.HTML.safe_to_string()
+  end
+
+  defp html_escape(text) do
+    text
+    |> Phoenix.HTML.html_escape()
+    |> Phoenix.HTML.safe_to_string()
   end
 end

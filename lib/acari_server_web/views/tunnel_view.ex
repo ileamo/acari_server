@@ -25,7 +25,8 @@ defmodule AcariServerWeb.TunnelView do
     cond do
       tm < 60 * 2 -> "#{tm} сек."
       tm < 60 * 60 * 2 -> "#{div(tm, 60)} мин."
-      true -> "#{div(tm, 60 * 60)} час."
+      tm < 60 * 60 * 24 * 2 -> "#{div(tm, 60 * 60)} час."
+      true -> "#{div(tm, 60 * 60 * 24)} дн."
     end
   end
 
