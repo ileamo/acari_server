@@ -184,6 +184,10 @@
                                                   type: "hidden",
                                                   value: ""
                 %>
+                <%= text_input f, :comment_id,  id: "client-comments-comment-id",
+                                                  type: "hidden",
+                                                  value: ""
+                %>
               </div>
 
               <div class="form-group">

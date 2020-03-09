@@ -231,6 +231,7 @@ if (document.getElementById("client-comments")) {
     $(this).find('.modal-body #client-comments-other-users').html(data_field.data('other-users'))
     document.getElementById('client-comments-user-id').value = data_field.data('user-id')
     document.getElementById('client-comments-client-id').value = data_field.data('client-id')
+    document.getElementById('client-comments-comment-id').value = data_field.data('comment-id')
     document.getElementById('client-comments-content').value = data_field.data('user-comment')
   })
 }

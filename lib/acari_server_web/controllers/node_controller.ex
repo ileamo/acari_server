@@ -6,6 +6,7 @@ defmodule AcariServerWeb.NodeController do
   alias AcariServer.NodeManager.Node
   alias AcariServer.RepoRO
   alias AcariServer.Repo
+  alias AcariServer.ClientCommentManager
 
   import AcariServer.UserManager,
     only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2, is_user_in_group: 2]
@@ -16,8 +17,9 @@ defmodule AcariServerWeb.NodeController do
   plug :is_user_in_group when action in [:client_grp]
 
   def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, _params) do
-    nodes = NodeManager.list_nodes()
-    |> RepoRO.preload(client_comments: :user)
+    nodes =
+      NodeManager.list_nodes()
+      |> RepoRO.preload(client_comments: :user)
 
     render(conn, "index.html", nodes: nodes)
   end
@@ -181,16 +183,41 @@ defmodule AcariServerWeb.NodeController do
   end
 
   def client_comment_new(conn, params) do
-    IO.inspect(params)
+    comment_id = params["comment_id"]
 
-    case AcariServer.ClientCommentManager.create_client_comment(params) do
-      {:ok, _} ->
-        conn
-        |> put_flash(:info, "Комментарий добавлен")
+    if is_binary(comment_id) and String.match?(comment_id, ~r{\d+}) do
+      client_comment = ClientCommentManager.get_client_comment!(comment_id)
+      comment = params["comment"]
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      if is_binary(comment) and String.trim(comment) != "" do
+        case ClientCommentManager.update_client_comment(client_comment, params) do
+          {:ok, _} ->
+            conn
+            |> put_flash(:info, "Комментарий обновлен")
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            conn
+            |> put_flash(
+              :error,
+              "Ошибка при обновлении комментария: #{inspect(changeset.errors)}"
+            )
+        end
+      else
+        {:ok, _} = ClientCommentManager.delete_client_comment(client_comment)
+
         conn
-        |> put_flash(:error, "Ошибка при добавлении комментария: #{inspect(changeset.errors)}")
+        |> put_flash(:info, "Комментарий удален")
+      end
+    else
+      case ClientCommentManager.create_client_comment(params) do
+        {:ok, _} ->
+          conn
+          |> put_flash(:info, "Комментарий добавлен")
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          conn
+          |> put_flash(:error, "Ошибка при добавлении комментария: #{inspect(changeset.errors)}")
+      end
     end
     |> redirect(to: NavigationHistory.last_path(conn))
   end

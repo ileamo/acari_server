@@ -112,7 +112,7 @@ defmodule AcariServer.ClientCommentManager do
         user_comment =
           case user_comment_list do
             [user_comment] -> user_comment
-            _ -> %{comment: "", updated_at: nil}
+            _ -> %{comment: "", id: nil}
           end
 
         list =
@@ -123,7 +123,7 @@ defmodule AcariServer.ClientCommentManager do
             }</p>"
           end)
           |> Kernel.++([
-            case user_comment.updated_at do
+            case user_comment.id do
               nil ->
                 "<h6><strong>Введите комментарий:</strong></h6>"
 
@@ -135,10 +135,10 @@ defmodule AcariServer.ClientCommentManager do
           ])
           |> Enum.join("<hr/>")
 
-        {true, list, user_comment.comment}
+        {true, list, user_comment.comment, user_comment.id}
 
       _ ->
-        {nil, "<h6><strong>Введите комментарий:</strong></h6>", nil}
+        {nil, "<h6><strong>Введите комментарий:</strong></h6>", nil, nil}
     end
   end
 end
