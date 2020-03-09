@@ -203,7 +203,7 @@
 
                 <%= submit "Сохранить",
                       data: [confirm: "Сохранить комментарий?"],
-                      role: "button", class: "btn btn-danger"%>
+                      role: "button", class: "btn btn-info"%>
               </div>
             <% end %>
           </div>
