@@ -1,4 +1,4 @@
-<h2>Регистрация нового клиента</h2>
+<h2>Обнаружение нового клиента</h2>
 <%= if assigns[:params] do %>
 <h4> Параметры запроса: </h4>
   <ul>
@@ -62,7 +62,20 @@
   </li>
 </ul>
 
-<span><%= link "Зарегистрировать", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
+<%
+  lock = case AcariServer.NodeManager.get_node_by_name(@new_node.name) do
+    %{lock: true} -> true
+    _ -> false
+  end
+%>
+
+<%= if lock do %>
+  <%= link "Разблокировать",  to: Routes.new_node_path(@conn, :unlock, @new_node),
+                              data: [confirm: "Разблокировать клиента?"] %>
+<% else %>
+  <span><%= link "Зарегистрировать", to: Routes.new_node_path(@conn, :edit, @new_node) %></span>
+<% end %>
+
 |
 <span><%= link "К списку новых клиентов", to: Routes.new_node_path(@conn, :index) %></span>
 

@@ -3,7 +3,8 @@
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
-      <th scope="col">Дата</th>
+      <th scope="col">Первое обнаружение</th>
+      <th scope="col">Последнее обнаружение</th>
       <th scope="col">Идентификатор</th>
       <th scope="col">IP адрес</th>
       <th scope="col">Источник</th>
@@ -20,6 +21,7 @@
     %>
         <tr>
           <td><%=  AcariServer.db_time_to_local(new_node.inserted_at) %></td>
+          <td><%=  AcariServer.db_time_to_local(new_node.updated_at) %></td>
           <td>
             <%= link new_node.name, to: Routes.new_node_path(@conn, :show, new_node) %>
           </td>
