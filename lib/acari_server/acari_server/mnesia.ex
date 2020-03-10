@@ -824,36 +824,40 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
-  defp purge_client_status_table() do
+  def purge_client_status_table() do
     node_to_name = get_node_to_name_map()
 
     Mnesia.transaction(fn ->
       Mnesia.foldl(
         fn rec, acc ->
-          tun = Rec.client_status(rec, :name)
+          tun =
+            Rec.client_status(rec, :name)
 
           if Mnesia.wread({:tun, tun}) == [] do
             Mnesia.delete_object(rec)
             acc + 1
           else
-            {level, _port_list, mes} = create_tun_status_mes(tun, node_to_name)
+            {level, port_list, mes} =
+              create_tun_status_mes(tun, node_to_name)
 
-            if level == 4 and
+            cond do
+              (level == 4 and
                  :os.system_time(:microsecond) - (rec |> Rec.client_status(:timestamp)) >
-                   60_000_000 do
-              Mnesia.delete_object(rec)
-            else
-              Mnesia.write(
-                Rec.client_status(
-                  name: tun,
-                  timestamp: Rec.client_status(rec, :timestamp),
-                  opts: %{
-                    level: level,
-                    text: mes,
-                    description: Rec.client_status(rec, :opts)[:description]
-                  }
+                   60_000_000) or (level == 1 and port_list == []) ->
+                Mnesia.delete_object(rec)
+
+              true ->
+                Mnesia.write(
+                  Rec.client_status(
+                    name: tun,
+                    timestamp: Rec.client_status(rec, :timestamp),
+                    opts: %{
+                      level: level,
+                      text: mes,
+                      description: Rec.client_status(rec, :opts)[:description]
+                    }
+                  )
                 )
-              )
             end
 
             acc
