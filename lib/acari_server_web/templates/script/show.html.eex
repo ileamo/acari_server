@@ -15,17 +15,17 @@
   <h5 class="mb-0 mt-2">Шаблоны:</h5>
   <li>
     <strong>Конфигурация клиента:</strong>
-    <%= @script.remote && @script.remote.name%>
+    <%= @script.remote && @script.remote.description%>
   </li>
 
   <li>
     <strong>Конфигурация сервера:</strong>
-    <%= @script.local && @script.local.name %>
+    <%= @script.local && @script.local.description %>
   </li>
 
   <li>
     <strong>Скрипты:</strong>
-    <%= templates_list(@script) %>
+    <%= templates_list(@script) |> text_to_html() %>
   </li>
 
 
