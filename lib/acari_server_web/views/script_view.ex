@@ -5,8 +5,9 @@ defmodule AcariServerWeb.ScriptView do
 
   def templates_list(script) do
     script.templates
-    |> Enum.map(fn %{name: name} -> name end)
-    |> Enum.join(", ")
+    |> Enum.map(fn %{description: descr} -> descr end)
+    |> Enum.sort()
+    |> Enum.join(",\n")
   end
 
   def templ_id_list(nil) do

@@ -4,7 +4,7 @@ defmodule AcariServerWeb.ScheduleView do
   def template_name(sched) do
     case sched.template do
       nil -> "Не задано"
-      tpl -> tpl.name
+      tpl -> tpl.description
     end
   end
 

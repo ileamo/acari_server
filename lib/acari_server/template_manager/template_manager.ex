@@ -33,7 +33,7 @@ defmodule AcariServer.TemplateManager do
   def templ_name_id_pairs_list() do
     list_templates()
     |> Enum.filter(fn %{executable: ex} -> ex end)
-    |> Enum.map(fn %{name: name, id: id} -> {name, id} end)
+    |> Enum.map(fn %{id: id, name: name, description: descr} -> {"#{descr} (#{name})", id} end)
     |> Enum.sort()
   end
 

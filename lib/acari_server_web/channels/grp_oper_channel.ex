@@ -30,6 +30,7 @@ defmodule AcariServerWeb.GrpOperChannel do
         %{common_script: cs, class_list: cl} =
           get_group_scripts(nodes, (params["script_type"] == "server" && :local) || :templates)
 
+
         script_list =
           case params["class_id"] do
             "nil" ->
@@ -49,6 +50,7 @@ defmodule AcariServerWeb.GrpOperChannel do
                   )
               )
           end
+          |> Enum.sort()
 
         push(socket, "output", %{
           id: "select",
