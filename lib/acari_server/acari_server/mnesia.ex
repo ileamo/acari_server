@@ -824,7 +824,7 @@ defmodule AcariServer.Mnesia do
     end)
   end
 
-  def purge_client_status_table() do
+  defp purge_client_status_table() do
     node_to_name = get_node_to_name_map()
 
     Mnesia.transaction(fn ->
