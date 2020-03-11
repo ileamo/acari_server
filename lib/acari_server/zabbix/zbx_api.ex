@@ -50,24 +50,33 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   @impl true
   def init(_params) do
-    case Application.get_env(:acari_server, :zabbix)[:zbx_api_url] do
-      url when is_binary(url) ->
-        zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host] || "localhost"
-        zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port] || 10051
-        zbx_username = Application.get_env(:acari_server, :zabbix)[:zbx_username] || "Admin"
+    with url when is_binary(url) <- Application.get_env(:acari_server, :zabbix)[:zbx_api_url],
+         [url | _] <- String.split(url),
+         %URI{} = uri <- URI.parse(url),
+         scheme when is_binary(scheme) <- uri.scheme,
+         host when is_binary(host) <- uri.host do
+      url = "#{uri.scheme}://#{uri.host}:#{uri.port || 80}"
+      zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host] || "localhost"
+      zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port] || 10051
 
-        zbx_password =
-          Application.get_env(:acari_server, :zabbix)[:zbx_password] || "acari&zabbix"
+      {zbx_username, zbx_password} =
+        case Regex.run(~r{^([^:]+):?(.*)}, uri.userinfo || "") do
+          [_, name, pass] ->
+            {(name != "" && name) || "Admin", (pass != "" && pass) || "acari&zabbix"}
 
-        {:ok,
-         %State{
-           zbx_api_url: url,
-           zbx_snd_host: zbx_snd_host,
-           zbx_snd_port: zbx_snd_port,
-           zbx_username: zbx_username,
-           zbx_password: zbx_password
-         }, {:continue, :init}}
+          _ ->
+            {"Admin", "acari&zabbix"}
+        end
 
+      {:ok,
+       %State{
+         zbx_api_url: url,
+         zbx_snd_host: zbx_snd_host,
+         zbx_snd_port: zbx_snd_port,
+         zbx_username: zbx_username,
+         zbx_password: zbx_password
+       }, {:continue, :init}}
+    else
       _ ->
         Logger.warn("Zabbix: No URL for zabbix server")
         :ignore

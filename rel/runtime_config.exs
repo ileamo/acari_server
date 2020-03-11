@@ -42,6 +42,4 @@ config :acari_server, :zabbix,
   zbx_web_port: System.get_env("ZBX_WEB_PORT"),
   zbx_api_url: System.get_env("ZBX_API_URL"),
   zbx_snd_host: System.get_env("ZBX_SND_HOST"),
-  zbx_snd_port: System.get_env("ZBX_SND_PORT"),
-  zbx_username: System.get_env("ZBX_USERNAME"),
-  zbx_password: System.get_env("ZBX_PASSWORD")
+  zbx_snd_port: System.get_env("ZBX_SND_PORT")
