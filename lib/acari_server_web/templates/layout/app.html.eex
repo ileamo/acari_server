@@ -84,9 +84,68 @@
                       <%= render "messages.html", assigns |> Map.put(:mes_list, mes_list) %>
                     </ul>
             </div>
+
           </div>
         </div>
       </div>
+
+      <div class="collapse" id="usersChat">
+      <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded w-25 p-2"
+      style="bottom:20px; right:5px; z-index:100; min-width:400px; max-height:80%; opacity:0.9 ">
+
+        <div class="overflow-auto">
+          <p> 0000 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 1111 </p>
+          <p> 3333 </p>
+        </div>
+
+          <div>
+            <input type="text" id="msg" class="form-control"
+               placeholder="Your Message">
+          </div>
+      </div>
+    </div>
+
+      <div class="position-fixed" style="bottom:5px; right:5px; z-index:500;">
+        <a  data-toggle="collapse" href="#usersChat" role="button"
+             aria-controls="usersChat">
+          <span><i class="fas fa-comments"></i>
+        </a>
+      </div>
+
     </div>
 
     <!-- Modal -->
