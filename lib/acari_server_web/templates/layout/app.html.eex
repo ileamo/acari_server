@@ -94,47 +94,13 @@
       style="bottom:20px; right:5px; z-index:100; min-width:400px; max-height:80%; opacity:0.9 ">
 
         <div class="overflow-auto">
-          <p> 0000 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 1111 </p>
-          <p> 3333 </p>
+          <p> Привет </p>
+          <p> Привет, как дела? </p>
         </div>
 
           <div>
             <input type="text" id="msg" class="form-control"
-               placeholder="Your Message">
+               placeholder="Ваше сообщение">
           </div>
       </div>
     </div>
