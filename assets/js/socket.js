@@ -109,11 +109,25 @@ channel.on("link_event_mes", payload => {
   }
 })
 
+let chat_msg_timeout
 channel.on('shout', function(payload) { // listen to the 'shout' event
-  let div = document.createElement("div"); // create new list item DOM element
+  let div = document.createElement("div");
   div.innerHTML = payload.message;
-  msg_list.appendChild(div);
-  msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
+  if ($('#usersChat').is(":visible")) {
+    msg_list.appendChild(div);
+    msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
+  } else {
+    msg_list_popup.appendChild(div);
+    msg_list_popup.scrollTop = msg_list_popup.scrollHeight - msg_list_popup.clientHeight;
+    $('#chatMessage').removeClass('d-none')
+    clearTimeout(chat_msg_timeout)
+    chat_msg_timeout = setTimeout(
+      () => {
+        $('#chatMessage').addClass('d-none')
+      },
+      5 * 1000
+    );
+  }
 });
 
 channel.join()
@@ -126,6 +140,7 @@ channel.join()
 
 
 let msg_list = document.getElementById('chat-msg-list'); // list of messages.
+let msg_list_popup = document.getElementById('chat-msg-list-popup')
 let msg = document.getElementById('chat-msg'); // message input field
 
 // "listen" for the [Enter] keypress event to send a message:
@@ -148,6 +163,8 @@ $('#usersChat').on('show.bs.collapse', function() {
   sessionStorage.showUsersChat = 'show'
   channel.push('init_chat');
   msg_list.innerHTML = ""
+  $('#chatMessage').addClass('d-none')
+  msg_list_popup.innerHTML = ""
 })
 
 $('#usersChat').collapse(sessionStorage.showUsersChat || 'hide')
