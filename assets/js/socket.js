@@ -144,9 +144,10 @@ $('#usersChat').on('hide.bs.collapse', function() {
   sessionStorage.showUsersChat = 'hide';
 })
 
-$('#usersChat').on('shown.bs.collapse', function() {
+$('#usersChat').on('show.bs.collapse', function() {
   sessionStorage.showUsersChat = 'show'
-  msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
+  channel.push('init_chat');
+  msg_list.innerHTML = ""
 })
 
 $('#usersChat').collapse(sessionStorage.showUsersChat || 'hide')

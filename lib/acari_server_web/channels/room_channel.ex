@@ -4,9 +4,10 @@ defmodule AcariServerWeb.RoomChannel do
   alias AcariServer.ChatManager
   alias AcariServer.ChatManager.Chat
 
+  require Logger
+
   def join("room:lobby", _message, socket) do
     user = AcariServer.UserManager.get_user(socket.assigns[:current_user_id])
-    send(self(), :after_join)
     {:ok, assign(socket, :user, user)}
   end
 
@@ -39,13 +40,29 @@ defmodule AcariServerWeb.RoomChannel do
 
   # Chat
 
-  def handle_info(:after_join, socket) do
+  def handle_in("shout", payload, socket) do
+    user = socket.assigns[:user]
+
+    {:ok, %{updated_at: nt}} =
+      Chat.changeset(
+        %Chat{},
+        payload |> Map.put("user_id", user.id)
+      )
+      |> AcariServer.Repo.insert()
+
+    broadcast_msg_html = create_message(user.username, payload["message"], db_time_to_local(nt))
+
+    msg_html = change_message_color(broadcast_msg_html, "text-secondary")
+    broadcast_from(socket, "shout", %{"message" => broadcast_msg_html})
+    push(socket, "shout", %{"message" => msg_html})
+    {:noreply, socket}
+  end
+
+  def handle_in("init_chat", _payload, socket) do
     user = socket.assigns[:user]
 
     ChatManager.get_chat_messages()
     |> Enum.each(fn %{user: %{id: user_id, username: username}, message: message, updated_at: nt} ->
-      IO.inspect({username, message, nt})
-
       msg_html = create_message(username, message, db_time_to_local(nt, true))
 
       msg_html =
@@ -61,22 +78,8 @@ defmodule AcariServerWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in("shout", payload, socket) do
-    user = socket.assigns[:user]
-
-    {:ok, %{updated_at: nt}} =
-      Chat.changeset(
-        %Chat{},
-        payload |> Map.put("user_id", user.id)
-      )
-      |> AcariServer.Repo.insert()
-      |> IO.inspect()
-
-    broadcast_msg_html = create_message(user.username, payload["message"], db_time_to_local(nt))
-
-    msg_html = change_message_color(broadcast_msg_html, "text-secondary")
-    broadcast_from(socket, "shout", %{"message" => broadcast_msg_html})
-    push(socket, "shout", %{"message" => msg_html})
+  def handle_in(event, _payload, socket) do
+    Logger.error("Channel room: bad event: #{inspect(event)}")
     {:noreply, socket}
   end
 
