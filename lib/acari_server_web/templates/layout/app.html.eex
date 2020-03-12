@@ -91,19 +91,16 @@
 
       <div class="collapse" id="usersChat">
         <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded w-25 p-2"
-        style="bottom:50px; right:5px; z-index:100; min-width:400px; max-height:80%; opacity:0.9 ">
+        style="bottom:50px; right:5px; z-index:499; min-width:400px; max-height:80%; opacity:0.9 ">
 
-          <div class="overflow-auto">
-            <p> Привет </p>
-            <p> Привет, как дела? </p>
+          <div id="chat-msg-list" class="overflow-auto">
           </div>
 
-            <div>
-              <textarea  id="msg" rows="3" data-min-rows="3"
-                  class="autoExpand form-control overflow-hidden"
-                 placeholder="Ваше сообщение">
-              </textarea>
-            </div>
+          <div>
+            <textarea  id="chat-msg" rows="3" data-min-rows="3"
+                class="XautoExpand form-control overflow-hidden"
+               placeholder="Ваше сообщение"></textarea>
+          </div>
         </div>
       </div>
 

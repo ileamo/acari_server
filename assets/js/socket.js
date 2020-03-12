@@ -97,17 +97,24 @@ channel.on("link_event", payload => {
 })
 
 channel.on("link_event_mes", payload => {
-    if (global.osmMap && payload.events) {
-      global.osmMap(payload.events)
-    }
+  if (global.osmMap && payload.events) {
+    global.osmMap(payload.events)
+  }
 
-    if (messagesBadge && payload.num_of_mes != null) {
-      messagesBadge.innerText = `${payload.num_of_mes}`
-    }
-    if (messagesContainer && payload.messages != null) {
-      messagesContainer.innerHTML = `${payload.messages}`
-    }
+  if (messagesBadge && payload.num_of_mes != null) {
+    messagesBadge.innerText = `${payload.num_of_mes}`
+  }
+  if (messagesContainer && payload.messages != null) {
+    messagesContainer.innerHTML = `${payload.messages}`
+  }
 })
+
+channel.on('shout', function(payload) { // listen to the 'shout' event
+  let div = document.createElement("div"); // create new list item DOM element
+  div.innerHTML = payload.message;
+  msg_list.appendChild(div);
+  msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
+});
 
 channel.join()
   .receive("ok", resp => {
@@ -116,5 +123,34 @@ channel.join()
   .receive("error", resp => {
     console.log("Unable to join", resp)
   })
+
+
+let msg_list = document.getElementById('chat-msg-list'); // list of messages.
+let msg = document.getElementById('chat-msg'); // message input field
+
+// "listen" for the [Enter] keypress event to send a message:
+msg.addEventListener('keyup', function(event) {
+  if (event.keyCode == 13) {
+    if (msg.value.match(/^\s*$/) === null) {
+      channel.push('shout', {
+        message: msg.value
+      });
+    }
+    msg.value = '';
+  }
+});
+
+$('#usersChat').on('hide.bs.collapse', function() {
+  sessionStorage.showUsersChat = 'hide';
+})
+
+$('#usersChat').on('shown.bs.collapse', function() {
+  sessionStorage.showUsersChat = 'show'
+  msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
+})
+
+$('#usersChat').collapse(sessionStorage.showUsersChat || 'hide')
+
+
 
 export default socket

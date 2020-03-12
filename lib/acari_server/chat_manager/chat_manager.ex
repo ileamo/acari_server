@@ -5,6 +5,7 @@ defmodule AcariServer.ChatManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.ChatManager.Chat
 
@@ -18,7 +19,16 @@ defmodule AcariServer.ChatManager do
 
   """
   def list_chat_messages do
-    Repo.all(Chat)
+    RepoRO.all(Chat)
+  end
+
+  def get_chat_messages(num \\ 20) do
+    Chat
+    |> order_by(desc: :updated_at)
+    |> limit(^num)
+    |> RepoRO.all()
+    |> Enum.reverse()
+    |> RepoRO.preload(:user)
   end
 
   @doc """
@@ -35,7 +45,7 @@ defmodule AcariServer.ChatManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_chat!(id), do: Repo.get!(Chat, id)
+  def get_chat!(id), do: RepoRO.get!(Chat, id)
 
   @doc """
   Creates a chat.
