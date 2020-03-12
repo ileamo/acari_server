@@ -4,7 +4,7 @@ defmodule AcariServer.MixProject do
   def project do
     [
       app: :acari_server,
-      version: "1.1.13",
+      version: "1.1.14-pre",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
