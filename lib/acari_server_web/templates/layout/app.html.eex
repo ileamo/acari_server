@@ -124,7 +124,7 @@
 
     </div>
 
-    <!-- Modal -->
+    <!-- Modals -->
     <div class="modal fade" id="About" tabindex="-1" role="dialog" aria-labelledby="AboutTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -138,6 +138,25 @@
             <p>ООО "ЭН-ЭС-ДЖИ" (NSG Ltd.)</p>
             <p>Версия <%= {:ok, vsn} = :application.get_key(:acari_server, :vsn); vsn %></p>
             <p>Сборка <%= Application.get_env(:acari_server, :release_date) %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="AboutSystem" tabindex="-1" role="dialog" aria-labelledby="AboutTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="AboutTitle">О системе</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Сервера - <%= AcariServer.ServerManager.count_servers() %></p>
+            <p>Пользователи - <%= AcariServer.UserManager.count_users() %></p>
+            <p>Клиенты (всего) - <%= AcariServer.NodeManager.count_nodes() %></p>
+            <p>Клиенты (заблокировано) - <%= AcariServer.NodeManager.count_locked_nodes() %></p>
           </div>
         </div>
       </div>

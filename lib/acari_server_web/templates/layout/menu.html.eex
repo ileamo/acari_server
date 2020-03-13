@@ -122,6 +122,11 @@
     </a>
   </li>
   <li class="nav-item">
+    <a class="nav-link" href="#" data-toggle="modal" data-target="#AboutSystem">
+      О системе
+    </a>
+  </li>
+  <li class="nav-item">
     <%= link "Аудит", to: Routes.audit_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">

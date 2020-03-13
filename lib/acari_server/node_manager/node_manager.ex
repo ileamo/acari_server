@@ -234,4 +234,17 @@ defmodule AcariServer.NodeManager do
   def change_node(%Node{} = node) do
     Node.changeset(node, %{})
   end
+
+  def count_nodes() do
+    Node
+    |> select(fragment("count(*)"))
+    |> RepoRO.one()
+  end
+
+  def count_locked_nodes() do
+    Node
+    |> where(lock: true)
+    |> select(fragment("count(*)"))
+    |> RepoRO.one()
+  end
 end

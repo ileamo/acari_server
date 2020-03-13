@@ -367,4 +367,10 @@ defmodule AcariServer.UserManager do
         |> Enum.uniq()
     end
   end
+
+  def count_users() do
+    User
+    |> select(fragment("count(*)"))
+    |> RepoRO.one()
+  end
 end

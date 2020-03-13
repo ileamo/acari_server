@@ -113,4 +113,12 @@ defmodule AcariServer.ServerManager do
   def change_server(%Server{} = server) do
     Server.changeset(server, %{})
   end
+
+    def count_servers() do
+    Server
+    |> select(fragment("count(*)"))
+    |> RepoRO.one()
+  end
+
+
 end
