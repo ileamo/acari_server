@@ -3,30 +3,30 @@
 <ul>
 
   <li>
-    <strong>Username:</strong>
+    <strong>Пользователь:</strong>
     <%= @audit.username %>
   </li>
 
   <li>
-    <strong>Object:</strong>
+    <strong>Объект:</strong>
     <%= @audit.object %>
   </li>
 
   <li>
-    <strong>Object name:</strong>
+    <strong>Имя:</strong>
     <%= @audit.object_name %>
   </li>
 
   <li>
-    <strong>Operation:</strong>
+    <strong>Операция:</strong>
     <%= @audit.operation %>
   </li>
 
   <li>
-    <strong>Params:</strong>
-    <%= text_to_html(@audit.params) %>
+    <strong>Параметры (внутреннее представление):</strong>
+    <%= inspect(@audit.params, pretty: true) |> text_to_html() %>
   </li>
 
 </ul>
 
-<span><%= link "Back", to: Routes.audit_path(@conn, :index) %></span>
+<span><%= link "К списку", to: Routes.audit_path(@conn, :index) %></span>

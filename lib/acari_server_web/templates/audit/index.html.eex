@@ -9,8 +9,6 @@
       <th>Объект</th>
       <th>Имя</th>
       <th>Операция</th>
-      <th>Параметры</th>
-
     </tr>
   </thead>
   <tbody>
@@ -22,8 +20,6 @@
       <td><%= audit.object %></td>
       <td><%= audit.object_name %></td>
       <td><%= audit.operation %></td>
-      <td><%= audit.params %></td>
-
     </tr>
 <% end %>
   </tbody>

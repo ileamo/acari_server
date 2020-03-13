@@ -3,6 +3,7 @@ defmodule AcariServerWeb.ScriptController do
 
   alias AcariServer.ScriptManager
   alias AcariServer.ScriptManager.Script
+  alias AcariServer.AuditManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin when action in [:edit, :delete, :new]
@@ -30,6 +31,7 @@ defmodule AcariServerWeb.ScriptController do
         conn
         |> put_flash(:info, "Класс создан.")
         |> redirect(to: Routes.script_path(conn, :show, script))
+        |> AuditManager.create_audit_log(script, "create", script_params)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -70,7 +72,7 @@ defmodule AcariServerWeb.ScriptController do
         conn
         |> put_flash(:info, "Класс отредактирован.")
         |> redirect(to: Routes.script_path(conn, :show, script))
-        |> AcariServer.AuditManager.create_audit_log(script, "update")
+        |> AuditManager.create_audit_log(script, "update", script_params)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", script: script, changeset: changeset)
@@ -91,6 +93,7 @@ defmodule AcariServerWeb.ScriptController do
     {:ok, _script} = ScriptManager.delete_script(script)
 
     conn
+    |> AuditManager.create_audit_log(script, "delete")
     |> put_flash(:info, "Класс удален.")
     |> redirect(to: Routes.script_path(conn, :index))
   end

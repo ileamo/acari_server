@@ -8,12 +8,12 @@ defmodule AcariServer.AuditManager do
 
   def list_audit_logs do
     RepoRO.all(Audit)
-    |> humanize()
+    |> localize()
   end
 
   def get_audit!(id) do
     RepoRO.get!(Audit, id)
-    |> humanize()
+    |> localize()
   end
 
   def create_audit(attrs \\ %{}) do
@@ -32,38 +32,36 @@ defmodule AcariServer.AuditManager do
 
   # audit_log functions
 
-  @name_descr %{
-    "update" => "Редактирование",
+  @object_descr %{
     "class" => "Класс"
   }
 
-  def create_audit_log(conn, object, operation)
+  @operation_descr %{
+    "create" => "Coздание",
+    "update" => "Редактирование",
+    "delete" => "Удаление"
+  }
+
+  def create_audit_log(conn, object, operation, params \\ %{})
 
   def create_audit_log(
         conn,
         %AcariServer.ScriptManager.Script{} = class,
-        operation
+        operation,
+        params
       ) do
     create_audit(%{
       username: curr_user(conn),
       object: "class",
       object_name: class.name,
       operation: operation,
-      params: %{
-        "description" => class.description,
-        "remote" => class.remote && class.remote.description,
-        "local" => class.local && class.local.description,
-        "templates" => AcariServerWeb.ScriptView.templates_list(class),
-        "definition" => class.definition,
-        "prefix" => class.prefix,
-        "test_client_name" => class.test_client_name
-      }
+      params: params
     })
 
     conn
   end
 
-  def create_audit_log(conn, object, _operation) do
+  def create_audit_log(conn, object, _operation, _params) do
     Logger.error("Audit: #{curr_user(conn)}: unknown object #{inspect(object)}")
     conn
   end
@@ -72,32 +70,24 @@ defmodule AcariServer.AuditManager do
     conn.assigns.current_user.username
   end
 
-  defp humanize(list) when is_list(list) do
+  defp localize(list) when is_list(list) do
     list
-    |> Enum.map(&humanize/1)
+    |> Enum.map(&localize/1)
   end
 
-  defp humanize(log) do
+  defp localize(log) do
     %{
       log
-      | object: @name_descr[log.object],
-        operation: @name_descr[log.operation],
-        params: humanize(log.object, log.params)
-    }
-  end
+      | object: @object_descr[log.object],
+        operation: @operation_descr[log.operation],
+        params:
+          case log.params do
+            params when is_map(params) ->
+              params |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end) |> Enum.into(%{})
 
-  defp humanize("class", params) do
-    """
-    Описание: #{params["description"]},
-    Конфигурация клиента: #{params["remote"]},
-    Конфигурация сервера: #{params["local"]},
-    Скрипты:
-      #{params["templates"]},
-    Определения параметров:
-      #{params["definition"]},
-    Вычисление параметров:
-      #{params["prefix"]},
-    Тестовый клиент: #{params["test_client_name"]}
-    """
+            params ->
+              params
+          end
+    }
   end
 end
