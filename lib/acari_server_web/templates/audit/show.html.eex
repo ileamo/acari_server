@@ -1,0 +1,33 @@
+<h1>Show Audit</h1>
+
+<ul>
+
+  <li>
+    <strong>Username:</strong>
+    <%= @audit.username %>
+  </li>
+
+  <li>
+    <strong>Object:</strong>
+    <%= @audit.object %>
+  </li>
+
+  <li>
+    <strong>Object name:</strong>
+    <%= @audit.object_name %>
+  </li>
+
+  <li>
+    <strong>Operation:</strong>
+    <%= @audit.operation %>
+  </li>
+
+  <li>
+    <strong>Params:</strong>
+    <%= @audit.params %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.audit_path(@conn, :edit, @audit) %></span>
+<span><%= link "Back", to: Routes.audit_path(@conn, :index) %></span>

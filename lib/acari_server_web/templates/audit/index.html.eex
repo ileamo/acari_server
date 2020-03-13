@@ -1,0 +1,34 @@
+<h1>Listing Audit logs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Object</th>
+      <th>Object name</th>
+      <th>Operation</th>
+      <th>Params</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for audit <- @audit_logs do %>
+    <tr>
+      <td><%= audit.username %></td>
+      <td><%= audit.object %></td>
+      <td><%= audit.object_name %></td>
+      <td><%= audit.operation %></td>
+      <td><%= audit.params %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.audit_path(@conn, :show, audit) %></span>
+        <span><%= link "Edit", to: Routes.audit_path(@conn, :edit, audit) %></span>
+        <span><%= link "Delete", to: Routes.audit_path(@conn, :delete, audit), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Audit", to: Routes.audit_path(@conn, :new) %></span>
