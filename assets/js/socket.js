@@ -117,9 +117,9 @@ channel.on('shout', function(payload) { // listen to the 'shout' event
     msg_list.appendChild(div);
     msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
   } else {
+    $('#chatMessage').removeClass('d-none')
     msg_list_popup.appendChild(div);
     msg_list_popup.scrollTop = msg_list_popup.scrollHeight - msg_list_popup.clientHeight;
-    $('#chatMessage').removeClass('d-none')
     clearTimeout(chat_msg_timeout)
     chat_msg_timeout = setTimeout(
       () => {

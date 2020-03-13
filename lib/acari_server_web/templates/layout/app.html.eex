@@ -90,8 +90,8 @@
       </div>
 
       <div class="collapse" id="usersChat">
-        <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded w-25 p-2"
-        style="bottom:50px; right:5px; z-index:1499; min-width:400px; max-height:80%; opacity:0.9 ">
+        <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded p-2"
+        style="bottom:50px; right:5px; z-index:1499; max-width:380px; max-height:60%; opacity:0.9 ">
 
           <div id="chat-msg-list" class="overflow-auto">
           </div>
@@ -105,8 +105,8 @@
       </div>
 
       <div class="d-none" id="chatMessage">
-        <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded w-25 p-2"
-        style="bottom:50px; right:5px; z-index:1498; min-width:400px; max-height:80%; opacity:0.9 ">
+        <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded p-2"
+        style="bottom:50px; right:5px; z-index:1498; max-width:450px; max-height:30%; opacity:0.9 ">
 
           <div id="chat-msg-list-popup" class="overflow-auto">
 
