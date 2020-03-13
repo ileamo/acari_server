@@ -1,29 +1,29 @@
-<h1>Listing Audit logs</h1>
+<h2>Аудит</h2>
 
-<table>
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+
   <thead>
     <tr>
-      <th>Username</th>
-      <th>Object</th>
-      <th>Object name</th>
-      <th>Operation</th>
-      <th>Params</th>
+      <th>Дата</th>
+      <th>Пользователь</th>
+      <th>Объект</th>
+      <th>Имя</th>
+      <th>Операция</th>
+      <th>Параметры</th>
 
-      <th></th>
     </tr>
   </thead>
   <tbody>
 <%= for audit <- @audit_logs do %>
     <tr>
+      <td> <%= link audit.inserted_at, to: Routes.audit_path(@conn, :show, audit) %>
+      </td>
       <td><%= audit.username %></td>
       <td><%= audit.object %></td>
       <td><%= audit.object_name %></td>
       <td><%= audit.operation %></td>
       <td><%= audit.params %></td>
 
-      <td>
-        <span><%= link "Show", to: Routes.audit_path(@conn, :show, audit) %></span>
-      </td>
     </tr>
 <% end %>
   </tbody>

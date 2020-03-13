@@ -1,4 +1,4 @@
-<h1>Show Audit</h1>
+<h2>Запись аудита</h2>
 
 <ul>
 
@@ -24,7 +24,7 @@
 
   <li>
     <strong>Params:</strong>
-    <%= @audit.params %>
+    <%= text_to_html(@audit.params) %>
   </li>
 
 </ul>

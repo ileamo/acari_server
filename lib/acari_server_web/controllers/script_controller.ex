@@ -70,6 +70,7 @@ defmodule AcariServerWeb.ScriptController do
         conn
         |> put_flash(:info, "Класс отредактирован.")
         |> redirect(to: Routes.script_path(conn, :show, script))
+        |> AcariServer.AuditManager.create_audit_log(script, "update")
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", script: script, changeset: changeset)

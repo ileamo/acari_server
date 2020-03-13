@@ -7,7 +7,7 @@ defmodule AcariServer.Repo.Migrations.CreateAuditLogs do
       add(:object, :string)
       add(:object_name, :string)
       add(:operation, :string)
-      add(:params, :text)
+      add(:params, :map)
 
       timestamps()
     end

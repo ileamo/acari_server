@@ -122,6 +122,9 @@
     </a>
   </li>
   <li class="nav-item">
+    <%= link "Аудит", to: Routes.audit_path(@conn, :index), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
     <%= link "Помощь", to: Routes.page_path(@conn, :help), class: "nav-link" %>
   </li>
   <li class="nav-item">

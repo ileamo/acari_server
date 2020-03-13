@@ -6,7 +6,7 @@ defmodule AcariServer.AuditManager.Audit do
     field :object, :string, default: ""
     field :object_name, :string, default: ""
     field :operation, :string, default: ""
-    field :params, :string, default: ""
+    field :params, :map, default: %{}
     field :username, :string
 
     timestamps()

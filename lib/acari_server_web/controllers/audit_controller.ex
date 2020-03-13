@@ -2,7 +2,6 @@ defmodule AcariServerWeb.AuditController do
   use AcariServerWeb, :controller
 
   alias AcariServer.AuditManager
-  alias AcariServer.AuditManager.Audit
 
   def index(conn, _params) do
     audit_logs = AuditManager.list_audit_logs()
@@ -25,5 +24,4 @@ defmodule AcariServerWeb.AuditController do
     audit = AuditManager.get_audit!(id)
     render(conn, "show.html", audit: audit)
   end
-
 end

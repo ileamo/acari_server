@@ -1,86 +1,103 @@
 defmodule AcariServer.AuditManager do
-  @moduledoc """
-  The AuditManager context.
-  """
-
   import Ecto.Query, warn: false
   alias AcariServer.Repo
-
+  alias AcariServer.RepoRO
   alias AcariServer.AuditManager.Audit
 
-  @doc """
-  Returns the list of audit_logs.
+  require Logger
 
-  ## Examples
-
-      iex> list_audit_logs()
-      [%Audit{}, ...]
-
-  """
   def list_audit_logs do
-    Repo.all(Audit)
+    RepoRO.all(Audit)
+    |> humanize()
   end
 
-  @doc """
-  Gets a single audit.
+  def get_audit!(id) do
+    RepoRO.get!(Audit, id)
+    |> humanize()
+  end
 
-  Raises `Ecto.NoResultsError` if the Audit does not exist.
-
-  ## Examples
-
-      iex> get_audit!(123)
-      %Audit{}
-
-      iex> get_audit!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_audit!(id), do: Repo.get!(Audit, id)
-
-  @doc """
-  Creates a audit.
-
-  ## Examples
-
-      iex> create_audit(%{field: value})
-      {:ok, %Audit{}}
-
-      iex> create_audit(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def create_audit(attrs \\ %{}) do
     %Audit{}
     |> Audit.changeset(attrs)
     |> Repo.insert()
   end
 
-  @doc """
-  Deletes a audit.
-
-  ## Examples
-
-      iex> delete_audit(audit)
-      {:ok, %Audit{}}
-
-      iex> delete_audit(audit)
-      {:error, %Ecto.Changeset{}}
-
-  """
   def delete_audit(%Audit{} = audit) do
     Repo.delete(audit)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking audit changes.
-
-  ## Examples
-
-      iex> change_audit(audit)
-      %Ecto.Changeset{source: %Audit{}}
-
-  """
   def change_audit(%Audit{} = audit) do
     Audit.changeset(audit, %{})
+  end
+
+  # audit_log functions
+
+  @name_descr %{
+    "update" => "Редактирование",
+    "class" => "Класс"
+  }
+
+  def create_audit_log(conn, object, operation)
+
+  def create_audit_log(
+        conn,
+        %AcariServer.ScriptManager.Script{} = class,
+        operation
+      ) do
+    create_audit(%{
+      username: curr_user(conn),
+      object: "class",
+      object_name: class.name,
+      operation: operation,
+      params: %{
+        "description" => class.description,
+        "remote" => class.remote && class.remote.description,
+        "local" => class.local && class.local.description,
+        "templates" => AcariServerWeb.ScriptView.templates_list(class),
+        "definition" => class.definition,
+        "prefix" => class.prefix,
+        "test_client_name" => class.test_client_name
+      }
+    })
+
+    conn
+  end
+
+  def create_audit_log(conn, object, _operation) do
+    Logger.error("Audit: #{curr_user(conn)}: unknown object #{inspect(object)}")
+    conn
+  end
+
+  defp curr_user(conn) do
+    conn.assigns.current_user.username
+  end
+
+  defp humanize(list) when is_list(list) do
+    list
+    |> Enum.map(&humanize/1)
+  end
+
+  defp humanize(log) do
+    %{
+      log
+      | object: @name_descr[log.object],
+        operation: @name_descr[log.operation],
+        params: humanize(log.object, log.params)
+    }
+  end
+
+  defp humanize("class", params) do
+    """
+    Описание: #{params["description"]},
+    Конфигурация клиента: #{params["remote"]},
+    Конфигурация сервера: #{params["local"]},
+    Скрипты:
+      #{params["templates"]},
+    Определения параметров:
+      #{params["definition"]},
+    Вычисление параметров:
+      #{params["prefix"]},
+    Тестовый клиент: #{params["test_client_name"]}
+    """
   end
 end
