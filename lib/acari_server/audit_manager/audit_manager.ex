@@ -56,24 +56,6 @@ defmodule AcariServer.AuditManager do
   end
 
   @doc """
-  Updates a audit.
-
-  ## Examples
-
-      iex> update_audit(audit, %{field: new_value})
-      {:ok, %Audit{}}
-
-      iex> update_audit(audit, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_audit(%Audit{} = audit, attrs) do
-    audit
-    |> Audit.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
   Deletes a audit.
 
   ## Examples

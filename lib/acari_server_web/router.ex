@@ -81,6 +81,7 @@ defmodule AcariServerWeb.Router do
     resources "/notes", NoteController
     resources "/schedules", ScheduleController
     resources "/filters", FilterController
+    resources "/audit_logs", AuditController, only: [:index, :show]
 
     get "/secret", PageController, :secret
   end

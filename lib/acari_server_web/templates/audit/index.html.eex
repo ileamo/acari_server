@@ -23,12 +23,8 @@
 
       <td>
         <span><%= link "Show", to: Routes.audit_path(@conn, :show, audit) %></span>
-        <span><%= link "Edit", to: Routes.audit_path(@conn, :edit, audit) %></span>
-        <span><%= link "Delete", to: Routes.audit_path(@conn, :delete, audit), method: :delete, data: [confirm: "Are you sure?"] %></span>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
-
-<span><%= link "New Audit", to: Routes.audit_path(@conn, :new) %></span>

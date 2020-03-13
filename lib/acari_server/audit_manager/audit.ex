@@ -3,10 +3,10 @@ defmodule AcariServer.AuditManager.Audit do
   import Ecto.Changeset
 
   schema "audit_logs" do
-    field :object, :string
-    field :object_name, :string
-    field :operation, :string
-    field :params, :string
+    field :object, :string, default: ""
+    field :object_name, :string, default: ""
+    field :operation, :string, default: ""
+    field :params, :string, default: ""
     field :username, :string
 
     timestamps()
@@ -16,6 +16,6 @@ defmodule AcariServer.AuditManager.Audit do
   def changeset(audit, attrs) do
     audit
     |> cast(attrs, [:username, :object, :object_name, :operation, :params])
-    |> validate_required([:username, :object, :object_name, :operation, :params])
+    |> validate_required([:username])
   end
 end

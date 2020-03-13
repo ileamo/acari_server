@@ -1,5 +1,0 @@
-<h1>Edit Audit</h1>
-
-<%= render "form.html", Map.put(assigns, :action, Routes.audit_path(@conn, :update, @audit)) %>
-
-<span><%= link "Back", to: Routes.audit_path(@conn, :index) %></span>
