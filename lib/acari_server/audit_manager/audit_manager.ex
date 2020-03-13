@@ -33,6 +33,7 @@ defmodule AcariServer.AuditManager do
   # audit_log functions
 
   @object_descr %{
+    "user" => "Пользователь",
     "class" => "Класс"
   }
 
@@ -42,28 +43,38 @@ defmodule AcariServer.AuditManager do
     "delete" => "Удаление"
   }
 
-  def create_audit_log(conn, object, operation, params \\ %{})
-
-  def create_audit_log(
-        conn,
-        %AcariServer.ScriptManager.Script{} = class,
-        operation,
-        params
-      ) do
-    create_audit(%{
+  def create_audit_log(conn, object, operation, params \\ %{}) do
+    %{
       username: curr_user(conn),
-      object: "class",
-      object_name: class.name,
       operation: operation,
       params: params
-    })
+    }
+    |> Map.merge(parse_object(object))
+    |> create_audit()
 
     conn
   end
 
-  def create_audit_log(conn, object, _operation, _params) do
-    Logger.error("Audit: #{curr_user(conn)}: unknown object #{inspect(object)}")
-    conn
+  defp parse_object(%AcariServer.ScriptManager.Script{} = class) do
+    %{
+      object: "class",
+      object_name: class.name
+    }
+  end
+
+  defp parse_object(%AcariServer.UserManager.User{} = user) do
+    %{
+      object: "user",
+      object_name: user.username
+    }
+  end
+
+
+  defp parse_object(_) do
+    %{
+      object: "<UNKNOWN>",
+      object_name: "<UNKNOWN>"
+    }
   end
 
   defp curr_user(conn) do

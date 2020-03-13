@@ -4,6 +4,7 @@ defmodule AcariServerWeb.UserController do
 
   alias AcariServer.UserManager
   alias AcariServer.UserManager.User
+  alias AcariServer.AuditManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin
@@ -20,9 +21,11 @@ defmodule AcariServerWeb.UserController do
 
   def create(conn, %{"user" => user_params} = params) do
     rights = params["rights"] || %{}
+
     case UserManager.create_user(user_params, rights) do
       {:ok, user} ->
         conn
+        |> AuditManager.create_audit_log(user, "create", user_params |> Map.put("rights", rights))
         |> put_flash(:info, "Пользователь успешно создан.")
         |> redirect(to: Routes.user_path(conn, :show, user))
 
@@ -54,6 +57,7 @@ defmodule AcariServerWeb.UserController do
     case UserManager.update_user(user, user_params, rights) do
       {:ok, user} ->
         conn
+        |> AuditManager.create_audit_log(user, "update", user_params |> Map.put("rights", rights))
         |> put_flash(:info, "Пользователь отредактирован.")
         |> redirect(to: Routes.user_path(conn, :show_rw, user))
 
@@ -67,6 +71,7 @@ defmodule AcariServerWeb.UserController do
     {:ok, _user} = UserManager.delete_user(user)
 
     conn
+    |> AuditManager.create_audit_log(user, "delete")
     |> put_flash(:info, "Пользователь удален.")
     |> redirect(to: Routes.user_path(conn, :index))
   end
