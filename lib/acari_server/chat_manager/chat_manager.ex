@@ -24,7 +24,7 @@ defmodule AcariServer.ChatManager do
 
   def get_chat_messages(num \\ 20) do
     Chat
-    |> order_by(desc: :updated_at)
+    |> order_by([desc: :inserted_at, desc: :id])
     |> limit(^num)
     |> RepoRO.all()
     |> Enum.reverse()

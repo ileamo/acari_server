@@ -7,7 +7,10 @@ defmodule AcariServer.AuditManager do
   require Logger
 
   def list_audit_logs do
-    RepoRO.all(Audit)
+    Audit
+    |> order_by([desc: :inserted_at, desc: :id])
+    |> limit(1000)
+    |> RepoRO.all()
     |> localize()
   end
 
@@ -68,7 +71,6 @@ defmodule AcariServer.AuditManager do
       object_name: user.username
     }
   end
-
 
   defp parse_object(_) do
     %{
