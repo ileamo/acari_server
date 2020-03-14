@@ -3,16 +3,24 @@ defmodule AcariServer.SFX do
   alias AcariServer.NodeManager
   alias AcariServer.ScriptManager.Script
 
-
   def create_script_from_template(node_name, templ_id, params \\ %{}) do
     case NodeManager.get_node_with_class(node_name) do
       %NodeManager.Node{script: %Script{} = class} = node ->
         templ_id =
           case templ_id do
-            templ_id when is_binary(templ_id) -> templ_id
-            :local -> (class = AcariServer.RepoRO.preload(class, :local)) && class.local.name
-            :remote -> (class = AcariServer.RepoRO.preload(class, :remote)) && class.remote.name
-            _ -> nil
+            templ_id when is_binary(templ_id) ->
+              templ_id
+
+            :local ->
+              (class = AcariServer.RepoRO.preload(class, :local)) && class.local &&
+                class.local.name
+
+            :remote ->
+              (class = AcariServer.RepoRO.preload(class, :remote)) && class.remote &&
+                class.remote.name
+
+            _ ->
+              nil
           end
 
         {create_sfx(templ_id, node, Map.put(params, "id", node_name)), templ_id}

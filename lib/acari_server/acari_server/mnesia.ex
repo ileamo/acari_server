@@ -1069,6 +1069,7 @@ defmodule AcariServer.Mnesia do
       |> link_list_to_map()
 
     nodes
+    |> Enum.filter(fn %{name: name} -> status[name] end)
     |> Enum.map(fn %{
                      id: id,
                      name: name,
