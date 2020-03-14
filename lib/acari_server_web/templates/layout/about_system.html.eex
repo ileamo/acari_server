@@ -1,0 +1,4 @@
+<p>Сервера - <%= AcariServer.ServerManager.count_servers() %></p>
+<p>Пользователи - <%= AcariServer.UserManager.count_users() %></p>
+<p>Клиенты (всего) - <%= AcariServer.NodeManager.count_nodes() %></p>
+<p>Клиенты (заблокировано) - <%= AcariServer.NodeManager.count_locked_nodes() %></p>

@@ -130,6 +130,11 @@ channel.on('shout', function(payload) { // listen to the 'shout' event
   }
 });
 
+channel.on('about_system', function(payload) {
+  $('#about-system-div').html(payload.message)
+  $('#AboutSystem').modal('show')
+})
+
 channel.join()
   .receive("ok", resp => {
     console.log("Joined successfully", resp)
@@ -169,6 +174,14 @@ $('#usersChat').on('show.bs.collapse', function() {
 
 $('#usersChat').collapse(sessionStorage.showUsersChat || 'hide')
 
+// AboutSystem
+
+let about_system_menus = document.getElementsByClassName("about-system-menu")
+for (var i = 0; i < about_system_menus.length; i++) {
+  about_system_menus[i].addEventListener("click", function(event) {
+    channel.push('get_about_system');
+  })
+}
 
 
 export default socket

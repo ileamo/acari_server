@@ -78,6 +78,12 @@ defmodule AcariServerWeb.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_in("get_about_system", _payload, socket) do
+    msg_html = Phoenix.View.render_to_string(AcariServerWeb.LayoutView, "about_system.html", [])
+    push(socket, "about_system", %{"message" => msg_html})
+    {:noreply, socket}
+  end
+
   def handle_in(event, _payload, socket) do
     Logger.error("Channel room: bad event: #{inspect(event)}")
     {:noreply, socket}
