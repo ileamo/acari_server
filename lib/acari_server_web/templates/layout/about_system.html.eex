@@ -1,4 +1,5 @@
 <p>Сервера - <%= AcariServer.ServerManager.count_servers() %></p>
 <p>Пользователи - <%= AcariServer.UserManager.count_users() %></p>
-<p>Клиенты (всего) - <%= AcariServer.NodeManager.count_nodes() %></p>
-<p>Клиенты (заблокировано) - <%= AcariServer.NodeManager.count_locked_nodes() %></p>
+<p>Клиенты (всего) - <%= clients_num = AcariServer.NodeManager.count_nodes() %></p>
+<p>Клиенты (разблокировано) - <%= clients_num - AcariServer.NodeManager.count_locked_nodes() %></p>
+<p>Клиенты (активные) - <%= AcariServer.Mnesia.get_tunnels_num() %></p>
