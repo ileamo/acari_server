@@ -3,6 +3,7 @@ defmodule AcariServerWeb.ServerController do
 
   alias AcariServer.ServerManager
   alias AcariServer.ServerManager.Server
+  alias AcariServer.AuditManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin when action in [:edit, :delete, :new]
@@ -23,6 +24,7 @@ defmodule AcariServerWeb.ServerController do
         AcariServer.ServerMonitor.connect_all_nodes()
 
         conn
+        |> AuditManager.create_audit_log(server, "create", server_params)
         |> put_flash(:info, "Сервер создан.")
         |> redirect(to: Routes.server_path(conn, :show, server, after_redirect: true))
 
@@ -53,6 +55,7 @@ defmodule AcariServerWeb.ServerController do
         end
 
         conn
+        |> AuditManager.create_audit_log(server, "update", server_params)
         |> put_flash(:info, "Сервер отредактирован.")
         |> redirect(to: Routes.server_path(conn, :show, server))
 
@@ -68,6 +71,7 @@ defmodule AcariServerWeb.ServerController do
     Node.disconnect(server.name |> String.to_atom())
 
     conn
+    |> AuditManager.create_audit_log(server, "delete")
     |> put_flash(:info, "Сервер удален.")
     |> redirect(to: Routes.server_path(conn, :index))
   end

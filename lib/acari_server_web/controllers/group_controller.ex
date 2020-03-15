@@ -3,6 +3,7 @@ defmodule AcariServerWeb.GroupController do
 
   alias AcariServer.GroupManager
   alias AcariServer.GroupManager.Group
+  alias AcariServer.AuditManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin when action in [:edit, :delete, :new, :oper]
@@ -21,6 +22,7 @@ defmodule AcariServerWeb.GroupController do
     case GroupManager.create_group(group_params) do
       {:ok, group} ->
         conn
+        |> AuditManager.create_audit_log(group, "create", group_params)
         |> put_flash(:info, "Группа успешно создана.")
         |> redirect(to: Routes.group_path(conn, :show, group))
 
@@ -46,6 +48,7 @@ defmodule AcariServerWeb.GroupController do
     case GroupManager.update_group(group, group_params) do
       {:ok, group} ->
         conn
+        |> AuditManager.create_audit_log(group, "update", group_params)
         |> put_flash(:info, "Группа отредактирована.")
         |> redirect(to: Routes.group_path(conn, :show, group))
 
@@ -59,6 +62,7 @@ defmodule AcariServerWeb.GroupController do
     {:ok, _group} = GroupManager.delete_group(group)
 
     conn
+    |> AuditManager.create_audit_log(group, "delete")
     |> put_flash(:info, "Группа удалена.")
     |> redirect(to: Routes.group_path(conn, :index))
   end

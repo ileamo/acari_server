@@ -3,6 +3,7 @@ defmodule AcariServerWeb.ScheduleController do
 
   alias AcariServer.ScheduleManager
   alias AcariServer.ScheduleManager.Schedule
+  alias AcariServer.AuditManager
 
   def index(conn, _params) do
     schedules = ScheduleManager.list_schedules()
@@ -16,8 +17,9 @@ defmodule AcariServerWeb.ScheduleController do
 
   def create(conn, %{"schedule" => schedule_params}) do
     case ScheduleManager.create_schedule(schedule_params) do
-      {:ok, _schedule} ->
+      {:ok, schedule} ->
         conn
+        |> AuditManager.create_audit_log(schedule, "create", schedule_params)
         |> put_flash(:info, "Задача создана успешно.")
         |> redirect(to: Routes.schedule_path(conn, :index))
 
@@ -41,8 +43,9 @@ defmodule AcariServerWeb.ScheduleController do
     schedule = ScheduleManager.get_schedule!(id)
 
     case ScheduleManager.update_schedule(schedule, schedule_params) do
-      {:ok, _schedule} ->
+      {:ok, schedule} ->
         conn
+        |> AuditManager.create_audit_log(schedule, "update", schedule_params)
         |> put_flash(:info, "Задача изменена успешно.")
         |> redirect(to: Routes.schedule_path(conn, :index))
 
@@ -56,6 +59,7 @@ defmodule AcariServerWeb.ScheduleController do
     {:ok, _schedule} = ScheduleManager.delete_schedule(schedule)
 
     conn
+    |> AuditManager.create_audit_log(schedule, "update")
     |> put_flash(:info, "Задача удалена успешно.")
     |> redirect(to: Routes.schedule_path(conn, :index))
   end

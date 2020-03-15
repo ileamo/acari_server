@@ -37,7 +37,11 @@ defmodule AcariServer.AuditManager do
 
   @object_descr %{
     "user" => "Пользователь",
-    "class" => "Класс"
+    "class" => "Класс",
+    "client" => "Клиент",
+    "server" => "Сервер",
+    "group" => "Группа",
+    "schedule" => "Планировщик"
   }
 
   @operation_descr %{
@@ -65,10 +69,38 @@ defmodule AcariServer.AuditManager do
     }
   end
 
+  defp parse_object(%AcariServer.NodeManager.Node{} = client) do
+    %{
+      object: "client",
+      object_name: client.name
+    }
+  end
+
   defp parse_object(%AcariServer.UserManager.User{} = user) do
     %{
       object: "user",
       object_name: user.username
+    }
+  end
+
+  defp parse_object(%AcariServer.ServerManager.Server{} = server) do
+    %{
+      object: "server",
+      object_name: server.name
+    }
+  end
+
+  defp parse_object(%AcariServer.GroupManager.Group{} = group) do
+    %{
+      object: "group",
+      object_name: group.name
+    }
+  end
+
+  defp parse_object(%AcariServer.ScheduleManager.Schedule{} = schedule) do
+    %{
+      object: "schedule",
+      object_name: schedule.description
     }
   end
 

@@ -7,6 +7,7 @@ defmodule AcariServerWeb.NodeController do
   alias AcariServer.RepoRO
   alias AcariServer.Repo
   alias AcariServer.ClientCommentManager
+  alias AcariServer.AuditManager
 
   import AcariServer.UserManager,
     only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2, is_user_in_group: 2]
@@ -73,6 +74,7 @@ defmodule AcariServerWeb.NodeController do
     case NodeManager.create_node(node_params) do
       {:ok, node} ->
         conn
+        |> AuditManager.create_audit_log(node, "create", node_params)
         |> put_flash(:info, "Клиент создан.")
         |> redirect(to: Routes.node_path(conn, :show, node))
 
@@ -100,6 +102,7 @@ defmodule AcariServerWeb.NodeController do
     case NodeManager.update_node(old_node, node_params) do
       {:ok, node} ->
         conn
+        |> AuditManager.create_audit_log(node, "update", node_params)
         |> put_flash(:info, "Клиент отредактирован.")
         |> redirect(to: Routes.node_path(conn, :show, node))
 
@@ -112,12 +115,14 @@ defmodule AcariServerWeb.NodeController do
     node = NodeManager.get_node!(id)
     {:ok, _node} = NodeManager.delete_node(node)
     AcariServer.Master.delete_tunnel(node.name)
+    node
   end
 
   def delete(conn, %{"id" => id}) do
-    delete_node_and_tunnel(id)
+    node = delete_node_and_tunnel(id)
 
     conn
+    |> AuditManager.create_audit_log(node, "delete")
     |> put_flash(:info, "Клиент удален.")
     |> redirect_to_index_or_client_grp()
   end
