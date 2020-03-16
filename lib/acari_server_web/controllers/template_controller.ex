@@ -4,6 +4,7 @@ defmodule AcariServerWeb.TemplateController do
   alias AcariServer.TemplateManager
   alias AcariServer.TemplateManager.Template
   alias AcariServer.TemplateEventManager
+  alias AcariServer.AuditManager
 
   import AcariServer.UserManager, only: [is_admin: 2]
   plug :is_admin when action in [:edit, :delete, :new]
@@ -43,6 +44,7 @@ defmodule AcariServerWeb.TemplateController do
     case TemplateManager.create_template(template_params) do
       {:ok, template} ->
         conn
+        |> AuditManager.create_audit_log(template, "create", template_params)
         |> put_flash(:info, "Шаблон создан.")
         |> redirect(to: Routes.template_path(conn, :show, template))
         |> create_template_event(template_params, %{template: ""})
@@ -69,6 +71,7 @@ defmodule AcariServerWeb.TemplateController do
     case TemplateManager.update_template(template, template_params) do
       {:ok, templ} ->
         conn
+        |> AuditManager.create_audit_log(template, "update", template_params)
         |> put_flash(:info, "Шаблон отредактирован.")
         |> redirect(to: Routes.template_path(conn, :show, templ))
         |> create_template_event(template_params, template)
@@ -83,6 +86,7 @@ defmodule AcariServerWeb.TemplateController do
     {:ok, _template} = TemplateManager.delete_template(template)
 
     conn
+    |> AuditManager.create_audit_log(template, "delete")
     |> put_flash(:info, "Шаблон удален.")
     |> redirect(to: Routes.template_path(conn, :index))
   end

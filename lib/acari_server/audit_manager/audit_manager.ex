@@ -43,6 +43,7 @@ defmodule AcariServer.AuditManager do
     "server" => "Сервер",
     "group" => "Группа",
     "schedule" => "Планировщик",
+    "template" => "Шаблон",
     "auth" => "Аутентификация"
   }
 
@@ -125,6 +126,13 @@ defmodule AcariServer.AuditManager do
     %{
       object: "schedule",
       object_name: schedule.description
+    }
+  end
+
+  defp parse_object(%AcariServer.TemplateManager.Template{} = template) do
+    %{
+      object: "template",
+      object_name: template.name
     }
   end
 

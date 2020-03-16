@@ -15,6 +15,10 @@ defmodule AcariServerWeb.RoomChannel do
     {:error, %{reason: "unauthorized"}}
   end
 
+  # def terminate(reason, state) do
+  #   :ok
+  # end
+
   intercept(["link_event_mes"])
 
   def handle_out("link_event_mes", %{mes_list: mes_list}, socket) do
