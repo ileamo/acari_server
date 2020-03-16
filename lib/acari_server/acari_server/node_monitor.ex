@@ -137,7 +137,7 @@ defmodule AcariServer.NodeMonitor do
         |> Enum.map(fn {node_name, %{timestamp: ts, data: data}} ->
           "#{AcariServer.get_local_time(ts)}  #{node_name}\n#{data}"
         end)
-        |> List.insert_at(0, id <> "\n")
+        |> List.insert_at(0, (id || "unknown") <> "\n")
         |> Enum.join("\n")
 
       _ ->

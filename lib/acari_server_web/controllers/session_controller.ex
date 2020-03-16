@@ -3,6 +3,7 @@ defmodule AcariServerWeb.SessionController do
   require Logger
 
   alias AcariServer.{UserManager, UserManager.User, UserManager.Guardian}
+  alias AcariServer.AuditManager
 
 
   def new(conn, _params) do
@@ -39,6 +40,7 @@ defmodule AcariServerWeb.SessionController do
       Logger.info("User #{username} logged out")
 
     conn
+    |> AuditManager.create_audit_log({"auth", username}, "logout")
     |> Guardian.Plug.sign_out()
     |> redirect(to: "/login")
   end
@@ -48,6 +50,7 @@ defmodule AcariServerWeb.SessionController do
 
 
     conn
+    |> AuditManager.create_audit_log({"auth", username}, "login")
     |> put_flash(:success, "Welcome back!")
     |> Guardian.Plug.sign_in(%{
       user: user,
@@ -61,6 +64,7 @@ defmodule AcariServerWeb.SessionController do
     Logger.info("User #{username} is not logged in")
 
     conn
+    |> AuditManager.create_audit_log({"auth", username}, "logerr")
     |> put_flash(:error, "Неверный пароль")
     |> new(%{})
   end

@@ -139,6 +139,7 @@ defmodule AcariServerWeb.NodeController do
     Process.sleep(1000)
 
     conn
+    |> AuditManager.create_audit_log(node, (if node.lock, do: "lock", else: "unlock"), node_params)
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
     |> redirect_to_index_or_client_grp()
   end
@@ -174,6 +175,16 @@ defmodule AcariServerWeb.NodeController do
     end)
 
     conn
+    |> AuditManager.create_audit_log(
+      "clients",
+      operation,
+      params
+      |> Enum.reject(fn
+        {"_" <> _, _} -> true
+        _ -> false
+      end)
+      |> Enum.into(%{})
+    )
     |> redirect_to_index_or_client_grp()
   end
 

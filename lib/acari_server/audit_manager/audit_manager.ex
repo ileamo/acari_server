@@ -8,7 +8,7 @@ defmodule AcariServer.AuditManager do
 
   def list_audit_logs do
     Audit
-    |> order_by([desc: :inserted_at, desc: :id])
+    |> order_by(desc: :inserted_at, desc: :id)
     |> limit(1000)
     |> RepoRO.all()
     |> localize()
@@ -39,15 +39,24 @@ defmodule AcariServer.AuditManager do
     "user" => "Пользователь",
     "class" => "Класс",
     "client" => "Клиент",
+    "clients" => "Клиенты",
     "server" => "Сервер",
     "group" => "Группа",
-    "schedule" => "Планировщик"
+    "schedule" => "Планировщик",
+    "auth" => "Аутентификация"
   }
 
   @operation_descr %{
     "create" => "Coздание",
     "update" => "Редактирование",
-    "delete" => "Удаление"
+    "delete" => "Удаление",
+    "lock" => "Заблокировать",
+    "unlock" => "Разблокировать",
+    "class" => "Изменить класс",
+    "groups" => "Изменить группы",
+    "login" => "Вход",
+    "logout" => "Выход",
+    "logerr" => "Неудачный вход"
   }
 
   def create_audit_log(conn, object, operation, params \\ %{}) do
@@ -60,6 +69,21 @@ defmodule AcariServer.AuditManager do
     |> create_audit()
 
     conn
+  end
+
+  defp parse_object("clients") do
+    %{
+      object: "clients",
+      object_name: "Группа"
+    }
+  end
+
+  defp parse_object({"auth", name}) do
+    %{
+      object: "auth",
+      object_name: name,
+      username: name
+    }
   end
 
   defp parse_object(%AcariServer.ScriptManager.Script{} = class) do
@@ -112,7 +136,10 @@ defmodule AcariServer.AuditManager do
   end
 
   defp curr_user(conn) do
-    conn.assigns.current_user.username
+    case conn.assigns[:current_user] do
+      %{username: name} -> name
+      _ -> "unknown"
+    end
   end
 
   defp localize(list) when is_list(list) do
