@@ -16,6 +16,7 @@ defmodule AcariServer.Application do
 
       # Start the endpoint when the application starts
       AcariServerWeb.Endpoint,
+      AcariServer.Presence,
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},
       AcariServer.TermSup,

@@ -3,16 +3,29 @@ defmodule AcariServerWeb.RoomChannel do
 
   alias AcariServer.ChatManager
   alias AcariServer.ChatManager.Chat
+  alias AcariServer.Presence
 
   require Logger
 
   def join("room:lobby", _message, socket) do
     user = AcariServer.UserManager.get_user(socket.assigns[:current_user_id])
+    send(self(), :after_join)
     {:ok, assign(socket, :user, user)}
   end
 
   def join("room:" <> _private_room_id, _params, _socket) do
     {:error, %{reason: "unauthorized"}}
+  end
+
+  def handle_info(:after_join, socket) do
+    push(socket, "presence_state", Presence.list(socket))
+
+    {:ok, _} =
+      Presence.track(socket, socket.assigns.user.username, %{
+        #online_at: inspect(System.system_time(:second)),
+      })
+
+    {:noreply, socket}
   end
 
   # def terminate(reason, state) do
