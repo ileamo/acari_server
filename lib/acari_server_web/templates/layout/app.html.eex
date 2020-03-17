@@ -102,7 +102,7 @@
                placeholder="Ваше сообщение"></textarea>
           </div>
 
-          <div id="chat-msg-user-list">
+          <div id="chat-msg-user-list" class="text-muted">
           </div>
         </div>
       </div>
