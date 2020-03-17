@@ -6,14 +6,8 @@ defmodule AcariServer.NodeMonitor do
   end
 
   @impl true
-  def init(%{output_pid: output_pid, tun_name: tun_name, rights: rights} = _params) do
-
-    {:ok,
-     %{
-       tun_name: tun_name,
-       output_pid: output_pid,
-       rights: rights
-     }}
+  def init(params) do
+    {:ok, params}
   end
 
   @impl true
@@ -47,11 +41,24 @@ defmodule AcariServer.NodeMonitor do
         with tag when is_binary(tag) <- params["script"],
              %AcariServer.TemplateManager.Template{} = template <-
                AcariServer.TemplateManager.get_template_by_name(tag),
-               :ok <- AcariServer.UserManager.is_script_executable_for_user?(template.rights, state.rights) do
+             :ok <-
+               AcariServer.UserManager.is_script_executable_for_user?(
+                 template.rights,
+                 state.rights
+               ) do
           AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag)
           AcariServer.Master.exec_script_on_peer(tun_name, tag)
+
+          AcariServer.AuditManager.create_audit_log(
+            state,
+            {:tunnel, tun_name},
+            "client_script",
+            %{"template_name" => tag}
+          )
         else
-          :no_rights -> no_rights_for_script("script", params["script"])
+          :no_rights ->
+            no_rights_for_script("script", params["script"])
+
           _ ->
             script_not_defined("script")
         end
@@ -60,10 +67,23 @@ defmodule AcariServer.NodeMonitor do
         with tag when is_binary(tag) <- params["script"],
              %AcariServer.TemplateManager.Template{} = template <-
                AcariServer.TemplateManager.get_template_by_name(tag),
-               :ok <- AcariServer.UserManager.is_script_executable_for_user?(template.rights, state.rights) do
+             :ok <-
+               AcariServer.UserManager.is_script_executable_for_user?(
+                 template.rights,
+                 state.rights
+               ) do
           AcariServer.Master.run_script_on_all_servers(tun_name, tag)
+          AcariServer.AuditManager.create_audit_log(
+            state,
+            {:tunnel, tun_name},
+            "server_script",
+            %{"template_name" => tag}
+          )
+
         else
-          :no_rights -> no_rights_for_script("srv_script", params["script"])
+          :no_rights ->
+            no_rights_for_script("srv_script", params["script"])
+
           _ ->
             script_not_defined("srv_script")
         end

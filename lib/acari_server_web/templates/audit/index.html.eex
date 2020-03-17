@@ -14,7 +14,7 @@
   <tbody>
 <%= for audit <- @audit_logs do %>
     <tr>
-      <td> <%= link audit.inserted_at, to: Routes.audit_path(@conn, :show, audit) %>
+      <td> <%= link AcariServer.db_time_to_local(audit.inserted_at), to: Routes.audit_path(@conn, :show, audit) %>
       </td>
       <td><%= audit.username %></td>
       <td><%= audit.object %></td>

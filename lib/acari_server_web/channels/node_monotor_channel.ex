@@ -20,7 +20,12 @@ defmodule AcariServerWeb.NodeMonitorChannel do
       end
 
     {:ok, node_monitor} =
-      NodeMonitor.start_link(%{output_pid: self(), tun_name: tun_name, rights: rights})
+      NodeMonitor.start_link(%{
+        output_pid: self(),
+        tun_name: tun_name,
+        rights: rights,
+        username: user.username
+      })
 
     {:ok, assign(socket, :node_monitor, node_monitor)}
   end

@@ -30,7 +30,6 @@ defmodule AcariServerWeb.GrpOperChannel do
         %{common_script: cs, class_list: cl} =
           get_group_scripts(nodes, (params["script_type"] == "server" && :local) || :templates)
 
-
         script_list =
           case params["class_id"] do
             "nil" ->
@@ -141,7 +140,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           nodes_list =
             get_nodes_list(socket, params["group_id"], params["class_id"], params["filter"])
 
-          get_exec_nodes_list(nodes_list, socket, tag)
+          (clients_list = get_exec_nodes_list(nodes_list, socket, tag))
           |> Enum.each(fn %{name: name} ->
             case params["script_type"] do
               "server" ->
@@ -157,6 +156,19 @@ defmodule AcariServerWeb.GrpOperChannel do
                 AcariServer.Master.exec_script_on_peer(name, tag)
             end
           end)
+
+          AcariServer.AuditManager.create_audit_log(
+            socket,
+            :tunnels,
+            params["script_type"] == "server" && "server_script" || "client_script",
+            %{
+              "template_name" => tag,
+              "clients_list" => clients_list |> Enum.map(fn %{id: id} -> to_string(id) end),
+              "group" => params["group_id"],
+              "class" => params["class_id"],
+              "filter" => params["filter"]
+            }
+          )
 
           Process.sleep(1_000)
           get_script(socket, params["script_type"], tag, nodes_list)

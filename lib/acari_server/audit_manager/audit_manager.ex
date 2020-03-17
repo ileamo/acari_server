@@ -44,7 +44,7 @@ defmodule AcariServer.AuditManager do
     "group" => "Группа",
     "schedule" => "Планировщик",
     "template" => "Шаблон",
-    "auth" => "Аутентификация"
+    "auth" => "Аутентификация",
   }
 
   @operation_descr %{
@@ -57,7 +57,9 @@ defmodule AcariServer.AuditManager do
     "groups" => "Изменение групп  ",
     "login" => "Вход",
     "logout" => "Выход",
-    "logerr" => "Неудачный вход"
+    "logerr" => "Неудачный вход",
+    "client_script" => "Выполнение скрипта",
+    "server_script" => "Выполнение скрипта на сервере"
   }
 
   def create_audit_log(conn, object, operation, params \\ %{}) do
@@ -70,6 +72,20 @@ defmodule AcariServer.AuditManager do
     |> create_audit()
 
     conn
+  end
+
+  defp parse_object({:tunnel, tun_name}) do
+    %{
+      object: "client",
+      object_name: tun_name
+    }
+  end
+
+  defp parse_object(:tunnels) do
+    %{
+      object: "clients",
+      object_name: "Группа"
+    }
   end
 
   defp parse_object("clients") do
@@ -143,11 +159,21 @@ defmodule AcariServer.AuditManager do
     }
   end
 
-  defp curr_user(conn) do
-    case conn.assigns[:current_user] do
-      %{username: name} -> name
-      _ -> "unknown"
-    end
+  defp curr_user(%Plug.Conn{assigns: %{current_user: %{username: name}}}) do
+    name
+  end
+
+  defp curr_user(%Phoenix.Socket{assigns: %{user: %{username: name}}}) do
+    name
+  end
+
+  defp curr_user(%{username: name}) do
+    name
+  end
+
+  defp curr_user(a) do
+    IO.inspect(a)
+    "unknown"
   end
 
   defp localize(list) when is_list(list) do
