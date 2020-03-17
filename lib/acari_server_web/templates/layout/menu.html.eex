@@ -17,8 +17,19 @@
   </li>
 
   <li class="nav-item">
-    <%= link "Карта", to: Routes.map_path(@conn, :index), class: "nav-link" %>
-  </li>
+    <a class="nav-link" data-toggle="collapse" href="#clientsByGroups" role="button" aria-expanded="false" aria-controls="clientsByGroups">
+    <i class="fas fa-arrow-down"></i>Карты
+  </a></li>
+  <div class="collapse" id="clientsByGroups">
+    <% groups = @current_user_groups %>
+    <%= for %{name: name} = group <- groups do %>
+      <li class="nav-item"><em>
+        <%= link "- "<>name, to: Routes.map_path(@conn, :index, group_id: group.id), class: "nav-link" %>
+      </em></li>
+    <% end %>
+    <%= link "- Все", to: Routes.map_path(@conn, :index), class: "nav-link" %>
+  </div>
+
 
 
   <!-- <li class="nav-item">
@@ -123,7 +134,8 @@
     </a>
   </li>
   <li class="nav-item">
-    <%= link "Аудит", to: Routes.audit_path(@conn, :index), class: "nav-link" %>
+    <%= link "Аудит", to: Routes.audit_path(@conn, :index),
+                      class: "nav-link"<>(@current_user.is_admin && "" || " bg-disabled") %>
   </li>
   <li class="nav-item">
     <%= link "Помощь", to: Routes.page_path(@conn, :help), class: "nav-link" %>

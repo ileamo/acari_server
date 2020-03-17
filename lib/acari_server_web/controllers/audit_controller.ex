@@ -3,6 +3,10 @@ defmodule AcariServerWeb.AuditController do
 
   alias AcariServer.AuditManager
 
+  import AcariServer.UserManager, only: [is_admin: 2]
+  plug :is_admin
+
+
   def index(conn, _params) do
     audit_logs = AuditManager.list_audit_logs()
     render(conn, "index.html", audit_logs: audit_logs)
