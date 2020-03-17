@@ -114,6 +114,7 @@ channel.on('shout', function(payload) { // listen to the 'shout' event
   let div = document.createElement("div");
   div.innerHTML = payload.message;
   if ($('#usersChat').is(":visible")) {
+    user_list.innerHTML = payload.chat_users
     msg_list.appendChild(div);
     msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
   } else {
@@ -145,6 +146,7 @@ channel.join()
 
 
 let msg_list = document.getElementById('chat-msg-list'); // list of messages.
+let user_list = document.getElementById('chat-msg-user-list'); // list of messages.
 let msg_list_popup = document.getElementById('chat-msg-list-popup')
 let msg = document.getElementById('chat-msg'); // message input field
 

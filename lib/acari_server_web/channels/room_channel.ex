@@ -70,13 +70,15 @@ defmodule AcariServerWeb.RoomChannel do
     broadcast_msg_html = create_message(user.username, payload["message"], db_time_to_local(nt))
 
     msg_html = change_message_color(broadcast_msg_html, "text-secondary")
-    broadcast_from(socket, "shout", %{"message" => broadcast_msg_html})
-    push(socket, "shout", %{"message" => msg_html})
+    chat_users = get_chat_users()
+    broadcast_from(socket, "shout", %{"message" => broadcast_msg_html, "chat_users" => chat_users})
+    push(socket, "shout", %{"message" => msg_html, "chat_users" => chat_users})
     {:noreply, socket}
   end
 
   def handle_in("init_chat", _payload, socket) do
     user = socket.assigns[:user]
+    chat_users = get_chat_users()
 
     ChatManager.get_chat_messages()
     |> Enum.each(fn %{user: %{id: user_id, username: username}, message: message, updated_at: nt} ->
@@ -89,7 +91,7 @@ defmodule AcariServerWeb.RoomChannel do
           msg_html
         end
 
-      push(socket, "shout", %{"message" => msg_html})
+      push(socket, "shout", %{"message" => msg_html, "chat_users" => chat_users})
     end)
 
     {:noreply, socket}
@@ -104,6 +106,12 @@ defmodule AcariServerWeb.RoomChannel do
   def handle_in(event, _payload, socket) do
     Logger.error("Channel room: bad event: #{inspect(event)}")
     {:noreply, socket}
+  end
+
+  defp get_chat_users() do
+    AcariServer.Presence.list("room:lobby")
+    |> Enum.map(fn {user, %{metas: list}} -> user<>(length(list) > 1 &&  "(#{length(list)})" || "") end)
+    |> Enum.join(", ")
   end
 
   defp create_message(username, message, timestamp) do

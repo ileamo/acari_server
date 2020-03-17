@@ -98,8 +98,11 @@
 
           <div>
             <textarea  id="chat-msg" rows="3" data-min-rows="3"
-                class="XautoExpand form-control overflow-hidden"
+                class="form-control overflow-hidden"
                placeholder="Ваше сообщение"></textarea>
+          </div>
+
+          <div id="chat-msg-user-list">
           </div>
         </div>
       </div>
