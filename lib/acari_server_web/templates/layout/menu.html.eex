@@ -17,10 +17,10 @@
   </li>
 
   <li class="nav-item">
-    <a class="nav-link" data-toggle="collapse" href="#clientsByGroups" role="button" aria-expanded="false" aria-controls="clientsByGroups">
+    <a class="nav-link" data-toggle="collapse" href="#mapsByGroup" role="button" aria-expanded="false" aria-controls="mapsByGroup">
     <i class="fas fa-arrow-down"></i>Карты
   </a></li>
-  <div class="collapse" id="clientsByGroups">
+  <div class="collapse" id="mapsByGroup">
     <% groups = @current_user_groups %>
     <%= for %{name: name} = group <- groups do %>
       <li class="nav-item"><em>
