@@ -830,15 +830,13 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn ->
       Mnesia.foldl(
         fn rec, acc ->
-          tun =
-            Rec.client_status(rec, :name)
+          tun = Rec.client_status(rec, :name)
 
           if Mnesia.wread({:tun, tun}) == [] do
             Mnesia.delete_object(rec)
             acc + 1
           else
-            {level, port_list, mes} =
-              create_tun_status_mes(tun, node_to_name)
+            {level, port_list, mes} = create_tun_status_mes(tun, node_to_name)
 
             cond do
               (level == 4 and
@@ -1069,7 +1067,7 @@ defmodule AcariServer.Mnesia do
       |> link_list_to_map()
 
     nodes
-    |> Enum.filter(fn %{name: name} -> status[name] end)
+    # |> Enum.filter(fn %{name: name} -> status[name] end)
     |> Enum.map(fn %{
                      id: id,
                      name: name,
@@ -1092,7 +1090,10 @@ defmodule AcariServer.Mnesia do
       |> Map.merge(
         case status[name] do
           nil ->
-            %{}
+            case name_to_server[name] do
+              nil -> %{}
+              _ -> %{alert: 0, links_number: 0}
+            end
 
           link_list ->
             link_list
@@ -1163,6 +1164,7 @@ defmodule AcariServer.Mnesia do
     )
   end
 
+  defp alert(%{links_up: [], links_down: []}), do: %{alert: 0}
   defp alert(%{links_up: [], links_down: ld}), do: %{alert: 1, links_down: ld |> get_links_str()}
   defp alert(%{links_up: lu, links_down: []}), do: %{alert: 4, links_up: lu |> get_links_str()}
 

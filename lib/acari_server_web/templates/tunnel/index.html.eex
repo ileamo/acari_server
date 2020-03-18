@@ -51,6 +51,7 @@
   <tbody>
 <%= for tunnel <- AcariServer.Mnesia.get_tunnel_list(@nodes) do %>
 <% al = case tunnel[:alert] do
+        0 -> "table-secondary"
         1 -> "table-danger"
         2 -> "table-warning"
         3 -> "table-info"
