@@ -172,7 +172,6 @@ defmodule AcariServer.AuditManager do
   end
 
   defp curr_user(a) do
-    IO.inspect(a)
     "unknown"
   end
 

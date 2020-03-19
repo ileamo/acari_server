@@ -10,7 +10,7 @@ defmodule AcariServerWeb.RoomChannel do
   def join("room:lobby", _message, socket) do
     user = AcariServer.UserManager.get_user(socket.assigns[:current_user_id])
     send(self(), :after_join)
-    {:ok, assign(socket, :user, user)}
+    {:ok, assign(socket, :user, user) |> assign(:conn, socket.assigns[:conn])}
   end
 
   def join("room:" <> _private_room_id, _params, _socket) do
@@ -21,16 +21,27 @@ defmodule AcariServerWeb.RoomChannel do
     push(socket, "presence_state", Presence.list(socket))
 
     {:ok, _} =
-      Presence.track(socket, socket.assigns.user.username, %{
-        #online_at: inspect(System.system_time(:second)),
-      })
+      Presence.track(
+        socket,
+        socket.assigns.user.username,
+        %{
+          conn: socket.assigns.conn,
+          timestamp: :os.system_time(:second),
+          server: Node.self()
+        }
+      )
 
+    broadcast_from(socket, "shout", %{"chat_users" => get_chat_users()})
     {:noreply, socket}
   end
 
-  # def terminate(reason, state) do
-  #   :ok
-  # end
+  def terminate(_reason, socket) do
+    Task.start(fn ->
+      Process.sleep(1000)
+      broadcast_from(socket, "shout", %{"chat_users" => get_chat_users()})
+    end)
+    :ok
+  end
 
   intercept(["link_event_mes"])
 
@@ -71,7 +82,9 @@ defmodule AcariServerWeb.RoomChannel do
 
     msg_html = change_message_color(broadcast_msg_html, "text-secondary")
     chat_users = get_chat_users()
+
     broadcast_from(socket, "shout", %{"message" => broadcast_msg_html, "chat_users" => chat_users})
+
     push(socket, "shout", %{"message" => msg_html, "chat_users" => chat_users})
     {:noreply, socket}
   end
@@ -110,7 +123,9 @@ defmodule AcariServerWeb.RoomChannel do
 
   defp get_chat_users() do
     AcariServer.Presence.list("room:lobby")
-    |> Enum.map(fn {user, %{metas: list}} -> user<>(length(list) > 1 &&  "(#{length(list)})" || "") end)
+    |> Enum.map(fn {user, %{metas: list}} ->
+      user <> ((length(list) > 1 && "(#{length(list)})") || "")
+    end)
     |> Enum.join(", ")
   end
 

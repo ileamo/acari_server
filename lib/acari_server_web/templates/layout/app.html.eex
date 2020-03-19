@@ -276,6 +276,14 @@
             _ ->  false
           end %>
       }
+
+      window.acari_server_conn = {
+        remote_ip: "<%= :inet.ntoa(@conn.remote_ip) |> to_string() %>",
+        user_agent: "<%= @conn.req_headers |> Enum.into(%{}) |> Map.get("user-agent") %>"
+      }
+
+      console.log("WIN", window.acari_server_conn, window.acari_server_env)
+
     </script>
 
     <script>window.userToken = "<%= assigns[:user_token] %>"</script>

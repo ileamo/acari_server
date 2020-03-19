@@ -12,7 +12,8 @@ import {
 
 let socket = new Socket("/socket", {
   params: {
-    token: window.userToken
+    token: window.userToken,
+    conn: window.acari_server_conn
   }
 })
 
@@ -111,15 +112,22 @@ channel.on("link_event_mes", payload => {
 
 let chat_msg_timeout
 channel.on('shout', function(payload) { // listen to the 'shout' event
-  let div = document.createElement("div");
-  div.innerHTML = payload.message;
+  let div
+  if (payload.message) {
+    div = document.createElement("div");
+    div.innerHTML = payload.message;
+  }
   if ($('#usersChat').is(":visible")) {
     user_list.innerHTML = payload.chat_users
-    msg_list.appendChild(div);
+    if (div) {
+      msg_list.appendChild(div)
+    }
     msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
   } else {
     $('#chatMessage').removeClass('d-none')
-    msg_list_popup.appendChild(div);
+    if (div) {
+      msg_list_popup.appendChild(div)
+    }
     msg_list_popup.scrollTop = msg_list_popup.scrollHeight - msg_list_popup.clientHeight;
     clearTimeout(chat_msg_timeout)
     chat_msg_timeout = setTimeout(

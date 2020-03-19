@@ -87,7 +87,6 @@ defmodule AcariServer.Scheduler.Api do
   end
 
   defp exec_script(template, client) do
-    IO.inspect({template.name, client.name})
     AcariServer.Master.exec_script_on_peer(client.name, template.name)
   end
 
