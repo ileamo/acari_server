@@ -117,8 +117,8 @@ channel.on('shout', function(payload) { // listen to the 'shout' event
   if (payload.message) {
     div = document.createElement("div");
     div.innerHTML = payload.message;
-    sessionStorage.setItem("chat_msg_id", payload.chat_msg_id)
-    sessionStorage.setItem("chat_msg_timestamp", payload.chat_msg_timestamp)
+    localStorage.setItem("chat_msg_id", payload.chat_msg_id)
+    localStorage.setItem("chat_msg_timestamp", payload.chat_msg_timestamp)
   }
   if ($('#usersChat').is(":visible")) {
     user_list.innerHTML = payload.chat_users
@@ -148,10 +148,10 @@ channel.on('about_system', function(payload) {
 channel.join()
   .receive("ok", resp => {
     console.log("Joined successfully", resp)
-    if (sessionStorage.showUsersChat != 'show') {
+    if (localStorage.showUsersChat != 'show') {
       channel.push('get_chat_msgs', {
-        id: sessionStorage.getItem("chat_msg_id"),
-        timestamp: sessionStorage.getItem("chat_msg_timestamp")
+        id: localStorage.getItem("chat_msg_id"),
+        timestamp: localStorage.getItem("chat_msg_timestamp")
       })
     }
   })
@@ -178,18 +178,18 @@ msg.addEventListener('keyup', function(event) {
 });
 
 $('#usersChat').on('hide.bs.collapse', function() {
-  sessionStorage.showUsersChat = 'hide';
+  localStorage.showUsersChat = 'hide';
 })
 
 $('#usersChat').on('show.bs.collapse', function() {
-  sessionStorage.showUsersChat = 'show'
+  localStorage.showUsersChat = 'show'
   channel.push('init_chat');
   msg_list.innerHTML = ""
   $('#chatMessage').addClass('d-none')
   msg_list_popup.innerHTML = ""
 })
 
-$('#usersChat').collapse(sessionStorage.showUsersChat || 'hide')
+$('#usersChat').collapse(localStorage.showUsersChat || 'hide')
 
 // AboutSystem
 
