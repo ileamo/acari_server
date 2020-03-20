@@ -112,10 +112,13 @@ channel.on("link_event_mes", payload => {
 
 let chat_msg_timeout
 channel.on('shout', function(payload) { // listen to the 'shout' event
+  console.log('SHOUT', payload)
   let div
   if (payload.message) {
     div = document.createElement("div");
     div.innerHTML = payload.message;
+    sessionStorage.setItem("chat_msg_id", payload.chat_msg_id)
+    sessionStorage.setItem("chat_msg_timestamp", payload.chat_msg_timestamp)
   }
   if ($('#usersChat').is(":visible")) {
     user_list.innerHTML = payload.chat_users
@@ -123,11 +126,9 @@ channel.on('shout', function(payload) { // listen to the 'shout' event
       msg_list.appendChild(div)
     }
     msg_list.scrollTop = msg_list.scrollHeight - msg_list.clientHeight;
-  } else {
+  } else if (div) {
     $('#chatMessage').removeClass('d-none')
-    if (div) {
-      msg_list_popup.appendChild(div)
-    }
+    msg_list_popup.appendChild(div)
     msg_list_popup.scrollTop = msg_list_popup.scrollHeight - msg_list_popup.clientHeight;
     clearTimeout(chat_msg_timeout)
     chat_msg_timeout = setTimeout(
@@ -147,6 +148,12 @@ channel.on('about_system', function(payload) {
 channel.join()
   .receive("ok", resp => {
     console.log("Joined successfully", resp)
+    if (sessionStorage.showUsersChat != 'show') {
+      channel.push('get_chat_msgs', {
+        id: sessionStorage.getItem("chat_msg_id"),
+        timestamp: sessionStorage.getItem("chat_msg_timestamp")
+      })
+    }
   })
   .receive("error", resp => {
     console.log("Unable to join", resp)

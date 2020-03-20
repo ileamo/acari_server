@@ -80,7 +80,7 @@ defmodule AcariServerWeb.RoomChannel do
   def handle_in("shout", payload, socket) do
     user = socket.assigns[:user]
 
-    {:ok, %{updated_at: nt}} =
+    {:ok, %{id: id, inserted_at: nt}} =
       Chat.changeset(
         %Chat{},
         payload |> Map.put("user_id", user.id)
@@ -92,30 +92,25 @@ defmodule AcariServerWeb.RoomChannel do
     msg_html = change_message_color(broadcast_msg_html, "text-secondary")
     chat_users = get_chat_users()
 
-    broadcast_from(socket, "shout", %{"message" => broadcast_msg_html, "chat_users" => chat_users})
+    broadcast_from(socket, "shout", %{
+      "message" => broadcast_msg_html,
+      "chat_users" => chat_users,
+      "chat_msg_id" => id,
+      "chat_msg_timestamp" => nt
+    })
 
-    push(socket, "shout", %{"message" => msg_html, "chat_users" => chat_users})
+    push(socket, "shout", %{
+      "message" => msg_html,
+      "chat_users" => chat_users,
+      "chat_msg_id" => id,
+      "chat_msg_timestamp" => nt
+    })
+
     {:noreply, socket}
   end
 
   def handle_in("init_chat", _payload, socket) do
-    user = socket.assigns[:user]
-    chat_users = get_chat_users()
-
-    ChatManager.get_chat_messages()
-    |> Enum.each(fn %{user: %{id: user_id, username: username}, message: message, updated_at: nt} ->
-      msg_html = create_message(username, message, db_time_to_local(nt, true))
-
-      msg_html =
-        if user.id == user_id do
-          change_message_color(msg_html, "text-secondary")
-        else
-          msg_html
-        end
-
-      push(socket, "shout", %{"message" => msg_html, "chat_users" => chat_users})
-    end)
-
+    push_chat_messages(socket)
     {:noreply, socket}
   end
 
@@ -125,17 +120,64 @@ defmodule AcariServerWeb.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_in("get_chat_msgs", payload, socket) do
+    with iso_datetime when is_binary(iso_datetime) <- payload["timestamp"],
+         {:ok, ndt} <- NaiveDateTime.from_iso8601(iso_datetime) do
+      push_chat_messages(socket, ndt, payload["id"])
+    else
+      _ -> push_chat_messages(socket)
+    end
+
+    {:noreply, socket}
+  end
+
   def handle_in(event, _payload, socket) do
     Logger.error("Channel room: bad input event: #{inspect(event)}")
     {:noreply, socket}
   end
 
-  defp get_chat_users() do
-    connections = Presence.list("room:lobby")
-    |> Enum.flat_map(fn {_, %{metas: list}} -> list end)
-    |> Enum.sort_by(fn %{online_at: t} -> t end)
-    |> IO.inspect()
+  defp push_chat_messages(socket, ndt \\ nil, id \\ nil) do
+    user = socket.assigns[:user]
+    chat_users = get_chat_users()
 
+    if (chat_messages = ChatManager.get_chat_messages(ndt, id)) != [] do
+      {chat_msg_id, chat_msg_timestamp} =
+        case List.last(chat_messages) do
+          %{id: id, inserted_at: tm} -> {id, tm}
+          _ -> {0, 0}
+        end
+
+      msg_html =
+        chat_messages
+        |> Enum.map(fn %{
+                         user: %{id: user_id, username: username},
+                         message: message,
+                         updated_at: nt
+                       } ->
+          msg_html = create_message(username, message, db_time_to_local(nt, true))
+
+          if user.id == user_id do
+            change_message_color(msg_html, "text-secondary")
+          else
+            msg_html
+          end
+        end)
+        |> Enum.join()
+
+      push(socket, "shout", %{
+        "message" => msg_html,
+        "chat_users" => chat_users,
+        "chat_msg_id" => chat_msg_id,
+        "chat_msg_timestamp" => chat_msg_timestamp
+      })
+    end
+  end
+
+  defp get_chat_users() do
+    connections =
+      Presence.list("room:lobby")
+      |> Enum.flat_map(fn {_, %{metas: list}} -> list end)
+      |> Enum.sort_by(fn %{online_at: t} -> t end)
 
     connections
     |> Enum.map(fn %{username: u} -> u end)
@@ -146,7 +188,9 @@ defmodule AcariServerWeb.RoomChannel do
 
   defp create_message(username, message, timestamp) do
     """
-    <strong>#{timestamp} #{username}:</strong> #{message}
+    <div>
+      <strong>#{timestamp} #{username}:</strong> #{message}
+    </div>
     """
   end
 

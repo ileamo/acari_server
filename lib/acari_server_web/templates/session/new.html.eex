@@ -13,9 +13,9 @@
 
     <dev class="signin">
       <%= form_for @changeset, @action, [class: "form-signin", autocomplete: "off"], fn f -> %>
-       <img class="mb-4" src="<%= Routes.static_path(@conn, "/images/nsg_logo.svg") %>" alt="" width="72" height="72">
+       <!-- <img class="mb-4" src="<%= Routes.static_path(@conn, "/images/nsg_logo.svg") %>" alt="" width="72" height="72">
 
-       <img class="mb-4" src="<%= Routes.static_path(@conn, "/images/bogatka.png") %>" alt="" width="128" height="72">
+       <img class="mb-4" src="<%= Routes.static_path(@conn, "/images/bogatka.png") %>" alt="" width="128" height="72"> -->
 
         <h1 class="h3 mb-3 font-weight-normal">Богатка</h1>
 
