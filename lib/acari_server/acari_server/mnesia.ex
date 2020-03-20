@@ -755,13 +755,6 @@ defmodule AcariServer.Mnesia do
     })
   end
 
-  def broadcast_sessions() do
-    sessions_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "session.html", [])
-
-    Endpoint.broadcast!("room:lobby", "link_event", %{
-      sessions: sessions_html
-    })
-  end
 
   def server_and_db_alert() do
     Task.start(fn ->
@@ -978,7 +971,6 @@ defmodule AcariServer.Mnesia do
       Mnesia.write({:session, jti, params, :os.system_time(:second)})
     end)
 
-    broadcast_sessions()
   end
 
   def delete_session(jti) do
@@ -986,7 +978,6 @@ defmodule AcariServer.Mnesia do
       Mnesia.delete({:session, jti})
     end)
 
-    broadcast_sessions()
   end
 
   def update_session_activity(jti) do
@@ -997,7 +988,6 @@ defmodule AcariServer.Mnesia do
 
         [record] ->
           Mnesia.write(Rec.session(record, activity: :os.system_time(:second)))
-          broadcast_sessions()
       end
     end)
   end

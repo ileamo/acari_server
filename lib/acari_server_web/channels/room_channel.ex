@@ -25,12 +25,13 @@ defmodule AcariServerWeb.RoomChannel do
         %{
           username: socket.assigns.user.username,
           online_at: :os.system_time(:second),
-          server: Node.self(),
+          server: Node.self() |> AcariServer.Mnesia.get_server_name_by_system_name(),
           conn: socket.assigns.conn
         }
       )
 
     broadcast_from(socket, "shout", %{"chat_users" => get_chat_users()})
+    broadcast_sessions()
     {:noreply, socket}
   end
 
@@ -38,9 +39,18 @@ defmodule AcariServerWeb.RoomChannel do
     Task.start(fn ->
       Process.sleep(1000)
       broadcast_from(socket, "shout", %{"chat_users" => get_chat_users()})
+      broadcast_sessions()
     end)
 
     :ok
+  end
+
+  defp broadcast_sessions() do
+    sessions_html = Phoenix.View.render_to_string(AcariServerWeb.PageView, "session.html", [])
+
+    AcariServerWeb.Endpoint.broadcast!("room:lobby", "link_event", %{
+      sessions: sessions_html
+    })
   end
 
   intercept(["link_event_mes", "presence_diff"])
@@ -174,16 +184,20 @@ defmodule AcariServerWeb.RoomChannel do
   end
 
   defp get_chat_users() do
-    connections =
-      Presence.list("room:lobby")
-      |> Enum.flat_map(fn {_, %{metas: list}} -> list end)
-      |> Enum.sort_by(fn %{online_at: t} -> t end)
-
-    connections
+    get_sorted_presence()
     |> Enum.map(fn %{username: u} -> u end)
-    |> Enum.reverse()
     |> Enum.uniq()
     |> Enum.join(", ")
+  end
+
+  def get_sessions() do
+    get_sorted_presence()
+  end
+
+  defp get_sorted_presence() do
+    Presence.list("room:lobby")
+    |> Enum.flat_map(fn {_, %{metas: list}} -> list end)
+    |> Enum.sort_by(fn %{online_at: t} -> t end, &>=/2)
   end
 
   defp create_message(username, message, timestamp) do
