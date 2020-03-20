@@ -18,16 +18,15 @@ defmodule AcariServerWeb.RoomChannel do
   end
 
   def handle_info(:after_join, socket) do
-    push(socket, "presence_state", Presence.list(socket))
-
     {:ok, _} =
       Presence.track(
         socket,
-        socket.assigns.user.username,
+        socket.assigns.user.id,
         %{
-          conn: socket.assigns.conn,
-          timestamp: :os.system_time(:second),
-          server: Node.self()
+          username: socket.assigns.user.username,
+          online_at: :os.system_time(:second),
+          server: Node.self(),
+          conn: socket.assigns.conn
         }
       )
 
@@ -40,10 +39,15 @@ defmodule AcariServerWeb.RoomChannel do
       Process.sleep(1000)
       broadcast_from(socket, "shout", %{"chat_users" => get_chat_users()})
     end)
+
     :ok
   end
 
-  intercept(["link_event_mes"])
+  intercept(["link_event_mes", "presence_diff"])
+
+  def handle_out("presence_diff", _params, socket) do
+    {:noreply, socket}
+  end
 
   def handle_out("link_event_mes", %{mes_list: mes_list}, socket) do
     mes_list =
@@ -63,6 +67,11 @@ defmodule AcariServerWeb.RoomChannel do
       events: events
     })
 
+    {:noreply, socket}
+  end
+
+  def handle_out(event, _params, socket) do
+    Logger.error("Channel room: bad output event: #{inspect(event)}")
     {:noreply, socket}
   end
 
@@ -117,15 +126,21 @@ defmodule AcariServerWeb.RoomChannel do
   end
 
   def handle_in(event, _payload, socket) do
-    Logger.error("Channel room: bad event: #{inspect(event)}")
+    Logger.error("Channel room: bad input event: #{inspect(event)}")
     {:noreply, socket}
   end
 
   defp get_chat_users() do
-    AcariServer.Presence.list("room:lobby")
-    |> Enum.map(fn {user, %{metas: list}} ->
-      user <> ((length(list) > 1 && "(#{length(list)})") || "")
-    end)
+    connections = Presence.list("room:lobby")
+    |> Enum.flat_map(fn {_, %{metas: list}} -> list end)
+    |> Enum.sort_by(fn %{online_at: t} -> t end)
+    |> IO.inspect()
+
+
+    connections
+    |> Enum.map(fn %{username: u} -> u end)
+    |> Enum.reverse()
+    |> Enum.uniq()
     |> Enum.join(", ")
   end
 

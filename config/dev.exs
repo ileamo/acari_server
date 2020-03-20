@@ -91,7 +91,7 @@ config :acari_server, AcariServer.Listener,
 
 config :acari_server, :zabbix,
   zbx_ext_url: "https://84.253.109.155:4443",
-  zbx_api_url: "http://Admin:IMo19-0708@84.253.109.155:4080",
+  #zbx_api_url: "http://Admin:IMo19-0708@84.253.109.155:4080",
   zbx_snd_host: "84.253.109.155"
 
 config :acari_server, :openstreetmap,
