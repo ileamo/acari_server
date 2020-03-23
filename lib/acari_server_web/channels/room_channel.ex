@@ -192,11 +192,21 @@ defmodule AcariServerWeb.RoomChannel do
 
   def get_sessions() do
     get_sorted_presence()
+    |> IO.inspect()
   end
 
   defp get_sorted_presence() do
     Presence.list("room:lobby")
-    |> Enum.flat_map(fn {_, %{metas: list}} -> list end)
+    |> Enum.flat_map(fn {id, %{metas: list}} ->
+      list
+      # TODO Убрать после 1.1.15
+      |> Enum.map(fn
+        %{username: _} = item -> item
+        _ -> %{username: id, online_at: 1, server: "unknown", conn: %{}}
+      end)
+
+      #
+    end)
     |> Enum.sort_by(fn %{online_at: t} -> t end, &>=/2)
   end
 
