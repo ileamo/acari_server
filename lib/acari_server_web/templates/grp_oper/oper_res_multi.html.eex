@@ -23,7 +23,11 @@
           <td>
             <a href="#" data-toggle="modal" data-target="#grp-script-res"
               data-content="<%= data %>" data-name="<%= id %>">
-                  <%= if String.length(data) <= 16, do: data, else: (data |> String.slice(0, 16))<>"..." %>
+                  <%= if String.length(data) <= 20 do %>
+                    <%= data %>
+                  <% else %>
+                    <%= (data |> String.slice(0, 20)) %>&hellip;
+                  <% end  %>
             </a>
           </td>
         <% end %>

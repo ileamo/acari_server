@@ -92,7 +92,7 @@ if (grp_oper) {
   if (grp_oper_filter && grp_oper_filter_text) {
     grp_oper_filter.addEventListener("click", selectElementFilter, false);
     grp_oper_filter_text.addEventListener("input", inputFilterText, false);
-    let filter_sav =  sessionStorage.getItem("grp_oper_filter")
+    let filter_sav = sessionStorage.getItem("grp_oper_filter")
     grp_oper_filter_text.value = filter_sav === null && "false" || filter_sav
   }
 
@@ -279,12 +279,13 @@ if (grp_oper) {
           document.querySelector("#go-script-name").innerText = `${payload.opt}`
         }
         document.querySelector("#go-script-field").innerHTML = `${payload.data}`
+        let table
         if (!payload.opt) {
           $("#datatable-filter").DataTable(datatable_params_wo_find);
         } else if (sessionStorage.getItem("grp_oper_script_type") == "server") {
           $("#datatable-srv").DataTable(datatable_params_wo_find);
         } else {
-          $("#datatable").DataTable(datatable_params_wo_find);
+          table = $("#datatable").DataTable(datatable_params_wo_find);
         }
 
         $('#grp-script-res').on('show.bs.modal', function(event) {
@@ -324,6 +325,27 @@ if (grp_oper) {
             }
           }
         }
+
+        let grp_oper_show_full_data = document.getElementById("grp-oper-show-full-data")
+        if (grp_oper_show_full_data) {
+
+          function showFullData() {
+            if (table) {
+              let checked = grp_oper_show_full_data.checked
+              console.log(checked)
+              if (checked) {
+                table.column(4).visible(false);
+                table.column(5).visible(true);
+              } else {
+                table.column(4).visible(true);
+                table.column(5).visible(false);
+              }
+            }
+          }
+          grp_oper_show_full_data.addEventListener("change", showFullData, false);
+          showFullData()
+        }
+
         break;
 
       default:

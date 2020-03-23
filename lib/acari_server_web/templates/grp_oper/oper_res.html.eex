@@ -28,6 +28,13 @@
   </button>
 <% end %>
 
+<div class="form-check form-check-inline">
+  <input class="form-check-input" type="checkbox" value="" id="grp-oper-show-full-data">
+  <label class="form-check-label" for="defaultCheck1">
+    Полные данные
+  </label>
+</div>
+
 <table id="datatable" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
@@ -35,6 +42,7 @@
       <th scope="col">Описание</th>
       <th scope="col">Запрос</th>
       <th scope="col">Ответ</th>
+      <th scope="col">Данные</th>
       <th scope="col">Данные</th>
       <th scope="col">Статус</th>
     </tr>
@@ -65,8 +73,15 @@
         <td>
           <a href="#" data-toggle="modal" data-target="#grp-script-res"
             data-content="<%= data %>" data-name="<%= name %>">
-                <%= if String.length(data) <= 16, do: data, else: (data |> String.slice(0, 16))<>"..." %>
+                <%= if String.length(data) <= 20 do %>
+                  <%= data %>
+                <% else %>
+                  <%= (data |> String.slice(0, 20)) %>&hellip;
+                <% end  %>
           </a>
+        </td>
+        <td>
+          <%= data %>
         </td>
         <% {text, color} = cond do
                   ts > 0 and ts >= (params[:reqv_ts] || 0) -> {"выполнен", "text-success"}
