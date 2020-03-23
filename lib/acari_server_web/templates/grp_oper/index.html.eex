@@ -22,13 +22,13 @@
       </div>
 
       <select class="custom-select" id="grp-oper-group">
-        <option value="nil">Все</option>
-        <option disabled="disabled">─────────────</option>
         <% groups = AcariServer.GroupManager.list_groups(@current_user)
                     |> Enum.sort_by(fn %{name: name} -> name end) %>
         <%= for %{id: id, name: name} = _group <- groups do %>
           <option value="<%= id %>" ><%= name %></option>
         <% end %>
+        <option disabled="disabled">─────────────</option>
+        <option value="nil">Все</option>
       </select>
 
       <div class="input-group-prepend">

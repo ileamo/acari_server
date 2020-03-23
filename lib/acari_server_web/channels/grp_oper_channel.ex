@@ -11,6 +11,9 @@ defmodule AcariServerWeb.GrpOperChannel do
       "select" ->
         nodes =
           case params["group_id"] do
+            "false" ->
+              []
+
             "nil" ->
               AcariServer.NodeManager.list_nodes(socket.assigns[:user])
 
@@ -160,7 +163,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           AcariServer.AuditManager.create_audit_log(
             socket,
             :tunnels,
-            params["script_type"] == "server" && "server_script" || "client_script",
+            (params["script_type"] == "server" && "server_script") || "client_script",
             %{
               "template_name" => tag,
               "clients_list" => clients_list |> Enum.map(fn %{id: id} -> to_string(id) end),
@@ -277,7 +280,13 @@ defmodule AcariServerWeb.GrpOperChannel do
     {:noreply, socket}
   end
 
-  defp get_nodes_list(socket, group_id, class_id, filter, opts \\ []) do
+  defp get_nodes_list(socket, group_id, class_id, filter, opts \\ [])
+
+  defp get_nodes_list(_socket, _group_id, _class_id, "false", _opts) do
+    []
+  end
+
+  defp get_nodes_list(socket, group_id, class_id, filter, opts) do
     class_id =
       case class_id do
         "nil" -> nil

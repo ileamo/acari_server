@@ -84,7 +84,7 @@ if (grp_oper) {
   let grp_oper_group = document.getElementById("grp-oper-group")
   if (grp_oper_group) {
     grp_oper_group.addEventListener("click", selectElement, false);
-    grp_oper_group.value = sessionStorage.getItem("grp_oper_group_id") || "nil";
+    grp_oper_group.value = sessionStorage.getItem("grp_oper_group_id") || "false";
   }
 
   let grp_oper_filter = document.getElementById("grp-oper-filter")
@@ -92,7 +92,8 @@ if (grp_oper) {
   if (grp_oper_filter && grp_oper_filter_text) {
     grp_oper_filter.addEventListener("click", selectElementFilter, false);
     grp_oper_filter_text.addEventListener("input", inputFilterText, false);
-    grp_oper_filter_text.value = sessionStorage.getItem("grp_oper_filter") || "";
+    let filter_sav =  sessionStorage.getItem("grp_oper_filter")
+    grp_oper_filter_text.value = filter_sav === null && "false" || filter_sav
   }
 
   let grp_oper_filter_show = document.getElementById("grp-oper-filter-show")
@@ -184,7 +185,8 @@ if (grp_oper) {
 
   function selectElement() {
     let class_id = grp_oper_class.options[grp_oper_class.selectedIndex].value
-    let group_id = grp_oper_group.options[grp_oper_group.selectedIndex].value
+    let group_selected_index = grp_oper_group.options[grp_oper_group.selectedIndex]
+    let group_id = group_selected_index && group_selected_index.value || "false"
     let filter = grp_oper_filter_text.value
     let script_type = $('#grp-oper-radio input:radio:checked').val()
     sessionStorage.setItem("grp_oper_class_id", class_id)
@@ -196,7 +198,6 @@ if (grp_oper) {
     } else {
       grp_oper_show_only_button.hidden = false;
     }
-
 
     channel.push('input', {
       cmd: "select",

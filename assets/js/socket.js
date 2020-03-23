@@ -112,7 +112,6 @@ channel.on("link_event_mes", payload => {
 
 let chat_msg_timeout
 channel.on('shout', function(payload) { // listen to the 'shout' event
-  console.log('SHOUT', payload)
   let div
   if (payload.message) {
     div = document.createElement("div");

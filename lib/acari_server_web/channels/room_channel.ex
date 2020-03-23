@@ -192,7 +192,6 @@ defmodule AcariServerWeb.RoomChannel do
 
   def get_sessions() do
     get_sorted_presence()
-    |> IO.inspect()
   end
 
   defp get_sorted_presence() do
