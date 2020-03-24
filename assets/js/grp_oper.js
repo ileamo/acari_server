@@ -118,16 +118,25 @@ if (grp_oper) {
 
   let grp_oper_client_script = document.getElementById("grp-oper-client-script")
   let grp_oper_server_script = document.getElementById("grp-oper-server-script")
-  if (grp_oper_client_script && grp_oper_server_script) {
+  let grp_oper_zabbix_script = document.getElementById("grp-oper-zabbix-script")
+  if (grp_oper_client_script && grp_oper_server_script && grp_oper_zabbix_script) {
     grp_oper_client_script.addEventListener("click", selectElementScriptType, false);
     grp_oper_server_script.addEventListener("click", selectElementScriptType, false);
+    grp_oper_zabbix_script.addEventListener("click", selectElementScriptType, false);
 
     let script_type = sessionStorage.getItem("grp_oper_script_type") || "client"
-    if (script_type == "server") {
+    if (script_type == "zabbix") {
+      grp_oper_zabbix_script.checked = true;
+      grp_oper_server_script.checked = false;
+      grp_oper_client_script.checked = false;
+      grp_oper_show_only_button.hidden = true;
+    } else if (script_type == "server") {
+      grp_oper_zabbix_script.checked = false;
       grp_oper_server_script.checked = true;
       grp_oper_client_script.checked = false;
       grp_oper_show_only_button.hidden = true;
     } else {
+      grp_oper_zabbix_script.checked = false;
       grp_oper_server_script.checked = false;
       grp_oper_client_script.checked = true;
       grp_oper_show_only_button.hidden = false;
@@ -193,7 +202,7 @@ if (grp_oper) {
     sessionStorage.setItem("grp_oper_group_id", group_id)
     sessionStorage.setItem("grp_oper_filter", filter)
     sessionStorage.setItem("grp_oper_script_type", script_type)
-    if (script_type == "server") {
+    if (script_type == "server" || script_type == "zabbix") {
       grp_oper_show_only_button.hidden = true;
     } else {
       grp_oper_show_only_button.hidden = false;

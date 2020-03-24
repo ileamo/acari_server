@@ -142,6 +142,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
     {:noreply, state}
   end
 
+  def handle_cast({:exec_api, client_name, template}, state) do
+    exec_api(client_name, template)
+    {:noreply, state}
+  end
+
   @impl true
   def handle_info(:time_to_send, state) do
     zabbix_sender(state)
@@ -223,6 +228,21 @@ defmodule AcariServer.Zabbix.ZbxApi do
       {:ok, [%{"hostid" => id}]} -> zbx_post("host.delete", [id])
       _ -> nil
     end
+  end
+
+  def exec_api(client_name, tag) do
+    {script, _} = AcariServer.SFX.create_script_from_template(client_name, tag, %{})
+    IO.inspect(script, label: "SCRIPT")
+
+    {res, _} =
+      try do
+        Code.eval_string(script, client_name: client_name)
+      rescue
+        x ->
+          {inspect(x), nil}
+      end
+
+    AcariServer.Master.set_script(client_name, tag, to_string(res))
   end
 
   defp groups_sync() do
@@ -726,5 +746,9 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_del_host(name) do
     GenServer.cast(__MODULE__, {:del_host, name})
+  end
+
+  def zbx_exec_api(client_name, template) do
+    GenServer.cast(__MODULE__, {:exec_api, client_name, template})
   end
 end

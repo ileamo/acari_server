@@ -104,11 +104,15 @@
     <div class="input-group-prepend" id="grp-oper-radio">
         <label class="input-group-text">
           <input type="radio" name="grp-oper-radio-group" id="grp-oper-client-script" autocomplete="off" value="client" checked>
-            на клиенте
+            Клиент
         </label>
         <label class="input-group-text">
           <input type="radio" name="grp-oper-radio-group" id="grp-oper-server-script" autocomplete="off" value="server">
-            на сервере
+            Сервер
+        </label>
+        <label class="input-group-text">
+          <input type="radio" name="grp-oper-radio-group" id="grp-oper-zabbix-script" autocomplete="off" value="zabbix">
+            Zabbix
         </label>
     </div>
 

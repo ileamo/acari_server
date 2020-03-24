@@ -31,7 +31,14 @@ defmodule AcariServerWeb.GrpOperChannel do
           |> node_filter(params["filter"], socket)
 
         %{common_script: cs, class_list: cl} =
-          get_group_scripts(nodes, (params["script_type"] == "server" && :local) || :templates)
+          get_group_scripts(
+            nodes,
+            case params["script_type"] do
+              "zabbix" -> :zabbix
+              "server" -> :local
+              _ -> :templates
+            end
+          )
 
         script_list =
           case params["class_id"] do
@@ -154,6 +161,10 @@ defmodule AcariServerWeb.GrpOperChannel do
 
                 AcariServer.Master.run_script_on_all_servers(name, tag)
 
+              "zabbix" ->
+                AcariServer.Mnesia.update_tun_state(name, tag, %{reqv_ts: ts})
+                AcariServer.Zabbix.ZbxApi.exec_api(name, tag)
+
               _ ->
                 AcariServer.Mnesia.update_tun_state(name, tag, %{reqv_ts: ts})
                 AcariServer.Master.exec_script_on_peer(name, tag)
@@ -221,7 +232,7 @@ defmodule AcariServerWeb.GrpOperChannel do
                 end)
               end)
 
-            _ ->
+            scrtyp ->
               exec_nodes_list
               |> Enum.filter(fn %{name: name} ->
                 with stat = %{} <- AcariServer.Mnesia.get_tunnel_state(name),
@@ -233,7 +244,10 @@ defmodule AcariServerWeb.GrpOperChannel do
                 end
               end)
               |> Enum.each(fn %{name: name} ->
-                AcariServer.Master.exec_script_on_peer(name, tag)
+                case scrtyp do
+                  "zabbix" -> AcariServer.Zabbix.ZbxApi.exec_api(name, tag)
+                  _ -> AcariServer.Master.exec_script_on_peer(name, tag)
+                end
               end)
           end
 
@@ -524,10 +538,17 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   defp get_templates_list(class, templ_group) do
-    case Map.get(class, templ_group) do
-      res when is_list(res) -> res
-      nil -> []
-      res -> [res]
+    case templ_group do
+      :zabbix ->
+        AcariServer.TemplateManager.list_templates()
+        |> Enum.filter(fn %{name: name} -> String.match?(name, ~r/\.zbx$/) end)
+
+      _ ->
+        case Map.get(class, templ_group) do
+          res when is_list(res) -> res
+          nil -> []
+          res -> [res]
+        end
     end
   end
 
