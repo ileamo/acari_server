@@ -171,7 +171,7 @@ defmodule AcariServer.AuditManager do
     name
   end
 
-  defp curr_user(a) do
+  defp curr_user(_) do
     "unknown"
   end
 

@@ -232,11 +232,12 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def exec_api(client_name, tag) do
     {script, _} = AcariServer.SFX.create_script_from_template(client_name, tag, %{})
-    IO.inspect(script, label: "SCRIPT")
+
+    prefix = "alias AcariServer.Zabbix.ZbxApi\n"
 
     {res, _} =
       try do
-        Code.eval_string(script, client_name: client_name)
+        Code.eval_string(prefix <> script, [client_name: client_name], file: tag)
       rescue
         x ->
           {inspect(x), nil}
@@ -244,6 +245,29 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
     AcariServer.Master.set_script(client_name, tag, to_string(res))
   end
+
+  def get_item_id(name, key) do
+    with {:ok, list} <-
+           zbx_post("item.get", %{host: name, output: ["itemid", "key_"], search: %{key_: key}}) do
+      list
+    else
+      _ -> []
+    end
+    |> Enum.reduce_while(nil, fn
+      %{"itemid" => id, "key_" => ^key}, _ -> {:halt, id}
+      _, _ -> {:cont, nil}
+    end)
+  end
+
+  def get_history(params) do
+    with {:ok, list} <- zbx_post("history.get", params) do
+      list
+    else
+      _ -> []
+    end
+  end
+
+  defdelegate utc_to_local(ts), to: AcariServer, as: :get_local_date
 
   defp groups_sync() do
     # Delete old groups
