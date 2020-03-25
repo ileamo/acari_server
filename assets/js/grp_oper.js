@@ -93,7 +93,7 @@ if (grp_oper) {
     grp_oper_filter.addEventListener("click", selectElementFilter, false);
     grp_oper_filter_text.addEventListener("input", inputFilterText, false);
     let filter_sav = sessionStorage.getItem("grp_oper_filter")
-    grp_oper_filter_text.value = filter_sav === null && "false" || filter_sav
+    grp_oper_filter_text.value = filter_sav === null && "" || filter_sav
   }
 
   let grp_oper_filter_show = document.getElementById("grp-oper-filter-show")

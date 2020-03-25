@@ -243,7 +243,14 @@ defmodule AcariServer.Zabbix.ZbxApi do
           {inspect(x), nil}
       end
 
-    AcariServer.Master.set_script(client_name, tag, to_string(res))
+    AcariServer.Master.set_script(
+      client_name,
+      tag,
+      case res do
+        str when is_binary(str) -> str
+        res -> inspect(res)
+      end
+    )
   end
 
   def get_item_id(name, key) do

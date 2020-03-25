@@ -313,6 +313,8 @@ defmodule AcariServerWeb.GrpOperChannel do
         "nil" ->
           AcariServer.NodeManager.list_nodes(socket.assigns[:user])
 
+        "false" -> []  
+
         group_id ->
           AcariServer.GroupManager.get_group!(group_id)
           |> Map.get(:nodes)
