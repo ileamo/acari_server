@@ -248,7 +248,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
       tag,
       case res do
         str when is_binary(str) -> str
-        res -> inspect(res)
+        res -> inspect(res, pretty: true)
       end
     )
   end
@@ -275,6 +275,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   defdelegate utc_to_local(ts), to: AcariServer, as: :get_local_date
+
+  def timestamp(nt) do
+    NaiveDateTime.to_erl(nt)
+    |> :calendar.local_time_to_universal_time()
+    |> :erlang.universaltime_to_posixtime()
+    |> to_string()
+  end
 
   defp groups_sync() do
     # Delete old groups

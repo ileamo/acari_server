@@ -163,7 +163,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
               "zabbix" ->
                 AcariServer.Mnesia.update_tun_state(name, tag, %{reqv_ts: ts})
-                AcariServer.Zabbix.ZbxApi.exec_api(name, tag)
+                AcariServer.Zabbix.ZbxApi.zbx_exec_api(name, tag)
 
               _ ->
                 AcariServer.Mnesia.update_tun_state(name, tag, %{reqv_ts: ts})
@@ -245,7 +245,7 @@ defmodule AcariServerWeb.GrpOperChannel do
               end)
               |> Enum.each(fn %{name: name} ->
                 case scrtyp do
-                  "zabbix" -> AcariServer.Zabbix.ZbxApi.exec_api(name, tag)
+                  "zabbix" -> AcariServer.Zabbix.ZbxApi.zbx_exec_api(name, tag)
                   _ -> AcariServer.Master.exec_script_on_peer(name, tag)
                 end
               end)
@@ -313,7 +313,7 @@ defmodule AcariServerWeb.GrpOperChannel do
         "nil" ->
           AcariServer.NodeManager.list_nodes(socket.assigns[:user])
 
-        "false" -> []  
+        "false" -> []
 
         group_id ->
           AcariServer.GroupManager.get_group!(group_id)
