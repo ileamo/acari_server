@@ -19,8 +19,8 @@
 
         delta = curr_time - ses.online_at
         cond do
-          delta > 60 * 60 -> "table-dark"
-          delta > 24 * 60 * 60 -> "table-secondary"
+          delta > 24 * 60 * 60 -> "table-dark"
+          delta > 60 * 60 -> "table-secondary"
           true -> ""
         end
       %>">

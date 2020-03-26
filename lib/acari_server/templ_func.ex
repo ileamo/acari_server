@@ -10,6 +10,7 @@ defmodule TemplFunc do
       "include_file" => fn x, _render ->
         include_file(x |> String.trim())
       end,
+      "include_templ" => &include_templ/2,
       "Lua" => &lua/2
     }
   end
@@ -59,6 +60,17 @@ defmodule TemplFunc do
       {:ok, res} when is_binary(res) -> res
       {:ok, res} -> inspect(res, pretty: true)
       {:error, err} -> "Lua eror: #{Template.humanize_lua_err(err)}"
+    end
+  end
+
+  defp include_templ(body, render) do
+    templ_name = String.trim(body)
+
+    with %AcariServer.TemplateManager.Template{} = templ <-
+           AcariServer.TemplateManager.get_template_by_name(templ_name) do
+      render.(templ.template)
+    else
+      _ -> ""
     end
   end
 end
