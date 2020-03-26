@@ -64,11 +64,35 @@ defmodule TemplFunc do
   end
 
   defp include_templ(body, render) do
-    templ_name = String.trim(body)
+    [_, templ_name, json] = Regex.run(~r/^\s*([^\s]+)\s+(.*)$/, body)
 
     with %AcariServer.TemplateManager.Template{} = templ <-
            AcariServer.TemplateManager.get_template_by_name(templ_name) do
-      render.(templ.template)
+      assigns =
+        case Jason.decode(json) do
+          {:ok, %{} = a} -> a
+          _ -> nil
+        end
+
+      template =
+        if assigns do
+          delimiter = case assigns["DELIMITER"] do
+
+            nil -> "{{={% %}=}}"
+            dl -> "{{=#{dl}=}}"
+          end
+
+          :bbmustache.render(
+            delimiter <> templ.template,
+            assigns,
+            key_type: :binary,
+            escape_fun: & &1
+          )
+        else
+          templ.template
+        end
+
+      render.(template)
     else
       _ -> ""
     end
