@@ -22,12 +22,12 @@
   </div>
 
   <% templ_id_pair_list = AcariServer.TemplateManager.templ_name_id_pairs_list() %>
-  <% templ_list_with_nil = [{"<NO_TEMPL>", nil}  | templ_id_pair_list] %>
   <h5>Шаблоны:</h5>
   <div class="form-group row">
     <%= label f, "Конфигурация клиента", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= select f, :remote_id, templ_list_with_nil, class: "form-control" %>
+      <%= select f, :remote_id, [{"<NO_TEMPL>", nil} | templ_name_id_pairs_list("client")],
+          class: "form-control" %>
       <%= error_tag f, :remote_id %>
     </div>
   </div>
@@ -35,7 +35,8 @@
   <div class="form-group row">
     <%= label f, "Конфигурация сервера", class: "col-sm-4 col-form-label" %>
     <div class="col-sm-8">
-      <%= select f, :local_id, templ_list_with_nil, class: "form-control" %>
+      <%= select f, :local_id, [{"<NO_TEMPL>", nil} | templ_name_id_pairs_list("server")],
+          class: "form-control" %>
       <%= error_tag f, :local_id %>
     </div>
   </div>
@@ -43,7 +44,7 @@
   <div class="form-group row">
     <%= label f, "Скрипты", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-10">
-      <%= multiple_select f, :templates_list, templ_id_pair_list, selected: templ_id_list(assigns[:script]), class: "form-control", size: min(length(templ_id_pair_list), 16) %>
+      <%= multiple_select f, :templates_list, templ_name_id_pairs_list("client"), selected: templ_id_list(assigns[:script]), class: "form-control", size: min(length(templ_id_pair_list), 16) %>
       <%= error_tag f, :templates %>
     </div>
   </div>

@@ -25,7 +25,9 @@
   <div class="form-group row">
     <%= label f, "Назначение", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-8">
-      <%= select f, :type, templ_type_id_list, class: "form-control" %>
+      <%= select f, :type, templ_type_id_list, class: "form-control", id: "template-form-type",
+                    data: [exectype: exec_type_csv()]
+      %>
       <%= error_tag f, :type %>
     </div>
   </div>
@@ -41,11 +43,7 @@
   </div>
 
   <%
-      exec = case input_value(f, :executable) do
-        "false" -> false
-        "true" -> true
-        other -> other
-      end
+      exec = is_executable?(input_value(f, :type), input_value(f, :executable))
 
       rights = (input_value(f, :rights) || "rw")
   %>

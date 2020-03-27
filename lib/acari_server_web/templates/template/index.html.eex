@@ -22,7 +22,7 @@
       <td><%= template.description %></td>
       <td><%= type_to_name[template.type] || "Нет" %></td>
       <td><%= template.executable && "Да" || "Нет" %></td>
-      <td><%= template.executable && rights_descr(template.rights) || "" %></td>
+      <td><%= is_executable?(template.type, template.executable) && rights_descr(template.rights) || "" %></td>
       <td>
         <%= link to: Routes.template_path(@conn, :edit, template),
             class: AcariServer.UserManager.get_disabled(@current_user) do %>

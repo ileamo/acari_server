@@ -23,7 +23,7 @@
     <%= label f, "Публичный", class: "col-2 form-check-label" %>
     <div class="col10">
       <div class="form-check ml-3">
-        <%= checkbox f, :common, class: "form-check-input", id: "template-form-exec" %>
+        <%= checkbox f, :common, class: "form-check-input" %>
         <%= error_tag f, :common %>
       </div>
     </div>

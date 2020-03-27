@@ -40,7 +40,8 @@ defmodule AcariServer.Template do
         "name" => template.name,
         "description" => template.description,
         "rights" => template.rights,
-        "executable" => template.executable
+        "executable" => template.executable,
+        "type" => template.type
       })
 
     with {:ok, calculated} <-

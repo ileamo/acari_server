@@ -22,7 +22,7 @@
     <%= @template.executable && "Да" || "Нет" %>
   </li>
 
-  <%= if @template.executable do %>
+  <%= if is_executable?(@template.type, @template.executable) do %>
     <li>
       <strong>Требуемые права:</strong>
       <%= rights_descr(@template.rights) %>
