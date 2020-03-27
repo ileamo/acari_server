@@ -142,8 +142,11 @@
   </li>
   <li class="nav-item">
     <%= link "ЧаВо", to: Routes.page_path(@conn, :faq), class: "nav-link" %>
-  </li> -->
+  </li>
   <li class="nav-item">
     <%= link "Заметки", to: Routes.note_path(@conn, :index), class: "nav-link" %>
+  </li>-->
+  <li class="nav-item">
+    <%= link "История чата", to: Routes.page_path(@conn, :chat), class: "nav-link" %>
   </li>
 </ul>

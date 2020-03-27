@@ -18,10 +18,17 @@ defmodule AcariServer.ChatManager do
       [%Chat{}, ...]
 
   """
-  def list_chat_messages do
+  def list_all_chat_messages do
     RepoRO.all(Chat)
   end
 
+  def list_chat_messages do
+    Chat
+    |> order_by(desc: :inserted_at, desc: :id)
+    |> limit(1000)
+    |> RepoRO.all()
+    |> RepoRO.preload(:user)
+  end
 
   def get_chat_messages(ndt \\ nil, id \\ nil) do
     case ndt do

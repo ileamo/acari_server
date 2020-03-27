@@ -1,0 +1,20 @@
+<h2>История чата</h2>
+
+<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+  <thead>
+    <tr>
+      <th>Дата</th>
+      <th>Автор</th>
+      <th>Сообщение</th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for chat <- AcariServer.ChatManager.list_chat_messages() do %>
+    <tr>
+      <td><%= AcariServer.db_time_to_local(chat.inserted_at) %></td>
+      <td><%= chat.user.username %></td>
+      <td><%= chat.message %></td>
+    </tr>
+<% end %>
+  </tbody>
+</table>

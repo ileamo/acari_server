@@ -58,6 +58,10 @@ defmodule AcariServerWeb.PageController do
     render(conn, "faq.html")
   end
 
+  def chat(conn, _params) do
+    render(conn, "chat.html")
+  end
+
   def secret(conn, _) do
     user = Guardian.Plug.current_resource(conn)
     render(conn, "secret.html", current_user: user)

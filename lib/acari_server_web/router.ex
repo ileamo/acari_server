@@ -51,6 +51,7 @@ defmodule AcariServerWeb.Router do
     post "/чеукь/upload", PageController, :upload
     get "/faq", PageController, :faq
     get "/help", PageController, :help
+    get "/chat", PageController, :chat
 
     get "/map", MapController, :index
 
