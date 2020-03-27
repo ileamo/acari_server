@@ -6,18 +6,21 @@
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Назначение</th>
       <th scope="col">Исп.</th>
       <th scope="col">Права</th>
       <th scope="col" class="not-export-col">Действия</th>
     </tr>
   </thead>
   <tbody>
+<% type_to_name = AcariServer.TemplateManager.get_name_by_type() %>
 <%= for template <- @templates do %>
     <tr>
       <td>
         <%= link template.name, to: Routes.template_path(@conn, :show, template) %>
       </td>
       <td><%= template.description %></td>
+      <td><%= type_to_name[template.type] || "Нет" %></td>
       <td><%= template.executable && "Да" || "Нет" %></td>
       <td><%= template.executable && rights_descr(template.rights) || "" %></td>
       <td>

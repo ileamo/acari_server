@@ -9,6 +9,7 @@ defmodule AcariServer.TemplateManager.Template do
     field :executable, :boolean, default: false
     field :validator, :string
     field :rights, :string, default: "rw"
+    field :type, :string, default: "no"
     field :test_client_name, :string
     field :test_params, :string
     field :zabbix_send, :boolean, default: false
@@ -34,6 +35,7 @@ defmodule AcariServer.TemplateManager.Template do
       :executable,
       :validator,
       :rights,
+      :type,
       :test_client_name,
       :test_params,
       :zabbix_send,

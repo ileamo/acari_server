@@ -37,6 +37,25 @@ defmodule AcariServer.TemplateManager do
     |> Enum.sort()
   end
 
+  @type_id_list [
+    {"Клиент", "client"},
+    {"Сервер", "server"},
+    {"Zabbix", "zabbix"},
+    {"Текст", "text"},
+    {"Вставка", "include"},
+    {"Нет", "no"}
+  ]
+
+  def templ_type_id_list() do
+    @type_id_list
+  end
+
+  def get_name_by_type() do
+    @type_id_list
+    |> Enum.map(fn {name, type} -> {type, name} end)
+    |> Enum.into(%{})
+  end
+
   def script_list(tun_name) do
     with node <- AcariServer.NodeManager.get_node_with_class(tun_name, :templates),
          script when is_map(script) <- node |> Map.get(:script),
