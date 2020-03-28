@@ -41,9 +41,9 @@ defmodule AcariServer.TemplateManager do
   end
 
   @type_id_list [
-    {"Клиент", "client"},
-    {"Сервер", "server"},
-    {"Zabbix", "zabbix"},
+    {"Скрипт на клиенте", "client"},
+    {"Скрипт на сервере", "server"},
+    {"Zabbix API", "zabbix"},
     {"Текст", "text"},
     {"Вставка", "include"},
     {"Нет", "no"}

@@ -8,14 +8,21 @@ defmodule AcariServer.Validator do
   end
 
   def get_validator_list() do
-    validators() |> Enum.map(fn {name, _} -> name end)
+    validators()
+    |> Enum.map(fn {name, _} -> name end)
     |> Enum.sort()
   end
 
   defp exs_validator(text) do
     case Code.string_to_quoted(text) do
-      {:ok, _} -> :ok
-      {:error, {line, error, _token}} -> "#{line}: #{error}"
+      {:ok, _} ->
+        :ok
+
+      {:error, {line, error, token}} when is_binary(error) ->
+        "#{line}: #{error} #{inspect(token)}"
+
+      {:error, {line, error, token}} ->
+        "#{line}: #{inspect(error)} #{inspect(token)}"
     end
   end
 end

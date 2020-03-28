@@ -543,7 +543,11 @@ defmodule AcariServerWeb.GrpOperChannel do
     case templ_group do
       :zabbix ->
         AcariServer.TemplateManager.list_templates()
-        |> Enum.filter(fn %{name: name} -> String.match?(name, ~r/\.zbx$/) end)
+        |> Enum.filter(fn
+          %{type: "no", name: name} -> String.match?(name, ~r/\.zbx$/) #TODO remove after 1.2.1
+          %{type: "zabbix"} -> true
+          _ -> false
+      end)
 
       _ ->
         case Map.get(class, templ_group) do

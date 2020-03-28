@@ -69,7 +69,10 @@
       </div>
 
       <div class="form-row align-items-center mt-3">
-        <%= label f, "Zabbix", class: "col-sm-2 form-check-label" %>
+        <%= label f, :zabbix_send, class: "col-sm-3 form-check-label" do
+          "Посылать результат в Zabbix"
+        end
+        %>
         <div class="col-sm-1">
           <div class="form-check mb-4">
             <%= checkbox f, :zabbix_send, class: "form-check-input" %>
@@ -77,7 +80,7 @@
           </div>
         </div>
 
-        <%= label f, "Ключ элемента данных", class: "col-sm-4 col-form-label" %>
+        <%= label f, "Ключ элемента данных", class: "col-sm-3 col-form-label" %>
         <div class="col-sm-5">
           <%= text_input f, :zabbix_key, class: "form-control" %>
           <%= error_tag f, :zabbix_key %>
