@@ -49,6 +49,6 @@ defmodule AcariServerWeb.TemplateView do
 
   defdelegate highlight_line(s, n), to: AcariServer.Template
   defdelegate get_line(n), to: AcariServer.Template
-  defdelegate is_executable?(type, exec \\ false), to: AcariServer.TemplateManager
+  defdelegate is_executable?(type), to: AcariServer.TemplateManager
   defdelegate exec_type_csv(), to: AcariServer.TemplateManager
 end

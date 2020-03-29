@@ -341,7 +341,6 @@ if (grp_oper) {
           function showFullData() {
             if (table) {
               let checked = grp_oper_show_full_data.checked
-              console.log(checked)
               if (checked) {
                 table.column(4).visible(false);
                 table.column(5).visible(true);

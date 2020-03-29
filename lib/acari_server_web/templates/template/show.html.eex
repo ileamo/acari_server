@@ -17,12 +17,7 @@
     <%= AcariServer.TemplateManager.get_name_by_type()[@template.type] || "Нет"%>
   </li>
 
-  <li>
-    <strong>Исполняемый:</strong>
-    <%= @template.executable && "Да" || "Нет" %>
-  </li>
-
-  <%= if is_executable?(@template.type, @template.executable) do %>
+  <%= if is_executable?(@template.type) do %>
     <li>
       <strong>Требуемые права:</strong>
       <%= rights_descr(@template.rights) %>

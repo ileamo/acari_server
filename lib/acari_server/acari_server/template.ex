@@ -40,7 +40,6 @@ defmodule AcariServer.Template do
         "name" => template.name,
         "description" => template.description,
         "rights" => template.rights,
-        "executable" => template.executable,
         "type" => template.type
       })
 
@@ -328,7 +327,7 @@ defmodule AcariServer.Template do
       "name" => "TEMPLATE_NAME",
       "description" => "TEMPLATE_DESCRIPTION",
       "rights" => "TEMPLATE_RIGHTS",
-      "executable" => true
+      "type" => "Нет"
     })
   end
 

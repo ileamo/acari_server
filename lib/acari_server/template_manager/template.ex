@@ -32,7 +32,6 @@ defmodule AcariServer.TemplateManager.Template do
       :description,
       :template,
       :script_id,
-      :executable,
       :validator,
       :rights,
       :type,

@@ -24,7 +24,7 @@ defmodule AcariServer.TemplateManager do
 
   def templ_name_id_pairs_list() do
     list_templates()
-    |> Enum.filter(fn %{type: type, executable: ex} -> is_executable?(type, ex) end)
+    |> Enum.filter(fn %{type: type} -> is_executable?(type) end)
     |> Enum.map(fn %{id: id, name: name, description: descr} -> {"#{descr} (#{name})", id} end)
     |> Enum.sort()
   end
@@ -33,7 +33,6 @@ defmodule AcariServer.TemplateManager do
     list_templates()
     |> Enum.filter(fn
       %{type: ^type} -> true
-      %{type: "no", executable: true} -> true
       _ -> false
     end)
     |> Enum.map(fn %{id: id, name: name, description: descr} -> {"#{descr} (#{name})", id} end)
@@ -67,12 +66,10 @@ defmodule AcariServer.TemplateManager do
   end
 
   def exec_type_csv(), do: "client,server,zabbix"
-  def is_executable?(type, exec \\ false)
-  def is_executable?("client", _), do: true
-  def is_executable?("server", _), do: true
-  def is_executable?("zabbix", _), do: true
-  def is_executable?("no", exec), do: exec
-  def is_executable?(_, _), do: false
+  def is_executable?("client"), do: true
+  def is_executable?("server"), do: true
+  def is_executable?("zabbix"), do: true
+  def is_executable?(_), do: false
 
   def script_list(tun_name) do
     with node <- AcariServer.NodeManager.get_node_with_class(tun_name, :templates),
@@ -98,8 +95,8 @@ defmodule AcariServer.TemplateManager do
 
   def get_templ_names_ex_noex() do
     list_templates()
-    |> Enum.reduce([[], []], fn %{name: name, type: type, executable: ex}, [ex_list, list] ->
-      case is_executable?(type, ex) do
+    |> Enum.reduce([[], []], fn %{name: name, type: type}, [ex_list, list] ->
+      case is_executable?(type) do
         true -> [[name | ex_list], list]
         _ -> [ex_list, [name | list]]
       end
