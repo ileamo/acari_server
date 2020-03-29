@@ -144,6 +144,13 @@ defmodule AcariServerWeb.NewNodeController do
   end
 
   defp add_new_client(text, client_params) do
+    case String.printable?(text) do
+      true -> add_new_client_(text, client_params)
+      _ -> {:error, "Файл содержит непечатные символы"}
+    end
+  end
+
+  defp add_new_client_(text, client_params) do
     var_def =
       with class when is_binary(class) <- client_params["script_id"],
            {class_id, ""} <- Integer.parse(class),

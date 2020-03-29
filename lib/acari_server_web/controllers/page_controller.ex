@@ -82,18 +82,19 @@ defmodule AcariServerWeb.PageController do
   end
 
   def upload(conn, params) do
-    mes =
+    {type, mes} =
       with %{path: path, filename: filename} <- params["upload"],
            home when is_binary(home) <- System.user_home(),
            target_dir <- home <> "/uploads/",
            {_, 0} <- System.cmd("mkdir", ["-p", target_dir]),
            :ok <- File.cp(path, target_dir <> filename) do
-        "OK"
+        {:info, "Файл успешно загружен"}
       else
-        res -> inspect(res)
+        res -> {:error, "Ошибка загрузки: #{inspect(res)}"}
       end
 
     conn
-    |> redirect(to: Routes.page_path(conn, :xterm, err_mes: mes))
+    |> put_flash(type, mes)
+    |> redirect(to: Routes.page_path(conn, :xterm))
   end
 end
