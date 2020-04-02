@@ -37,13 +37,13 @@ config :acari_server, AcariServerWeb.Gettext, default_locale: "ru"
 config :acari,
   server: true
 
-  config :acari_server, AcariServer.Scheduler,
+config :acari_server, AcariServer.Scheduler,
   debug_logging: false,
   global: true,
   timezone: "Europe/Moscow",
   jobs: [
     # Every minute
-    {"* * * * *",      {AcariServer.Scheduler.Api, :send_clients_number_to_zabbix, []}}
+    {"* * * * *", {AcariServer.Scheduler.Api, :send_clients_number_to_zabbix, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom

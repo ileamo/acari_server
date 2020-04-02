@@ -108,7 +108,12 @@ defmodule AcariServer.Hs do
   end
 
   defp start_tun(id, params) do
-    case Acari.start_tun(id, AcariServer.Master, peer_params: params) do
+    IO.inspect(params)
+
+    case Acari.start_tun(id, AcariServer.Master,
+           peer_params: params,
+           iface_conf: [tap: params["tap"]]
+         ) do
       :ok -> :ok
       {:error, {:already_started, _}} -> :ok
     end
