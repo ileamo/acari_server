@@ -1,5 +1,5 @@
 %{
-  "acari": {:git, "https://github.com/ileamo/acari.git", "bf82347b2145ae4be689d6fa6d60f77829037604", []},
+  "acari": {:git, "https://github.com/ileamo/acari.git", "3f494364d0c896229de8347312376616aca308a6", []},
   "artificery": {:hex, :artificery, "0.4.2", "3ded6e29e13113af52811c72f414d1e88f711410cac1b619ab3a2666bbd7efd4", [:mix], [], "hexpm"},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], [], "hexpm"},
   "bbmustache": {:hex, :bbmustache, "1.8.1", "22af8ad50383b7022066c246486aaf2db980e3883c6c620600e9299caa420c10", [:rebar3], [], "hexpm", "4e8d1a5870f6e874e917cdc55e5c874c1b1965b9b5e8e34c69c01699ba48626c"},
