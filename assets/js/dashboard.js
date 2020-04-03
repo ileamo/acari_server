@@ -1,13 +1,13 @@
 // Messages
 $('#collapseMessages').on('hide.bs.collapse', function() {
-  sessionStorage.showMessages = 'hide';
+  localStorage.showMessages = 'hide';
 })
 
 $('#collapseMessages').on('show.bs.collapse', function() {
-  sessionStorage.showMessages = 'show'
+  localStorage.showMessages = 'show'
 })
 
-$('#collapseMessages').collapse(sessionStorage.showMessages || 'show')
+$('#collapseMessages').collapse(localStorage.showMessages || 'show')
 
 
 $(function() {

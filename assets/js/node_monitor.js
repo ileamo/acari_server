@@ -49,7 +49,7 @@ if (node_monitor) {
   })
 
   function getScript() {
-    sessionStorage.setItem("lastScript" + window.location.pathname, this.id)
+    localStorage.setItem("lastScript" + window.location.pathname, this.id)
     channel.push('input', {
       input: "get_script",
       script: this.id
@@ -57,7 +57,7 @@ if (node_monitor) {
   }
 
   function getLastScript() {
-    let id = sessionStorage.getItem("lastScript" + window.location.pathname)
+    let id = localStorage.getItem("lastScript" + window.location.pathname)
     channel.push('input', {
       input: "get_script",
       script: id
@@ -67,7 +67,7 @@ if (node_monitor) {
   document.getElementById("nm-update-script").addEventListener("click", updateScript, false);
 
   function updateScript() {
-    let id = sessionStorage.getItem("lastScript" + window.location.pathname)
+    let id = localStorage.getItem("lastScript" + window.location.pathname)
     let r = confirm("Выполнить скрипт " + id + " на клиенте?")
     if (r) {
       document.querySelector("#nm-script-field").innerText = "Wait ..."
@@ -86,7 +86,7 @@ if (node_monitor) {
   })
 
   function getSrvScript() {
-    sessionStorage.setItem("lastSrvScript" + window.location.pathname, this.id)
+    localStorage.setItem("lastSrvScript" + window.location.pathname, this.id)
     channel.push('input', {
       input: "get_srv_script",
       script: this.id
@@ -96,7 +96,7 @@ if (node_monitor) {
   document.getElementById("nm-show-srv-script").addEventListener("click", getLastSrvScript, false);
 
   function getLastSrvScript() {
-    let id = sessionStorage.getItem("lastSrvScript" + window.location.pathname)
+    let id = localStorage.getItem("lastSrvScript" + window.location.pathname)
     channel.push('input', {
       input: "get_srv_script",
       script: id
@@ -106,7 +106,7 @@ if (node_monitor) {
   document.getElementById("nm-update-srv-script").addEventListener("click", updateSrvScript, false);
 
   function updateSrvScript() {
-    let id = sessionStorage.getItem("lastSrvScript" + window.location.pathname)
+    let id = localStorage.getItem("lastSrvScript" + window.location.pathname)
     let r = confirm("Выполнить скрипт " + id + " на сервере?")
     if (r) {
       document.querySelector("#nm-srv-script-field").innerText = "Нажмите 'Обновить' для просмотра результата"

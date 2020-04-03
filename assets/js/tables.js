@@ -64,6 +64,7 @@ let datatatable_print_text = '<i class="fas fa-print"></i> Печать'
 datatable_params = {
   select: false,
   stateSave: true,
+  stateDuration: 0,
   responsive: true,
   dom: datatable_dom,
   buttons: [{
