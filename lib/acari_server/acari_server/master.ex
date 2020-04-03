@@ -284,15 +284,16 @@ defmodule AcariServer.Master do
   end
 
   def delete_tunnel(tun_name) do
+    AcariServer.Mnesia.del_tunnel(tun_name)
     [node() | Node.list()]
     |> Enum.each(fn node ->
       GenServer.cast({__MODULE__, node}, {:del_tun, tun_name})
     end)
 
-    Task.start(fn ->
-      Process.sleep(5_000)
-      AcariServer.Mnesia.del_tunnel(tun_name)
-    end)
+    # Task.start(fn ->
+    #   Process.sleep(5_000)
+    #   AcariServer.Mnesia.del_tunnel(tun_name)
+    # end)
   end
 
   def run_script_on_server(tun_name, template, node \\ Node.self()) do

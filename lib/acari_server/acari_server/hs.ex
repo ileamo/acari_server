@@ -86,7 +86,14 @@ defmodule AcariServer.Hs do
   defp start_tun(%{"id" => id} = request, ipaddr) do
     case Acari.tun_exist?(id) do
       true ->
-        :ok
+        state = Acari.TunMan.get_state(id)
+
+        if !!state.peer_params["tap"] == !!request["params"]["tap"] do
+          :ok
+        else
+          AcariServer.Master.delete_tunnel(id)
+          start_tun(request, ipaddr)
+        end
 
       false ->
         if Application.get_env(:acari_server, AcariServer)[:allow_unconfigured] do
@@ -108,8 +115,6 @@ defmodule AcariServer.Hs do
   end
 
   defp start_tun(id, params) do
-    IO.inspect(params)
-
     case Acari.start_tun(id, AcariServer.Master,
            peer_params: params,
            iface_conf: [tap: params["tap"]]
