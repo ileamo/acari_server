@@ -201,8 +201,7 @@ defmodule AcariServer.Master do
       }
     }
 
-    {script, _} =
-      AcariServer.SFX.create_script_from_template(tun_name, :remote, params)
+    {script, _} = AcariServer.SFX.create_script_from_template(tun_name, :remote, params)
 
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
@@ -243,7 +242,8 @@ defmodule AcariServer.Master do
          {:ok, list} <- :inet.getifaddrs(),
          {_, addr_list} <-
            list |> Enum.find(fn {name, _} -> name == to_charlist(ifname) end),
-         {:ok, dstaddr} <- addr_list |> Keyword.fetch(:dstaddr),
+         # TODO find more common algorithm
+         {_, _, _, _} = dstaddr <- addr_list[:dstaddr] || addr_list[:broadaddr],
          dstaddr when is_list(dstaddr) <- :inet.ntoa(dstaddr) do
       to_string(dstaddr)
     else
@@ -285,6 +285,7 @@ defmodule AcariServer.Master do
 
   def delete_tunnel(tun_name) do
     AcariServer.Mnesia.del_tunnel(tun_name)
+
     [node() | Node.list()]
     |> Enum.each(fn node ->
       GenServer.cast({__MODULE__, node}, {:del_tun, tun_name})
@@ -315,8 +316,7 @@ defmodule AcariServer.Master do
   end
 
   def exec_sh(tun_name, template, env \\ []) do
-    {script, templ_name} =
-      AcariServer.SFX.create_script_from_template(tun_name, template, %{})
+    {script, templ_name} = AcariServer.SFX.create_script_from_template(tun_name, template, %{})
 
     case System.cmd("sh", ["-c", script |> String.replace("\r\n", "\n")],
            stderr_to_stdout: true,

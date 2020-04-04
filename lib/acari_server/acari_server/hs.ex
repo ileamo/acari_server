@@ -92,6 +92,7 @@ defmodule AcariServer.Hs do
           :ok
         else
           AcariServer.Master.delete_tunnel(id)
+          Process.sleep(1000) # wait while tunnel deleted
           start_tun(request, ipaddr)
         end
 
