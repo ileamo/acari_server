@@ -96,4 +96,45 @@ defmodule AcariServerWeb.TemplateController do
     diff = AcariServer.TemplateEventManager.get_template_events_diff(template.name)
     render(conn, "diff.html", template: template, diff: diff)
   end
+
+  def import(conn, params) do
+    {type, mes} =
+      with %{path: path} <- params["upload"],
+           {:ok, json} <- File.read(path),
+           {:ok, templates} <- Jason.decode(json),
+           :ok <- if(is_list(templates), do: :ok, else: {:error, "Должен быть список шаблонов"}) do
+        res =
+          templates
+          |> Enum.map(fn
+            %{} = params ->
+              case TemplateManager.create_template(params) do
+                {:ok, _} ->
+                  nil
+
+                {:error, %{changes: %{name: name}, errors: [name: {"has already been taken", _}]}} ->
+                  "#{name}: Уже существует"
+
+                res ->
+                  inspect(res)
+              end
+
+            _ ->
+              nil
+          end)
+          |> Enum.filter(& &1)
+          |> IO.inspect()
+
+        {:info,
+         case res do
+           [] -> "Шаблоны успешно импортированы"
+           list -> "Шаблоны импортированы\n#{Enum.join(list, "\n")}"
+         end}
+      else
+        res -> {:error, "Ошибка импорта: #{inspect(res)}"}
+      end
+
+    conn
+    |> put_flash(type, mes)
+    |> redirect(to: Routes.template_path(conn, :index))
+  end
 end
