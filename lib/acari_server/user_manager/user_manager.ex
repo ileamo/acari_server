@@ -49,6 +49,13 @@ defmodule AcariServer.UserManager do
     |> RepoRO.preload(:groups_users)
   end
 
+  def get_username_by_id(id) do
+    case User |> RepoRO.get(id) do
+      %{username: u} -> u
+      _ -> nil
+    end
+  end
+
   @doc """
   Creates a user.
 

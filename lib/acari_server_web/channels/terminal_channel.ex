@@ -29,12 +29,16 @@ defmodule AcariServerWeb.TerminalChannel do
   end
 
   def join("terminal:2", _payload, socket) do
-    with {:ok, terminal} <-
+    with username when is_binary(username) <-
+           AcariServer.UserManager.get_username_by_id(socket.assigns.current_user_id),
+         {:ok, terminal} <-
            Terminal.start_child(Node.self(), %{
              output_pid: self(),
              tun_name: AcariServer.Mnesia.get_server_name_by_system_name(node()),
              command: '/bin/bash',
-             init_send: "stty echo\nstty rows 40\nscreen -d -r\n"
+             init_send:
+               "stty echo\nstty rows 40\n" <>
+                 "screen -d -R -h 4096 -s /bin/bash -S #{username}\n"
            }) do
       Process.link(terminal)
       {:ok, assign(socket, :terminal, terminal)}
