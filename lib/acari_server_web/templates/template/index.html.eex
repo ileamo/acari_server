@@ -1,9 +1,10 @@
 <h2>Список шаблонов</h2>
 
-<table id="datatable" class="table display table-striped table-bordered table-sm w-100">
+<table id="datatable-select" class="table display table-striped table-bordered table-sm w-100">
 
   <thead>
     <tr>
+      <th style="display:none;"></th>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
       <th scope="col">Назначение</th>
@@ -15,6 +16,7 @@
 <% type_to_name = AcariServer.TemplateManager.get_name_by_type() %>
 <%= for template <- @templates do %>
     <tr>
+      <td style="display:none;"><%= template.id %></td>
       <td>
         <%= link template.name, to: Routes.template_path(@conn, :show, template) %>
       </td>
@@ -39,3 +41,5 @@
 
 <span><%= link "Новый шаблон", to: Routes.template_path(@conn, :new),
             class: AcariServer.UserManager.get_disabled(@current_user) %></span>
+|
+<span><%= link "Экспорт выделенных шаблонов", to: "#", id: "export-selected-templates" %></span>

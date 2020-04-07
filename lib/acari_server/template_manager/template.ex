@@ -14,7 +14,7 @@ defmodule AcariServer.TemplateManager.Template do
     field :test_params, :string
     field :zabbix_send, :boolean, default: false
     field :zabbix_key, :string
-    belongs_to :script, AcariServer.ScriptManager.Script
+    belongs_to :script, AcariServer.ScriptManager.Script # TODO remove
     has_many :schedules, AcariServer.ScheduleManager.Schedule
 
 

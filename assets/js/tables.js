@@ -130,7 +130,7 @@ $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
 
 var table = $("#datatable").DataTable(datatable_params);
 var table_all = $("#datatable_all").DataTable(datatable_params);
-var table_select = $("#datatable_select").DataTable(datatable_params_with_select);
+var table_select = $("#datatable-select").DataTable(datatable_params_with_select);
 
 $('.buttonNext').addClass('btn btn-success');
 $('.buttonPrevious').addClass('btn btn-primary');
@@ -225,10 +225,29 @@ if (document.getElementById("exec-selected-clients")) {
 }
 
 
+let export_selected_templates = document.getElementById("export-selected-templates")
+if (export_selected_templates) {
+  export_selected_templates.addEventListener("click", exportTemplates, false);
+
+  function exportTemplates() {
+    let selected = table_select.rows('.selected').data()
+    let num = selected.length
+    if (num > 0) {
+      let ids = selected.map(function(x) {
+        return x[0]
+      }).join(',')
+      global.pushExportTemplateList(ids)
+      table_select.rows().deselect();
+    } else {
+      alert("Не выбрано ни одного шаблона")
+    }
+  }
+}
+
+
 if (document.getElementById("client-comments")) {
   $('#client-comments').on('show.bs.modal', function(event) {
     let data_field = $(event.relatedTarget)
-    console.log('DATA FIELD',data_field)
     $(this).find('.modal-body #client-comments-other-users').html(data_field.data('other-users'))
     document.getElementById('client-comments-user-id').value = data_field.data('user-id')
     document.getElementById('client-comments-client-id').value = data_field.data('client-id')

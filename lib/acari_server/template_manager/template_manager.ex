@@ -123,6 +123,10 @@ defmodule AcariServer.TemplateManager do
     |> RepoRO.preload(:script)
   end
 
+  def get_template(id) do
+    RepoRO.get(Template, id)
+  end
+
   def get_template_by_name(name) do
     Template
     |> RepoRO.get_by(name: name)

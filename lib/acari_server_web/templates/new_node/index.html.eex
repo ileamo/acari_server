@@ -94,5 +94,5 @@
         <%= submit "Загрузить" %>
       </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
+</div>
