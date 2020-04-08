@@ -224,26 +224,25 @@ if (document.getElementById("exec-selected-clients")) {
   })
 }
 
+let linkx = document.getElementById("export-templates-linkX")
+if (linkx) {
+  linkx.addEventListener('click', function(event) {
+    // Stop the link from redirecting
+    event.preventDefault();
 
-let export_selected_templates = document.getElementById("export-selected-templates")
-if (export_selected_templates) {
-  export_selected_templates.addEventListener("click", exportTemplates, false);
-
-  function exportTemplates() {
     let selected = table_select.rows('.selected').data()
     let num = selected.length
     if (num > 0) {
       let ids = selected.map(function(x) {
         return x[0]
       }).join(',')
-      global.pushExportTemplateList(ids)
-      table_select.rows().deselect();
+      // Redirect instead with JavaScript
+      window.location.href = linkx.href + '?list=' + encodeURIComponent(ids)
     } else {
-      alert("Не выбрано ни одного шаблона")
+      alert('Не выделена ни одна строка в таблице')
     }
-  }
+  }, false);
 }
-
 
 if (document.getElementById("client-comments")) {
   $('#client-comments').on('show.bs.modal', function(event) {

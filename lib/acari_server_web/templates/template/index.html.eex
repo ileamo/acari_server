@@ -42,7 +42,8 @@
 <span><%= link "Новый шаблон", to: Routes.template_path(@conn, :new),
             class: AcariServer.UserManager.get_disabled(@current_user) %></span>
 |
-<span><%= link "Экспорт выделенных шаблонов", to: "#", id: "export-selected-templates" %></span>
+<span><%= link "Экспорт выделенных шаблонов", to: Routes.template_path(@conn, :export),
+  id: "export-templates-linkX" %></span>
 |
 <span><a href="#" data-toggle="modal" data-target="#import-templates"
   class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">

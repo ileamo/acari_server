@@ -105,6 +105,45 @@ defmodule AcariServerWeb.TemplateController do
     end
   end
 
+  def export(conn, %{"list" => list}) do
+    json =
+      list
+      |> String.split(",")
+      |> Enum.map(fn id -> AcariServer.TemplateManager.get_template(id) end)
+      |> Enum.filter(& &1)
+      |> Enum.map(fn t ->
+        %{
+          description: t.description,
+          executable: t.executable,
+          name: t.name,
+          rights: t.rights,
+          template: t.template,
+          test_params: t.test_params,
+          type: t.type,
+          validator: t.validator,
+          zabbix_key: t.zabbix_key,
+          zabbix_send: t.zabbix_send
+        }
+      end)
+      |> Jason.encode()
+      |> IO.inspect()
+
+    case json do
+      {:ok, content} ->
+        conn
+        |> put_flash(:info, "Шаблоны экспортированы")
+        |> send_download({:binary, content},
+          filename:
+            "bogatka_templates_" <>
+              (NaiveDateTime.utc_now() |> to_string() |> String.replace(" ", "_")) <> ".json"
+        )
+
+      _ ->
+        conn
+        |> redirect(to: Routes.template_path(conn, :index))
+    end
+  end
+
   def import(conn, params) do
     {type, mes} =
       with %{path: path} <- params["upload"],
@@ -119,8 +158,7 @@ defmodule AcariServerWeb.TemplateController do
                 {:ok, _} ->
                   nil
 
-                {:error,
-                 %{changes: %{name: name}, errors: [name: {"has already been taken", _}]}} ->
+                {:error, %{changes: %{name: name}, errors: [name: {"has already been taken", _}]}} ->
                   "#{name}: Уже существует"
 
                 {:error, %{changes: %{name: name}, errors: err}} ->

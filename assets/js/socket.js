@@ -199,16 +199,5 @@ for (var i = 0; i < about_system_menus.length; i++) {
   })
 }
 
-global.pushExportTemplateList = function(list) {
-  channel.push('export_template_list', {
-    list: list
-  });
-}
-
-channel.on('export_template_msg', function(payload) {
-  alert(payload.message)
-})
-
-
 
 export default socket

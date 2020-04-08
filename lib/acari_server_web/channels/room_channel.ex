@@ -141,50 +141,6 @@ defmodule AcariServerWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in("export_template_list", payload, socket) do
-    json =
-      payload["list"]
-      |> String.split(",")
-      |> Enum.map(fn id -> AcariServer.TemplateManager.get_template(id) end)
-      |> Enum.filter(& &1)
-      |> Enum.map(fn t ->
-        %{
-          description: t.description,
-          executable: t.executable,
-          name: t.name,
-          rights: t.rights,
-          template: t.template,
-          test_params: t.test_params,
-          type: t.type,
-          validator: t.validator,
-          zabbix_key: t.zabbix_key,
-          zabbix_send: t.zabbix_send
-        }
-      end)
-      |> Jason.encode()
-
-    with {:ok, content} <- json,
-         tmp_dir when is_binary(tmp_dir) <- System.tmp_dir(),
-         file_name <-
-           Path.join(
-             tmp_dir,
-             "bogatka_templates_" <>
-               (NaiveDateTime.utc_now() |> to_string() |> String.replace(" ", "_")) <> ".json"
-           ),
-         :ok <- File.write(file_name, content) do
-      push(socket, "export_template_msg", %{
-        "message" => "Шаблоны экспортированы в файл #{file_name}"
-      })
-    else
-      res ->
-        push(socket, "export_template_msg", %{
-          "message" => "Ошибка экспорта шаблонов #{inspect(res)}"
-        })
-    end
-
-    {:noreply, socket}
-  end
-
   def handle_in(event, _payload, socket) do
     Logger.error("Channel room: bad input event: #{inspect(event)}")
     {:noreply, socket}

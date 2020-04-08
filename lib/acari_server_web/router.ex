@@ -78,6 +78,7 @@ defmodule AcariServerWeb.Router do
     resources "/scripts", ScriptController
     resources "/templates", TemplateController
     post "/templates/import", TemplateController, :import
+    get "/templates_export", TemplateController, :export
     get "/templates_diff/:id", TemplateController, :diff
 
     resources "/servers", ServerController
