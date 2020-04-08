@@ -97,6 +97,14 @@ defmodule AcariServerWeb.TemplateController do
     render(conn, "diff.html", template: template, diff: diff)
   end
 
+  defp slice(str) do
+    if String.length(str) > 80 do
+      String.slice(str, 0, 80) <> "..."
+    else
+      str
+    end
+  end
+
   def import(conn, params) do
     {type, mes} =
       with %{path: path} <- params["upload"],
@@ -111,8 +119,12 @@ defmodule AcariServerWeb.TemplateController do
                 {:ok, _} ->
                   nil
 
-                {:error, %{changes: %{name: name}, errors: [name: {"has already been taken", _}]}} ->
+                {:error,
+                 %{changes: %{name: name}, errors: [name: {"has already been taken", _}]}} ->
                   "#{name}: Уже существует"
+
+                {:error, %{changes: %{name: name}, errors: err}} ->
+                  "#{name}: #{inspect(err) |> slice()}"
 
                 res ->
                   inspect(res)
@@ -126,10 +138,16 @@ defmodule AcariServerWeb.TemplateController do
 
         {:info,
          case res do
-           [] -> "Шаблоны успешно импортированы"
-           list -> "Шаблоны импортированы\n#{Enum.join(list, "\n")}"
+           [] ->
+             "Шаблоны успешно импортированы"
+
+           list ->
+             "Шаблоны импортированы кроме:<br>#{Enum.join(list, "<br>")}"
+             |> Phoenix.HTML.raw()
          end}
       else
+        nil -> {:error, "Ошибка импорта: файл не выбран"}
+        {:error, res} -> {:error, "Ошибка импорта: #{inspect(res)}"}
         res -> {:error, "Ошибка импорта: #{inspect(res)}"}
       end
 
