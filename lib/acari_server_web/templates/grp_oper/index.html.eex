@@ -144,7 +144,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="grp-script-res" tabindex="-1" role="dialog" aria-labelledby="ScriptTitle" aria-hidden="true">
+<div class="modal" id="grp-script-res" tabindex="-1" role="dialog" aria-labelledby="ScriptTitle" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -161,7 +161,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="grp-filter-table" tabindex="-1" role="dialog" aria-labelledby="FilterTable" aria-hidden="true">
+<div class="modal" id="grp-filter-table" tabindex="-1" role="dialog" aria-labelledby="FilterTable" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -179,7 +179,7 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="user-filters" tabindex="-1" role="dialog"
+<div class="modal" id="user-filters" tabindex="-1" role="dialog"
         aria-labelledby="user-filters-title" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">

@@ -34,7 +34,7 @@
 </table>
 
 <!-- Modal -->
-<div class="modal fade" id="template-diff" tabindex="-1" role="dialog"
+<div class="modal" id="template-diff" tabindex="-1" role="dialog"
         aria-labelledby="DiffTitle" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">

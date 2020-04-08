@@ -129,7 +129,7 @@
     </div>
 
     <!-- Modals -->
-    <div class="modal fade" id="About" tabindex="-1" role="dialog" aria-labelledby="AboutTitle" aria-hidden="true">
+    <div class="modal" id="About" tabindex="-1" role="dialog" aria-labelledby="AboutTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -147,7 +147,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="AboutSystem" tabindex="-1" role="dialog" aria-labelledby="AboutTitle" aria-hidden="true">
+    <div class="modal" id="AboutSystem" tabindex="-1" role="dialog" aria-labelledby="AboutTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -163,7 +163,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="ZabbixSync" tabindex="-1" role="dialog"
+    <div class="modal" id="ZabbixSync" tabindex="-1" role="dialog"
          aria-labelledby="ZabbixTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
@@ -216,7 +216,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="client-comments" tabindex="-1" role="dialog"
+    <div class="modal" id="client-comments" tabindex="-1" role="dialog"
             aria-labelledby="client-comments-title" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">

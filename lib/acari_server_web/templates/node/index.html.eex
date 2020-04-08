@@ -100,7 +100,7 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exec-selected-clients" tabindex="-1" role="dialog"
+<div class="modal" id="exec-selected-clients" tabindex="-1" role="dialog"
         aria-labelledby="exec-selected-client-title" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
