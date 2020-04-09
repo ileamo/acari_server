@@ -128,8 +128,13 @@ datatable_params_with_select.buttons =
 
 $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
 
+let datatable_params_desc0 = Object.assign({}, datatable_params)
+datatable_params_desc0.order = [[0, 'desc']]
+
+
 var table = $("#datatable").DataTable(datatable_params);
 var table_all = $("#datatable_all").DataTable(datatable_params);
+var table_desc_0 = $("#datatable_desc0").DataTable(datatable_params_desc0);
 var table_select = $("#datatable-select").DataTable(datatable_params_with_select);
 
 $('.buttonNext').addClass('btn btn-success');
