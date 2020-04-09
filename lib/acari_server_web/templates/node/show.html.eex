@@ -1,7 +1,17 @@
-<h2>Параметры клиента</h2>
+<% {color, text, confirm} = lock_state(@node) %>
+<div class="d-flex align-items-center">
+  <h2 class="d-inline">Параметры клиента</h2>
+
+  <span class="d-inline ml-2 <%=color%>">
+  <%= link to: Routes.node_path(@conn, :toggle_lock, @node, lock: !@node.lock),
+            class: color, data: [confirm: confirm] do %>
+    <i class="fas fa-toggle-<%= text %> mx-1"></i>
+  <% end %>
+  </span>
+</div>
 
 <%  lat = @node.latitude || 55.777594
-    lng = @node.longitude || 37.737926
+lng = @node.longitude || 37.737926
 %>
 
 <ul>

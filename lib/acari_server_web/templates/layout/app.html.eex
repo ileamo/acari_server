@@ -17,11 +17,11 @@
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="http://www.nsg.ru">NSG</a>
 
-      <a class="navbar-brand col col-md-2 text-center" href="#">
+      <!-- <a class="navbar-brand col col-md-2 text-center" href="#">
         <i class="fas fa-paw text-secondary"></i>
           <span class="text-warning">Будь дома</span>
         <i class="fas fa-paw text-secondary"></i>
-      </a>
+      </a> -->
 
       <div class="navbar-nav px-3 d-flex flex-wrap">
         <span class="d-none d-md-block navbar-text pr-3">

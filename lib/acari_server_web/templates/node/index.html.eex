@@ -30,12 +30,7 @@
       <td><%= script_name(node) %></td>
       <td><%= param_list(node.params) %></td>
       <td><%= AcariServer.GroupManager.groups_list(node) %></td>
-      <% {color, text, confirm} = if node.lock do
-           {"text-muted", "off", "Разблокировать клиента?"}
-         else
-           {"", "on", "Заблокировать клиента?"}
-         end
-      %>
+      <% {color, text, confirm} = lock_state(node) %>
       <td>
         <%= link to: Routes.node_path(@conn, :edit, node), class: bg_disabled do %>
           <i class="far fa-edit mr-1"></i>

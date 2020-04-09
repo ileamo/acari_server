@@ -141,7 +141,7 @@ defmodule AcariServerWeb.NodeController do
     conn
     |> AuditManager.create_audit_log(node, (if node.lock, do: "lock", else: "unlock"), node_params)
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
-    |> redirect_to_index_or_client_grp()
+    |> redirect(to: NavigationHistory.last_path(conn,1))
   end
 
   def exec_selected(conn, params = %{"clients_list" => ids, "operation" => operation}) do

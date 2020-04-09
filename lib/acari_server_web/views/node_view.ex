@@ -28,4 +28,12 @@ defmodule AcariServerWeb.NodeView do
     |> Enum.find(fn x -> String.match?(x, ~r{^/nodes($|/grp/\d+$)}) end) ||
       Routes.node_path(conn, :index)
   end
+
+  def lock_state(node) do
+    if node.lock do
+      {"text-muted", "off", "Разблокировать клиента?"}
+    else
+      {"", "on", "Заблокировать клиента?"}
+    end
+  end
 end
