@@ -536,11 +536,14 @@ defmodule AcariServer.Zabbix.ZbxApi do
         end
 
       _ ->
-        nil
+        add_or_update_host(node, "create")
     end
   end
 
-  defp add_or_update_host(node, method, hostid \\ nil) do
+  defp add_or_update_host(node, method, hostid \\ nil)
+  defp add_or_update_host(%{lock: true}, _method, _hostid), do: nil
+
+  defp add_or_update_host(node, method, hostid) do
     with [%{"templateid" => template_id}] <- get_template_id(),
          [%{"groupid" => hostgroup_id}] <- get_main_group() do
       group_list =

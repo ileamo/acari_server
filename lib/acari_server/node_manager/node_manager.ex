@@ -131,7 +131,7 @@ defmodule AcariServer.NodeManager do
     case res do
       {:ok, node = %AcariServer.NodeManager.Node{}} ->
         NewNodeDiscovery.sync_new_node(node)
-        ZbxApi.zbx_add_host(node)
+        if !node.lock, do: ZbxApi.zbx_add_host(node)
         res
 
       _ ->
@@ -163,7 +163,7 @@ defmodule AcariServer.NodeManager do
     case res do
       {:ok, updated_node = %AcariServer.NodeManager.Node{}} ->
         NewNodeDiscovery.sync_new_node(updated_node)
-        ZbxApi.zbx_update_host(updated_node, node.name)
+        if !updated_node.lock, do: ZbxApi.zbx_update_host(updated_node, node.name)
         res
 
       _ ->
