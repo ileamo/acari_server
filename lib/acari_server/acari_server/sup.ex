@@ -10,7 +10,8 @@ defmodule AcariServer.Sup do
     children = [
       AcariServer.Master,
       AcariServer.HsSup,
-      AcariServer.Listener
+      AcariServer.Listener,
+      AcariServer.TCPListener
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

@@ -8,9 +8,13 @@ defmodule AcariServer.Hs do
 
   ## Callbacks
   @impl true
-  def init(sock) do
+  def init({sock, :tls}) do
     :ssl.controlling_process(sock, self())
     {:ok, sock, {:continue, :init}}
+  end
+
+  def init({sock, :tcp}) do
+    {:ok, sock}
   end
 
   @impl true
@@ -26,10 +30,34 @@ defmodule AcariServer.Hs do
 
   @impl true
   def handle_info({:ssl, sslsocket, frame}, state) do
+    handle_request(:ssl, sslsocket, frame)
+    {:stop, :shutdown, state}
+  end
+
+  def handle_info({:tcp, socket, frame}, state) do
+    handle_request(:gen_tcp, socket, frame)
+    {:stop, :shutdown, state}
+  end
+
+  def handle_info({:ssl_closed, _sslsocket}, state) do
+    {:stop, :shutdown, state}
+  end
+
+  def handle_info({:ssl_error, _sslsocket, _reason}, state) do
+    {:stop, :shutdown, state}
+  end
+
+  def handle_info(msg, state) do
+    Logger.warn("SSL: unknown message: #{inspect(msg)}")
+    {:noreply, state}
+  end
+
+  # Private
+  defp handle_request(proto, sslsocket, frame) do
     with <<1::1, _val::15, json::binary>> <- :erlang.list_to_binary(frame),
          {:ok, %{"id" => id, "link" => link} = request} when is_binary(id) and is_binary(link) <-
            Jason.decode(json),
-         {:ok, {ipaddr, port}} <- :ssl.peername(sslsocket),
+         {:ok, {ipaddr, port}} <- proto.peername(sslsocket),
          Logger.info(
            "Listener: accept connection from #{:inet.ntoa(ipaddr)}:#{port}, id:#{id}, link:#{link}"
          ),
@@ -39,12 +67,12 @@ defmodule AcariServer.Hs do
              :connect -> sslsocket
              :restart -> false
            end) do
-      :ssl.controlling_process(sslsocket, pid)
+      proto.controlling_process(sslsocket, pid)
 
       # Re-send ssl messages
       {:messages, list} = Process.info(self(), :messages)
 
-      for {:ssl, _sslsocket, _frame} = mes <- list do
+      for {_, _sslsocket, _frame} = mes <- list do
         send(pid, mes)
       end
     else
@@ -65,24 +93,8 @@ defmodule AcariServer.Hs do
 
         Process.sleep(1 * 60 * 1000)
     end
-
-    {:stop, :shutdown, state}
   end
 
-  def handle_info({:ssl_closed, _sslsocket}, state) do
-    {:stop, :shutdown, state}
-  end
-
-  def handle_info({:ssl_error, _sslsocket, _reason}, state) do
-    {:stop, :shutdown, state}
-  end
-
-  def handle_info(msg, state) do
-    Logger.warn("SSL: unknown message: #{inspect(msg)}")
-    {:noreply, state}
-  end
-
-  # Private
   defp start_tun(%{"id" => id} = request, ipaddr) do
     case Acari.tun_exist?(id) do
       true ->
@@ -92,7 +104,8 @@ defmodule AcariServer.Hs do
           :ok
         else
           AcariServer.Master.delete_tunnel(id)
-          Process.sleep(1000) # wait while tunnel deleted
+          # wait while tunnel deleted
+          Process.sleep(1000)
           start_tun(request, ipaddr)
         end
 
@@ -137,10 +150,10 @@ defmodule AcariServer.Hs do
   end
 
   # Client
-  def handshake(sock) do
+  def handshake(sock, type) do
     DynamicSupervisor.start_child(
       AcariServer.HsSup,
-      child_spec(sock)
+      child_spec({sock, type})
     )
   end
 end

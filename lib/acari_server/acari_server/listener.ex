@@ -20,7 +20,7 @@ defmodule AcariServer.Listener do
 
   defp accept_loop(l) do
     {:ok, sock} = :ssl.transport_accept(l)
-    {:ok, _pid} = AcariServer.Hs.handshake(sock)
+    {:ok, _pid} = AcariServer.Hs.handshake(sock, :tls)
     accept_loop(l)
   end
 end
