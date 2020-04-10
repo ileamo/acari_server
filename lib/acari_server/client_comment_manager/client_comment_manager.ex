@@ -5,6 +5,7 @@ defmodule AcariServer.ClientCommentManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.ClientCommentManager.ClientComment
 
@@ -18,7 +19,7 @@ defmodule AcariServer.ClientCommentManager do
 
   """
   def list_client_comments do
-    Repo.all(ClientComment)
+    RepoRO.all(ClientComment)
   end
 
   @doc """
@@ -35,7 +36,7 @@ defmodule AcariServer.ClientCommentManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_client_comment!(id), do: Repo.get!(ClientComment, id)
+  def get_client_comment!(id), do: RepoRO.get!(ClientComment, id)
 
   @doc """
   Creates a client_comment.

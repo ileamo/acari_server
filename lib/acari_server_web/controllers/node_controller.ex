@@ -139,9 +139,9 @@ defmodule AcariServerWeb.NodeController do
     Process.sleep(1000)
 
     conn
-    |> AuditManager.create_audit_log(node, (if node.lock, do: "lock", else: "unlock"), node_params)
+    |> AuditManager.create_audit_log(node, if(node.lock, do: "lock", else: "unlock"), node_params)
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
-    |> redirect(to: NavigationHistory.last_path(conn,1))
+    |> redirect(to: NavigationHistory.last_path(conn, 1))
   end
 
   def exec_selected(conn, params = %{"clients_list" => ids, "operation" => operation}) do
@@ -235,6 +235,12 @@ defmodule AcariServerWeb.NodeController do
           |> put_flash(:error, "Ошибка при добавлении комментария: #{inspect(changeset.errors)}")
       end
     end
+    |> sleep_before_response()
     |> redirect(to: NavigationHistory.last_path(conn))
+  end
+
+  defp sleep_before_response(conn) do
+    Process.sleep(1000)
+    conn
   end
 end
