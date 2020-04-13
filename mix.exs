@@ -93,7 +93,9 @@ defmodule AcariServer.MixProject do
       {:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
       {:tunctl, git: "https://github.com/ileamo/tunctl.git"},
-      {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"}
+      {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"},
+      {:swarm, git: "https://github.com/ileamo/swarm.git", override: true}
+
     ]
   end
 
