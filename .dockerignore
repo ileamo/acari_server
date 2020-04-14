@@ -1,1 +1,4 @@
 assets/node_modules
+.git
+_build
+deps

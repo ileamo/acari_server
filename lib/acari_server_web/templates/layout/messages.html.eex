@@ -8,11 +8,13 @@
           4 -> "success"
           _ -> "secondary"
         end
-        name = opts[:description] || name
+        visible_name = opts[:description] || name
   %>
   <li class="list-group-item list-group-item-<%= alert %> p-1">
     <p>
-      <strong><%= "#{get_local_time(ts, current_time)} #{name}" %></br></strong>
+      <strong><%= get_local_time(ts, current_time) %>
+        <%= link visible_name, to: Routes.tunnel_path(AcariServerWeb.Endpoint, :show, name) %>
+      </br></strong>
       <%= body %>
     </p>
   </li>
