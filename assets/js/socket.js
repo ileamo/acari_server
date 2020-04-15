@@ -99,14 +99,14 @@ channel.on("link_event", payload => {
 
 // Messages
 
-document.getElementById("collapseMessages").addEventListener("mouseenter", mouseOverCollapseMessages);
-document.getElementById("collapseMessages").addEventListener("mouseleave", mouseOutCollapseMessages);
+document.getElementById("collapseMessagesList").addEventListener("mouseenter", mouseOverCollapseMessagesList);
+document.getElementById("collapseMessagesList").addEventListener("mouseleave", mouseOutCollapseMessagesList);
 
 let is_messages_freeze = false
 let last_messages = messagesContainer.innerHTML
 let freese_timeout
 
-function mouseOverCollapseMessages(e) {
+function mouseOverCollapseMessagesList(e) {
   if (is_messages_freeze == false) {
     is_messages_freeze = true
     freese_timeout = setTimeout(
@@ -119,7 +119,7 @@ function mouseOverCollapseMessages(e) {
   }
 }
 
-function mouseOutCollapseMessages() {
+function mouseOutCollapseMessagesList() {
   clearTimeout(freese_timeout)
   is_messages_freeze = false
   messagesContainer.innerHTML = last_messages

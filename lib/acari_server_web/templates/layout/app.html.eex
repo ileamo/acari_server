@@ -81,9 +81,13 @@
 
             <div class="col-lg-3 col-12 collapse p-0" id="collapseMessages">
               <h5>Сообщения:</h5>
+
+              <div  id="collapseMessagesList">
                     <ul class="list-group p-0" id="event-log">
                       <%= render "messages.html", assigns |> Map.put(:mes_list, mes_list) %>
                     </ul>
+              </div>
+
             </div>
 
           </div>
