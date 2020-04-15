@@ -7,7 +7,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
       <span>
         <%= render AcariServerWeb.NodeView, "client_comments.html",
               current_user: @current_user, node: @node %>
-      </spsn>
+      </span>
 
     </div>
     <div class="navbar">
