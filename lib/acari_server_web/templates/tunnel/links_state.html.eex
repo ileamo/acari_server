@@ -2,6 +2,7 @@
   <table class="table table-sm table-borderless">
     <tr>
         <th scope="col">Соединение</th>
+        <th scope="col">Протокол</th>
         <th scope="col">Состояние</th>
         <th scope="col">Число падений</th>
         <th scope="col">Без связи</th>
@@ -14,6 +15,11 @@
           <th  scope="row">
             <%= name %>
           </th>
+          <td><%= case state[:opts][:proto] do
+            :ssl -> "ssl"
+            :gen_tcp -> "tcp"
+            _ -> "?"
+          end%></td>
           <% {text, color} = if up, do: {"UP(#{last_up_tm})", "text-success"},
               else: {"DOWN(#{last_down_tm})","text-danger"} %>
           <td class="<%=color%>"><%= text %></td>

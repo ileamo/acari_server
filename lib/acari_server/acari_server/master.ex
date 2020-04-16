@@ -83,13 +83,13 @@ defmodule AcariServer.Master do
     {:noreply, state}
   end
 
-  def handle_cast({:sslink_opened, tun_name, sslink_name, _num}, state) do
-    set_sslink_up(tun_name, sslink_name, true)
+  def handle_cast({:sslink_opened, tun_name, sslink_name, opts}, state) do
+    set_sslink_up(tun_name, sslink_name, true, opts)
     {:noreply, state}
   end
 
-  def handle_cast({:sslink_closed, tun_name, sslink_name, _num}, state) do
-    set_sslink_up(tun_name, sslink_name, false)
+  def handle_cast({:sslink_closed, tun_name, sslink_name, opts}, state) do
+    set_sslink_up(tun_name, sslink_name, false, opts)
     {:noreply, state}
   end
 
@@ -138,7 +138,7 @@ defmodule AcariServer.Master do
     state
   end
 
-  defp set_sslink_up(tun_name, sslink_name, link_state) do
+  defp set_sslink_up(tun_name, sslink_name, link_state, opts) do
     with [{_, _, _, tun_state = %TunState{}}] <- :ets.lookup(:tuns, tun_name),
          tun_state <-
            tun_state
@@ -158,7 +158,7 @@ defmodule AcariServer.Master do
         {4, tun_state}
       )
 
-      Mnesia.update_link(sslink_name, tun_name, link_state)
+      Mnesia.update_link(sslink_name, tun_name, link_state, opts)
     else
       res -> Logger.error("Can't set sslink state: #{inspect(res)}")
     end

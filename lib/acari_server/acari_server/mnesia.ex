@@ -558,7 +558,7 @@ defmodule AcariServer.Mnesia do
 
   # link
 
-  def update_link(name, tun, up) do
+  def update_link(name, tun, up, opts \\ []) do
     node = node()
     id = {name, tun, node}
     tm = :erlang.system_time(:second)
@@ -567,14 +567,32 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn ->
       state =
         case Mnesia.wread({:link, id}) do
-          [] -> %{down_count: 0, tm_start: tm, tm_down: 0, tm_down_start: tm, tm_up_start: tm}
-          [record] -> record |> Rec.link(:state)
+          [] ->
+            %{
+              down_count: 0,
+              tm_start: tm,
+              tm_down: 0,
+              tm_down_start: tm,
+              tm_up_start: tm,
+              opts: %{}
+            }
+
+          [record] ->
+            record |> Rec.link(:state)
         end
 
       state =
         case up do
-          true -> %{state | tm_down: state.tm_down + tm - state.tm_down_start, tm_up_start: tm}
-          _ -> %{state | down_count: state.down_count + 1, tm_down_start: tm}
+          true ->
+            %{
+              state
+              | tm_down: state.tm_down + tm - state.tm_down_start,
+                tm_up_start: tm,
+                opts: opts |> Enum.into(state.opts || %{})
+            }
+
+          _ ->
+            %{state | down_count: state.down_count + 1, tm_down_start: tm}
         end
 
       Mnesia.write(
@@ -754,7 +772,6 @@ defmodule AcariServer.Mnesia do
       mes_list: mes_list
     })
   end
-
 
   def server_and_db_alert() do
     Task.start(fn ->
@@ -970,14 +987,12 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn ->
       Mnesia.write({:session, jti, params, :os.system_time(:second)})
     end)
-
   end
 
   def delete_session(jti) do
     Mnesia.transaction(fn ->
       Mnesia.delete({:session, jti})
     end)
-
   end
 
   def update_session_activity(jti) do
