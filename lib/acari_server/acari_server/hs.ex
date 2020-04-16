@@ -23,7 +23,11 @@ defmodule AcariServer.Hs do
       {:ok, sslsock} ->
         {:noreply, %{sslsocket: sslsock}}
 
-      {:error, :closed} ->
+      {:error, err} ->
+        Logger.error("SSL handshake error: #{inspect(err)}")
+        {:stop, :shutdown, %{}}
+
+      _ ->
         {:stop, :shutdown, %{}}
     end
   end
@@ -43,21 +47,35 @@ defmodule AcariServer.Hs do
     {:stop, :shutdown, state}
   end
 
+  def handle_info({:tcp_closed, _sslsocket}, state) do
+    {:stop, :shutdown, state}
+  end
+
   def handle_info({:ssl_error, _sslsocket, _reason}, state) do
     {:stop, :shutdown, state}
   end
 
+  def handle_info({:tcp_error, _sslsocket, _reason}, state) do
+    {:stop, :shutdown, state}
+  end
+
   def handle_info(msg, state) do
-    Logger.warn("SSL: unknown message: #{inspect(msg)}")
+    Logger.warn("SSLink: unknown message: #{inspect(msg)}")
     {:noreply, state}
   end
 
   # Private
   defp handle_request(proto, sslsocket, frame) do
+    peername =
+      case proto do
+        :gen_tcp -> &:inet.peername/1
+        _ -> &:ssl.peername/1
+      end
+
     with <<1::1, _val::15, json::binary>> <- :erlang.list_to_binary(frame),
          {:ok, %{"id" => id, "link" => link} = request} when is_binary(id) and is_binary(link) <-
            Jason.decode(json),
-         {:ok, {ipaddr, port}} <- proto.peername(sslsocket),
+         {:ok, {ipaddr, port}} <- peername.(sslsocket),
          Logger.info(
            "Listener: accept connection from #{:inet.ntoa(ipaddr)}:#{port}, id:#{id}, link:#{link}"
          ),
@@ -66,6 +84,7 @@ defmodule AcariServer.Hs do
            Acari.add_link(id, link, fn
              :connect -> sslsocket
              :restart -> false
+             :proto -> proto
            end) do
       proto.controlling_process(sslsocket, pid)
 
