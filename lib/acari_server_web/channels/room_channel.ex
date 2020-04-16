@@ -2,7 +2,6 @@ defmodule AcariServerWeb.RoomChannel do
   use Phoenix.Channel, log_join: :debug, log_handle_in: false
 
   alias AcariServer.ChatManager
-  alias AcariServer.ChatManager.Chat
   alias AcariServer.Presence
 
   require Logger
@@ -91,11 +90,7 @@ defmodule AcariServerWeb.RoomChannel do
     user = socket.assigns[:user]
 
     {:ok, %{id: id, inserted_at: nt}} =
-      Chat.changeset(
-        %Chat{},
-        payload |> Map.put("user_id", user.id)
-      )
-      |> AcariServer.Repo.insert()
+      ChatManager.create_chat(payload |> Map.put("user_id", user.id))
 
     broadcast_msg_html = create_message(user.username, payload["message"], db_time_to_local(nt))
 

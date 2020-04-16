@@ -84,12 +84,17 @@ defmodule AcariServerWeb.NodeController do
   end
 
   def show(conn, %{"id" => id}) do
-    node = NodeManager.get_node!(id)
+    node =
+      NodeManager.get_node!(id)
+      |> RepoRO.preload(client_comments: :user)
+
     render(conn, "show.html", node: node)
   end
 
   def edit(conn, %{"id" => id}) do
     node = NodeManager.get_node!(id)
+    |> RepoRO.preload(client_comments: :user)
+    
     changeset = NodeManager.change_node(node)
     render(conn, "edit.html", node: node, changeset: changeset)
   end

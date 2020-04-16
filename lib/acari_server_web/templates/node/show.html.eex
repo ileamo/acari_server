@@ -8,6 +8,10 @@
     <i class="fas fa-toggle-<%= text %> mx-1"></i>
   <% end %>
   </span>
+  <span>
+    <%= render AcariServerWeb.NodeView, "client_comments.html",
+          current_user: @current_user, node: @node %>
+  </span>
 </div>
 
 <%  lat = @node.latitude || 55.777594

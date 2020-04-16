@@ -59,7 +59,7 @@ defmodule AcariServerWeb.TunnelController do
   def show(conn, %{"name" => name}) do
     node =
       AcariServer.NodeManager.get_node_with_class(name)
-      |> RepoRO.preload(client_comments: :user)
+      |> RepoRO.preload([:groups, client_comments: :user])
 
     render(conn, "show.html", name: name, node: node)
   end

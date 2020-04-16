@@ -7,7 +7,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
       <span>
         <%= render AcariServerWeb.NodeView, "client_comments.html",
               current_user: @current_user, node: @node %>
-      </spsn>
+      </span>
 
     </div>
     <div class="navbar">
@@ -27,6 +27,9 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
   <% else %>
     Не назначен
   <% end %>
+</h6>
+<h6>
+  <strong>Группы:</strong> <%= AcariServer.GroupManager.groups_list(@node) %>
 </h6>
 <h6><strong>Основной сервер:</strong> <%= tun.server %></h6>
 <hr/>

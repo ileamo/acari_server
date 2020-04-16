@@ -97,18 +97,52 @@ channel.on("link_event", payload => {
   }
 })
 
-channel.on("link_event_mes", payload => {
+// Messages
+
+document.getElementById("collapseMessagesList").addEventListener("mouseenter", mouseOverCollapseMessagesList);
+document.getElementById("collapseMessagesList").addEventListener("mouseleave", mouseOutCollapseMessagesList);
+
+let is_messages_freeze = false
+let last_messages = messagesContainer.innerHTML
+let freese_timeout
+
+function mouseOverCollapseMessagesList(e) {
+  if (is_messages_freeze == false) {
+    is_messages_freeze = true
+    freese_timeout = setTimeout(
+      () => {
+        is_messages_freeze = null
+        messagesContainer.innerHTML = last_messages
+      },
+      5 * 1000
+    )
+  }
+}
+
+function mouseOutCollapseMessagesList() {
+  clearTimeout(freese_timeout)
+  is_messages_freeze = false
+  messagesContainer.innerHTML = last_messages
+}
+
+channel.on("link_event_mes", function(payload) {
   if (global.osmMap && payload.events) {
     global.osmMap(payload.events)
   }
 
   if (messagesBadge && payload.num_of_mes != null) {
-    messagesBadge.innerText = `${payload.num_of_mes}`
+    messagesBadge.innerText = payload.num_of_mes
   }
   if (messagesContainer && payload.messages != null) {
-    messagesContainer.innerHTML = `${payload.messages}`
+    last_messages = payload.messages
+    if (!is_messages_freeze) {
+      messagesContainer.innerHTML = payload.messages
+    }
   }
 })
+
+
+//Chat
 
 let chat_msg_timeout
 channel.on('shout', function(payload) { // listen to the 'shout' event
