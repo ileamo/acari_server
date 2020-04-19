@@ -84,7 +84,6 @@ defmodule AcariServer.Hs do
            Acari.add_link(id, link, fn
              :connect -> sslsocket
              :restart -> false
-             :proto -> proto
            end) do
       proto.controlling_process(sslsocket, pid)
 

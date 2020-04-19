@@ -11,6 +11,7 @@ defmodule AcariServer.Listener do
         Application.get_env(:acari_server, AcariServer.Listener)[:port],
         certfile: Application.get_env(:acari_server, AcariServer.Listener)[:certfile],
         keyfile: Application.get_env(:acari_server, AcariServer.Listener)[:keyfile],
+        versions: [:"tlsv1.3", :"tlsv1.2"],
         reuseaddr: true,
         packet: 2
       )

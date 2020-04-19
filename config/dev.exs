@@ -89,10 +89,14 @@ config :acari_server, AcariServer.Listener,
   keyfile: "priv/cert/selfsigned_key.pem",
   certfile: "priv/cert/selfsigned.pem"
 
+  config :acari_server, AcariServer.TCPListener,
+    port: 50020
+
+
 config :acari_server, :zabbix,
-  zbx_ext_url: "https://84.253.109.155:4443",
-  #zbx_api_url: "http://Admin:IMo19-0708@84.253.109.155:4080",
-  zbx_snd_host: "84.253.109.155"
+  zbx_ext_url: "https://localhost:10443",
+  zbx_api_url: "http://Admin:zabbix@localhost:10080",
+  zbx_snd_host: "localhost"
 
 config :acari_server, :openstreetmap,
   #provider_url: nil

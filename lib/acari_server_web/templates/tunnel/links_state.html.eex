@@ -16,9 +16,8 @@
             <%= name %>
           </th>
           <td><%= case state[:opts][:proto] do
-            :ssl -> "ssl"
-            :gen_tcp -> "tcp"
-            _ -> "?"
+            nil -> "?"
+            proto -> proto
           end%></td>
           <% {text, color} = if up, do: {"UP(#{last_up_tm})", "text-success"},
               else: {"DOWN(#{last_down_tm})","text-danger"} %>
