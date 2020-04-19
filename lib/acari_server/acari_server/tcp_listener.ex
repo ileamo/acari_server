@@ -8,7 +8,7 @@ defmodule AcariServer.TCPListener do
   def run(_arg) do
     {:ok, l} =
       :gen_tcp.listen(
-        Application.get_env(:acari_server, AcariServer.TCPListener)[:port],
+        Application.get_env(:acari_server, AcariServer.TCPListener)[:port] || 50020,
         reuseaddr: true,
         packet: 2
       )

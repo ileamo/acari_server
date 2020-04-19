@@ -89,9 +89,7 @@ config :acari_server, AcariServer.Listener,
   keyfile: "priv/cert/selfsigned_key.pem",
   certfile: "priv/cert/selfsigned.pem"
 
-  config :acari_server, AcariServer.TCPListener,
-    port: 50020
-
+config :acari_server, AcariServer.TCPListener, port: 50020
 
 config :acari_server, :zabbix,
   zbx_ext_url: "https://localhost:10443",
@@ -99,5 +97,5 @@ config :acari_server, :zabbix,
   zbx_snd_host: "localhost"
 
 config :acari_server, :openstreetmap,
-  #provider_url: nil
+  # provider_url: nil
   provider_url: "http://10.33.33.32:8080/styles/klokantech-basic/{z}/{x}/{y}.png"
