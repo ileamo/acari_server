@@ -75,12 +75,12 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
 config :acari_server, AcariServer.Repo,
-  hostname: "10.0.10.10",
-  port: 55432
+  hostname: "localhost",
+  port: 5432
 
 config :acari_server, AcariServer.RepoManager,
-  rw: "10.0.10.10:55432,10.0.10.3:55432",
-  ro: "10.0.10.3:55432,10.0.10.10:55432"
+  rw: "localhost:5432",
+  ro: "localhost:5432"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 
