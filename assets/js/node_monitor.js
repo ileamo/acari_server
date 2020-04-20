@@ -133,4 +133,13 @@ if (node_monitor) {
       input: "sensors"
     })
   }
+
+  $('#link-state-proto-info').on('show.bs.modal', function(event) {
+    let data_field = $(event.relatedTarget)
+    let content = data_field.data('content')
+    let name = data_field.data('name')
+    let modal = $(this)
+    modal.find('.modal-title').text('Параметры соединения ' + name)
+    modal.find('.modal-body code').text(content)
+  })
 }
