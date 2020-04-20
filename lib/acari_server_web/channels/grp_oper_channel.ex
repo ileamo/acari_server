@@ -313,7 +313,8 @@ defmodule AcariServerWeb.GrpOperChannel do
         "nil" ->
           AcariServer.NodeManager.list_nodes(socket.assigns[:user])
 
-        "false" -> []
+        "false" ->
+          []
 
         group_id ->
           AcariServer.GroupManager.get_group!(group_id)
@@ -542,12 +543,7 @@ defmodule AcariServerWeb.GrpOperChannel do
   defp get_templates_list(class, templ_group) do
     case templ_group do
       :zabbix ->
-        AcariServer.TemplateManager.list_templates()
-        |> Enum.filter(fn
-          %{type: "no", name: name} -> String.match?(name, ~r/\.zbx$/) #TODO remove after 1.2.1
-          %{type: "zabbix"} -> true
-          _ -> false
-      end)
+        AcariServer.TemplateManager.list_templates("zabbix")
 
       _ ->
         case Map.get(class, templ_group) do

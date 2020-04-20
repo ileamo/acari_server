@@ -22,6 +22,14 @@ defmodule AcariServer.TemplateManager do
     RepoRO.all(Template)
   end
 
+  def list_templates(type) do
+    RepoRO.all(Template)
+    |> Enum.filter(fn
+      %{type: ^type} -> true
+      _ -> false
+    end)
+  end
+
   def templ_name_id_pairs_list() do
     list_templates()
     |> Enum.filter(fn %{type: type} -> is_executable?(type) end)

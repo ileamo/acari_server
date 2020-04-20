@@ -126,7 +126,6 @@ defmodule AcariServerWeb.TemplateController do
         }
       end)
       |> Jason.encode()
-      |> IO.inspect()
 
     case json do
       {:ok, content} ->
@@ -172,7 +171,6 @@ defmodule AcariServerWeb.TemplateController do
               nil
           end)
           |> Enum.filter(& &1)
-          |> IO.inspect()
 
         {:info,
          case res do

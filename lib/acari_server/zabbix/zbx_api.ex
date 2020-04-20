@@ -237,7 +237,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
     {res, _} =
       try do
-        Code.eval_string(prefix <> script, [client_name: client_name], file: tag)
+        try do
+          Code.eval_string(prefix <> script, [client_name: client_name], file: tag)
+        catch
+          sig, mes -> {inspect({sig, mes}), nil}
+        end
       rescue
         x ->
           {inspect(x), nil}

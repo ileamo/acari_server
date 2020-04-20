@@ -12,6 +12,7 @@ if (node_monitor) {
     .receive("ok", resp => {
       //console.log("node_monitor: Joined successfully", resp)
       getLastScript()
+      getLastZbxScript()
       getLastSrvScript()
     })
     .receive("error", resp => {
@@ -24,6 +25,10 @@ if (node_monitor) {
       case "script":
         document.querySelector("#nm-script-name").innerText = `${payload.opt}`
         document.querySelector("#nm-script-field").innerText = `${payload.data}`
+        break;
+      case "zbx_script":
+        document.querySelector("#nm-zbx-script-name").innerText = `${payload.opt}`
+        document.querySelector("#nm-zbx-script-field").innerText = `${payload.data}`
         break;
       case "srv_script":
         document.querySelector("#nm-srv-script-name").innerText = `${payload.opt}`
@@ -41,7 +46,7 @@ if (node_monitor) {
   }) // From the Channel
 
 
-  // Remote script
+  // Client script
   var scripts = document.querySelectorAll("#nm-script a") //.addEventListener("click", getScript, false);
 
   scripts.forEach(function(item) {
@@ -78,14 +83,52 @@ if (node_monitor) {
     }
   }
 
-  // Local script
-  var srv_scripts = document.querySelectorAll("#nm-srv-script a") //.addEventListener("click", getScript, false);
+  // Zabbix script
+  var zbx_scripts = document.querySelectorAll("#nm-zbx-script a") //.addEventListener("click", getScript, false);
+
+  zbx_scripts.forEach(function(item) {
+    item.addEventListener("click", getZbxScript, false)
+  })
+
+  function getZbxScript() {
+    localStorage.setItem("lastZbxScript" + window.location.pathname, this.id)
+    channel.push('input', {
+      input: "get_zbx_script",
+      script: this.id
+    })
+  }
+
+  function getLastZbxScript() {
+    let id = localStorage.getItem("lastZbxScript" + window.location.pathname)
+    channel.push('input', {
+      input: "get_zbx_script",
+      script: id
+    })
+  }
+
+  document.getElementById("nm-update-zbx-script").addEventListener("click", updateZbxScript, false);
+
+  function updateZbxScript() {
+    let id = localStorage.getItem("lastZbxScript" + window.location.pathname)
+    let r = confirm("Выполнить скрипт " + id + " на клиенте?")
+    if (r) {
+      document.querySelector("#nm-zbx-script-field").innerText = "Wait ..."
+      channel.push('input', {
+        input: "zbx_script",
+        script: id
+      })
+    }
+  }
+
+  // Server script
+  var srv_scripts = document.querySelectorAll("#nm-srv-script a")
 
   srv_scripts.forEach(function(item) {
     item.addEventListener("click", getSrvScript, false)
   })
 
   function getSrvScript() {
+
     localStorage.setItem("lastSrvScript" + window.location.pathname, this.id)
     channel.push('input', {
       input: "get_srv_script",
