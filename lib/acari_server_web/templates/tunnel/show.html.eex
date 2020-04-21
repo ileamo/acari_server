@@ -68,7 +68,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="nm-script">
               <%= for {descr, script_name} <- script_list do %>
-                <%= link descr, to: "#", class: "dropdown-item", id: script_name %>
+                <%= link descr, to: {:javascript, "void(0)"}, class: "dropdown-item", id: script_name %>
               <% end %>
             </div>
           </li>
@@ -100,7 +100,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="nm-srv-script">
               <%= for {descr, script_name} <- srv_script_list do %>
-                <%= link descr, to: "#", class: "dropdown-item", id: script_name %>
+                <%= link descr, to: {:javascript, "void(0)"}, class: "dropdown-item", id: script_name %>
               <% end %>
             </div>
           </li>
@@ -138,9 +138,10 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="nm-zbx-script">
               <%= for %{description: descr, name: script_name} <- zbx_script_list do %>
-                <%= link descr, to: "#", class: "dropdown-item", id: script_name %>
+                <%= link descr, to: {:javascript, "void(0)"}, class: "dropdown-item", id: script_name %>
               <% end %>
             </div>
+
           </li>
         </ul>
         <div class="navbar">

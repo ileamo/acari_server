@@ -67,7 +67,7 @@
                           "#{c && "1" || "0"}#{is_binary(d) && String.trim(d) || ""}#{f}" end)
           %>
           <%= for filter <- filters do %>
-            <a class="dropdown-item" href="#" id="<%= filter.filter %>">
+            <a class="dropdown-item" href="javascript:void(0)" id="<%= filter.filter %>">
             <%= if is_binary(filter.description) && String.trim(filter.description) != "" do %>
               <strong><%= filter.description %>:</strong>
             <% end %>
