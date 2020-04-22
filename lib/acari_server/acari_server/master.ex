@@ -57,7 +57,7 @@ defmodule AcariServer.Master do
 
   @impl true
   def handle_cast({:tun_started, %{tun_name: tun_name} = tun_state}, state) do
-    Logger.debug("Master get :tun_started from #{tun_name}, tun_state = #{inspect(tun_state)}")
+    Logger.info("Master get :tun_started from #{tun_name}, tun_state = #{inspect(tun_state)}")
     params = %{"ifname" => tun_state.ifname}
     peer_params = tun_state.peer_params
     :ets.insert(:tuns, {tun_name, params, peer_params, %TunState{}})
