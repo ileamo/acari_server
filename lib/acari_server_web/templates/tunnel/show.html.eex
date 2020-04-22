@@ -1,6 +1,9 @@
 <% tun = AcariServer.Mnesia.get_tunnel_state(@name)
 links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 %>
+
+<%= if tun do %>
+
 <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
     <div class="navbar p-0">
       <span class="navbar-brand">Клиент <%= @name %></span>
@@ -189,4 +192,8 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 
 <% else %>
  <h5 class="text-danger">Это устройство не подключено</h5>
+<% end %>
+
+<% else %>
+  Нет туннеля  именем <%= @name %>
 <% end %>

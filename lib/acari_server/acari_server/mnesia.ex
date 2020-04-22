@@ -396,31 +396,35 @@ defmodule AcariServer.Mnesia do
   def get_tunnel_state(name) do
     node = AcariServer.NodeManager.get_node_by_name(name)
 
-    case Mnesia.transaction(fn ->
-           Mnesia.read({:tun, name})
-         end) do
-      {:atomic, [record]} ->
-        record
-        |> Rec.tun(:state)
-        |> Map.merge(%{
-          id: node.id,
-          name: name,
-          description: node.description,
-          address: node.address,
-          server:
-            record
-            |> Rec.tun(:server_id)
-            |> get_server_name_by_system_name()
-        })
+    if node do
+      case Mnesia.transaction(fn ->
+             Mnesia.read({:tun, name})
+           end) do
+        {:atomic, [record]} ->
+          record
+          |> Rec.tun(:state)
+          |> Map.merge(%{
+            id: node.id,
+            name: name,
+            description: node.description,
+            address: node.address,
+            server:
+              record
+              |> Rec.tun(:server_id)
+              |> get_server_name_by_system_name()
+          })
 
-      _ ->
-        %{
-          id: node.id,
-          name: name,
-          description: node.description,
-          address: node.address,
-          server: nil
-        }
+        _ ->
+          %{
+            id: node.id,
+            name: name,
+            description: node.description,
+            address: node.address,
+            server: nil
+          }
+      end
+    else
+      nil
     end
   end
 
