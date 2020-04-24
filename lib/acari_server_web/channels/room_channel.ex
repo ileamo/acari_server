@@ -86,13 +86,16 @@ defmodule AcariServerWeb.RoomChannel do
 
   # Chat
 
-  def handle_in("shout", payload, socket) do
+  def handle_in("shout", %{"message" => msg}, socket) do
     user = socket.assigns[:user]
 
-    {:ok, %{id: id, inserted_at: nt}} =
-      ChatManager.create_chat(payload |> Map.put("user_id", user.id))
+    # '\n' may be inside string
+    msg = msg |> String.replace("\n", "")
 
-    broadcast_msg_html = create_message(user.username, payload["message"], db_time_to_local(nt))
+    {:ok, %{id: id, inserted_at: nt}} =
+      ChatManager.create_chat(%{"user_id" => user.id, "message" => msg})
+
+    broadcast_msg_html = create_message(user.username, msg, db_time_to_local(nt))
 
     msg_html = change_message_color(broadcast_msg_html, "text-secondary")
     chat_users = get_chat_users()
@@ -136,8 +139,8 @@ defmodule AcariServerWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in(event, _payload, socket) do
-    Logger.error("Channel room: bad input event: #{inspect(event)}")
+  def handle_in(event, payload, socket) do
+    Logger.error("Channel room: bad input event: #{inspect(event)}, payload: #{payload}")
     {:noreply, socket}
   end
 
@@ -204,12 +207,15 @@ defmodule AcariServerWeb.RoomChannel do
     |> Enum.sort_by(fn %{online_at: t} -> t end, &>=/2)
   end
 
+  import Phoenix.HTML, only: [sigil_E: 2, safe_to_string: 1]
+
   defp create_message(username, message, timestamp) do
-    """
+    ~E"""
     <div>
-      <strong>#{timestamp} #{username}:</strong> #{message}
+      <strong><%= timestamp %> <%= username %>:</strong> <%= message %>
     </div>
     """
+    |> safe_to_string()
   end
 
   defp change_message_color(mes, color_class) do
