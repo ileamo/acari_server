@@ -40,12 +40,13 @@ if (grp_oper) {
       if (checked) {
         grp_oper_script_multi.hidden = false
         grp_oper_script_div.hidden = true
-        getLastScriptMulti()
+        //getLastScriptMulti()
       } else {
         grp_oper_script_multi.hidden = true
         grp_oper_script_div.hidden = false
-        getLastScript();
+        //getLastScript();
       }
+      selectElement()
     }
   }
 
@@ -129,7 +130,7 @@ if (grp_oper) {
       grp_oper_zabbix_script.checked = true;
       grp_oper_server_script.checked = false;
       grp_oper_client_script.checked = false;
-      grp_oper_show_only_button.hidden = true;
+      grp_oper_show_only_button.hidden = false;
     } else if (script_type == "server") {
       grp_oper_zabbix_script.checked = false;
       grp_oper_server_script.checked = true;
@@ -202,7 +203,7 @@ if (grp_oper) {
     localStorage.setItem("grp_oper_group_id", group_id)
     localStorage.setItem("grp_oper_filter", filter)
     localStorage.setItem("grp_oper_script_type", script_type)
-    if (script_type == "server" || script_type == "zabbix") {
+    if (script_type == "server") {
       grp_oper_show_only_button.hidden = true;
     } else {
       grp_oper_show_only_button.hidden = false;
@@ -213,7 +214,8 @@ if (grp_oper) {
       class_id: class_id,
       group_id: group_id,
       filter: filter,
-      script_type: script_type
+      script_type: script_type,
+      show_only: localStorage.getItem("grp_oper_show_only")
     })
 
   }

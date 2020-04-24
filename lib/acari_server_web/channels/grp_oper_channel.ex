@@ -7,6 +7,7 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   def handle_in("input", params, socket) do
+
     case params["cmd"] do
       "select" ->
         nodes =
@@ -33,10 +34,16 @@ defmodule AcariServerWeb.GrpOperChannel do
         %{common_script: cs, class_list: cl} =
           get_group_scripts(
             nodes,
-            case params["script_type"] do
-              "zabbix" -> :zabbix
-              "server" -> :local
-              _ -> :templates
+            case params["show_only"] do
+              "true" ->
+                :show_only
+
+              _ ->
+                case params["script_type"] do
+                  "zabbix" -> :zabbix
+                  "server" -> :local
+                  _ -> :templates
+                end
             end
           )
 
@@ -244,6 +251,10 @@ defmodule AcariServerWeb.GrpOperChannel do
                 end
               end)
               |> Enum.each(fn %{name: name} ->
+                AcariServer.Mnesia.update_tun_state(name, tag, %{
+                  reqv_ts: :os.system_time(:second)
+                })
+
                 case scrtyp do
                   "zabbix" -> AcariServer.Zabbix.ZbxApi.zbx_exec_api(name, tag)
                   _ -> AcariServer.Master.exec_script_on_peer(name, tag)
@@ -538,6 +549,10 @@ defmodule AcariServerWeb.GrpOperChannel do
       )
 
     %{class_list: class_list, common_script: common_script}
+  end
+
+  defp get_templates_list(class, :show_only) do
+    get_templates_list(class, :templates) ++ get_templates_list(class, :zabbix)
   end
 
   defp get_templates_list(class, templ_group) do
