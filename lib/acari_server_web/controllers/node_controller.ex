@@ -92,9 +92,10 @@ defmodule AcariServerWeb.NodeController do
   end
 
   def edit(conn, %{"id" => id}) do
-    node = NodeManager.get_node!(id)
-    |> RepoRO.preload(client_comments: :user)
-    
+    node =
+      NodeManager.get_node!(id)
+      |> RepoRO.preload(client_comments: :user)
+
     changeset = NodeManager.change_node(node)
     render(conn, "edit.html", node: node, changeset: changeset)
   end
@@ -106,6 +107,8 @@ defmodule AcariServerWeb.NodeController do
 
     case NodeManager.update_node(old_node, node_params) do
       {:ok, node} ->
+        Process.sleep(1000)
+
         conn
         |> AuditManager.create_audit_log(node, "update", node_params)
         |> put_flash(:info, "Клиент отредактирован.")
