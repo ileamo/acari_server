@@ -17,16 +17,21 @@ defmodule AcariServerWeb.TunnelView do
 
     last_down_tm = if up, do: 0, else: tm - state.tm_down_start
     last_up_tm = if up, do: tm - (state[:tm_up_start] || tm), else: 0
-    down = state.tm_down + last_down_tm
-    {interval_to_text(last_up_tm), interval_to_text(last_down_tm), down * 100 / total}
+    downtime = state.tm_down + last_down_tm
+    uptime = total - downtime
+
+    avg = interval_to_text(round(uptime / (state[:down_count] + if(up, do: 1, else: 0))))
+
+    {interval_to_text(last_up_tm), interval_to_text(last_down_tm), interval_to_text(total),
+     downtime * 100 / total, avg}
   end
 
   defp interval_to_text(tm) do
     cond do
       tm < 60 * 2 -> "#{tm} сек."
-      tm < 60 * 60 * 2 -> "#{div(tm, 60)} мин."
-      tm < 60 * 60 * 24 * 2 -> "#{div(tm, 60 * 60)} час."
-      true -> "#{div(tm, 60 * 60 * 24)} дн."
+      tm < 60 * 60 * 2 -> "#{round(tm / 60)} мин."
+      tm < 60 * 60 * 24 * 2 -> "#{round(tm / (60 * 60))} час."
+      true -> "#{round(tm / (60 * 60 * 24))} дн."
     end
   end
 
@@ -76,5 +81,4 @@ defmodule AcariServerWeb.TunnelView do
     |> Enum.find(fn x -> String.match?(x, ~r{^/tunnels($|/\d+$)}) end) ||
       Routes.node_path(conn, :index)
   end
-
 end

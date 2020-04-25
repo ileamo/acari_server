@@ -4,13 +4,17 @@
         <th scope="col">Соединение</th>
         <th scope="col">Протокол</th>
         <th scope="col">Состояние</th>
-        <th scope="col">Число падений</th>
+        <th scope="col">Время работы</th>
         <th scope="col">Без связи</th>
+        <th scope="col">Число падений</th>
+        <th scope="col">Средняя сессия</th>
     </tr>
     <tbody>
       <%= for %{name_srv: name, up: up, state: state} <-
-                                      links_sorted(@links_state) do %>
-        <% {last_up_tm, last_down_tm, pc} = get_down_pc_m(state, up) %>
+                                      links_sorted(@links_state)
+                                      |> IO.inspect()
+                                       do %>
+        <% {last_up_tm, last_down_tm, total, pc, avg} = get_down_pc_m(state, up) %>
         <tr>
           <th  scope="row">
             <%= name %>
@@ -30,8 +34,10 @@
           <% {text, color} = if up, do: {"UP(#{last_up_tm})", "text-success"},
               else: {"DOWN(#{last_down_tm})","text-danger"} %>
           <td class="<%=color%>"><%= text %></td>
-          <td><%= state[:down_count] %></td>
+          <td><%= total %></td>
           <td><%= pc |> Float.round(2) %>%</td>
+          <td><%= state[:down_count] %></td>
+          <td><%= avg %></td>
           </td>
         </tr>
       <% end %>
