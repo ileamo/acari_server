@@ -148,6 +148,14 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   @impl true
+  def handle_call({:get_hostid, name}, _from, state) do
+    hostid = get_hostid(name)
+    {:reply, hostid, state}
+  end
+
+
+
+  @impl true
   def handle_info(:time_to_send, state) do
     zabbix_sender(state)
   end
@@ -220,12 +228,22 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  def del_host(name) do
+  defp del_host(name) do
     case zbx_post(
            "host.get",
            %{output: ["hostid"], filter: %{host: [name]}}
          ) do
       {:ok, [%{"hostid" => id}]} -> zbx_post("host.delete", [id])
+      _ -> nil
+    end
+  end
+
+  defp get_hostid(name) do
+    case zbx_post(
+           "host.get",
+           %{output: ["hostid"], filter: %{host: [name]}}
+         ) do
+      {:ok, [%{"hostid" => id}]} -> id
       _ -> nil
     end
   end
@@ -791,6 +809,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_del_host(name) do
     GenServer.cast(__MODULE__, {:del_host, name})
+  end
+
+  def zbx_get_host_id(name) do
+    GenServer.call(__MODULE__, {:get_hostid, name})
   end
 
   def zbx_exec_api(client_name, template) do

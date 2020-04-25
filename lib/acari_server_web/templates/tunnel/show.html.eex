@@ -14,6 +14,8 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 
     </div>
     <div class="navbar">
+    <%= link "Zabbix", to: Routes.page_path(@conn, :zabbix, name: @name),
+          class: "nav-link py-1 px-2 mr-2", target: "_blank" %>
     <%= link "Конфигурация клиента", to: Routes.node_path(@conn, :show, tun.id),
           role: "button",
           class: "nav-link py-1 px-2 mr-2" %>

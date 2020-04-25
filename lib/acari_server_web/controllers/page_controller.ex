@@ -31,7 +31,7 @@ defmodule AcariServerWeb.PageController do
     is_admin(conn, params)
   end
 
-  def zabbix(conn, _params) do
+  def zabbix(conn, params) do
     zbx_url =
       case Application.get_env(:acari_server, :zabbix)[:zbx_ext_url] do
         url when is_binary(url) ->
@@ -41,6 +41,16 @@ defmodule AcariServerWeb.PageController do
           zbx_web_url = conn |> Plug.Conn.request_url() |> URI.parse()
           zbx_web_port = Application.get_env(:acari_server, :zabbix)[:zbx_web_port] || 10433
           "#{zbx_web_url.scheme}://#{zbx_web_url.host}:#{zbx_web_port}"
+      end
+
+    zbx_url =
+      case params do
+        %{"name" => name} ->
+          hostid = AcariServer.Zabbix.ZbxApi.zbx_get_host_id(name)
+          zbx_url <> "/host_screen.php?hostid=#{hostid}"
+
+        _ ->
+          zbx_url
       end
 
     redirect(conn, external: zbx_url)
