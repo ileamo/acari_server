@@ -29,10 +29,15 @@ defmodule AcariServer.Zabbix.ZbxApi do
   defmodule State do
     defstruct [
       :zbx_api_url,
+      :zbx_api_url_2,
       :zbx_snd_host,
       :zbx_snd_port,
+      :zbx_snd_host_2,
+      :zbx_snd_port_2,
       :zbx_username,
+      :zbx_username_2,
       :zbx_password,
+      :zbx_password_2,
       :auth,
       sender: %Sender{}
     ]
@@ -68,13 +73,45 @@ defmodule AcariServer.Zabbix.ZbxApi do
             {"Admin", "acari&zabbix"}
         end
 
+      {url_2, zbx_username_2, zbx_password_2,zbx_snd_host_2,zbx_snd_port_2} =
+        with url when is_binary(url) <-
+               Application.get_env(:acari_server, :zabbix)[:zbx_api_url_2],
+             [url | _] <- String.split(url),
+             %URI{} = uri <- URI.parse(url),
+             scheme when is_binary(scheme) <- uri.scheme,
+             host when is_binary(host) <- uri.host do
+          url = "#{uri.scheme}://#{uri.host}:#{uri.port || 80}"
+
+          {zbx_username, zbx_password} =
+            case Regex.run(~r{^([^:]+):?(.*)}, uri.userinfo || "") do
+              [_, name, pass] ->
+                {(name != "" && name) || "Admin", (pass != "" && pass) || "acari&zabbix"}
+
+              _ ->
+                {"Admin", "acari&zabbix"}
+            end
+
+            zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host_2]
+            zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port_2] || 10051
+
+
+          {url, zbx_username, zbx_password,zbx_snd_host,zbx_snd_port}
+        else
+          _ -> {nil, nil, nil, nil, nil}
+        end
+
       {:ok,
        %State{
          zbx_api_url: url,
+         zbx_api_url_2: url_2,
          zbx_snd_host: zbx_snd_host,
          zbx_snd_port: zbx_snd_port,
+         zbx_snd_host_2: zbx_snd_host_2,
+         zbx_snd_port_2: zbx_snd_port_2,
          zbx_username: zbx_username,
-         zbx_password: zbx_password
+         zbx_password: zbx_password,
+         zbx_username_2: zbx_username_2,
+         zbx_password_2: zbx_password_2
        }, {:continue, :init}}
     else
       _ ->
@@ -83,10 +120,31 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
+  defp zbx_auth(url, username, password) do
+    with :ok <- Zabbix.API.create_client(url),
+         {:ok, auth} <- Zabbix.API.login(username, password) do
+      {:ok, auth}
+    else
+      res -> res
+    end
+  end
+
+  defp double_zbx(state, func) do
+    if state.zbx_api_url_2 do
+      case zbx_auth(state.zbx_api_url_2, state.zbx_username_2, state.zbx_password_2) do
+        {:ok, _} -> func.()
+        _ -> nil
+      end
+
+      zbx_auth(state.zbx_api_url, state.zbx_username, state.zbx_password)
+    end
+
+    func.()
+  end
+
   @impl true
   def handle_continue(:init, state) do
-    with :ok <- Zabbix.API.create_client(state.zbx_api_url),
-         {:ok, auth} <- Zabbix.API.login(state.zbx_username, state.zbx_password),
+    with {:ok, auth} <- zbx_auth(state.zbx_api_url, state.zbx_username, state.zbx_password),
          {:main_group, [%{"groupid" => _}]} <- {:main_group, get_main_group()},
          {:main_usrgroup, [%{"usrgrpid" => _}]} <- {:main_usrgroup, get_main_usrgroup()},
          {:main_template, [%{"templateid" => _}]} <- {:main_template, get_template_id()} do
@@ -94,7 +152,27 @@ defmodule AcariServer.Zabbix.ZbxApi do
       hosts_sync()
       Logger.info("Zabbix API successfully init")
 
-      {:noreply, %State{state | auth: auth}}
+      url_2 =
+        with url_2 when is_binary(url_2) <- state.zbx_api_url_2,
+             {:ok, _auth} <- zbx_auth(url_2, state.zbx_username_2, state.zbx_password_2),
+             {:main_group, [%{"groupid" => _}]} <- {:main_group, get_main_group()},
+             {:main_usrgroup, [%{"usrgrpid" => _}]} <- {:main_usrgroup, get_main_usrgroup()},
+             {:main_template, [%{"templateid" => _}]} <- {:main_template, get_template_id()} do
+          create_master_host()
+          hosts_sync()
+          Logger.info("Aux Zabbix API successfully init")
+
+          url_2
+        else
+          res ->
+            Logger.error(
+              "Can't init aux zabbix API(#{inspect(state.zbx_api_url_2)}): #{inspect(res)}"
+            )
+
+            nil
+        end
+
+      {:noreply, %State{state | auth: auth, zbx_api_url_2: url_2}}
     else
       res ->
         Logger.error("Can't init zabbix API(#{state.zbx_api_url}): #{inspect(res)}")
@@ -113,32 +191,32 @@ defmodule AcariServer.Zabbix.ZbxApi do
   end
 
   def handle_cast(:groups_sync, state) do
-    groups_sync()
+    double_zbx(state, fn -> groups_sync() end)
     {:noreply, state}
   end
 
   def handle_cast(:users_sync, state) do
-    users_sync()
+    double_zbx(state, fn -> users_sync() end)
     {:noreply, state}
   end
 
   def handle_cast({:hosts_sync, opts}, state) do
-    hosts_sync(opts)
+    double_zbx(state, fn -> hosts_sync(opts) end)
     {:noreply, state}
   end
 
   def handle_cast({:add_host, node}, state) do
-    add_host(node)
+    double_zbx(state, fn -> add_host(node) end)
     {:noreply, state}
   end
 
   def handle_cast({:update_host, node, old_name}, state) do
-    update_host(node, old_name)
+    double_zbx(state, fn -> update_host(node, old_name) end)
     {:noreply, state}
   end
 
   def handle_cast({:del_host, name}, state) do
-    del_host(name)
+    double_zbx(state, fn -> del_host(name) end)
     {:noreply, state}
   end
 
@@ -152,8 +230,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
     hostid = get_hostid(name)
     {:reply, hostid, state}
   end
-
-
 
   @impl true
   def handle_info(:time_to_send, state) do
@@ -173,7 +249,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
-  def get_main_usrgroup() do
+  defp get_main_usrgroup() do
     case zbx_post("usergroup.get", %{output: ["name"], filter: %{name: [@main_group]}}) do
       {:ok, list} -> list
       _ -> []
@@ -273,36 +349,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
         res -> inspect(res, pretty: true)
       end
     )
-  end
-
-  def get_item_id(name, key) do
-    with {:ok, list} <-
-           zbx_post("item.get", %{host: name, output: ["itemid", "key_"], search: %{key_: key}}) do
-      list
-    else
-      _ -> []
-    end
-    |> Enum.reduce_while(nil, fn
-      %{"itemid" => id, "key_" => ^key}, _ -> {:halt, id}
-      _, _ -> {:cont, nil}
-    end)
-  end
-
-  def get_history(params) do
-    with {:ok, list} <- zbx_post("history.get", params) do
-      list
-    else
-      _ -> []
-    end
-  end
-
-  defdelegate utc_to_local(ts), to: AcariServer, as: :get_local_date
-
-  def timestamp(nt) do
-    NaiveDateTime.to_erl(nt)
-    |> :calendar.local_time_to_universal_time()
-    |> :erlang.universaltime_to_posixtime()
-    |> to_string()
   end
 
   defp groups_sync() do
@@ -729,6 +775,38 @@ defmodule AcariServer.Zabbix.ZbxApi do
     end
   end
 
+  # Public function
+
+  def get_item_id(name, key) do
+    with {:ok, list} <-
+           zbx_post("item.get", %{host: name, output: ["itemid", "key_"], search: %{key_: key}}) do
+      list
+    else
+      _ -> []
+    end
+    |> Enum.reduce_while(nil, fn
+      %{"itemid" => id, "key_" => ^key}, _ -> {:halt, id}
+      _, _ -> {:cont, nil}
+    end)
+  end
+
+  def get_history(params) do
+    with {:ok, list} <- zbx_post("history.get", params) do
+      list
+    else
+      _ -> []
+    end
+  end
+
+  defdelegate utc_to_local(ts), to: AcariServer, as: :get_local_date
+
+  def timestamp(nt) do
+    NaiveDateTime.to_erl(nt)
+    |> :calendar.local_time_to_universal_time()
+    |> :erlang.universaltime_to_posixtime()
+    |> to_string()
+  end
+
   # ███████ ███████ ███    ██ ██████  ███████ ██████
   # ██      ██      ████   ██ ██   ██ ██      ██   ██
   # ███████ █████   ██ ██  ██ ██   ██ █████   ██████
@@ -756,19 +834,29 @@ defmodule AcariServer.Zabbix.ZbxApi do
       ZabbixSender.Protocol.encode_request(sender.value_list, nil)
       |> ZabbixSender.Serializer.serialize()
 
-    with {:ok, response} <- ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port),
-         {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
-         {:ok, decoded} <- ZabbixSender.Protocol.decode_response(deserialized) do
-      if decoded.failed == 0 do
-        # Logger.debug("zabbix_sender: #{decoded.processed} values processed")
-      else
-        # Logger.warn(
-        #   "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
-        # )
+      case ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port) do
+        {:ok, _response} -> :ok
+        res -> Logger.error("zabbix_sender: #{inspect(res)}")
       end
-    else
-      res -> Logger.error("zabbix_sender: #{inspect(res)}")
-    end
+
+      if state.zbx_snd_host_2 do
+        IO.inspect("SBX SEND HOST 2")
+        ZabbixSender.send(request, state.zbx_snd_host_2, state.zbx_snd_port_2)
+      end
+
+    # with {:ok, response} <- ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port),
+    #      {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
+    #      {:ok, decoded} <- ZabbixSender.Protocol.decode_response(deserialized) do
+    #   if decoded.failed == 0 do
+    #     # Logger.debug("zabbix_sender: #{decoded.processed} values processed")
+    #   else
+    #     # Logger.warn(
+    #     #   "zabbix_sender: #{decoded.processed} values processed out of #{decoded.total}"
+    #     # )
+    #   end
+    # else
+    #   res -> Logger.error("zabbix_sender: #{inspect(res)}")
+    # end
 
     {:noreply, %State{state | sender: %Sender{}}}
   end
