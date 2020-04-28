@@ -42,6 +42,9 @@ config :acari_server, :zabbix,
   zbx_web_port: System.get_env("ZBX_WEB_PORT"),
   zbx_api_url: System.get_env("ZBX_API_URL"),
   zbx_snd_host: System.get_env("ZBX_SND_HOST"),
-  zbx_snd_port: System.get_env("ZBX_SND_PORT")
+  zbx_snd_port: System.get_env("ZBX_SND_PORT"),
+  zbx_api_url_2: System.get_env("ZBX_API_URL_2"),
+  zbx_snd_host_2: System.get_env("ZBX_SND_HOST_2"),
+  zbx_snd_port_2: System.get_env("ZBX_SND_PORT_2")
 
   config :acari_server, :openstreetmap, provider_url: System.get_env("MAP_PROVIDER_URL")
