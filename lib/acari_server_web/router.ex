@@ -70,6 +70,7 @@ defmodule AcariServerWeb.Router do
     delete "/nodes", NodeController, :exec_selected
     get "/nodes/grp/:id", NodeController, :client_grp
     post "/client_comment/new", NodeController, :client_comment_new
+    get "/client_comment/del/:id", NodeController, :client_comment_del
 
     resources "/newnodes", NewNodeController
     post "/newnodes/upload", NewNodeController, :upload

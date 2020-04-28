@@ -206,6 +206,23 @@ defmodule AcariServerWeb.NodeController do
     )
   end
 
+  def client_comment_del(%{assigns: %{current_user: %{is_admin: true}}} = conn, %{"id" => id}) do
+    client_comment = ClientCommentManager.get_client_comment!(id)
+    {:ok, _} = ClientCommentManager.delete_client_comment(client_comment)
+
+    conn
+    |> put_flash(:info, "Комментарий удален")
+    |> sleep_before_response()
+    |> redirect(to: NavigationHistory.last_path(conn, 1))
+  end
+
+  def client_comment_del(conn, %{"id" => _id}) do
+    conn
+    |> put_flash(:error, "Только администратор может удалять чужие комментарии")
+    |> sleep_before_response()
+    |> redirect(to: NavigationHistory.last_path(conn, 1))
+  end
+
   def client_comment_new(conn, params) do
     comment_id = params["comment_id"]
 

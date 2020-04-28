@@ -840,7 +840,6 @@ defmodule AcariServer.Zabbix.ZbxApi do
       end
 
       if state.zbx_snd_host_2 do
-        IO.inspect("SBX SEND HOST 2")
         ZabbixSender.send(request, state.zbx_snd_host_2, state.zbx_snd_port_2)
       end
 
