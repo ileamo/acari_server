@@ -36,6 +36,7 @@ if (node_monitor) {
         break;
       case "links_state":
         document.querySelector("#nm-links-state").innerHTML = `${payload.data}`
+        $('#link-state-proto-info').on('show.bs.modal', stateProtoInfoModal)
         break;
       case "sensors":
         document.querySelector("#nm-sensors").innerHTML = `${payload.data}`
@@ -177,12 +178,14 @@ if (node_monitor) {
     })
   }
 
-  $('#link-state-proto-info').on('show.bs.modal', function(event) {
+  $('#link-state-proto-info').on('show.bs.modal', stateProtoInfoModal)
+
+  function stateProtoInfoModal(event) {
     let data_field = $(event.relatedTarget)
     let content = data_field.data('content')
     let name = data_field.data('name')
     let modal = $(this)
     modal.find('.modal-title').text('Параметры соединения ' + name)
     modal.find('.modal-body code').text(content)
-  })
+  }
 }
