@@ -19,6 +19,7 @@ defmodule AcariServerWeb.Router do
   pipeline :auth do
     plug AcariServer.UserManager.Pipeline
     plug :load_current_user
+    plug :put_root_layout, {AcariServerWeb.LayoutView, :root}
   end
 
   # We use ensure_auth to fail if there is no one logged in

@@ -16,7 +16,7 @@ config :acari_server, AcariServerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "m/N7ZJoj+UaMtvJvhdxYi8NJTR5s8FTfvrF6QjhiO89uGtxopT6YS8fCXc44rjYg",
   render_errors: [view: AcariServerWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: AcariServer.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: AcariServer.PubSub 
 
 # Configures Elixir's Logger
 config :logger, :console,

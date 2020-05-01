@@ -16,6 +16,7 @@ defmodule AcariServer.Application do
 
       # Start the endpoint when the application starts
       AcariServerWeb.Endpoint,
+      {Phoenix.PubSub, [name: AcariServer.PubSub, adapter: Phoenix.PubSub.PG2]},
       AcariServer.Presence,
       # Starts a worker by calling: AcariServer.Worker.start_link(arg)
       # {AcariServer.Worker, arg},

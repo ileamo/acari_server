@@ -29,6 +29,7 @@ defmodule AcariServerWeb.NewNodeController do
       end
 
     conn
+    |> put_root_layout(false)
     |> put_layout("qr_layout.html")
     |> render("show.html", new_node: new_node, params: params, res: res)
   end
