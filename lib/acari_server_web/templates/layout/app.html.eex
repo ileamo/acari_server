@@ -1,5 +1,4 @@
-<main role="main" class="col-12 col-lg px-0 px-lg-4 mr-1" id="mainPage"
-style="overflow-x: auto;">
+<main role="main" id="mainPage" >
 
   <div id="alert-server-bd">
     <%= render "alert_server_db.html", assigns %>

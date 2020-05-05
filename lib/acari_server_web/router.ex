@@ -8,7 +8,10 @@ defmodule AcariServerWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug NavigationHistory.Tracker, history_size: 11, excluded_paths: [~r(/login.*), ~r(/zabbix.*)]
+
+    plug NavigationHistory.Tracker,
+      history_size: 11,
+      excluded_paths: [~r(/login.*), ~r(/zabbix.*)]
   end
 
   pipeline :api do
@@ -25,6 +28,12 @@ defmodule AcariServerWeb.Router do
   # We use ensure_auth to fail if there is no one logged in
   pipeline :ensure_auth do
     plug Guardian.Plug.EnsureAuthenticated
+  end
+
+  import AcariServer.UserManager, only: [is_admin: 2]
+
+  pipeline :ensure_admin do
+    plug :is_admin
   end
 
   scope "/", AcariServerWeb do
@@ -90,11 +99,27 @@ defmodule AcariServerWeb.Router do
     resources "/audit_logs", AuditController, only: [:index, :show]
 
     get "/secret", PageController, :secret
+
+    live "/live", PageLive
   end
 
   scope "/api", AcariServerWeb.Api, as: :api do
     pipe_through(:api)
     post("/", AutoconfController, :index)
     get "/nodes_num", AuxController, :nodes_num
+  end
+
+  # Enables LiveDashboard only for development
+  #
+  # If you want to use the LiveDashboard in production, you should put
+  # it behind authentication and allow only admins to access it.
+  # If your application does not have an admins-only section yet,
+  # you can use Plug.BasicAuth to set up some basic authentication
+  # as long as you are also using SSL (which you should anyway).
+  import Phoenix.LiveDashboard.Router
+
+  scope "/" do
+    pipe_through [:browser, :auth, :ensure_auth, :ensure_admin]
+    live_dashboard "/system_dashboard", metrics: AcariServerWeb.Telemetry
   end
 end

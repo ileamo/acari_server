@@ -66,9 +66,9 @@
 
         <div class="col-md-10 ml-sm-auto px-4 bg-light pt-3 pb-3 flex-grow-1">
           <div class="row d-flex flex-wrap-reverse flex-lg-nowrap">
-
-            <%= @inner_content %>
-
+            <div  class="col-12 col-lg px-0 px-lg-4 mr-1" style="overflow-x: auto;">
+              <%= @inner_content %>
+            </div>
             <div class="col-lg-3 col-12 collapse p-0" id="collapseMessages">
               <h5>Сообщения:</h5>
               <div  id="collapseMessagesList">

@@ -149,4 +149,12 @@
   <li class="nav-item">
     <%= link "История чата", to: Routes.page_path(@conn, :chat), class: "nav-link" %>
   </li>
+  <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+    <li>
+      <%= link "Системная панель", to: Routes.live_dashboard_path(@conn, :home),
+            target: "_blank",
+            class: "nav-link"<>(@current_user.is_admin && "" || " bg-disabled") %>
+    </li>
+  <% end %>
+
 </ul>
