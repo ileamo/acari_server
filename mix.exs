@@ -4,7 +4,7 @@ defmodule AcariServer.MixProject do
   def project do
     [
       app: :acari_server,
-      version: "1.3.0",
+      version: "1.3.0-beta",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -77,7 +77,7 @@ defmodule AcariServer.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:cowboy, "~> 2.7"},
-      {:plug_cowboy, "~> 2.0"},
+      {:plug_cowboy, "~> 2.1"},
       {:guardian, "~> 1.0"},
       {:comeonin, "~> 5.1"},
       {:bcrypt_elixir, "~> 2.0"},
