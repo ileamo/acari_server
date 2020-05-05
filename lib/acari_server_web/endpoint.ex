@@ -1,9 +1,16 @@
 defmodule AcariServerWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :acari_server
 
+  @session_options [
+    store: :cookie,
+    key: "_acari_server_key",
+    signing_salt: "ZtutPWthp5Gq0Y6WFAFz9A5Sexd/Um9H"
+  ]
   socket "/socket", AcariServerWeb.UserSocket,
     websocket: true,
     longpoll: false
+
+  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -38,10 +45,7 @@ defmodule AcariServerWeb.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
-  plug Plug.Session,
-    store: :cookie,
-    key: "_acari_server_key",
-    signing_salt: "qhqCDKT5"
+  plug Plug.Session, @session_options
 
   plug AcariServerWeb.Router
 end

@@ -23,6 +23,7 @@ defmodule AcariServerWeb do
 
       import Plug.Conn
       import AcariServerWeb.Gettext
+      import Phoenix.LiveView.Controller
       alias AcariServerWeb.Router.Helpers, as: Routes
     end
   end
@@ -41,6 +42,7 @@ defmodule AcariServerWeb do
 
       import AcariServerWeb.ErrorHelpers
       import AcariServerWeb.Gettext
+      import Phoenix.LiveView.Helpers
       alias AcariServerWeb.Router.Helpers, as: Routes
     end
   end
@@ -50,6 +52,7 @@ defmodule AcariServerWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 
