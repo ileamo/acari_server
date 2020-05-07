@@ -7,7 +7,8 @@ defmodule AcariServer.Repo do
     username: "postgres",
     password: "postgres",
     database: "bogatka",
-    pool_size: 10
+    pool_size: 10,
+    telemetry_prefix: [:bogatka, :bd_rw]
   ]
   def init(:runtime, config) do
     {:ok, config |> Keyword.merge(@params)}

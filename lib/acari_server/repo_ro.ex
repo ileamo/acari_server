@@ -8,7 +8,9 @@ defmodule AcariServer.RepoRO do
     username: "postgres",
     password: "postgres",
     database: "bogatka",
-    pool_size: 10
+    pool_size: 10,
+    telemetry_prefix: [:bogatka, :bd_ro]
+
   ]
 
   def init(:runtime, config) do

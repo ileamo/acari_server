@@ -20,27 +20,31 @@ defmodule AcariServerWeb.Telemetry do
   def metrics do
     [
       # Phoenix Metrics
-      summary("phoenix.endpoint.stop.duration",
-        unit: {:native, :millisecond}
-      ),
-      summary("phoenix.router_dispatch.stop.duration",
-        tags: [:route],
-        unit: {:native, :millisecond}
-      ),
+      # summary("phoenix.endpoint.stop.duration",
+      #   unit: {:native, :millisecond}
+      # ),
+      # summary("phoenix.router_dispatch.stop.duration",
+      #   tags: [:route],
+      #   unit: {:native, :millisecond}
+      # ),
 
       # Database Metrics
-      summary("acari_server.repo.query.total_time", unit: {:native, :millisecond}),
-      summary("acari_server.repo_ro.query.total_time", unit: {:native, :millisecond}),
+      summary("bogatka.bd_rw.query.total_time", unit: {:native, :millisecond}),
+      summary("bogatka.bd_ro.query.total_time", unit: {:native, :millisecond}),
       #summary("acari_server.repo.query.decode_time", unit: {:native, :millisecond}),
       #summary("acari_server.repo.query.query_time", unit: {:native, :millisecond}),
       #summary("acari_server.repo.query.queue_time", unit: {:native, :millisecond}),
       #summary("acari_server.repo.query.idle_time", unit: {:native, :millisecond}),
 
       # VM Metrics
-      summary("vm.memory.total", unit: {:byte, :kilobyte}),
+      summary("vm.memory.total", unit: {:byte, :megabyte}, description: "Память"),
       summary("vm.total_run_queue_lengths.total"),
       summary("vm.total_run_queue_lengths.cpu"),
-      summary("vm.total_run_queue_lengths.io")
+      summary("vm.total_run_queue_lengths.io"),
+
+      #
+      summary("bogatka.clients.down", description: "Кол-во неработающих клиентов"),
+      summary("bogatka.links.down", description: "Кол-во неработающих портов")
     ]
   end
 

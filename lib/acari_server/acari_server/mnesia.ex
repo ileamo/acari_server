@@ -705,6 +705,8 @@ defmodule AcariServer.Mnesia do
     tun_num = get_tunnels_num()
     num = tun_num - bad
 
+    :telemetry.execute([:bogatka, :clients], %{active: num})
+
     set_stat(:clients_number, {tun_num, num})
 
     AcariServer.Zabbix.ZbxApi.zbx_send_master(
@@ -926,18 +928,38 @@ defmodule AcariServer.Mnesia do
   end
 
   defp update_stat(key, func) do
-    Mnesia.transaction(fn ->
-      value =
-        case Mnesia.wread({:stat, key}) do
-          [{:stat, ^key, value}] -> value
+    tval =
+      Mnesia.transaction(fn ->
+        value =
+          case Mnesia.wread({:stat, key}) do
+            [{:stat, ^key, value}] -> value
+            _ -> nil
+          end
+          |> func.()
+
+        :ok = Mnesia.write({:stat, key, value})
+        value
+      end)
+      |> elem(1)
+
+    # Telemetry
+    case key do
+      :down_port ->
+        case tval do
+          {val, _} -> :telemetry.execute([:bogatka, :links], %{down: val})
           _ -> nil
         end
-        |> func.()
+      :down_tun ->
+        case tval do
+          {val, _} -> :telemetry.execute([:bogatka, :clients], %{down: val})
+          _ -> nil
+        end
 
-      :ok = Mnesia.write({:stat, key, value})
-      value
-    end)
-    |> elem(1)
+      _ ->
+        nil
+    end
+
+    tval
   end
 
   # zabbix
