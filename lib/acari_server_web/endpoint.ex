@@ -39,6 +39,7 @@ defmodule AcariServerWeb.Endpoint do
   plug Plug.Logger
 
   plug Plug.Parsers,
+    body_reader: {CacheBodyReader, :read_body, []},
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library(),

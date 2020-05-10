@@ -1,4 +1,5 @@
 defmodule AcariServerWeb.Router do
+  require Logger
   use AcariServerWeb, :router
   import AcariServer.UserManager, only: [load_current_user: 2]
 
@@ -121,5 +122,19 @@ defmodule AcariServerWeb.Router do
   scope "/" do
     pipe_through [:browser, :auth, :ensure_auth, :ensure_admin]
     live_dashboard "/system_dashboard", metrics: AcariServerWeb.Telemetry
+  end
+
+  scope "/" do
+    forward "/zbx", ReverseProxyPlug,
+      upstream: &AcariServer.Zabbix.ZbxApi.zbx_get_api_url/0,
+      error_callback: &__MODULE__.log_reverse_proxy_error/1
+
+    forward "/zbx2", ReverseProxyPlug2,
+      upstream: &AcariServer.Zabbix.ZbxApi.zbx_get_api_url2/0,
+      error_callback: &__MODULE__.log_reverse_proxy_error/1
+
+    def log_reverse_proxy_error(error) do
+      Logger.warn("ReverseProxyPlug network error: #{inspect(error)}")
+    end
   end
 end

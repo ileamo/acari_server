@@ -73,7 +73,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
             {"Admin", "acari&zabbix"}
         end
 
-      {url_2, zbx_username_2, zbx_password_2,zbx_snd_host_2,zbx_snd_port_2} =
+      {url_2, zbx_username_2, zbx_password_2, zbx_snd_host_2, zbx_snd_port_2} =
         with url when is_binary(url) <-
                Application.get_env(:acari_server, :zabbix)[:zbx_api_url_2],
              [url | _] <- String.split(url),
@@ -91,11 +91,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
                 {"Admin", "acari&zabbix"}
             end
 
-            zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host_2]
-            zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port_2] || 10051
+          zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host_2]
+          zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port_2] || 10051
 
-
-          {url, zbx_username, zbx_password,zbx_snd_host,zbx_snd_port}
+          {url, zbx_username, zbx_password, zbx_snd_host, zbx_snd_port}
         else
           _ -> {nil, nil, nil, nil, nil}
         end
@@ -229,6 +228,16 @@ defmodule AcariServer.Zabbix.ZbxApi do
   def handle_call({:get_hostid, name}, _from, state) do
     hostid = get_hostid(name)
     {:reply, hostid, state}
+  end
+
+  def handle_call({:get_api_url, n}, _from, state) do
+    url =
+      case n do
+        2 -> state.zbx_api_url_2
+        _ -> state.zbx_api_url
+      end
+
+    {:reply, url, state}
   end
 
   @impl true
@@ -834,14 +843,14 @@ defmodule AcariServer.Zabbix.ZbxApi do
       ZabbixSender.Protocol.encode_request(sender.value_list, nil)
       |> ZabbixSender.Serializer.serialize()
 
-      case ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port) do
-        {:ok, _response} -> :ok
-        res -> Logger.error("zabbix_sender: #{inspect(res)}")
-      end
+    case ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port) do
+      {:ok, _response} -> :ok
+      res -> Logger.error("zabbix_sender: #{inspect(res)}")
+    end
 
-      if state.zbx_snd_host_2 do
-        ZabbixSender.send(request, state.zbx_snd_host_2, state.zbx_snd_port_2)
-      end
+    if state.zbx_snd_host_2 do
+      ZabbixSender.send(request, state.zbx_snd_host_2, state.zbx_snd_port_2)
+    end
 
     # with {:ok, response} <- ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port),
     #      {:ok, deserialized} <- ZabbixSender.Serializer.deserialize(response),
@@ -904,5 +913,13 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   def zbx_exec_api(client_name, template) do
     GenServer.cast(__MODULE__, {:exec_api, client_name, template})
+  end
+
+  def zbx_get_api_url() do
+    GenServer.call(__MODULE__, {:get_api_url, 0})
+  end
+
+  def zbx_get_api_url2() do
+    GenServer.call(__MODULE__, {:get_api_url, 2})
   end
 end
