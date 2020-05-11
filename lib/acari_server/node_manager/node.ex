@@ -40,4 +40,11 @@ defmodule AcariServer.NodeManager.Node do
     |> foreign_key_constraint(:script_id)
     |> unique_constraint(:name)
   end
+
+  def update_changeset(node, attrs) do
+    changeset(node, attrs)
+    |> validate_change(:name, &validate_update_node_name/2)
+  end
+
+  defp validate_update_node_name(:name, _), do: [name: "Имя клиента не может быть изменено"]
 end

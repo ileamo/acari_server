@@ -156,7 +156,7 @@ defmodule AcariServer.NodeManager do
 
     res =
       node
-      |> Node.changeset(attrs)
+      |> Node.update_changeset(attrs)
       |> AcariServer.GroupManager.Group.put_groups(attrs)
       |> Repo.update()
 
