@@ -10,7 +10,7 @@
   </head>
 
 
-  <body>
+  <body style="overflow-y: scroll;">
     <% AcariServer.Mnesia.purge_stat()
        mes_list = AcariServer.Mnesia.get_client_status(@current_user)
        num_of_mes = mes_list |> length() %>
@@ -67,9 +67,14 @@
         <div class="col-md-10 ml-sm-auto px-4 bg-light pt-3 pb-3 flex-grow-1">
           <div class="row d-flex flex-wrap-reverse flex-lg-nowrap">
             <div  class="col-12 col-lg px-0 px-lg-4 mr-1" style="overflow-x: auto;">
+              <div id="alert-server-bd">
+                <%= render "alert_server_db.html", assigns %>
+              </div>
+
               <%= @inner_content %>
+
             </div>
-            <div class="col-lg-3 col-12 collapse p-0" id="collapseMessages">
+            <div class="col-lg-3 col-12 collapse p-0 mb-3" id="collapseMessages">
               <h5>Сообщения:</h5>
               <div  id="collapseMessagesList">
                     <ul class="list-group p-0" id="event-log">

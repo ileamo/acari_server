@@ -1,10 +1,5 @@
 <main role="main" id="mainPage" >
 
-  <div id="alert-server-bd">
-    <%= render "alert_server_db.html", assigns %>
-  </div>
-
-
   <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
   <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
   <%= @inner_content %>
