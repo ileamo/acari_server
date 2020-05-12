@@ -36,4 +36,21 @@ defmodule AcariServerWeb.NodeView do
       {"", "on", "Заблокировать клиента?"}
     end
   end
+
+  def two_col(vars) do
+      vars
+      |> Enum.group_by(fn {name, _} ->
+        case Regex.run(~r|^[^_]+_(.+)$|, name) do
+          [_, name] -> name
+          _ -> "яяя"
+        end
+      end)
+      |> Enum.sort_by(fn {name, _} -> name end)
+      |> Enum.map(fn {_, x} ->
+        x
+        |> Enum.chunk_every(2, 2, [nil])
+      end)
+      |> List.flatten()
+      |> Enum.chunk_every(2, 2, [nil])
+  end
 end

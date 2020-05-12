@@ -1,27 +1,29 @@
 <%= if map_size(@vars) != 0 do %>
 
   <h2> Параметры: </h2>
-  <%= for  {k, v}  <-  @vars  do %>
+  <%= for  pair  <-  two_col(@vars)  do %>
     <div class="form-group row">
-      <%= label :node, k, k, class: "col-sm-2 col-form-label" %>
-      <% value = @node_params &&
-        case v do
-          value_list when is_list(value_list) ->
-            Enum.member?(value_list, val = @node_params[k]) && val
-          _ ->   @node_params[k]
-        end
-      %>
-      <% opts = [class: "form-control", onfocus: "this.style.color='#000'"] ++
-      (value && [value: value] || [value: is_binary(v) && v || Enum.at(v, 0), style: "color: #AAA"]) %>
+      <%= for {k, v} <- pair do %>
+        <%= label :node, k, k, class: "col-sm-2 col-form-label" %>
+        <% value = @node_params &&
+          case v do
+            value_list when is_list(value_list) ->
+              Enum.member?(value_list, val = @node_params[k]) && val
+            _ ->   @node_params[k]
+          end
+        %>
+        <% opts = [class: "form-control", onfocus: "this.style.color='#000'"] ++
+        (value && [value: value] || [value: is_binary(v) && v || Enum.at(v, 0), style: "color: #AAA"]) %>
 
-      <div class="col-sm-10">
-        <%= if is_binary(v) do %>
-        <%= text_input :params, k, opts %>
-        <% else %>
-        <%= select :params, k, v, opts %>
-        <% end %>
-      </div>
+        <div class="col-sm-4">
+          <%= if is_binary(v) do %>
+          <%= text_input :params, k, opts %>
+          <% else %>
+          <%= select :params, k, v, opts %>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   <% end %>
-
+<hr/>
 <% end %>
