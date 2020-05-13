@@ -4,7 +4,7 @@
   <%= for  pair  <-  two_col(@vars)  do %>
     <div class="form-group row">
       <%= for {k, v} <- pair do %>
-        <%= label :node, k, k, class: "col-sm-2 col-form-label" %>
+        <%= label :node, k, k, class: "col-sm-2 col-form-label text-right pr-0" %>
         <% value = @node_params &&
           case v do
             value_list when is_list(value_list) ->

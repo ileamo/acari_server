@@ -12,7 +12,6 @@
     <tbody>
       <%= for %{name_srv: name, up: up, state: state} <-
                                       links_sorted(@links_state)
-                                      |> IO.inspect()
                                        do %>
         <% {last_up_tm, last_down_tm, total, pc, avg} = get_down_pc_m(state, up) %>
         <tr>

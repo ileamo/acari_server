@@ -2,8 +2,8 @@ import socket from './socket'
 
 let node_monitor = document.getElementById('node-monitor');
 if (node_monitor) {
-  document.getElementById('mainPage')
-    .setAttribute("style", "padding-bottom: 600px; margin-bottom: -600px;");
+  // document.getElementById('mainPage')
+  //   .setAttribute("style", "padding-bottom: 600px; margin-bottom: -600px;");
 
   let channel = socket.channel("node_monitor:1", {
     pathname: window.location.pathname
