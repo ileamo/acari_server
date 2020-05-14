@@ -37,20 +37,38 @@ defmodule AcariServerWeb.NodeView do
     end
   end
 
-  def two_col(vars) do
+  def multi_col(vars) do
+    gr =
       vars
       |> Enum.group_by(fn {name, _} ->
         case Regex.run(~r|^[^_]+_(.+)$|, name) do
           [_, name] -> name
-          _ -> "яяя"
+          _ -> "_" <> name
         end
       end)
-      |> Enum.sort_by(fn {name, _} -> name end)
-      |> Enum.map(fn {_, x} ->
-        x
-        |> Enum.chunk_every(2, 2, [nil])
-      end)
-      |> List.flatten()
-      |> Enum.chunk_every(2, 2, [nil])
+      |> Enum.sort_by(fn {_name, list = [{name1,_} | _]} -> {-length(list), name1} end)
+
+      max = gr |> Enum.max_by(fn {_, list} -> length(list) end)
+      |> elem(1)
+      |> length()
+
+    cols = case max do
+      1 -> 1
+      2 -> 2
+      3 -> 3
+      4 -> 4
+      5 -> 3
+      6 -> 3
+      _ -> 4
+    end
+
+    rows = gr
+    |> Enum.map(fn {_, x} ->
+      x
+      |> Enum.chunk_every(cols, cols, List.duplicate(nil, cols - 1))
+    end)
+    |> List.flatten()
+    |> Enum.chunk_every(cols, cols, List.duplicate(nil, cols - 1))
+    {cols, rows}
   end
 end
