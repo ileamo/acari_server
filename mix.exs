@@ -92,7 +92,7 @@ defmodule AcariServer.MixProject do
       {:bbmustache, "~> 1.8"},
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
-      {:wild, "~> 1.0.0-rc.3"},
+      {:wild, "~> 1.0.0"},
       {:navigation_history, "~> 0.3"},
       {:benchee, "~> 1.0", only: :dev},
       {:acari, git: "https://github.com/ileamo/acari.git"},

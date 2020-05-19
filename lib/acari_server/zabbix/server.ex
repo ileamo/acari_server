@@ -16,6 +16,7 @@ defmodule AcariServer.Zabbix.Server do
   ## Callbacks
   @impl true
   def init(listen_sock) do
+    IO.inspect("ZBX init")
     {:ok, sock} = :gen_tcp.accept(listen_sock)
     {:ok, %State{socket: sock, rest: ""}}
   end
@@ -58,6 +59,7 @@ defmodule AcariServer.Zabbix.Server do
       data
       |> Enum.reduce(0, fn
         %{"host" => host, "key" => key, "value" => value}, acc ->
+          IO.inspect({host, key,value})
           AcariServer.Mnesia.update_zabbix(host, key, value)
           AcariServer.Zabbix.ZbxApi.zbx_send(host, key, value)
           acc + 1
