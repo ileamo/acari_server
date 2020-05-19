@@ -103,12 +103,7 @@ defmodule AcariServerWeb.Router do
 
     live "/live", PageLive
 
-    live "/sysconfigs", SysConfigLive.Index, :index
-    live "/sysconfigs/new", SysConfigLive.Index, :new
-    live "/sysconfigs/:id/edit", SysConfigLive.Index, :edit
-
-    live "/sysconfigs/:id", SysConfigLive.Show, :show
-    live "/sysconfigs/:id/show/edit", SysConfigLive.Show, :edit
+    live "/sysconfig", SysConfigLive
 
 
   end

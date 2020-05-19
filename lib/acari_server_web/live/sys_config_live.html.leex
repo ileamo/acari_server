@@ -1,0 +1,13 @@
+<h2>Системная конфигурация</h2>
+
+
+
+<%= for {key, value} <- [{"a.b.c", "abc"}, {"d.e.f", "def"}, {"x.y.z", "xyz"}] do %>
+    <div class="row d-flex align-items-center">
+      <label class="col-sm-4 col-form-label"><%= key %></label>
+      <input class="col-sm-7 p-0" type="text" name="q" value="<%= value %>"
+        phx-focus="<%= key %>" phx-blur="<%= key %>"
+        placeholder="Введите значение"/>
+      <a phx-click="save" phx-value-key="<%= key %>"  class="col-sm-1" href="#"><i class="far fa-save mx-1"></i></a>
+    </div>
+<% end %>
