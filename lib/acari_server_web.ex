@@ -43,6 +43,7 @@ defmodule AcariServerWeb do
       import AcariServerWeb.ErrorHelpers
       import AcariServerWeb.Gettext
       import Phoenix.LiveView.Helpers
+      import AcariServerWeb.LiveHelpers
       alias AcariServerWeb.Router.Helpers, as: Routes
     end
   end
@@ -87,6 +88,7 @@ defmodule AcariServerWeb do
 
       # Import LiveView helpers (live_render, live_component, live_patch, etc)
       import Phoenix.LiveView.Helpers
+      import AcariServerWeb.LiveHelpers
 
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
