@@ -103,7 +103,6 @@ defmodule AcariServerWeb.Router do
 
     live "/live", PageLive
 
-    live "/sysconfig", SysConfigLive
 
 
   end
@@ -125,6 +124,7 @@ defmodule AcariServerWeb.Router do
 
   scope "/" do
     pipe_through [:browser, :auth, :ensure_auth, :ensure_admin]
+    live "/sysconfig", AcariServerWeb.SysConfigLive
     live_dashboard "/system_dashboard", metrics: AcariServerWeb.Telemetry
   end
 
