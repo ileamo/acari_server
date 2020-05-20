@@ -2,23 +2,25 @@ defmodule AcariServerWeb.SysConfigLive do
   use AcariServerWeb, :live_view
 
   alias AcariServer.SysConfigManager
-  #alias AcariServer.SysConfigManager.SysConfig
+  alias AcariServer.SysConfigManager.Schema
 
   @impl true
   def mount(_params, _session, socket) do
-    IO.inspect(socket.assigns, label: "MOUNT")
-    {:ok, assign(socket, sysconfigs: fetch_sysconfigs(), query: "")}
+    {:ok, assign(socket, sysconfig: fetch_sysconfigs())}
   end
 
-
   @impl true
-  def handle_event(event, params, socket) do
-    IO.inspect({event, params})
-
-    {:noreply, assign(socket, :sysconfigs, fetch_sysconfigs())}
+  def handle_event(_event, _params, socket) do
+    {:noreply, socket}
   end
 
   defp fetch_sysconfigs do
-    SysConfigManager.list_sysconfigs()
+    sysconfig =
+      SysConfigManager.list_sysconfigs()
+      |> Enum.map(fn %{key: key, value: value} -> {key, value} end)
+      |> Enum.into(%{})
+
+    Schema.get()
+    |> Enum.map(fn sch = %{key: key} -> sch |> Map.put(:value, sysconfig[key]) end)
   end
 end

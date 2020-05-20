@@ -57,7 +57,7 @@ defmodule AcariServer.NewNodeDiscovery do
   end
 
   def insert_or_update_new_node(attrs = %{name: name}) do
-    case NewNode |> RepoRO.get_by(name: name) do
+    case NewNode |> Repo.get_by(name: name) do
       nil -> %NewNode{}
       newnode -> newnode
     end

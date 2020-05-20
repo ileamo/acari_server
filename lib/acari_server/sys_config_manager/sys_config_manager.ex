@@ -55,6 +55,17 @@ defmodule AcariServer.SysConfigManager do
     |> Repo.insert()
   end
 
+  def insert_or_update_sys_config(attrs = %{key: key}) do
+    case SysConfig |> Repo.get_by(key: key) do
+      nil -> %SysConfig{}
+      config -> config
+    end
+    |> SysConfig.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
+
+
   @doc """
   Updates a sys_config.
 

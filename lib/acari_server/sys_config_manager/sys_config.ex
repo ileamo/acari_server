@@ -3,7 +3,7 @@ defmodule AcariServer.SysConfigManager.SysConfig do
   import Ecto.Changeset
 
   schema "sysconfigs" do
-    field :name, :string
+    field :key, :string
     field :value, :string
 
     timestamps()
@@ -12,7 +12,7 @@ defmodule AcariServer.SysConfigManager.SysConfig do
   @doc false
   def changeset(sys_config, attrs) do
     sys_config
-    |> cast(attrs, [:name, :value])
-    |> validate_required([:name, :value])
+    |> cast(attrs, [:key, :value])
+    |> validate_required([:key, :value])
   end
 end

@@ -3,11 +3,12 @@ defmodule AcariServer.Repo.Migrations.CreateSysconfigs do
 
   def change do
     create table(:sysconfigs) do
-      add :name, :string
+      add :key, :string
       add :value, :text
 
       timestamps()
     end
+    create(index(:sysconfigs, [:key]))
 
   end
 end
