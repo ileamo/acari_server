@@ -37,6 +37,10 @@ defmodule AcariServer.SysConfigManager do
   """
   def get_sys_config!(id), do: Repo.get!(SysConfig, id)
 
+  def get_conf_by_key(key) do
+    SysConfig |> Repo.get_by(key: key)
+  end
+
   @doc """
   Creates a sys_config.
 
@@ -63,8 +67,6 @@ defmodule AcariServer.SysConfigManager do
     |> SysConfig.changeset(attrs)
     |> Repo.insert_or_update()
   end
-
-
 
   @doc """
   Updates a sys_config.

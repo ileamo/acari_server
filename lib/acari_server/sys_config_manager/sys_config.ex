@@ -13,6 +13,6 @@ defmodule AcariServer.SysConfigManager.SysConfig do
   def changeset(sys_config, attrs) do
     sys_config
     |> cast(attrs, [:key, :value])
-    |> validate_required([:key, :value])
+    |> validate_required([:key])
   end
 end

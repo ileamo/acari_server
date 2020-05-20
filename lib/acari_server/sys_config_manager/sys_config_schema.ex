@@ -4,7 +4,7 @@ defmodule AcariServer.SysConfigManager.Schema do
       %{
         key: "layout.navbar.banner",
         name: "Баннер",
-        description: "Техт в верхней навигационной панели",
+        description: "Задает текст в верхней навигационной панели",
         type: :string
       },
       %{
