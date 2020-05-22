@@ -4,6 +4,7 @@
   <%
     module = case type do
       :boolean -> AcariServerWeb.SysConfigLive.BooleanComponent
+      :select -> AcariServerWeb.SysConfigLive.SelectComponent
       _ -> AcariServerWeb.SysConfigLive.StringComponent
     end
   %>

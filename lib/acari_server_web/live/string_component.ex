@@ -10,18 +10,12 @@ defmodule AcariServerWeb.SysConfigLive.StringComponent do
   end
 
   def handle_event("input_blur", params, socket) do
-    color = if params["value"] == socket.assigns.saved_value, do: "dark", else: "primary"
-
-    {:noreply, assign(socket, color: color, value: params["value"])}
-  end
-
-  def handle_event("save", _params, socket) do
     {:ok, %{value: value}} =
       SysConfigManager.insert_or_update_sys_config(%{
         key: socket.assigns.key,
-        value: socket.assigns.value
+        value: params["value"]
       })
 
-    {:noreply, assign(socket, saved_value: value, color: "dark")}
+    {:noreply, assign(socket, value: value, color: "dark")}
   end
 end

@@ -3,11 +3,15 @@
     <label class="col-sm-3 col-form-label"
       phx-click="descr" phx-target="<%= @myself %>"><%= @name %></label>
 
-    <input class="col-sm-9 form-control p-0 text-<%= @color %>" type="text" name="q" value="<%= @value %>"
-      phx-focus="input_focus" phx-blur="input_blur"
-      phx-target="<%= @myself %>"
-      placeholder="Введите значение"/>
+    <select class="form-control col-sm-9 p-0" phx-click="select" phx-target="<%= @myself %>">
+      <%= for {value, text} <- @select do %>
+        <option value="<%= value %>" <%= if value == @value, do: "selected" %>>
+          <%= text %>
+        </option>
+      <% end %>
+    </select>
   </div>
+
   <div class="pb-<%= @descr_pb %> text-muted" phx-click="descr_off" phx-target="<%= @myself %>">
     <%= @descr %>
   </div>

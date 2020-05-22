@@ -13,8 +13,17 @@
   <body style="overflow-y: scroll;">
     <% AcariServer.Mnesia.purge_stat()
        mes_list = AcariServer.Mnesia.get_client_status(@current_user)
-       num_of_mes = mes_list |> length() %>
-    <nav class="navbar navbar-expand navbar-dark flex-sm-nowrap p-0 justify-content-between"
+       num_of_mes = mes_list |> length()
+
+       theme = AcariServer.SysConfigManager.get_conf_by_key("layout.navbar.theme")[:value]
+       {navbar, bg} = case theme do
+         "dark" -> {"navbar-dark", "bg-dark"}
+         "light" -> {"navbar-light", "bg-light"}
+         _ -> {"navbar-dark", ""}
+       end
+
+    %>
+    <nav  class="navbar navbar-expand <%= navbar %> <%= bg %> flex-sm-nowrap p-0 justify-content-between"
           style="background-color: #305478;">
       <a class="navbar-brand col col-md-2 mr-0" href="http://www.nsg.ru">NSG</a>
 
@@ -24,7 +33,7 @@
             <span><%= conf.value %></span>
           <!-- <i class="fas fa-paw text-secondary"></i> -->
         </a>
-      <%= end %>
+      <% end %>
 
       <div class="navbar-nav px-3 d-flex flex-wrap">
         <span class="d-none d-md-block navbar-text pr-3">

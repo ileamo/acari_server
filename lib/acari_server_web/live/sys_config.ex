@@ -8,11 +8,11 @@ defmodule AcariServer.SysConfig do
            key: assigns.id,
            name: assigns.config.name,
            value: assigns.config.value,
-           saved_value: assigns.config.value,
            color: "dark",
            descr: "",
            description: assigns.config.description,
-           descr_pb: 0
+           descr_pb: 0,
+           select: assigns.config[:select]
          )}
       end
 
