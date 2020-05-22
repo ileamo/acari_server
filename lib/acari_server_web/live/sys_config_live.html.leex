@@ -1,8 +1,11 @@
 <h2>Системная конфигурация</h2>
 
-
-
-<%= for %{key: key} = config <- @sysconfig do %>
-    <%= live_component @socket, AcariServerWeb.SysConfigLive.StringComponent,
-          id: key, config: config%>
+<%= for %{key: key, type: type} = config <- @sysconfig do %>
+  <%
+    module = case type do
+      :boolean -> AcariServerWeb.SysConfigLive.BooleanComponent
+      _ -> AcariServerWeb.SysConfigLive.StringComponent
+    end
+  %>
+  <%= live_component @socket, module, id: key, config: config %>
 <% end %>

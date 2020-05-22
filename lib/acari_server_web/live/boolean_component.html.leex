@@ -1,0 +1,13 @@
+<div>
+  <div class="row d-flex align-items-center">
+    <label class="col-sm-3 col-form-label"
+      phx-click="descr" phx-target="<%= @myself %>"><%= @name %></label>
+
+    <% checked = if @value, do: "checked", else: "" %>
+    <input class="p-0 text-<%= @color %>" type="checkbox" <%= checked %>
+      phx-click="check" phx-target="<%= @myself %>"/>
+  </div>
+  <div class="pb-<%= @descr_pb %> text-muted" phx-click="descr_off" phx-target="<%= @myself %>">
+    <%= @descr %>
+  </div>
+</div>

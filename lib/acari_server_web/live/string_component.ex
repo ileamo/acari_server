@@ -2,22 +2,9 @@ defmodule AcariServerWeb.SysConfigLive.StringComponent do
   use Phoenix.LiveComponent
   alias AcariServer.SysConfigManager
 
-  @impl true
-  def update(assigns, socket) do
-    {:ok,
-     assign(socket,
-       key: assigns.id,
-       name: assigns.config.name,
-       value: assigns.config.value,
-       saved_value: assigns.config.value,
-       color: "dark",
-       descr: "",
-       description: assigns.config.description,
-       descr_pb: 0
-     )}
-  end
+  require AcariServer.SysConfig
+  AcariServer.SysConfig.component_common()
 
-  @impl true
   def handle_event("input_focus", _params, socket) do
     {:noreply, assign(socket, color: "primary")}
   end
@@ -36,22 +23,5 @@ defmodule AcariServerWeb.SysConfigLive.StringComponent do
       })
 
     {:noreply, assign(socket, saved_value: value, color: "dark")}
-  end
-
-  def handle_event("descr", params, socket) do
-    {descr, pb} =
-      if socket.assigns.descr == "", do: {socket.assigns.description, 3}, else: {"", 0}
-
-    {:noreply, assign(socket, descr: descr, descr_pb: pb)}
-  end
-
-  def handle_event("descr_off", _params, socket) do
-    {:noreply, assign(socket, descr: "", descr_pb: 0)}
-  end
-
-  def handle_event(event, params, socket) do
-    IO.inspect({event, params, socket.assigns}, label: "COMPONENT")
-
-    {:noreply, socket}
   end
 end

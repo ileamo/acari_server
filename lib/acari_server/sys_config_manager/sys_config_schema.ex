@@ -8,13 +8,13 @@ defmodule AcariServer.SysConfigManager.Schema do
         type: :string
       },
       %{
-        key: "layout.color",
-        name: "Цвет",
-        description: "Цвет",
-        type: :string
+        key: "admin.ro_plus",
+        name: "Просмотр+",
+        description:
+          "Разрешить пользователю с ограниченными правами редактировать информационные параметры клиента",
+        type: :boolean
       }
     ]
     |> Enum.uniq_by(fn %{key: key} -> key end)
   end
-
 end
