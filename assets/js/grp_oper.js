@@ -344,11 +344,11 @@ if (grp_oper) {
             if (table) {
               let checked = grp_oper_show_full_data.checked
               if (checked) {
-                table.column(4).visible(false);
-                table.column(5).visible(true);
-              } else {
-                table.column(4).visible(true);
                 table.column(5).visible(false);
+                table.column(6).visible(true);
+              } else {
+                table.column(5).visible(true);
+                table.column(6).visible(false);
               }
             }
           }

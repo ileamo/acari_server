@@ -382,7 +382,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
     script_res_list =
       nodes
-      |> Enum.map(fn %{name: tun_name, description: descr} ->
+      |> Enum.map(fn %{name: tun_name, description: descr, address: address} ->
         data =
           AcariServer.Mnesia.get_tunnel_srv_state(tun_name)[tag] ||
             %{}
@@ -390,6 +390,7 @@ defmodule AcariServerWeb.GrpOperChannel do
         %{
           id: tun_name,
           description: descr,
+          address: address,
           data: data,
           rights:
             if user.is_admin or template_rights == "ro" do
@@ -424,7 +425,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
     script_res_list =
       nodes
-      |> Enum.map(fn %{id: id, name: tun_name, description: descr} ->
+      |> Enum.map(fn %{id: id, name: tun_name, description: descr, address: address} ->
         {ts, data, reqv_ts} =
           case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
             %{timestamp: ts, data: data} = state -> {ts, data, state[:reqv_ts] || 0}
@@ -435,6 +436,7 @@ defmodule AcariServerWeb.GrpOperChannel do
           id: id,
           name: tun_name,
           description: descr,
+          address: address,
           timestamp: ts,
           reqv_ts: reqv_ts,
           data: data |> to_string(),
@@ -482,7 +484,7 @@ defmodule AcariServerWeb.GrpOperChannel do
   defp get_script_multi(socket, tag_list, group_id, class_id, filter) do
     script_res_multi =
       get_nodes_list(socket, group_id, class_id, filter)
-      |> Enum.map(fn %{name: tun_name, description: descr} ->
+      |> Enum.map(fn %{name: tun_name, description: descr, address: address} ->
         tag_data_list =
           (tag_list || [])
           |> Enum.map(fn tag ->
@@ -492,7 +494,7 @@ defmodule AcariServerWeb.GrpOperChannel do
             end
           end)
 
-        %{id: tun_name, description: descr, data_list: tag_data_list}
+        %{id: tun_name, description: descr, address: address, data_list: tag_data_list}
       end)
 
     push(socket, "output", %{

@@ -1,9 +1,11 @@
 <hr/>
+
 <table id="datatable-multi" class="table display table-striped table-bordered table-sm w-100">
   <thead>
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Адрес</th>
       <% [%{data_list: data_list} | _] = @script_res_multi %>
       <%=  for {tag, _data} <- data_list do %>
         <th scope="col"><%= tag %></th>
@@ -11,24 +13,30 @@
     </tr>
   </thead>
   <tbody>
-    <%= for %{id: id, description: descr, data_list: data_list} <- @script_res_multi do %>
+    <%= for %{id: id, description: descr, address: address, data_list: data_list} <-
+            @script_res_multi do %>
       <tr>
         <td>
           <%= link id, to: Routes.tunnel_path(AcariServerWeb.Endpoint, :show, id) %>
         </td>
         <td><%= descr %></td>
+        <td><%= address %></td>
 
         <%= for {_tag, data} <- data_list do  %>
           <% data = to_string(data) %>
           <td>
-            <a href="#" data-toggle="modal" data-target="#grp-script-res"
-              data-content="<%= data %>" data-name="<%= id %>">
-                  <%= if String.length(data) <= 20 do %>
-                    <%= data %>
-                  <% else %>
-                    <%= (data |> String.slice(0, 20)) %>&hellip;
-                  <% end  %>
-            </a>
+            <%= if true do %>
+              <%= data %>
+            <% else %>
+              <a href="#" data-toggle="modal" data-target="#grp-script-res"
+                data-content="<%= data %>" data-name="<%= id %>">
+                    <%= if String.length(data) <= 20 do %>
+                      <%= data %>
+                    <% else %>
+                      <%= (data |> String.slice(0, 20)) %>&hellip;
+                    <% end  %>
+              </a>
+            <% end %>
           </td>
         <% end %>
 

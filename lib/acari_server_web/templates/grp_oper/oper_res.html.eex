@@ -40,6 +40,7 @@
     <tr>
       <th scope="col">Имя</th>
       <th scope="col">Описание</th>
+      <th scope="col">Адрес</th>
       <th scope="col">Запрос</th>
       <th scope="col">Ответ</th>
       <th scope="col">Данные</th>
@@ -51,6 +52,7 @@
     <%= for %{
               name: name,
               description: descr,
+              address: address,
               timestamp: ts,
               reqv_ts: reqv_ts,
               data: data,
@@ -60,6 +62,7 @@
           <%= link name, to: Routes.tunnel_path(AcariServerWeb.Endpoint, :show, name) %>
         </td>
         <td><%= descr %></td>
+        <td><%= address %></td>
         <td><%= case reqv_ts do
                   0 -> "-"
                   ts -> AcariServer.get_local_date(ts)
