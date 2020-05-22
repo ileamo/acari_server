@@ -38,7 +38,10 @@ defmodule AcariServer.SysConfigManager do
   def get_sys_config!(id), do: Repo.get!(SysConfig, id)
 
   def get_conf_by_key(key) do
-    SysConfig |> Repo.get_by(key: key)
+    case Repo.get_by(SysConfig, key: key) do
+        %{value: value} -> value
+        _ -> nil
+    end
   end
 
   @doc """

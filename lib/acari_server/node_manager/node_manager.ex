@@ -151,12 +151,12 @@ defmodule AcariServer.NodeManager do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_node(%Node{} = node, attrs, var_def \\ nil) do
-    attrs = update_attrs(node, attrs, var_def)
+  def update_node(%Node{} = node, attrs, opts \\ []) do
+    attrs = update_attrs(node, attrs, opts[:var_def])
 
     res =
       node
-      |> Node.update_changeset(attrs)
+      |> Node.update_changeset(attrs, opts[:user])
       |> AcariServer.GroupManager.Group.put_groups(attrs)
       |> Repo.update()
 

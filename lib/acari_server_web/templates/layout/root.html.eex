@@ -15,7 +15,7 @@
        mes_list = AcariServer.Mnesia.get_client_status(@current_user)
        num_of_mes = mes_list |> length()
 
-       theme = AcariServer.SysConfigManager.get_conf_by_key("layout.navbar.theme")[:value]
+       theme = AcariServer.SysConfigManager.get_conf_by_key("layout.navbar.theme")
        {navbar, bg} = case theme do
          "dark" -> {"navbar-dark", "bg-dark"}
          "light" -> {"navbar-light", "bg-light"}
@@ -30,7 +30,7 @@
       <%= if conf = AcariServer.SysConfigManager.get_conf_by_key("layout.navbar.banner") do %>
         <a class="navbar-brand col col-md-2 text-center" href="#">
           <!-- <i class="fas fa-paw text-s econdary"></i> -->
-            <span><%= conf.value %></span>
+            <span><%= conf %></span>
           <!-- <i class="fas fa-paw text-secondary"></i> -->
         </a>
       <% end %>

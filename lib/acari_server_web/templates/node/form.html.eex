@@ -72,6 +72,7 @@
 
     %>
     <%= render "parameters_form.html", vars: vars, node_params: params %>
+    <div class="text-danger"><%= error_tag f, :params %></div>
   </div>
 
   <%  lat = assigns[:node] && @node.latitude || @changeset.data.latitude || 55.777594
@@ -79,6 +80,7 @@
   %>
 
 
+  <hr/>
 
   <div class="form-group row">
     <%= label f, "Местоположение", class: "col-sm-2 col-form-label" %>

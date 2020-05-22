@@ -84,7 +84,7 @@ defmodule AcariServerWeb.ScriptController do
     |> AcariServer.RepoRO.preload(:groups)
     |> AcariServer.NodeManager.update_node(
       %{"script_id" => to_string(script_id), "groups_list" => false},
-      var_def
+      var_def: var_def
     )
   end
 

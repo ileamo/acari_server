@@ -41,10 +41,32 @@ defmodule AcariServer.NodeManager.Node do
     |> unique_constraint(:name)
   end
 
-  def update_changeset(node, attrs) do
+  def update_changeset(node, attrs, nil) do
     changeset(node, attrs)
     |> validate_change(:name, &validate_update_node_name/2)
   end
 
+  def update_changeset(node, attrs, user) do
+    ch = update_changeset(node, attrs, nil)
+
+    AcariServer.SysConfigManager.get_conf_by_key("admin.ro_plus")
+
+    rights =
+      AcariServer.UserManager.get_user_node_rights(user, node.id)
+
+
+    case rights do
+      "ro" ->
+        ch
+        |> validate_change(:params, &validate_update_ro/2)
+        |> validate_change(:script_id, &validate_update_ro/2)
+
+      _ ->
+        ch
+    end
+  end
+
   defp validate_update_node_name(:name, _), do: [name: "Имя клиента не может быть изменено"]
+  defp validate_update_ro(:params, _), do: [{:params, "Нет прав на изменение параметров"}]
+  defp validate_update_ro(attr_name, _), do: [{attr_name, "Нет прав на изменение параметра"}]
 end

@@ -13,7 +13,7 @@ defmodule AcariServerWeb.NodeController do
     only: [is_admin: 2, is_user_node_rw: 2, is_user_node_ro: 2, is_user_in_group: 2]
 
   plug :is_admin when action in [:new, :exec_selected]
-  plug :is_user_node_rw, :node when action in [:edit, :delete]
+  plug :is_user_node_rw, :node when action in [:delete]
   plug :is_user_node_ro, :node when action in [:show]
   plug :is_user_in_group when action in [:client_grp]
 
@@ -105,7 +105,7 @@ defmodule AcariServerWeb.NodeController do
 
     old_node = NodeManager.get_node!(id)
 
-    case NodeManager.update_node(old_node, node_params) do
+    case NodeManager.update_node(old_node, node_params, user: conn.assigns.current_user) do
       {:ok, node} ->
         Process.sleep(1000)
 
