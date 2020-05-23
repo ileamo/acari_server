@@ -49,18 +49,12 @@ defmodule AcariServer.NodeManager.Node do
   def update_changeset(node, attrs, user) do
     ch = update_changeset(node, attrs, nil)
 
-    AcariServer.SysConfigManager.get_conf_by_key("admin.ro_plus")
-
-    rights =
-      AcariServer.UserManager.get_user_node_rights(user, node.id)
-
-
-    case rights do
-      "ro" ->
-        ch
-        |> validate_change(:params, &validate_update_ro/2)
-        |> validate_change(:script_id, &validate_update_ro/2)
-
+    with true <- !user.is_admin,
+         "ro" <- AcariServer.UserManager.get_user_node_rights(user, node.id) do
+      ch
+      |> validate_change(:params, &validate_update_ro/2)
+      |> validate_change(:script_id, &validate_update_ro/2)
+    else
       _ ->
         ch
     end

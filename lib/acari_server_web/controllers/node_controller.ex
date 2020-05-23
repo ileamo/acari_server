@@ -92,12 +92,24 @@ defmodule AcariServerWeb.NodeController do
   end
 
   def edit(conn, %{"id" => id}) do
-    node =
-      NodeManager.get_node!(id)
-      |> RepoRO.preload(client_comments: :user)
+    conn =
+      case AcariServer.SysConfigManager.get_conf_by_key("admin.ro_plus") do
+        "on" -> conn
+        _ -> is_user_node_rw(conn, :node)
+      end
 
-    changeset = NodeManager.change_node(node)
-    render(conn, "edit.html", node: node, changeset: changeset)
+    case conn.halted do
+      true ->
+        conn
+
+      _ ->
+        node =
+          NodeManager.get_node!(id)
+          |> RepoRO.preload(client_comments: :user)
+
+        changeset = NodeManager.change_node(node)
+        render(conn, "edit.html", node: node, changeset: changeset)
+    end
   end
 
   def update(conn, %{"id" => id, "node" => node_params} = attrs) do
