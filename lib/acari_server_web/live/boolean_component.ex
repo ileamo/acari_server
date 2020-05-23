@@ -14,10 +14,4 @@ defmodule AcariServerWeb.SysConfigLive.BooleanComponent do
 
     {:noreply, assign(socket, value: value)}
   end
-
-  def handle_event(event, params, socket) do
-    IO.inspect({event, params, socket.assigns}, label: "COMPONENT")
-
-    {:noreply, socket}
-  end
 end

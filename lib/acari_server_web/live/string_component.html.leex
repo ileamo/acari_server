@@ -3,7 +3,7 @@
     <label class="col-sm-3 col-form-label"
       phx-click="descr" phx-target="<%= @myself %>"><%= @name %></label>
 
-    <input class="col-sm-9 form-control p-0 text-<%= @color %>" type="text" name="q" value="<%= @value %>"
+    <input class="col-sm-9 form-control p-1 text-<%= @color %>" type="text" name="q" value="<%= @value %>"
       phx-focus="input_focus" phx-blur="input_blur"
       phx-target="<%= @myself %>"
       placeholder="Введите значение"/>
