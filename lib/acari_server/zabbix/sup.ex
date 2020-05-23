@@ -9,7 +9,8 @@ defmodule AcariServer.Zabbix.Sup do
   def init(_arg) do
     children = [
       AcariServer.Zabbix.SerSup,
-      AcariServer.Zabbix.Listener
+      AcariServer.Zabbix.Listener,
+      AcariServer.Zabbix.Handler
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

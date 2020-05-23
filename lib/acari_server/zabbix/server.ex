@@ -57,6 +57,10 @@ defmodule AcariServer.Zabbix.Server do
     num =
       data
       |> Enum.reduce(0, fn
+        %{"host" => host, "key" => "bogatka." <> key, "value" => value}, acc ->
+          AcariServer.Zabbix.Handler.handle(host, key, value)
+          acc
+
         %{"host" => host, "key" => key, "value" => value}, acc ->
           AcariServer.Mnesia.update_zabbix(host, key, value)
           AcariServer.Zabbix.ZbxApi.zbx_send(host, key, value)
