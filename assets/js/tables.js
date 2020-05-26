@@ -47,16 +47,16 @@ $.extend($.fn.dataTable.defaults, {
 });
 
 let datatable_dom =
-  "<'mb-2'B>" +
-  "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-  "<'row'<'col-sm-12'tr>>" +
-  "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+  "<'d-flex justify-content-lg-between flex-wrap mb-2'Bp>" +
+  "<'d-flex justify-content-between flex-wrap'lf>" +
+  "<tr>" +
+  "<'d-flex justify-content-between flex-wrap'ip>"
 
 let datatable_dom_wo_find =
-  "<'mb-2'B>" +
-  "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'>>" +
-  "<'row'<'col-sm-12'tr>>" +
-  "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+  "<'d-flex justify-content-lg-between flex-wrap mb-2'Bp>" +
+  "<'d-flex justify-content-start'l>" +
+  "<tr>" +
+  "<'d-flex justify-content-between flex-wrap'ip>"
 
 let datatatable_csv_text = '<i class="fas fa-file-csv"></i> Экспорт CSV'
 let datatatable_print_text = '<i class="fas fa-print"></i> Печать'
