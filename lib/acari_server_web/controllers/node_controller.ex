@@ -164,6 +164,21 @@ defmodule AcariServerWeb.NodeController do
     |> redirect(to: NavigationHistory.last_path(conn, 1))
   end
 
+  def qr(conn, %{"clients_list" => clients_list} = params) do
+
+    conn
+    |> put_root_layout(false)
+    |> put_layout(false)
+    |> render("qr.html", clients_list: clients_list)
+  end
+
+
+
+  def exec_selected(conn, params = %{"clients_list" => ids, "operation" => "work-order"}) do
+    conn
+    |> redirect(to: Routes.node_path(conn, :qr, clients_list: ids))
+  end
+
   def exec_selected(conn, params = %{"clients_list" => ids, "operation" => operation}) do
     String.split(ids, ",")
     |> Enum.each(fn id ->
