@@ -18,7 +18,8 @@ defmodule AcariServer.NodeMonitor do
 
         ls_html =
           Phoenix.View.render_to_string(AcariServerWeb.TunnelView, "links_state.html",
-            links_state: links_state
+            links_state: links_state,
+            name: tun_name
           )
 
         put_data(self(), "links_state", ls_html)

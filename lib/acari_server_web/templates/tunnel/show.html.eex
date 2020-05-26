@@ -38,17 +38,6 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 </h6>
 <h6><strong>Основной сервер:</strong> <%= tun.server %></h6>
 
-<div class="text-danger">
-  <%= raw(
-    case AcariServer.Mnesia.get_tunnel_state(@name)[:errormsg] do
-      %{} = map -> map
-        |> Enum.map(fn {port, mes} -> "#{port}: #{mes}" end)
-        |> Enum.join("</br>")
-      _ -> ""
-    end)
-  %>
-</div>
-
 <hr/>
   <div id="node-monitor">
 
@@ -67,7 +56,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
         </div>
     </nav>
     <div class="collapse show" id="nm-links-state">
-      <%= render "links_state.html", links_state: links_state  %>
+      <%= render "links_state.html", links_state: links_state, name: @name %>
     </div>
 
     <hr/>

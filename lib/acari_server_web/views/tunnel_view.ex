@@ -76,6 +76,29 @@ defmodule AcariServerWeb.TunnelView do
     |> Enum.sort_by(fn %{name_srv: ns} -> ns end)
   end
 
+  def get_down_ports_msgs(name, links_state) do
+    port_up =
+      links_state
+      |> Enum.reduce(%{}, fn %{id: {port, _, _}, up: up}, acc ->
+        Map.put(acc, port, up || (acc[port] || false))
+      end)
+
+    case AcariServer.Mnesia.get_tunnel_state(name)[:errormsg] do
+      %{} = map ->
+        map
+        |> Enum.map(fn {port, %{msg: msg, timestamp: tm}} ->
+          if !port_up[port] do
+            "#{AcariServer.get_local_date(tm)}: #{port}: #{msg}"
+          end
+        end)
+        |> Enum.reject(&is_nil(&1))
+        |> Enum.join("</br>")
+
+      _ ->
+        ""
+    end
+  end
+
   def redirect_path(conn) do
     NavigationHistory.last_paths(conn)
     |> Enum.find(fn x -> String.match?(x, ~r{^/tunnels($|/\d+$)}) end) ||

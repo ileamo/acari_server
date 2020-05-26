@@ -59,7 +59,7 @@ defmodule AcariServer.Zabbix.Server do
       |> Enum.reduce(0, fn
         %{"host" => host, "key" => "bogatka." <> key, "value" => value}, acc ->
           AcariServer.Zabbix.Handler.handle(host, key, value)
-          acc
+          acc + 1
 
         %{"host" => host, "key" => key, "value" => value}, acc ->
           AcariServer.Mnesia.update_zabbix(host, key, value)

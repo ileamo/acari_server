@@ -42,6 +42,10 @@
       <% end %>
     </tbody>
   </table>
+
+  <div class="text-danger">
+    <%= raw(get_down_ports_msgs(@name, @links_state)) %>
+  </div>
 </div>
 
 <!-- Modal -->
