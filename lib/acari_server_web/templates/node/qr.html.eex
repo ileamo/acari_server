@@ -7,30 +7,37 @@
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/a4.css") %>"/>
   </head>
   <body>
-
+    <h2>Ссылки на страницы мониторинга клиентов</h2>
     <%
-       nodes =  AcariServer.NodeManager.list_nodes()
-              |> Enum.map(fn %{id: id} -> AcariServer.NodeManager.get_node_hash(id) end)
-              |> Enum.map(fn %{id: id} -> AcariServer.NodeManager.get_node_hash(id) end)
-              |> Enum.chunk_every(3,3,[nil, nil])
+      nodes =  String.split(@clients_list, ",")
+        |> Enum.filter(fn x -> case Integer.parse(x) do
+            {_, ""} -> true
+            _ -> false
+          end
+        end)
+        |> Enum.map(fn id -> AcariServer.NodeManager.get_node_hash(id) end)
+        |> Enum.reject(&is_nil/1)
+        |> Enum.chunk_every(3,3,[nil, nil])
+
+      url = AcariServer.SysConfigManager.get_conf_by_key("system.url.mobile") ||
+        "http://localhost"
     %>
 
     <%= for triple <- nodes do %>
       <div class="pt-5 nonbreak row">
-
       <%= for %{hash: hash, name: name, description: description, address: address} <- triple do %>
           <div class="d-flex flex-column align-items-center col-4">
             <svg width="200" height="200" class="p-0">
-              <%= raw("https://ztp-nsg4.sberbank.ru:50443/client/"<>hash |> EQRCode.encode() |> EQRCode.svg(width: 200)) %>
+              <%= raw(url<>"/client/"<>hash |> EQRCode.encode() |> EQRCode.svg(width: 200)) %>
             </svg>
             <div class="px-3">
               <%= name %></br>
               <%= description %></br>
-              <%= address %>
+              <%= address %></br>
+              <%= hash %>
             </div>
           </div>
       <% end %>
-
       </div>
     <% end %>
 

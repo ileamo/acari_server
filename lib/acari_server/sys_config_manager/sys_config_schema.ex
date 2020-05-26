@@ -24,7 +24,13 @@ defmodule AcariServer.SysConfigManager.Schema do
         description:
           "Разрешить пользователю с ограниченными правами редактировать информационные параметры клиента",
         type: :boolean
-      }
+      },
+      %{
+        key: "system.url.mobile",
+        name: "URL",
+        description: "URL для доступа к серверу Богатка с мобильных устройств",
+        type: :string
+        }
     ]
     |> Enum.uniq_by(fn %{key: key} -> key end)
   end

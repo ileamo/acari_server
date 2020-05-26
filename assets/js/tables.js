@@ -129,7 +129,9 @@ datatable_params_with_select.buttons =
 $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn';
 
 let datatable_params_desc0 = Object.assign({}, datatable_params)
-datatable_params_desc0.order = [[0, 'desc']]
+datatable_params_desc0.order = [
+  [0, 'desc']
+]
 
 
 var table = $("#datatable").DataTable(datatable_params);
@@ -264,4 +266,22 @@ if (document.getElementById("client-comments")) {
     document.getElementById('client-comments-comment-id').value = data_field.data('comment-id')
     document.getElementById('client-comments-content').value = data_field.data('user-comment')
   })
+
+  let print_qr = document.getElementById("print-qr")
+  if (print_qr) {
+    print_qr.addEventListener('phoenix.link.click', function(e) {
+      e.stopPropagation();
+      let selected = table_select.rows('.selected').data()
+      if (selected.length > 0) {
+        let ids = selected.map(function(x) {
+          return x[0]
+        }).join(',')
+        e.target.setAttribute("href", "/qr?clients_list=" + encodeURIComponent(ids))
+      } else {
+        alert('Не выделена ни одна строка в таблице')
+        event.preventDefault();
+      }
+    }, false);
+  }
+
 }

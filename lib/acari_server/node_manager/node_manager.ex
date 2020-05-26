@@ -105,9 +105,12 @@ defmodule AcariServer.NodeManager do
         node
 
       %Node{} = node ->
+        {:ok, node} =
+          node
+          |> Node.changeset(%{"hash" => :crypto.strong_rand_bytes(12) |> Base.url_encode64()})
+          |> Repo.update()
+
         node
-        |> Node.changeset(%{"hash" => :crypto.strong_rand_bytes(12) |> Base.url_encode64()})
-        |> Repo.update()
 
       _ ->
         nil

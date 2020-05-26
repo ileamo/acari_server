@@ -41,6 +41,7 @@ defmodule AcariServer.NodeManager.Node do
     |> validate_required([:name])
     |> foreign_key_constraint(:script_id)
     |> unique_constraint(:name)
+    |> unique_constraint(:hash)
   end
 
   def update_changeset(node, attrs, nil) do

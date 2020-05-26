@@ -58,7 +58,6 @@ defmodule AcariServerWeb.Router do
 
     get "/", PageController, :index
     get "/zabbix", PageController, :zabbix
-    get "/qr", PageController, :qr
     get "/чеукь", PageController, :xterm
     post "/чеукь/upload", PageController, :upload
     get "/faq", PageController, :faq
@@ -83,6 +82,7 @@ defmodule AcariServerWeb.Router do
     get "/nodes/grp/:id", NodeController, :client_grp
     post "/client_comment/new", NodeController, :client_comment_new
     get "/client_comment/del/:id", NodeController, :client_comment_del
+    get "/qr", NodeController, :qr
 
     resources "/newnodes", NewNodeController
     post "/newnodes/upload", NewNodeController, :upload
