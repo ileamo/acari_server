@@ -1,0 +1,22 @@
+body {
+  width: 21cm;
+}
+
+@media print {
+  body {
+    margin: 1cm;
+  }
+
+  @page {
+    margin: 0;
+  }
+
+  svg {
+    display: block;
+    page-break-inside: avoid;
+  }
+
+  .nonbreak {
+    page-break-inside: avoid;
+  }
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Богатка</title>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/a4.css") %>"/>
+  </head>
+  <body>
+
+    <%
+       nodes =  AcariServer.NodeManager.list_nodes()
+              |> Enum.map(fn %{id: id} -> AcariServer.NodeManager.get_node_hash(id) end)
+              |> Enum.map(fn %{id: id} -> AcariServer.NodeManager.get_node_hash(id) end)
+              |> Enum.chunk_every(3,3,[nil, nil])
+    %>
+
+    <%= for triple <- nodes do %>
+      <div class="pt-5 nonbreak row">
+
+      <%= for %{hash: hash, name: name, description: description, address: address} <- triple do %>
+          <div class="d-flex flex-column align-items-center col-4">
+            <svg width="200" height="200" class="p-0">
+              <%= raw("https://ztp-nsg4.sberbank.ru:50443/client/"<>hash |> EQRCode.encode() |> EQRCode.svg(width: 200)) %>
+            </svg>
+            <div class="px-3">
+              <%= name %></br>
+              <%= description %></br>
+              <%= address %>
+            </div>
+          </div>
+      <% end %>
+
+      </div>
+    <% end %>
+
+
+
+  </body>
+</html>

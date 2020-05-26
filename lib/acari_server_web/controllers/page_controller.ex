@@ -107,4 +107,12 @@ defmodule AcariServerWeb.PageController do
     |> put_flash(type, mes)
     |> redirect(to: Routes.page_path(conn, :xterm))
   end
+
+  def qr(conn, _params) do
+    conn
+    |> put_root_layout(false)
+    |> put_layout(false)
+    |> render("qr.html")
+  end
+
 end
