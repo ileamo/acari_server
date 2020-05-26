@@ -114,6 +114,11 @@ defmodule AcariServer.NodeManager do
     end
   end
 
+  def get_node_by_hash(hash) do
+    Node
+    |> RepoRO.get_by(hash: hash)
+  end
+
   # TODO Cache
   def get_client_description_by_name(name) do
     with %Node{} = node <- get_node_by_name(name),
