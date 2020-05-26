@@ -90,6 +90,12 @@
   class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
     Назначить группы
 </a></span>
+|
+<span><a href="#" data-toggle="modal" data-target="#exec-selected-clients"
+  data-operation="work-order"
+  class="<%= AcariServer.UserManager.get_disabled(@current_user) %>">
+    Задание на работу
+</a></span>
 
 
 

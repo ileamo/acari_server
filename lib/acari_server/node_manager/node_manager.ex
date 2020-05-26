@@ -95,6 +95,25 @@ defmodule AcariServer.NodeManager do
     |> RepoRO.preload(script: script_assoc)
   end
 
+  def get_node_hash(id) do
+    node =
+      Node
+      |> Repo.get(id)
+
+    case node do
+      %Node{hash: hash} = node when is_binary(hash) ->
+        node
+
+      %Node{} = node ->
+        node
+        |> Node.changeset(%{"hash" => :crypto.strong_rand_bytes(12) |> Base.url_encode64()})
+        |> Repo.update()
+
+      _ ->
+        nil
+    end
+  end
+
   # TODO Cache
   def get_client_description_by_name(name) do
     with %Node{} = node <- get_node_by_name(name),

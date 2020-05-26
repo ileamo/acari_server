@@ -10,6 +10,7 @@ defmodule AcariServer.NodeManager.Node do
     field :latitude, :float, default: 55.777594
     field :longitude, :float, default: 37.737926
     field :lock, :boolean, default: false
+    field :hash, :string
 
     field :groups_list, {:array, :integer}, virtual: true
     belongs_to :script, AcariServer.ScriptManager.Script
@@ -34,7 +35,8 @@ defmodule AcariServer.NodeManager.Node do
       :script_id,
       :latitude,
       :longitude,
-      :lock
+      :lock,
+      :hash
     ])
     |> validate_required([:name])
     |> foreign_key_constraint(:script_id)
