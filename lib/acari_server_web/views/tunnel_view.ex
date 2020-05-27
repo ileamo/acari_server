@@ -77,11 +77,7 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   def get_down_ports_msgs(name, links_state) do
-    port_up =
-      links_state
-      |> Enum.reduce(%{}, fn %{id: {port, _, _}, up: up}, acc ->
-        Map.put(acc, port, up || (acc[port] || false))
-      end)
+    port_up = get_port_state(links_state)
 
     case AcariServer.Mnesia.get_tunnel_state(name)[:errormsg] do
       %{} = map ->
@@ -97,6 +93,30 @@ defmodule AcariServerWeb.TunnelView do
       _ ->
         ""
     end
+  end
+
+  def is_errormsg(name) do
+    case AcariServer.Mnesia.get_tunnel_state(name)[:errormsg] do
+      %{} = map ->
+        port_up =
+          AcariServer.Mnesia.get_link_list_for_tunnel(name)
+          |> get_port_state()
+
+        case Enum.reject(map, fn {port, _} -> port_up[port] end) do
+          [] -> false
+          _ -> true
+        end
+
+      _ ->
+        false
+    end
+  end
+
+  defp get_port_state(links_state) do
+    links_state
+    |> Enum.reduce(%{}, fn %{id: {port, _, _}, up: up}, acc ->
+      Map.put(acc, port, up || (acc[port] || false))
+    end)
   end
 
   def redirect_path(conn) do
