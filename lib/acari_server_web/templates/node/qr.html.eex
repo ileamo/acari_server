@@ -33,8 +33,7 @@
             <div class="px-3">
               <%= name %></br>
               <%= description %></br>
-              <%= address %></br>
-              <%= hash %>
+              <%= address %>
             </div>
           </div>
       <% end %>

@@ -20,6 +20,10 @@ defmodule AcariServerWeb.Router do
   end
 
   # Our pipeline implements "maybe" authenticated. We'll use the `:ensure_auth` below for when we need to make sure someone is logged in.
+  pipeline :client_live do
+    plug :put_root_layout, {AcariServerWeb.LayoutView, "root_client.html"}
+  end
+
   pipeline :auth do
     plug AcariServer.UserManager.Pipeline
     plug :load_current_user
@@ -130,7 +134,7 @@ defmodule AcariServerWeb.Router do
   end
 
   scope "/" do
-    pipe_through [:browser]
+    pipe_through [:browser, :client_live]
     live "/client/:hash", AcariServerWeb.ClientMonitorLive
   end
 
