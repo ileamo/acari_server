@@ -118,7 +118,7 @@ defmodule AcariServer.Master do
 
   defp exec_server_method(state, tun_name, "put.data", %{"id" => script_id, "data" => data}) do
     # Logger.info("Get script data #{data}")
-    set_script(tun_name, script_id, data)
+    set_script(tun_name, script_id, to_string(data))
     state
   end
 

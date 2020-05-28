@@ -1,0 +1,14 @@
+<div>
+      <div>
+        <svg width="20" height="20">
+          <circle cx="10" cy="10" r="9" stroke="black" stroke-width="1"
+          fill="<%= @up && "green" || "red" %>" />
+        </svg>
+        <span class="bg-h"><%= @name %></span>
+        <%= @oper %> <%= @csq %>
+      </div>
+      <%= if !@up do %>
+        <div><%= @error %></div>
+      <% end %>
+  <hr>
+</div>

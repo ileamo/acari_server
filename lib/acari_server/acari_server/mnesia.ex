@@ -319,6 +319,7 @@ defmodule AcariServer.Mnesia do
          when is_binary(key) <-
            AcariServer.TemplateManager.get_template_by_name(templ_name),
          true <- String.trim(key) != "" do
+      update_zabbix(host, key, to_string(data))
       AcariServer.Zabbix.ZbxApi.zbx_send(host, key, data)
     end
   end
@@ -949,6 +950,7 @@ defmodule AcariServer.Mnesia do
           {val, _} -> :telemetry.execute([:bogatka, :links], %{down: val})
           _ -> nil
         end
+
       :down_tun ->
         case tval do
           {val, _} -> :telemetry.execute([:bogatka, :clients], %{down: val})

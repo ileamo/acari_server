@@ -1,10 +1,20 @@
-<%= if @node do %>
+<%= if @client do %>
+  <% node = @client.node %>
 
-<h3>Здесь будет оперативный мониторинг клиента <%= @node.name %></h3>
-<div><%= @node.description %></div>
-<div><%= @node.address %></div>
+  <div class="bg-h"><%= node.name %></div>
+  <div><%= node.description %></div>
+  <div><%= node.address %></div>
+  <hr>
+  <%= for {name, port} <- @client.ports do %>
+    <%
+      module = case true do
+        _ -> AcariServerWeb.ClientMonitorLive.Radio
+      end
+    %>
+    <%= live_component @socket, module, id: name, port: port %>
+  <% end %>
 
 
 <% else %>
-<h1>404</h1>
+  <h1>404</h1>
 <% end %>
