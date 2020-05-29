@@ -79,16 +79,30 @@ defmodule AcariServerWeb.TunnelView do
   def get_down_ports_msgs(name, links_state) do
     port_up = get_port_state(links_state)
 
-    case AcariServer.Mnesia.get_tunnel_state(name)[:errormsg] do
+    case AcariServer.Mnesia.get_tunnel_state(name)[:wizard] do
       %{} = map ->
         map
-        |> Enum.map(fn {port, %{msg: msg, timestamp: tm}} ->
+        |> Enum.group_by(fn {key, _} -> get_arg(key) end)
+        |> Enum.reject(fn
+          {nil, _} -> true
+          _ -> false
+        end)
+        |> Enum.map(fn {port, list} ->
           if !port_up[port] do
-            "#{AcariServer.get_local_date(tm)}: #{port}: #{msg}"
+            [
+              "<h5>#{port}</h5>",
+              "<ul class='my-0 py-0'>",
+              list
+              |> Enum.map(fn {key, %{value: msg, timestamp: tm}} ->
+                [key] = Regex.run(~r/[^\[]+/, key)
+                "<li>#{AcariServer.get_local_date(tm)}: <strong>#{key}:</strong> #{msg}</li>"
+              end),
+              "</ul>"
+            ]
           end
         end)
         |> Enum.reject(&is_nil(&1))
-        |> Enum.join("</br>")
+        |> Enum.join()
 
       _ ->
         ""
@@ -96,13 +110,14 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   def is_errormsg(name) do
-    case AcariServer.Mnesia.get_tunnel_state(name)[:errormsg] do
+    case AcariServer.Mnesia.get_tunnel_state(name)[:wizard]
+         |> IO.inspect() do
       %{} = map ->
         port_up =
           AcariServer.Mnesia.get_link_list_for_tunnel(name)
           |> get_port_state()
 
-        case Enum.reject(map, fn {port, _} -> port_up[port] end) do
+        case Enum.reject(map, fn {key, _} -> port_up[get_arg(key)] end) do
           [] -> false
           _ -> true
         end
@@ -123,5 +138,12 @@ defmodule AcariServerWeb.TunnelView do
     NavigationHistory.last_paths(conn)
     |> Enum.find(fn x -> String.match?(x, ~r{^/tunnels($|/\d+$)}) end) ||
       Routes.node_path(conn, :index)
+  end
+
+  def get_arg(key) do
+    case Regex.run(~r/\[([^\[\]]+)\]/, key) do
+      [_, name] -> name
+      _ -> nil
+    end
   end
 end
