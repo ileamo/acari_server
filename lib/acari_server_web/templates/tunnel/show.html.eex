@@ -7,7 +7,16 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 <nav class="navbar navbar-expand  justify-content-between navbar-light bg-light p-0 mb-0">
     <div class="navbar p-0">
       <span class="navbar-brand">Клиент <%= @name %></span>
-      <span>
+      <span class="d-inline">
+
+        <%= if !@node.lock do %>
+            <%= link to: Routes.node_path(@conn, :lock_unlock, @node),
+                     data: [confirm: "Перезапустить клиента"] do %>
+              <i class="fas fa-recycle mx-1"></i>
+            <% end %>
+        <% end %>
+
+
         <%= render AcariServerWeb.NodeView, "client_comments.html",
               current_user: @current_user, node: @node %>
       </span>

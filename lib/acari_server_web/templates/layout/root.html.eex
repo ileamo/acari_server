@@ -98,7 +98,7 @@
       </div>
 
       <div class="collapse" id="usersChat">
-        <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded p-2"
+        <div class="position-fixed d-flex flex-column justify-content-end border bg-light border-info rounded p-2 ml-2"
         style="bottom:50px; right:5px; z-index:1499; max-width:380px; max-height:60%; opacity:0.9 ">
 
           <div id="chat-msg-list" class="overflow-auto">

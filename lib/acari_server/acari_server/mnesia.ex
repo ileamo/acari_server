@@ -1109,8 +1109,9 @@ defmodule AcariServer.Mnesia do
                      latitude: lat,
                      longitude: lng,
                      client_comments: client_comments
-                   } ->
+                   } = node ->
       %{
+        node: node,
         id: id,
         name: name,
         description: descr,

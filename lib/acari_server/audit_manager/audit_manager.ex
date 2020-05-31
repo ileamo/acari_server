@@ -53,6 +53,7 @@ defmodule AcariServer.AuditManager do
     "delete" => "Удаление",
     "lock" => "Блокирование",
     "unlock" => "Разблокирование",
+    "lock_unlock" => "Перезапуск",
     "class" => "Изменение класса",
     "groups" => "Изменение групп  ",
     "login" => "Вход",

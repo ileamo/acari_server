@@ -82,6 +82,7 @@ defmodule AcariServerWeb.Router do
     get "/groups/:id/oper", GroupController, :oper
     resources "/nodes", NodeController
     get "/nodes/:id/toggle_lock", NodeController, :toggle_lock
+    get "/nodes/:id/lock_unlock", NodeController, :lock_unlock
     delete "/nodes", NodeController, :exec_selected
     get "/nodes/grp/:id", NodeController, :client_grp
     post "/client_comment/new", NodeController, :client_comment_new

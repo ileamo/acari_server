@@ -164,6 +164,23 @@ defmodule AcariServerWeb.NodeController do
     |> redirect(to: NavigationHistory.last_path(conn, 1))
   end
 
+  def lock_unlock(conn, %{"id" => id}) do
+    node = NodeManager.get_node_rw!(id)
+    node_params = %{"lock" => true, "groups_list" => false}
+    {:ok, node} = NodeManager.update_node(node, node_params)
+    AcariServer.Master.delete_tunnel(node.name)
+    node_params = %{"lock" => false, "groups_list" => false}
+    {:ok, node} = NodeManager.update_node(node, node_params)
+
+
+    Process.sleep(1000)
+
+    conn
+    |> AuditManager.create_audit_log(node, "lock_unlock", node_params)
+    |> put_flash(:info, "Клиент #{node.name} перезапущен")
+    |> redirect(to: NavigationHistory.last_path(conn, 1))
+  end
+
   def qr(conn, %{"clients_list" => clients_list}) do
     conn
     |> put_root_layout(false)

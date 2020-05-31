@@ -74,6 +74,14 @@
       <td>
         <%= render AcariServerWeb.NodeView, "client_comments.html",
               current_user: @current_user, node: tunnel %>
+
+        <%= if !tunnel.node.lock do %>
+            <%= link to: Routes.node_path(@conn, :lock_unlock, tunnel.node),
+                     data: [confirm: "Перезапустить клиента"] do %>
+              <i class="fas fa-recycle mx-1"></i>
+            <% end %>
+        <% end %>
+
           <%= if is_errormsg(tunnel[:name]) do %>
             <span class="text-danger">
               <i class="fas fa-exclamation ml-1"></i>
