@@ -1,28 +1,34 @@
 <div>
-      <div>
-        <% icon_size = 20
+      <div class="bg-between">
+        <% icon_size = "2.6rem"
         %>
+        <div>
         <svg width="<%= icon_size %>" height="<%= icon_size %>"
-            xmlns="http://www.w3.org/2000/svg">
-          <circle cx="10" cy="10" r="9" stroke="black" stroke-width="1"
+             viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="100" stroke="black" stroke-width="1"
           fill="<%= @up && "#28a745" || "#dc3545" %>" />
         </svg>
 
-        <%= if @up do %>
-          <svg width="<%= icon_size %>" height="<%= icon_size %>" viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg">
-            <% [color1, color2, color3, color4] = get_signal_level_colors(@csq) %>
-            <rect  x="0" y="15" width="5" height="5" fill="<%= color1 %>" stroke-width="1" stroke="white"/>
-            <rect  x="5" y="10" width="5" height="10" fill="<%= color2 %>" stroke-width="1" stroke="white"/>
-            <rect  x="10" y="5" width="5" height="15" fill="<%= color3 %>" stroke-width="1" stroke="white"/>
-            <rect  x="15" y="0" width="5" height="20" fill="<%= color4 %>" stroke-width="1" stroke="white"/>
-          </svg>
-        <% end %>
-
         <span class="bg-h"><%= @port_name %></span>
-        <%= if !@up do %>
+        <%= if @up do %>
+          <span class="text-muted">(<%= @uptime %>)</span>
+        <% else %>
           <span class="text-danger"><%= @error %></span>
         <% end %>
+        </div>
+
+        <div>
+        <%= if @up do %>
+        <svg width="<%= icon_size %>" height="<%= icon_size %>"
+             viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <% [color1, color2, color3, color4] = get_signal_level_colors(@csq) %>
+          <rect  x="0" y="15" width="5" height="5" fill="<%= color1 %>" stroke-width="1" stroke="white"/>
+          <rect  x="5" y="10" width="5" height="10" fill="<%= color2 %>" stroke-width="1" stroke="white"/>
+          <rect  x="10" y="5" width="5" height="15" fill="<%= color3 %>" stroke-width="1" stroke="white"/>
+          <rect  x="15" y="0" width="5" height="20" fill="<%= color4 %>" stroke-width="1" stroke="white"/>
+        </svg>
+        <% end %>
+        </div>
 
       </div>
 

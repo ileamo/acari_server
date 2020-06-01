@@ -13,7 +13,7 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
         _, acc -> {:cont, acc}
       end)
 
-    up =
+    {up, uptime} =
       AcariServer.Mnesia.get_link_list_for_tunnel(client_name)
       |> Enum.group_by(fn %{name: name} -> name end)
       |> Map.get(port_name)
@@ -38,6 +38,7 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
      assign(socket,
        port_name: port_name,
        up: up,
+       uptime: uptime,
        csq: csq,
        error: wizard["errormsg"][:value],
        wizard: wizard
@@ -45,11 +46,23 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
   end
 
   defp port_up(links) do
-    (links || [])
-    |> Enum.reduce_while(false, fn
-      %{up: true}, _ -> {:halt, true}
-      _, _ -> {:cont, false}
-    end)
+    up =
+      (links || [])
+      |> Enum.reduce_while(false, fn
+        %{up: true}, _ -> {:halt, true}
+        _, _ -> {:cont, false}
+      end)
+
+    uptime =
+      if up do
+        tm_up_start =
+          (links
+           |> Enum.min_by(fn %{state: %{tm_up_start: tm}} -> tm end)).state.tm_up_start
+
+        AcariServerWeb.TunnelView.interval_to_text(:erlang.system_time(:second) - tm_up_start)
+      end
+
+    {up, uptime}
   end
 
   @grey "#ccc"

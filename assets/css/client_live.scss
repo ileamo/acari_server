@@ -106,13 +106,23 @@ hr {
 }
 
 .bg-h {
-  font-size: 2.3rem;
+  font-size: 2.6rem;
 }
 
 .text-danger {
   color: #dc3545;
 }
 
+.text-muted {
+  color: #6c757d;
+}
+
 li {
   margin: 0;
+}
+
+.bg-between {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 1rem;
 }

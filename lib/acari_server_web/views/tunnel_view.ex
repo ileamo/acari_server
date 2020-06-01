@@ -26,7 +26,7 @@ defmodule AcariServerWeb.TunnelView do
      downtime * 100 / total, avg}
   end
 
-  defp interval_to_text(tm) do
+  def interval_to_text(tm) do
     cond do
       tm < 60 * 2 -> "#{tm} сек."
       tm < 60 * 60 * 2 -> "#{round(tm / 60)} мин."

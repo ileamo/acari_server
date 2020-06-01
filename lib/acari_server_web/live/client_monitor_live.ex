@@ -17,8 +17,6 @@ defmodule AcariServerWeb.ClientMonitorLive do
 
   defp mount_client(socket, %AcariServer.NodeManager.Node{} = node) do
     ports = ports_list(node)
-    |> IO.inspect()
-
 
     if connected?(socket), do: Process.send_after(self(), :update, 5000)
 
@@ -35,9 +33,7 @@ defmodule AcariServerWeb.ClientMonitorLive do
 
     ports = ports_list(socket.assigns.node)
 
-    new =
-      (ports -- socket.assigns.ports)
-      |> IO.inspect()
+    new = ports -- socket.assigns.ports
 
     for name <- new do
       live_component(socket, AcariServerWeb.ClientMonitorLive.Radio,
