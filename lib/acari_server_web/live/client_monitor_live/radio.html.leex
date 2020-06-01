@@ -35,11 +35,11 @@
       <%= if @up do %>
         CSQ: <%= @csq %></br>
       <% else %>
-        <%= for {param, %{timestamp: _, value: value}} <- @wizard do %>
-          <%= if param != "errormsg" do %>
-            <strong><%= param %>:</strong> <%= value %></br>
-          <% end %>
-        <% end %>
+        <strong>Слот:</strong> <%= @wizard["slot"][:value] %></br>
+        <strong>Сим карта:</strong> <%= @wizard["sim"][:value] %></br>
+        <strong>Сеть:</strong> <%= @wizard["network"][:value] %></br>
+        <strong>CSQ:</strong> <%= @wizard["csq"][:value] %></br>
+        <strong>Режим:</strong> <%= @wizard["rat"][:value] %></br>
       <% end %>
 
   <hr>
