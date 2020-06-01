@@ -110,8 +110,7 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   def is_errormsg(name) do
-    case AcariServer.Mnesia.get_tunnel_state(name)[:wizard]
-         |> IO.inspect() do
+    case AcariServer.Mnesia.get_tunnel_state(name)[:wizard] do
       %{} = map ->
         port_up =
           AcariServer.Mnesia.get_link_list_for_tunnel(name)
