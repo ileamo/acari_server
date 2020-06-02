@@ -1,5 +1,11 @@
 <%= if @node do %>
-  <div class="bg-flex-end"><%= @local_time %></div>
+  <div class="bg-flex-between">
+    <div>
+      <img src="/images/bogatka-icon-32.png" style="width: 2rem; height: 2rem;"/>
+    </div>
+    <div><%= @local_time %></div>
+  </div>
+
   <div class="bg-h"><%= @node.name %></div>
   <div><%= @node.description %></div>
   <div><%= @node.address %></div>

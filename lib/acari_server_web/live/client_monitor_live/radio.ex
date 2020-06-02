@@ -9,7 +9,7 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
   def update(%{timer: true}, socket) do
     tm = :erlang.system_time(:second)
 
-    if socket.assigns[:tm_up_start] && tm - socket.assigns[:tm_up_start] < 120 do
+    if socket.assigns[:tm_up_start] && tm - socket.assigns[:tm_up_start] <= 120 do
       uptime = AcariServerWeb.TunnelView.interval_to_text(tm - socket.assigns[:tm_up_start])
 
       uptime_timer = send_uptime_timer(socket, 1_000)

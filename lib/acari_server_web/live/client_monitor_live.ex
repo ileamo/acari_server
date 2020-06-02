@@ -20,7 +20,7 @@ defmodule AcariServerWeb.ClientMonitorLive do
 
     if connected?(socket) do
       Process.send_after(self(), :timer, 1000)
-      Process.send_after(self(), :update, 5000)
+      Process.send_after(self(), :update, 10_000)
     end
 
     Phoenix.PubSub.subscribe(AcariServer.PubSub, "wizard:#{node.name}")
@@ -46,7 +46,7 @@ defmodule AcariServerWeb.ClientMonitorLive do
   end
 
   def handle_info(:update, socket) do
-    Process.send_after(self(), :update, 60_000)
+    Process.send_after(self(), :update, 10_000)
     update_ports(socket)
   end
 
@@ -58,7 +58,7 @@ defmodule AcariServerWeb.ClientMonitorLive do
     update_ports(socket)
   end
 
-  def handle_info(mes, socket) do
+  def handle_info(_mes, socket) do
     {:noreply, socket}
   end
 
