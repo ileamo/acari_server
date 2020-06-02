@@ -53,6 +53,7 @@ defmodule AcariServer.TemplateManager do
     {"Zabbix API", "zabbix"},
     {"Текст", "text"},
     {"Вставка", "include"},
+    {"Системный", "system"},
     {"Нет", "no"}
   ]
 

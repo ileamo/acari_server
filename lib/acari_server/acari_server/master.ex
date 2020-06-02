@@ -206,7 +206,7 @@ defmodule AcariServer.Master do
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 
-  def exec_script_on_peer(tun_name, templ) do
+  def exec_script_on_peer(tun_name, templ, params \\ %{}) do
     request = %{
       method: "get_exec_sh",
       params: %{
@@ -215,7 +215,7 @@ defmodule AcariServer.Master do
       }
     }
 
-    {script, _} = AcariServer.SFX.create_script_from_template(tun_name, templ, %{})
+    {script, _} = AcariServer.SFX.create_script_from_template(tun_name, templ, params)
     Acari.TunMan.send_master_mes_plus(tun_name, request, [script])
   end
 

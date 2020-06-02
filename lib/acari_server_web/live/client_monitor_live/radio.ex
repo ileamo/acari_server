@@ -60,9 +60,23 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
         send_uptime_timer(socket, 1000, port_name)
       end
 
+    wizard_snd_tm =
+      if !socket.assigns.first && !up do
+        tm = :os.system_time(:second)
+
+        if tm - socket.assigns.wizard_snd_tm > 60 do
+          AcariServer.Master.exec_script_on_peer(client_name, "nsgwizard_exec", %{
+            "port" => port_name
+          })
+
+          tm
+        end
+      end
+
     {:ok,
      assign(socket,
        first: false,
+       client_name: client_name,
        port_name: port_name,
        up: up,
        uptime: uptime,
@@ -70,7 +84,8 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
        uptime_timer: uptime_timer,
        csq: csq,
        error: wizard["errormsg"][:value],
-       wizard: wizard
+       wizard: wizard,
+       wizard_snd_tm: wizard_snd_tm || socket.assigns[:wizard_snd_tm] || 0
      )}
   end
 
