@@ -693,6 +693,12 @@ defmodule AcariServer.Mnesia do
     end)
 
     broadcast_link_event()
+
+    Phoenix.PubSub.broadcast(
+      AcariServer.PubSub,
+      "link_state:#{tun}",
+      {:update_link, name, node, up}
+    )
   end
 
   defp create_tun_status_mes(tun, node_to_name) do
@@ -762,7 +768,7 @@ defmodule AcariServer.Mnesia do
 
   defp update_active_tun_chart(_bad), do: nil
 
-  def broadcast_link_event() do
+  defp broadcast_link_event() do
     mes_list = get_client_status()
 
     statistics_html =

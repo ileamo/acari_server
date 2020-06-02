@@ -24,6 +24,7 @@ defmodule AcariServerWeb.ClientMonitorLive do
     end
 
     Phoenix.PubSub.subscribe(AcariServer.PubSub, "wizard:#{node.name}")
+    Phoenix.PubSub.subscribe(AcariServer.PubSub, "link_state:#{node.name}")
 
     {:ok,
      assign(socket, node: node, ports: ports, local_time: AcariServer.get_local_time(:wo_date))}
@@ -46,7 +47,22 @@ defmodule AcariServerWeb.ClientMonitorLive do
 
   def handle_info(:update, socket) do
     Process.send_after(self(), :update, 60_000)
+    update_ports(socket)
+  end
 
+  def handle_info({:wizard_trap, _key, _value}, socket) do
+    update_ports(socket)
+  end
+
+  def handle_info({:update_link, _port, _server, _up}, socket) do
+    update_ports(socket)
+  end
+
+  def handle_info(mes, socket) do
+    {:noreply, socket}
+  end
+
+  defp update_ports(socket) do
     ports = ports_list(socket.assigns.node)
 
     new = ports -- socket.assigns.ports
@@ -68,11 +84,7 @@ defmodule AcariServerWeb.ClientMonitorLive do
     node = AcariServer.NodeManager.get_node_rw!(socket.assigns.node.id)
 
     {:noreply, assign(socket, node: node, ports: ports)}
-  end
 
-  def handle_info(mes, socket) do
-    IO.inspect(mes)
-    {:noreply, socket}
   end
 
   defp ports_list(node) do
