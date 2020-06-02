@@ -34,7 +34,11 @@ defmodule AcariServer.Zabbix.Handler do
       key => %{value: value, timestamp: :os.system_time(:second)}
     })
 
-
+    Phoenix.PubSub.broadcast(
+      AcariServer.PubSub,
+      "wizard:#{host}",
+      {:wizard_trap, key, value}
+    )
   end
 
   # API
