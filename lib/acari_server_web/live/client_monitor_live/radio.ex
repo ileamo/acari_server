@@ -1,7 +1,27 @@
 defmodule AcariServerWeb.ClientMonitorLive.Radio do
   use Phoenix.LiveComponent
   @impl true
+  def mount(socket) do
+    {:ok, assign(socket, first: true)}
+  end
+
+  @impl true
+  def update(%{timer: true}, socket) do
+    tm = :erlang.system_time(:second)
+
+    if socket.assigns[:tm_up_start] && tm - socket.assigns[:tm_up_start] < 120 do
+      uptime = AcariServerWeb.TunnelView.interval_to_text(tm - socket.assigns[:tm_up_start])
+
+      uptime_timer = send_uptime_timer(socket, 1_000)
+
+      {:ok, assign(socket, uptime: uptime, uptime_timer: uptime_timer)}
+    else
+      {:ok, socket}
+    end
+  end
+
   def update(assigns, socket) do
+    # IO.inspect(socket.assigns, label: "MAIN")
     client_name = assigns.client_name
     port_name = assigns.id
     sensor = "csq[#{port_name}]"
@@ -13,7 +33,7 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
         _, acc -> {:cont, acc}
       end)
 
-    {up, uptime} =
+    {up, tm_up_start, uptime} =
       AcariServer.Mnesia.get_link_list_for_tunnel(client_name)
       |> Enum.group_by(fn %{name: name} -> name end)
       |> Map.get(port_name)
@@ -34,15 +54,34 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
         |> Enum.into(%{})
       end
 
+    uptime_timer =
+      if socket.assigns.first ||
+           tm_up_start != socket.assigns[:tm_up_start] do
+        send_uptime_timer(socket, 1000, port_name)
+      end
+
     {:ok,
      assign(socket,
+       first: false,
        port_name: port_name,
        up: up,
        uptime: uptime,
+       tm_up_start: tm_up_start,
+       uptime_timer: uptime_timer,
        csq: csq,
        error: wizard["errormsg"][:value],
        wizard: wizard
      )}
+  end
+
+  defp send_uptime_timer(socket, timeout, id \\ nil) do
+    ref = socket.assigns[:uptime_timer]
+
+    if ref do
+      Process.cancel_timer(socket.assigns[:uptime_timer])
+    end
+
+    Process.send_after(self(), {:timer, socket.assigns[:port_name] || id}, timeout)
   end
 
   defp port_up(links) do
@@ -53,16 +92,21 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
         _, _ -> {:cont, false}
       end)
 
-    uptime =
+    {tm_up_start, uptime} =
       if up do
         tm_up_start =
           (links
            |> Enum.min_by(fn %{state: %{tm_up_start: tm}} -> tm end)).state.tm_up_start
 
-        AcariServerWeb.TunnelView.interval_to_text(:erlang.system_time(:second) - tm_up_start)
+        {
+          tm_up_start,
+          AcariServerWeb.TunnelView.interval_to_text(:erlang.system_time(:second) - tm_up_start)
+        }
+      else
+        {nil, nil}
       end
 
-    {up, uptime}
+    {up, tm_up_start, uptime}
   end
 
   @grey "#ccc"

@@ -18,9 +18,13 @@ defmodule AcariServerWeb.ClientMonitorLive do
   defp mount_client(socket, %AcariServer.NodeManager.Node{} = node) do
     ports = ports_list(node)
 
-    if connected?(socket), do: Process.send_after(self(), :update, 5000)
+    if connected?(socket) do
+      Process.send_after(self(), :timer, 1000)
+      Process.send_after(self(), :update, 5000)
+    end
 
-    {:ok, assign(socket, node: node, ports: ports)}
+    {:ok,
+     assign(socket, node: node, ports: ports, local_time: AcariServer.get_local_time(:wo_date))}
   end
 
   defp mount_client(socket, _) do
@@ -28,8 +32,18 @@ defmodule AcariServerWeb.ClientMonitorLive do
   end
 
   @impl true
+  def handle_info({:timer, id}, socket) do
+    send_update(AcariServerWeb.ClientMonitorLive.Radio, id: id, timer: true)
+    {:noreply, socket}
+  end
+
+  def handle_info(:timer, socket) do
+    Process.send_after(self(), :timer, 1000)
+    {:noreply, assign(socket, local_time: AcariServer.get_local_time(:wo_date))}
+  end
+
   def handle_info(:update, socket) do
-    Process.send_after(self(), :update, 5000)
+    Process.send_after(self(), :update, 6_000)
 
     ports = ports_list(socket.assigns.node)
 

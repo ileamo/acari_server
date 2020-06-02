@@ -121,9 +121,15 @@ li {
   margin: 0;
 }
 
-.bg-between {
+.bg-flex-between {
   display: flex;
   justify-content: space-between;
+  margin-right: 1rem;
+}
+
+.bg-flex-end {
+  display: flex;
+  justify-content: end;
   margin-right: 1rem;
 }
 
