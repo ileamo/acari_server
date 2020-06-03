@@ -1,17 +1,17 @@
 defmodule AcariServer.SysConfigManager.Schema do
   def get do
     [
-      %{
-        key: "layout.navbar.theme",
-        name: "Тема",
-        description: "Цветовая схема верхней навигационной панели",
-        type: :select,
-        select: [
-          {"default", "Умолчательная"},
-          {"dark", "Темная"},
-          {"light", "Светлая"},
-        ]
-      },
+      # %{
+      #   key: "layout.navbar.theme",
+      #   name: "Тема",
+      #   description: "Цветовая схема верхней навигационной панели",
+      #   type: :select,
+      #   select: [
+      #     {"default", "Умолчательная"},
+      #     {"dark", "Темная"},
+      #     {"light", "Светлая"},
+      #   ]
+      # },
       %{
         key: "layout.navbar.banner",
         name: "Баннер",
