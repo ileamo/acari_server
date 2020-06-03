@@ -122,7 +122,7 @@ datatable_params_wo_find = Object.assign({}, datatable_params)
 datatable_params_wo_find.dom = datatable_dom_wo_find
 
 datatable_params_with_select = Object.assign({}, datatable_params)
-datatable_params_with_select.select = true
+datatable_params_with_select.select = {style: 'multi+shift'}
 datatable_params_with_select.buttons =
   select_buttons.concat(datatable_params_with_select.buttons)
 
