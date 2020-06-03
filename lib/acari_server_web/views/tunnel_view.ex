@@ -89,20 +89,26 @@ defmodule AcariServerWeb.TunnelView do
         end)
         |> Enum.map(fn {port, list} ->
           if !port_up[port] do
-            [
-              "<h5>#{port}</h5>",
-              "<ul class='my-0 py-0'>",
-              list
-              |> Enum.map(fn {key, %{value: msg, timestamp: tm}} ->
-                [key] = Regex.run(~r/[^\[]+/, key)
-                "<li>#{AcariServer.get_local_date(tm)}: <strong>#{key}:</strong> #{msg}</li>"
-              end),
-              "</ul>"
-            ]
+            IO.inspect(list)
+            params = Enum.into(list, %{})
+
+              """
+              <h5 class='mr-2'>#{port}</h5>
+                <div>
+                <span>#{AcariServer.get_local_date(params["errormsg[#{port}]"][:timestamp])}:</span>
+                <strong class='text-danger'>#{params["errormsg[#{port}]"][:value]}</strong>
+              </div>
+              <strong>Слот:</strong> #{params["slot[#{port}]"][:value]}</br>
+              <strong>Сим карта:</strong> #{params["sim[#{port}]"][:value]}</br>
+              <strong>Сеть:</strong> #{params["network[#{port}]"][:value]}</br>
+              <strong>CSQ:</strong> #{params["csq[#{port}]"][:value]}</br>
+              <strong>Режим:</strong> #{params["rat[#{port}]"][:value]}</br>
+
+              """
           end
         end)
         |> Enum.reject(&is_nil(&1))
-        |> Enum.join()
+        |> Enum.join("</br>")
 
       _ ->
         ""
