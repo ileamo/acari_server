@@ -72,7 +72,7 @@
       <p class="mb-0 mt-2">или вставьте текст</p>
       <%= textarea f, :text, class: "form-control text-monospace", rows: "16" %>
 
-      <p class="mb-0 mt-2">Загрузить клиентов с параметрами:</p>
+      <p class="mb-0 mt-2">Назначить новым клиентам параметры:</p>
 
       <div class="form-group row">
         <%= label f, "Класс", class: "col-sm-2 col-form-label" %>
