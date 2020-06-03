@@ -122,7 +122,9 @@ datatable_params_wo_find = Object.assign({}, datatable_params)
 datatable_params_wo_find.dom = datatable_dom_wo_find
 
 datatable_params_with_select = Object.assign({}, datatable_params)
-datatable_params_with_select.select = {style: 'multi+shift'}
+datatable_params_with_select.select = {
+  style: 'multi+shift'
+}
 datatable_params_with_select.buttons =
   select_buttons.concat(datatable_params_with_select.buttons)
 
@@ -271,17 +273,25 @@ if (document.getElementById("client-comments")) {
   if (print_qr) {
     print_qr.addEventListener('phoenix.link.click', function(e) {
       e.stopPropagation();
-      let selected = table_select.rows('.selected').data()
-      if (selected.length > 0) {
-        let ids = selected.map(function(x) {
-          return x[0]
-        }).join(',')
-        e.target.setAttribute("href", "/qr?clients_list=" + encodeURIComponent(ids))
+      var message = e.target.getAttribute("data-confirm");
+
+      r = confirm(message)
+      console.log(r, message)
+
+      if (!r) {
+        e.preventDefault();
       } else {
-        alert('Не выделена ни одна строка в таблице')
-        event.preventDefault();
+        let selected = table_select.rows('.selected').data()
+        if (selected.length > 0) {
+          let ids = selected.map(function(x) {
+            return x[0]
+          }).join(',')
+          e.target.setAttribute("href", "/qr?clients_list=" + encodeURIComponent(ids))
+        } else {
+          alert('Не выделена ни одна строка в таблице')
+          event.preventDefault();
+        }
       }
     }, false);
   }
-
 }

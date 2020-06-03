@@ -100,6 +100,7 @@
 <span><%= link "QR", to: Routes.node_path(@conn, :qr),
             id: "print-qr",
             target: "_blank",
+            data: [confirm: "Генерация QR кодов может занять значительное время. Сгенерировать?"],
             class: AcariServer.UserManager.get_disabled(@current_user)
 %></span>
 
