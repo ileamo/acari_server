@@ -1,14 +1,16 @@
-<div>
-  <div class="row d-flex align-items-center">
+<div class="mb-2">
+  <div class="form-group row mb-0">
     <label class="col-sm-3 col-form-label"
       phx-click="descr" phx-target="<%= @myself %>"><%= @name %></label>
 
-    <input class="col-sm-9 form-control p-1 text-<%= @color %>" type="text" name="q" value="<%= @value %>"
-      phx-focus="input_focus" phx-blur="input_blur"
-      phx-target="<%= @myself %>"
-      placeholder="Введите значение"/>
+    <div class="col-sm-9">
+      <input class="form-control text-<%= @color %>" type="text" name="q" value="<%= @value %>"
+        phx-focus="input_focus" phx-blur="input_blur"
+        phx-target="<%= @myself %>"
+        placeholder="Введите значение"/>
+    </div>
   </div>
   <div class="pb-<%= @descr_pb %> text-muted" phx-click="descr_off" phx-target="<%= @myself %>">
-    <%= @descr %>
+      <%= @descr %>
   </div>
 </div>

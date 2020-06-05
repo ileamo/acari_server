@@ -23,17 +23,17 @@
        end
 
     %>
-    <nav  class="navbar navbar-expand <%= navbar %> <%= bg %> flex-sm-nowrap p-0 justify-content-between"
+    <nav  class="navbar navbar-expand <%= navbar %> <%= bg %> d-flex flex-sm-nowrap p-0 justify-content-between"
           style="background-color: #305478;">
-      <a class="navbar-brand col col-md-2 mr-0" href="http://www.nsg.ru">NSG</a>
+      <a class="navbar-brand mx-2" href="http://www.nsg.ru">NSG</a>
 
-      <%= if conf = AcariServer.SysConfigManager.get_conf_by_key("layout.navbar.banner") do %>
-        <a class="navbar-brand col col-md-2 text-center" href="#">
+      <a class="d-none d-md-block navbar-brand text-center" href="#">
+        <%= if conf = AcariServer.SysConfigManager.get_conf_by_key("layout.navbar.banner") do %>
           <!-- <i class="fas fa-paw text-s econdary"></i> -->
             <span><%= conf %></span>
           <!-- <i class="fas fa-paw text-secondary"></i> -->
-        </a>
-      <% end %>
+        <% end %>
+      </a>
 
       <div class="navbar-nav px-3 d-flex flex-wrap">
         <span class="d-none d-md-block navbar-text pr-3">
