@@ -16,7 +16,9 @@ defmodule AcariServerWeb.ClientMonitorLive do
   end
 
   defp mount_client(socket, %AcariServer.NodeManager.Node{} = node) do
-    ports = ports_list(node)
+    config_list = get_port_list_from_config(node)
+
+    ports = ports_list(node, config_list)
 
     if connected?(socket) do
       Process.send_after(self(), :timer, 1000)
@@ -27,7 +29,12 @@ defmodule AcariServerWeb.ClientMonitorLive do
     Phoenix.PubSub.subscribe(AcariServer.PubSub, "link_state:#{node.name}")
 
     {:ok,
-     assign(socket, node: node, ports: ports, local_time: AcariServer.get_local_time(:wo_date))}
+     assign(socket,
+       node: node,
+       ports: ports,
+       config_list: config_list,
+       local_time: AcariServer.get_local_time(:wo_date)
+     )}
   end
 
   defp mount_client(socket, _) do
@@ -63,7 +70,7 @@ defmodule AcariServerWeb.ClientMonitorLive do
   end
 
   defp update_ports(socket) do
-    ports = ports_list(socket.assigns.node)
+    ports = ports_list(socket.assigns.node, socket.assigns.config_list)
 
     new = ports -- socket.assigns.ports
 
@@ -84,17 +91,59 @@ defmodule AcariServerWeb.ClientMonitorLive do
     node = AcariServer.NodeManager.get_node_rw!(socket.assigns.node.id)
 
     {:noreply, assign(socket, node: node, ports: ports)}
-
   end
 
-  defp ports_list(node) do
-    ((AcariServer.Mnesia.get_link_list_for_tunnel(node.name)
-      |> Enum.reduce([], fn %{name: name}, acc -> [name | acc] end)) ++
-       ((AcariServer.Mnesia.get_tunnel_state(node.name)[:wizard] || [])
-        |> Enum.reduce([], fn {key, _}, acc ->
-          [AcariServerWeb.TunnelView.get_arg(key) | acc]
-        end)))
+  defp ports_list(node, config_list) do
+    mnesia_list =
+      AcariServer.Mnesia.get_link_list_for_tunnel(node.name)
+      |> Enum.reduce([], fn %{name: name}, acc -> [name | acc] end)
+
+    wizard_list =
+      (AcariServer.Mnesia.get_tunnel_state(node.name)[:wizard] || [])
+      |> Enum.reduce([], fn {key, _}, acc ->
+        [AcariServerWeb.TunnelView.get_arg(key) | acc]
+      end)
+
+    (config_list ++ mnesia_list ++ wizard_list)
     |> Enum.uniq()
     |> Enum.sort()
+  end
+
+  defp get_port_list_from_config(node) do
+    with %AcariServer.TemplateManager.Template{} = configure_template <-
+           AcariServer.TemplateManager.get_template(node.script.remote_id),
+         {:ok, {configure_script, _}} <-
+           AcariServer.Template.test_eval(
+             %{configure_template | test_client_name: node.name},
+             %{}
+           ),
+         [_, acari_config_template_name] <-
+           Regex.run(~r{cp\s+\./(.+)\s+/etc/acari/acari_config.exs}, configure_script),
+         %AcariServer.TemplateManager.Template{} = acari_config_template <-
+           AcariServer.TemplateManager.get_template_by_name(acari_config_template_name),
+         {:ok, {acari_config_exs, _}} <-
+           AcariServer.Template.test_eval(
+             %{acari_config_template | test_client_name: node.name},
+             %{}
+           ),
+         {:ok, acari_config} <- get_conf(acari_config_exs),
+         links_list when is_list(links_list) <- acari_config[:links] do
+      links_list
+      |> Enum.map(fn kl -> kl[:dev] end)
+      |> Enum.reject(&is_nil/1)
+    else
+      _ ->
+        []
+    end
+  end
+
+  defp get_conf(str) do
+    try do
+      {conf, _} = Code.eval_string(str)
+      {:ok, conf}
+    rescue
+      x ->
+        {:error, inspect(x)}
+    end
   end
 end

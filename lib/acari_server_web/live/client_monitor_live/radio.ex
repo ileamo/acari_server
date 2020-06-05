@@ -83,7 +83,7 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
        tm_up_start: tm_up_start,
        uptime_timer: uptime_timer,
        csq: csq,
-       error: wizard["errormsg"][:value],
+       error: wizard["errormsg"][:value] || "Идет поиск неисправности...",
        wizard: wizard,
        wizard_snd_tm: wizard_snd_tm || socket.assigns[:wizard_snd_tm] || 0
      )}
