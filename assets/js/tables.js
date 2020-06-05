@@ -141,6 +141,13 @@ var table_all = $("#datatable_all").DataTable(datatable_params);
 var table_desc_0 = $("#datatable_desc0").DataTable(datatable_params_desc0);
 var table_select = $("#datatable-select").DataTable(datatable_params_with_select);
 
+table_select.on('user-select', function(e, dt, type, cell, originalEvent) {
+    let node_name = originalEvent.target.nodeName.toLowerCase()
+    if (node_name === 'i' || node_name === 'a') {
+      e.preventDefault();
+    }
+  });
+
 $('.buttonNext').addClass('btn btn-success');
 $('.buttonPrevious').addClass('btn btn-primary');
 $('.buttonFinish').addClass('btn btn-default');
