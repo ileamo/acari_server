@@ -120,6 +120,7 @@ defmodule AcariServer.NodeManager do
   def get_node_by_hash(hash) do
     Node
     |> RepoRO.get_by(hash: hash)
+    |> RepoRO.preload(:script)
   end
 
   # TODO Cache
