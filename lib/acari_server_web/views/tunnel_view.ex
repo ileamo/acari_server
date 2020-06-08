@@ -89,22 +89,18 @@ defmodule AcariServerWeb.TunnelView do
         end)
         |> Enum.map(fn {port, list} ->
           if !port_up[port] do
-            IO.inspect(list)
             params = Enum.into(list, %{})
 
-              """
-              <h5 class='mr-2'>#{port}</h5>
-                <div>
-                <span>#{AcariServer.get_local_date(params["errormsg[#{port}]"][:timestamp])}:</span>
-                <strong class='text-danger'>#{params["errormsg[#{port}]"][:value]}</strong>
-              </div>
-              <strong>Слот:</strong> #{params["slot[#{port}]"][:value]}</br>
-              <strong>Сим карта:</strong> #{params["sim[#{port}]"][:value]}</br>
-              <strong>Сеть:</strong> #{params["network[#{port}]"][:value]}</br>
-              <strong>CSQ:</strong> #{params["csq[#{port}]"][:value]}</br>
-              <strong>Режим:</strong> #{params["rat[#{port}]"][:value]}</br>
-
-              """
+            """
+            <h5 class='mr-2'>#{port}</h5>
+            #{wizard_errormsg(params, port)}
+            #{wizard_value(params, port, "slot", "Слот")}
+            #{wizard_value(params, port, "sim", "Сим карта")}
+            #{wizard_value(params, port, "network", "Сеть")}
+            #{wizard_value(params, port, "csq", "CSQ")}
+            #{wizard_value(params, port, "rat", "Режим")}
+            #{wizard_rest(params, port)}
+            """
           end
         end)
         |> Enum.reject(&is_nil(&1))
@@ -113,6 +109,46 @@ defmodule AcariServerWeb.TunnelView do
       _ ->
         ""
     end
+  end
+
+  defp wizard_errormsg(params, port) do
+    value = params["errormsg[#{port}]"][:value] || "Идет поиск неисправности..."
+
+    date =
+      case params["errormsg[#{port}]"][:timestamp] do
+        nil -> ""
+        ts -> AcariServer.get_local_date(ts) <> ":"
+      end
+
+    """
+    <div>
+      <span>#{date}</span>
+      <strong class='text-danger'>#{value}</strong>
+    </div>
+    """
+  end
+
+  defp wizard_value(params, port, name, descr) do
+    case params["#{name}[#{port}]"][:value] do
+      nil -> ""
+      value -> "<strong>#{descr}:</strong> #{value}</br>"
+    end
+  end
+
+  defp wizard_rest(params, port) do
+    std_keys = ["errormsg", "slot", "sim", "network", "csq", "rat"]
+
+    params
+    |> Enum.map(fn {key, %{value: value}} ->
+      [key] = Regex.run(~r/[^\[]+/, key)
+
+      if !(key in std_keys) do
+        "<strong>#{key}:</strong> #{value}</br>"
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> IO.inspect()
+
   end
 
   def is_errormsg(name) do

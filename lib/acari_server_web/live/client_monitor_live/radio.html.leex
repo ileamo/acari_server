@@ -35,11 +35,28 @@
       <%= if @up do %>
         CSQ: <%= @csq %></br>
       <% else %>
-        <strong>Слот:</strong> <%= @wizard["slot"][:value] %></br>
-        <strong>Сим карта:</strong> <%= @wizard["sim"][:value] %></br>
-        <strong>Сеть:</strong> <%= @wizard["network"][:value] %></br>
-        <strong>CSQ:</strong> <%= @wizard["csq"][:value] %></br>
-        <strong>Режим:</strong> <%= @wizard["rat"][:value] %></br>
+      <% IO.inspect(@wizard) %>
+        <%= if value = @wizard["slot"][:value] do %>
+          <strong>Слот:</strong> <%= value %></br>
+        <% end %>
+        <%= if value = @wizard["sim"][:value] do %>
+          <strong>Сим карта:</strong> <%= value %></br>
+        <% end %>
+        <%= if value = @wizard["network"][:value] do %>
+          <strong>Сеть:</strong> <%= value%></br>
+        <% end %>
+        <%= if value = @wizard["csq"][:value] do %>
+          <strong>CSQ:</strong> <%= value %></br>
+        <% end %>
+        <%= if value = @wizard["rat"][:value] do %>
+          <strong>Режим:</strong> <%= value %></br>
+        <% end %>
+        <% std_keys = ["errormsg", "slot", "sim", "network", "csq", "rat"] %>
+        <%= for {key, %{value: value}} <- @wizard do %>
+          <%= if !(key in std_keys) do %>
+            <strong><%= key %>:</strong> <%= value %></br>
+          <% end %>
+        <% end %>
       <% end %>
 
   <hr>
