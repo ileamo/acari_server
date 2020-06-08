@@ -41,7 +41,7 @@ defmodule AcariServer.NodeMonitorAgent do
 
         true
 
-      {pid, _, _} ->
+      {pid, _, _, _} ->
         if Process.alive?(pid), do: false, else: true
     end)
   end

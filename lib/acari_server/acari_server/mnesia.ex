@@ -309,7 +309,7 @@ defmodule AcariServer.Mnesia do
   end
 
   def update_tun_script(name, tag, data) do
-    update_tun_state(name, tag, data)
+    update_tun_state(name, tag, data, rcv_event: true)
     send_to_zabbix(name, tag, data)
   end
 
@@ -324,7 +324,7 @@ defmodule AcariServer.Mnesia do
     end
   end
 
-  def update_tun_state(name, tag, data) do
+  def update_tun_state(name, tag, data, opts \\ []) do
     Mnesia.transaction(fn ->
       case Mnesia.wread({:tun, name}) do
         [] ->
@@ -337,7 +337,10 @@ defmodule AcariServer.Mnesia do
             |> Map.update(tag, data, fn old_data -> old_data |> Map.merge(data) end)
 
           Mnesia.write(Rec.tun(record, state: state))
-          AcariServer.NodeMonitorAgent.event(name, tag |> to_string, data)
+
+          if opts[:rcv_event] do
+            AcariServer.NodeMonitorAgent.event(name, tag |> to_string, data)
+          end
       end
     end)
   end
