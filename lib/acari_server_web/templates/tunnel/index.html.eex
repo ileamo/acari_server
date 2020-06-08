@@ -82,8 +82,8 @@
             <% end %>
         <% end %>
 
-          <%= if is_errormsg(tunnel[:name]) do %>
-            <span class="text-danger">
+          <%= if err = is_errormsg(tunnel[:name]) do %>
+            <span class="text-danger" data-toggle="tooltip" data-html="true" title="<div class='text-left'><%= err %></div>">
               <i class="fas fa-exclamation ml-1"></i>
             </span>
           <% end %>

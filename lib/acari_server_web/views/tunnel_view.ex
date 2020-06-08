@@ -135,7 +135,7 @@ defmodule AcariServerWeb.TunnelView do
     end
   end
 
-  defp wizard_rest(params, port) do
+  defp wizard_rest(params, _port) do
     std_keys = ["errormsg", "slot", "sim", "network", "csq", "rat"]
 
     params
@@ -148,7 +148,6 @@ defmodule AcariServerWeb.TunnelView do
     end)
     |> Enum.reject(&is_nil/1)
     |> IO.inspect()
-
   end
 
   def is_errormsg(name) do
@@ -159,8 +158,20 @@ defmodule AcariServerWeb.TunnelView do
           |> get_port_state()
 
         case Enum.reject(map, fn {key, _} -> port_up[get_arg(key)] end) do
-          [] -> false
-          _ -> true
+          [] ->
+            false
+
+          list ->
+            list
+            |> Enum.map(fn
+              {"errormsg[" <> port, %{value: value}} ->
+                "<strong>#{String.slice(port, 0..-2)}:</strong> #{value}"
+
+              _ ->
+                nil
+            end)
+            |> Enum.reject(&is_nil/1)
+            |> Enum.join("</br>")
         end
 
       _ ->
