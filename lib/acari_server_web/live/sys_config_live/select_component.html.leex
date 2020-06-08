@@ -1,17 +1,18 @@
-<div>
-  <div class="row d-flex align-items-center">
+<div class="mb-2">
+  <div class="form-group row mb-0">
     <label class="col-sm-3 col-form-label"
       phx-click="descr" phx-target="<%= @myself %>"><%= @name %></label>
 
-    <select class="form-control col-sm-9 p-0" phx-click="select" phx-target="<%= @myself %>">
-      <%= for {value, text} <- @select do %>
-        <option value="<%= value %>" <%= if value == @value, do: "selected" %>>
-          <%= text %>
-        </option>
-      <% end %>
-    </select>
+    <div class="col-sm-9">
+      <select class="form-control px-2" phx-click="select" phx-target="<%= @myself %>">
+        <%= for {value, text} <- @select do %>
+          <option value="<%= value %>" <%= if value == @value, do: "selected" %>>
+            <%= text %>
+          </option>
+        <% end %>
+      </select>
+    </div>
   </div>
-
   <div class="pb-<%= @descr_pb %> text-muted" phx-click="descr_off" phx-target="<%= @myself %>">
     <%= @descr %>
   </div>
