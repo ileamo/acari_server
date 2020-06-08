@@ -145,4 +145,13 @@ defmodule AcariServerWeb.ClientMonitorLive.Radio do
   end
 
   defp get_signal_level_colors(_), do: List.duplicate(@grey, 4)
+
+  defp get_value(val) do
+    with str when is_binary(str) <- val,
+         val when val != "" <- String.trim(val) do
+      val
+    else
+      _ -> false
+    end
+  end
 end

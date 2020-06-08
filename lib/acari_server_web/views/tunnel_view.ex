@@ -129,9 +129,11 @@ defmodule AcariServerWeb.TunnelView do
   end
 
   defp wizard_value(params, port, name, descr) do
-    case params["#{name}[#{port}]"][:value] do
-      nil -> ""
-      value -> "<strong>#{descr}:</strong> #{value}</br>"
+    with value when is_binary(value) <- params["#{name}[#{port}]"][:value],
+         value when value != "" <- String.trim(value) do
+      "<strong>#{descr}:</strong> #{value}</br>"
+    else
+      _ -> ""
     end
   end
 
@@ -142,7 +144,7 @@ defmodule AcariServerWeb.TunnelView do
     |> Enum.map(fn {key, %{value: value}} ->
       [key] = Regex.run(~r/[^\[]+/, key)
 
-      if !(key in std_keys) do
+      if !(key in std_keys) and String.trim(value) != "" do
         "<strong>#{key}:</strong> #{value}</br>"
       end
     end)
