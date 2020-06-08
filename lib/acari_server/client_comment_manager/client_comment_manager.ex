@@ -108,9 +108,20 @@ defmodule AcariServer.ClientCommentManager do
   def parse_comments(comments_list, user) do
     case comments_list do
       [_ | _] = comments ->
+
+        short = comments
+        |> Enum.map(fn %{comment: comment, user: %{username: username}} ->
+          "<p class='text-left'><strong>#{username}:</strong> #{comment}</p>"
+         end)
+        |> Enum.join()
+        |> Phoenix.HTML.Format.text_to_html()
+
         {user_comment_list, list} =
           comments
           |> Enum.split_with(fn %{user_id: uid} -> uid == user.id end)
+
+
+
 
         user_comment =
           case user_comment_list do
@@ -148,10 +159,10 @@ defmodule AcariServer.ClientCommentManager do
           ])
           |> Enum.join("<hr/>")
 
-        {true, list, user_comment.comment, user_comment.id}
+        {true, short, list, user_comment.comment, user_comment.id}
 
       _ ->
-        {nil, "<h6><strong>Введите комментарий:</strong></h6>", nil, nil}
+        {nil, nil, "<h6><strong>Введите комментарий:</strong></h6>", nil, nil}
     end
   end
 

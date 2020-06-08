@@ -1,6 +1,6 @@
 <%= if @node do %>
   <%
-    {is_com?, list, user_comment, comment_id} =
+    {is_com?, short, list, user_comment, comment_id} =
     AcariServer.ClientCommentManager.parse_comments(@node.client_comments, @current_user)
   %>
   <%= link to: "#", data: [ toggle: "modal",
@@ -11,6 +11,8 @@
                             other_users: raw(list),
                             user_comment: user_comment
                           ] do %>
-        <i class="<%= is_com? && "fas" || "far" %> fa-comment-dots ml-1"></i>
+      <%= if is_com? do %><span data-toggle="tooltip" data-html="true" title="<%= short %>"><% end %>
+        <i class="<%= is_com? && "fas" || "far" %> fa-comment-dots ml-1" ></i>
+      <%= if is_com? do %></span><% end %>
   <% end %>
 <% end %>

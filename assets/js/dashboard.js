@@ -17,3 +17,5 @@ $(function() {
 $('.popover-dismiss').popover({
   trigger: 'focus'
 })
+
+$('body').tooltip({selector: '[data-toggle="tooltip"]'});
