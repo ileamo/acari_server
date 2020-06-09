@@ -1,5 +1,6 @@
 defmodule AcariServerWeb.ClientMonitorLive do
   use AcariServerWeb, :live_view
+  require Logger
 
   @impl true
   def mount(%{"hash" => "test"}, _session, socket) do
@@ -132,7 +133,8 @@ defmodule AcariServerWeb.ClientMonitorLive do
       |> Enum.map(fn kl -> kl[:dev] end)
       |> Enum.reject(&is_nil/1)
     else
-      _ ->
+      res ->
+        Logger.warn("get_port_list_from_config: #{inspect(res)}")
         []
     end
   end

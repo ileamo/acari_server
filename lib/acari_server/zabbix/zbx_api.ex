@@ -60,9 +60,14 @@ defmodule AcariServer.Zabbix.ZbxApi do
          %URI{} = uri <- URI.parse(url),
          scheme when is_binary(scheme) <- uri.scheme,
          host when is_binary(host) <- uri.host do
-      url = "#{uri.scheme}://#{uri.host}:#{uri.port || 80}"
+      url = "#{uri.scheme}://#{uri.host}:#{uri.port || 80}#{uri.path}"
       zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host] || "localhost"
-      zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port] || 10051
+
+      zbx_snd_port =
+        case Integer.parse(Application.get_env(:acari_server, :zabbix)[:zbx_snd_port]) do
+          {n, _} -> n
+          _ -> 10051
+        end
 
       {zbx_username, zbx_password} =
         case Regex.run(~r{^([^:]+):?(.*)}, uri.userinfo || "") do
@@ -80,7 +85,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
              %URI{} = uri <- URI.parse(url),
              scheme when is_binary(scheme) <- uri.scheme,
              host when is_binary(host) <- uri.host do
-          url = "#{uri.scheme}://#{uri.host}:#{uri.port || 80}"
+          url = "#{uri.scheme}://#{uri.host}:#{uri.port || 80}#{uri.path}"
 
           {zbx_username, zbx_password} =
             case Regex.run(~r{^([^:]+):?(.*)}, uri.userinfo || "") do
@@ -92,7 +97,12 @@ defmodule AcariServer.Zabbix.ZbxApi do
             end
 
           zbx_snd_host = Application.get_env(:acari_server, :zabbix)[:zbx_snd_host_2]
-          zbx_snd_port = Application.get_env(:acari_server, :zabbix)[:zbx_snd_port_2] || 10051
+
+          zbx_snd_port =
+            case Integer.parse(Application.get_env(:acari_server, :zabbix)[:zbx_snd_port_2]) do
+              {n, _} -> n
+              _ -> 10051
+            end
 
           {url, zbx_username, zbx_password, zbx_snd_host, zbx_snd_port}
         else
