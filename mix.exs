@@ -87,7 +87,7 @@ defmodule AcariServer.MixProject do
       {:httpoison, "~> 1.5"},
       {:sandbox, "~> 0.5"},
       {:nimble_parsec, "~> 0.5"},
-      {:zabbix, "~> 0.1.0"},
+      {:zabbix,  git: "https://github.com/ileamo/zabbix.git"},
       {:zabbix_sender, "~> 1.0.0"},
       {:bbmustache, "~> 1.8"},
       {:quantum, "~> 2.3"},
