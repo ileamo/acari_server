@@ -17,26 +17,38 @@ defmodule AcariServer do
 
   def get_local_date(system_time) do
     {{y, mn, d}, {h, m, s}} = :calendar.system_time_to_local_time(system_time, :second)
+
     :io_lib.format("~4..0B-~2..0B-~2..0B ~2..0B:~2..0B:~2..0B", [y, mn, d, h, m, s])
     |> to_string()
   end
 
   def get_local_time() do
     {{y, mn, d}, {h, m, s}} = :calendar.local_time()
+
     :io_lib.format("~4..0B-~2..0B-~2..0B ~2..0B:~2..0B:~2..0B", [y, mn, d, h, m, s])
     |> to_string()
   end
 
   def get_local_time(:wo_date) do
     {_, {h, m, s}} = :calendar.local_time()
+
     :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s])
     |> to_string()
   end
 
   def get_local_time(system_time) do
     {_, {h, m, s}} = :calendar.system_time_to_local_time(system_time, :second)
+
     :io_lib.format("~2..0B:~2..0B:~2..0B", [h, m, s])
     |> to_string()
   end
 
+  def system_get_integer_env(env) do
+    with val when is_binary(val) <- System.get_env(env),
+         {n, _} <- Integer.parse(val) do
+      n
+    else
+      _ -> nil
+    end
+  end
 end
