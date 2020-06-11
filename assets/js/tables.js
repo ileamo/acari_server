@@ -121,6 +121,11 @@ let select_buttons = [{
 datatable_params_wo_find = Object.assign({}, datatable_params)
 datatable_params_wo_find.dom = datatable_dom_wo_find
 
+
+datatable_params_export = Object.assign({}, datatable_params_wo_find)
+datatable_params_export.buttons = datatable_params_export.buttons.slice(0, -1)
+datatable_params_export.stateSave = false
+
 datatable_params_with_select = Object.assign({}, datatable_params)
 datatable_params_with_select.select = {
   style: 'multi+shift'

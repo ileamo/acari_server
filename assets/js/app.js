@@ -26,11 +26,36 @@ import "js-base64"
 import socket from "./socket"
 
 
-import {Socket} from "phoenix"
+import {
+  Socket
+} from "phoenix"
 import LiveSocket from "phoenix_live_view"
 
+
+let Hooks = {}
+
+let export_table
+
+Hooks.ExportDraw = {
+  updated() {
+    console.log('updated')
+    if (export_table) {
+      console.log('destroy')
+      export_table.destroy()
+    }
+    console.log('create')
+    export_table = $("#datatable-export").DataTable(datatable_params_export);
+
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}});
+let liveSocket = new LiveSocket("/live", Socket, {
+  hooks: Hooks,
+  params: {
+    _csrf_token: csrfToken
+  }
+});
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()

@@ -1,0 +1,84 @@
+<h2>Выгрузки</h2>
+
+<div class="input-group mb-5">
+  <div class="input-group-prepend">
+    <label class="input-group-text">Группа</label>
+  </div>
+
+  <select class="custom-select" phx-click="select_group">
+    <%= for {id, name} <- @groups do %>
+      <option value="<%= id %>" ><%= name %></option>
+    <% end %>
+    <option disabled="disabled">─────────────</option>
+    <option value="nil">Все</option>
+  </select>
+
+  <div class="input-group-prepend">
+    <label class="input-group-text">Класс</label>
+  </div>
+
+  <select class="custom-select" phx-click="select_class">
+    <%= for {id, name} <- @classes do %>
+      <option value="<%= id %>" ><%= name %></option>
+    <% end %>
+    <option disabled="disabled">─────────────</option>
+    <option value="nil">Все</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <%= for %{id: id, title: title} <- @left do %>
+      <div phx-click="left" phx-value-id="<%= id %>"><%= title %></div>
+      <% end %>
+    </div>
+    <div class="col-6">
+      <%= if @right == [] do %>
+        <p>Выберите поля для вывода из левой колонки</p>
+      <% else %>
+        <%= for %{id: id, title: title} = el <- @right do %>
+        <div>
+          <span phx-click="move_up" phx-value-id="<%= id %>">
+            <i class="fas fa-arrow-up"></i>
+          </span>
+          <span phx-click="move_down" phx-value-id="<%= id %>">
+            <i class="fas fa-arrow-down"></i>
+          </span>
+          <span phx-click="right" phx-value-id="<%= id %>"><%= title %></span>
+        </div>
+        <% end %>
+        <button class="btn btn-outline-secondary mt-3" type="button" phx-click="draw">
+          Результат
+        </button>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div id="export-draw" phx-hook="ExportDraw" class = "mt-5">
+<%= if @table != [] do %>
+<% [header | data] = @table %>
+
+  <table id="datatable-export" class="table display table-striped table-bordered table-sm w-100">
+    <thead>
+      <tr>
+        <%= for title <- header do %>
+          <th scope="col"><%= title %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for raw <- data do %>
+        <tr>
+          <%= for el <- raw do %>
+            <td><%= el %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+
+<% end %>
+</div>

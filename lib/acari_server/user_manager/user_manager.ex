@@ -198,6 +198,7 @@ defmodule AcariServer.UserManager do
         |> Conn.assign(:current_user, user)
         |> Conn.assign(:user_token, token)
         |> Conn.assign(:current_user_groups, groups)
+        |> Conn.put_session("current_user_id", user.id)
 
       _ ->
         conn
