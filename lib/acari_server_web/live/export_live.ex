@@ -10,6 +10,8 @@ defmodule AcariServerWeb.ExportLive do
       |> Enum.map(fn %{id: id, name: name} -> {id, name} end)
       |> Enum.sort_by(fn {_, name} -> name end)
 
+    [{group_id, _} | _] = groups
+
     classes =
       AcariServer.ScriptManager.list_scripts()
       |> Enum.map(fn %{id: id, name: name} -> {id, name} end)
@@ -25,7 +27,6 @@ defmodule AcariServerWeb.ExportLive do
           type: "script"
         }
       end)
-      |> IO.inspect()
 
     left =
       scripts
@@ -33,11 +34,10 @@ defmodule AcariServerWeb.ExportLive do
 
     right = []
 
-    IO.puts("MOUNTED!")
-
     {:ok,
      assign(socket,
        groups: groups,
+       group_id: group_id,
        classes: classes,
        scripts: scripts,
        left: left,
@@ -47,18 +47,24 @@ defmodule AcariServerWeb.ExportLive do
   end
 
   @impl true
+  def handle_event("select_group", %{"value" => id}, socket) do
+    {:noreply, assign(socket, group_id: id, table: [])}
+  end
+
   def handle_event("left", params, socket) do
-    IO.inspect(event: "left", params: params)
     {left, right} = left_to_right(socket.assigns, params["id"])
     {:noreply, assign(socket, left: left, right: right, table: [])}
   end
 
   def handle_event("right", params, socket) do
-    IO.inspect(event: "right", assigns: socket.assigns)
     {right, left} = right_to_left(socket.assigns, params["id"])
 
     {:noreply,
-     assign(socket, left: left |> Enum.sort_by(fn %{title: title} -> title end), right: right, table: [])}
+     assign(socket,
+       left: left |> Enum.sort_by(fn %{title: title} -> title end),
+       right: right,
+       table: []
+     )}
   end
 
   def handle_event("move_down", %{"id" => id}, socket) do
@@ -72,44 +78,31 @@ defmodule AcariServerWeb.ExportLive do
   end
 
   def handle_event("draw", _, socket) do
-    IO.puts "DRAW"
-    n = socket.assigns.right |> length()
+    tag_list =
+      socket.assigns.right
+      |> Enum.map(fn %{name: name} -> name end)
 
-    table = [
-      socket.assigns.right |> Enum.map(fn %{name: name} -> name end),
-      List.duplicate("title", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("1", n),
-      List.duplicate("2", n)
-    ]
+      value_list =
+    AcariServer.GroupManager.get_group!(socket.assigns.group_id)
+    |> Map.get(:nodes)
+    |> Enum.map(fn %{name: tun_name, description: descr, address: address} ->
+      tag_data_list =
+        (tag_list || [])
+        |> Enum.map(fn tag ->
+          case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
+            %{data: data} -> {tag, data}
+            _ -> {tag, "нет данных"}
+          end
+        end)
+
+      %{id: tun_name, description: descr, address: address, data_list: tag_data_list}
+    end)
+    |> Enum.map(fn %{data_list: data_list} ->
+      data_list
+      |> Enum.map(fn {_, val} -> val end)
+    end)
+
+    table = [ tag_list | value_list]
 
     {:noreply, assign(socket, table: table)}
   end
@@ -153,8 +146,7 @@ defmodule AcariServerWeb.ExportLive do
         _ -> true
       end)
 
-    (pref ++ swap(suff))
-    |> IO.inspect()
+    pref ++ swap(suff)
   end
 
   defp swap([a, b | tail]) do

@@ -1,6 +1,6 @@
 <h2>Выгрузки</h2>
 
-<div class="input-group mb-5">
+<div class="input-group mb-4">
   <div class="input-group-prepend">
     <label class="input-group-text">Группа</label>
   </div>
@@ -28,35 +28,37 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-6">
+    <div class="col-6 p-0">
+    <div class="left-export-live-pannel mr-1 p-2 h-100">
       <%= for %{id: id, title: title} <- @left do %>
       <div phx-click="left" phx-value-id="<%= id %>"><%= title %></div>
       <% end %>
-    </div>
-    <div class="col-6">
+    </div></div>
+    <div class="col-6 p-0">
+    <div class="right-export-live-pannel ml-1 p-2 h-100">
       <%= if @right == [] do %>
-        <p>Выберите поля для вывода из левой колонки</p>
+        <p class="text-muted">Выберите поля для вывода из левой колонки</p>
       <% else %>
         <%= for %{id: id, title: title} = el <- @right do %>
-        <div>
-          <span phx-click="move_up" phx-value-id="<%= id %>">
+        <div class="d-flex flex-row">
+          <span class="pr-1" phx-click="move_up" phx-value-id="<%= id %>">
             <i class="fas fa-arrow-up"></i>
           </span>
-          <span phx-click="move_down" phx-value-id="<%= id %>">
+          <span class="pr-1" phx-click="move_down" phx-value-id="<%= id %>">
             <i class="fas fa-arrow-down"></i>
           </span>
           <span phx-click="right" phx-value-id="<%= id %>"><%= title %></span>
         </div>
         <% end %>
         <button class="btn btn-outline-secondary mt-3" type="button" phx-click="draw">
-          Результат
+          Предварительный просмотр
         </button>
       <% end %>
-    </div>
+    </div></div>
   </div>
 </div>
 
-<div id="export-draw" phx-hook="ExportDraw" class = "mt-5">
+<div id="export-draw" phx-hook="ExportDraw" class = "mt-4">
 <%= if @table != [] do %>
 <% [header | data] = @table %>
 
