@@ -82,27 +82,24 @@ defmodule AcariServerWeb.ExportLive do
       socket.assigns.right
       |> Enum.map(fn %{name: name} -> name end)
 
-      value_list =
-    AcariServer.GroupManager.get_group!(socket.assigns.group_id)
-    |> Map.get(:nodes)
-    |> Enum.map(fn %{name: tun_name, description: descr, address: address} ->
-      tag_data_list =
-        (tag_list || [])
-        |> Enum.map(fn tag ->
-          case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
-            %{data: data} -> {tag, data}
-            _ -> {tag, "нет данных"}
-          end
-        end)
+    value_list =
+      AcariServer.GroupManager.get_group!(socket.assigns.group_id)
+      |> Map.get(:nodes)
+      |> Enum.map(fn %{name: tun_name} = _node ->
+        tun_state = AcariServer.Mnesia.get_tunnel_state(tun_name)
 
-      %{id: tun_name, description: descr, address: address, data_list: tag_data_list}
-    end)
-    |> Enum.map(fn %{data_list: data_list} ->
-      data_list
-      |> Enum.map(fn {_, val} -> val end)
-    end)
+        [
+          tun_name
+          | socket.assigns.right
+            |> Enum.map(fn
+              %{type: "script", name: name} -> tun_state[name][:data]
+              %{name: _} -> ""
+            end)
+        ]
+      end)
+      |> IO.inspect()
 
-    table = [ tag_list | value_list]
+    table = [["Имя" | tag_list] | value_list]
 
     {:noreply, assign(socket, table: table)}
   end

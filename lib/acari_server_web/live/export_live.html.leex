@@ -28,13 +28,13 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-6 p-0">
+    <div class="col-4 p-0">
     <div class="left-export-live-pannel mr-1 p-2 h-100">
       <%= for %{id: id, title: title} <- @left do %>
       <div phx-click="left" phx-value-id="<%= id %>"><%= title %></div>
       <% end %>
     </div></div>
-    <div class="col-6 p-0">
+    <div class="col-8 p-0">
     <div class="right-export-live-pannel ml-1 p-2 h-100">
       <%= if @right == [] do %>
         <p class="text-muted">Выберите поля для вывода из левой колонки</p>
@@ -60,7 +60,8 @@
 
 <div id="export-draw" phx-hook="ExportDraw" class = "mt-4">
 <%= if @table != [] do %>
-<% [header | data] = @table %>
+<% [header | data] = @table
+%>
 
   <table id="datatable-export" class="table display table-striped table-bordered table-sm w-100">
     <thead>
