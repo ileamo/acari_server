@@ -7,7 +7,7 @@ defmodule AcariServerWeb.ExportLive do
 
     groups =
       AcariServer.GroupManager.list_groups(user)
-      |> Enum.map(fn %{id: id, name: name} -> {id, name} end)
+      |> Enum.map(fn %{id: id, name: name} -> {to_string(id), name} end)
       |> Enum.sort_by(fn {_, name} -> name end)
 
     [{group_id, _} | _] = groups
@@ -52,12 +52,29 @@ defmodule AcariServerWeb.ExportLive do
       }
     ]
 
-    left = left_node ++ left_scripts
+    left_bogatka = [
+      %{
+        id: "bogatka_wizard",
+        type: :bogatka,
+        title: "Обнаруженные ошибки",
+        key: :wizard
+      }
+    ]
+
+    left = left_node ++ left_scripts ++ left_bogatka
 
     right = []
 
+    type_dscr = [
+      node: "Параметры клиентов",
+      script: "Скрипты",
+      bogatka: "ИИ Богатка"
+    ]
+
     {:ok,
      assign(socket,
+      user: user,
+       type_descr: type_dscr,
        groups: groups,
        group_id: group_id,
        classes: classes,
@@ -108,20 +125,48 @@ defmodule AcariServerWeb.ExportLive do
         %{title: title} -> title
       end)
 
+
+    nodes =
+      case socket.assigns.group_id do
+        "nil" ->
+          AcariServer.NodeManager.list_nodes(socket.assigns[:user])
+
+        _ ->
+          AcariServer.GroupManager.get_group!(socket.assigns.group_id)
+          |> Map.get(:nodes)
+      end
+
     value_list =
-      AcariServer.GroupManager.get_group!(socket.assigns.group_id)
-      |> Map.get(:nodes)
+      nodes
       |> Enum.map(fn %{name: tun_name} = node ->
-        tun_state = AcariServer.Mnesia.get_tunnel_state(tun_name)
+        tun_state =
+          AcariServer.Mnesia.get_tunnel_state(tun_name)
 
         socket.assigns.right
         |> Enum.map(fn
-          %{type: :script, name: name} -> tun_state[name][:data]
-          %{type: :node, key: key} -> Map.get(node, key)
-          %{name: _} -> ""
+          %{type: :script, name: name} ->
+            tun_state[name][:data]
+
+          %{type: :node, key: key} ->
+            Map.get(node, key)
+
+          %{type: :bogatka, key: key} ->
+            (tun_state[key] || [])
+            |> Enum.map(fn
+              {"errormsg[" <> port, %{value: value}} ->
+                "#{String.slice(port, 0..-2)}: #{value}"
+
+              _ ->
+                nil
+            end)
+            |> Enum.reject(&is_nil/1)
+            |> Enum.join("\n")
+
+
+          %{name: _} ->
+            ""
         end)
       end)
-      |> IO.inspect()
 
     table = [tag_list | value_list]
 
@@ -183,6 +228,7 @@ defmodule AcariServerWeb.ExportLive do
 
   defp group_left(left) do
     left
+    |> sort_left()
     |> Enum.group_by(fn %{type: type} -> type end)
   end
 end

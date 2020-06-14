@@ -7,10 +7,12 @@
 
   <select class="custom-select" phx-click="select_group">
     <%= for {id, name} <- @groups do %>
-      <option value="<%= id %>" ><%= name %></option>
+      <option value="<%= id %>"  <%= if id == @group_id, do: "selected" %>>
+        <%= name %>
+      </option>
     <% end %>
     <option disabled="disabled">─────────────</option>
-    <option value="nil">Все</option>
+    <option value="nil" <%= if "nil" == @group_id, do: "selected" %>>Все</option>
   </select>
 
   <div class="input-group-prepend">
@@ -28,10 +30,10 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-4 p-0">
+    <div class="col-6 p-0">
     <div class="left-export-live-pannel mr-1 p-2 h-100">
 
-      <%= for {type, descr} <- [node: "Параметры клиентов", script: "Скрипты"] do %>
+      <%= for {type, descr} <- @type_descr do %>
       <div class="mb-3">
         <%= if is_list(@left_groups[type]) &&  @left_groups[type] != [] do %>
           <h5><%= descr %></h5>
@@ -43,7 +45,7 @@
       <% end %>
 
     </div></div>
-    <div class="col-8 p-0">
+    <div class="col-6 p-0">
     <div class="right-export-live-pannel ml-1 p-2 h-100">
       <%= if @right == [] do %>
         <p class="text-muted">Выберите поля для вывода из левой колонки</p>
