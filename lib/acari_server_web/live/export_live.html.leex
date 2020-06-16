@@ -32,42 +32,51 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-6 p-0">
-    <div class="left-export-live-pannel mr-1 p-2 h-100">
+    <div class="col-4 p-0">
+      <div class="left-export-live-pannel mr-1 p-2 h-100">
 
-      <%= for {type, descr} <- @type_descr do %>
-      <div class="mb-3">
-        <%= if is_list(@left_groups[type]) &&  @left_groups[type] != [] do %>
-          <h5><%= descr %></h5>
-          <%= for %{id: id, title: title} <- @left_groups[type] do %>
-           <div phx-click="left" phx-value-id="<%= id %>"><%= title %></div>
+        <%= for {type, descr} <- @type_descr do %>
+        <div class="mb-3">
+          <%= if is_list(@left_groups[type]) &&  @left_groups[type] != [] do %>
+            <h5><%= descr %></h5>
+            <%= for %{id: id, title: title} <- @left_groups[type] do %>
+             <div phx-click="left" phx-value-id="<%= id %>"><%= title %></div>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
-      <% end %>
-
-    </div></div>
-    <div class="col-6 p-0">
-    <div class="right-export-live-pannel ml-1 p-2 h-100">
-      <%= if @right == [] do %>
-        <p class="text-muted">Выберите поля для вывода из левой колонки</p>
-      <% else %>
-        <%= for %{id: id, title: title} = el <- @right do %>
-        <div class="d-flex flex-row">
-          <span class="pr-1" phx-click="move_up" phx-value-id="<%= id %>">
-            <i class="fas fa-arrow-up"></i>
-          </span>
-          <span class="pr-1" phx-click="move_down" phx-value-id="<%= id %>">
-            <i class="fas fa-arrow-down"></i>
-          </span>
-          <span phx-click="right" phx-value-id="<%= id %>"><%= title %></span>
         </div>
         <% end %>
-        <button class="btn btn-outline-secondary mt-3" type="button" phx-click="draw">
-          Предварительный просмотр
-        </button>
-      <% end %>
-    </div></div>
+
+      </div>
+    </div>
+      <div class="col-8 p-0">
+        <div class="right-export-live-pannel ml-1 p-2 h-100">
+          <form phx-change="filters" phx-submit="draw">
+          <%= if @right == [] do %>
+            <p class="text-muted">Выберите поля для вывода из левой колонки</p>
+          <% else %>
+            <%= for %{id: id, title: title} = el <- @right do %>
+            <div class="d-flex flex-row align-items-center justify-content-between">
+              <div class="d-flex flex-row align-items-center">
+              <span class="pr-1" phx-click="move_up" phx-value-id="<%= id %>">
+                <i class="fas fa-arrow-up"></i>
+              </span>
+              <span class="pr-1" phx-click="move_down" phx-value-id="<%= id %>">
+                <i class="fas fa-arrow-down"></i>
+              </span>
+              <span phx-click="right" phx-value-id="<%= id %>"><%= title %></span>
+              </div>
+              <span><input  class="form-control" type="text" name="filter[<%= id %>]"
+                            value="<%= el[:filter] %>" placeholder="Фильтр">
+              </span>
+            </div>
+            <% end %>
+            <button class="btn btn-outline-secondary mt-3" type="submit">
+              Предварительный просмотр
+            </button>
+          <% end %>
+        </form>
+        </div>
+      </div>
   </div>
 </div>
 

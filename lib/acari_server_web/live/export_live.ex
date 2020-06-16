@@ -96,8 +96,8 @@ defmodule AcariServerWeb.ExportLive do
       Enum.reduce(
         Map.get(current_profile, :profile)["right"] || [],
         {left, right},
-        fn %{"id" => id}, {left, right} ->
-          from_to(left, right, id)
+        fn %{"id" => id} = el, {left, right} ->
+          from_to(left, right, id, %{filter: el["filter"]})
         end
       )
 
@@ -155,22 +155,45 @@ defmodule AcariServerWeb.ExportLive do
     {:noreply, assign(socket, right: right, table: [])}
   end
 
-  def handle_event("draw", _, socket) do
-    tag_list =
+  def handle_event("filters", %{"_target" => ["filter", item]} = params, socket) do
+    right =
       socket.assigns.right
+      |> Enum.map(fn
+        %{id: ^item} = el -> Map.put(el, :filter, params["filter"][item])
+        el -> el
+      end)
+
+    {:noreply, assign(socket, right: right, table: [])}
+  end
+
+  def handle_event("draw", params, socket) do
+    ass = socket.assigns
+
+    tag_list =
+      ass.right
       |> Enum.map(fn
         # %{name: name} -> name
         %{title: title} -> title
       end)
 
     nodes =
-      case socket.assigns.group_id do
+      case ass.group_id do
         "nil" ->
-          AcariServer.NodeManager.list_nodes(socket.assigns[:user])
+          AcariServer.NodeManager.list_nodes(ass[:user])
 
         _ ->
-          AcariServer.GroupManager.get_group!(socket.assigns.group_id)
+          AcariServer.GroupManager.get_group!(ass.group_id)
           |> Map.get(:nodes)
+      end
+
+    nodes =
+      case ass.class_id do
+        "nil" ->
+          nodes
+
+        class_id ->
+          nodes
+          |> Enum.filter(fn %{script_id: id} -> to_string(id) == class_id end)
       end
       |> AcariServer.RepoRO.preload(:groups)
 
@@ -240,13 +263,19 @@ defmodule AcariServerWeb.ExportLive do
     from_to(assigns.right, assigns.left, id)
   end
 
-  defp from_to(from, to, id) do
+  defp from_to(from, to, id, extra \\ %{}) do
     {el, from} =
       from
       |> Enum.split_with(fn
         %{id: ^id} -> true
         _ -> false
       end)
+
+    el =
+      case el do
+        [el] -> [Map.merge(el, extra)]
+        el -> el
+      end
 
     {from, to ++ el}
   end
