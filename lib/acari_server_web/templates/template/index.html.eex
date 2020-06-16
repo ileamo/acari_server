@@ -9,6 +9,8 @@
       <th scope="col">Описание</th>
       <th scope="col">Назначение</th>
       <th scope="col">Права</th>
+      <th scope="col">Выгрузка</th>
+      <th scope="col">Ключ</th>
       <th scope="col" class="not-export-col">Действия</th>
     </tr>
   </thead>
@@ -23,6 +25,8 @@
       <td><%= template.description %></td>
       <td><%= type_to_name[template.type] || "Нет" %></td>
       <td><%= is_executable?(template.type) && rights_descr(template.rights) || "" %></td>
+      <td><%= is_executable?(template.type) && template.export && "Да" || "" %></td>
+      <td><%= is_executable?(template.type) && template.zabbix_key || "" %></td>
       <td>
         <%= link to: Routes.template_path(@conn, :edit, template),
             class: AcariServer.UserManager.get_disabled(@current_user) do %>

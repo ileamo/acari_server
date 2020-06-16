@@ -315,7 +315,7 @@ defmodule AcariServer.Mnesia do
 
   defp send_to_zabbix(host, templ_name, data) do
     with %{data: data} <- data,
-         %AcariServer.TemplateManager.Template{zabbix_send: true, zabbix_key: key}
+         %AcariServer.TemplateManager.Template{zabbix_key: key}
          when is_binary(key) <-
            AcariServer.TemplateManager.get_template_by_name(templ_name),
          true <- String.trim(key) != "" do

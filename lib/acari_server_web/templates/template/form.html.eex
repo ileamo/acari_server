@@ -58,14 +58,14 @@
       </div>
 
       <div class="form-row align-items-center mt-3">
-        <%= label f, :zabbix_send, class: "col-sm-3 form-check-label" do
-          "Посылать результат в Zabbix"
+        <%= label f, :export, class: "col-sm-3 form-check-label" do
+          "Выгрузка"
         end
         %>
         <div class="col-sm-1">
           <div class="form-check mb-4">
-            <%= checkbox f, :zabbix_send, class: "form-check-input" %>
-            <%= error_tag f, :zabbix_send %>
+            <%= checkbox f, :export, class: "form-check-input" %>
+            <%= error_tag f, :export %>
           </div>
         </div>
 

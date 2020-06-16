@@ -122,7 +122,7 @@ defmodule AcariServerWeb.TemplateController do
           type: t.type,
           validator: t.validator,
           zabbix_key: t.zabbix_key,
-          zabbix_send: t.zabbix_send
+          export: t.export
         }
       end)
       |> Jason.encode()

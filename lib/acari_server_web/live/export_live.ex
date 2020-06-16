@@ -18,7 +18,9 @@ defmodule AcariServerWeb.ExportLive do
       |> Enum.sort_by(fn {_, name} -> name end)
 
     left_scripts =
-      AcariServer.TemplateManager.list_templates("client")
+      (AcariServer.TemplateManager.list_templates("client") ++
+      AcariServer.TemplateManager.list_templates("zabbix"))
+      |> Enum.filter(fn %{export: x} -> x end)
       |> Enum.map(fn %{id: id, name: name, description: description} ->
         %{
           id: "templ-#{id}",

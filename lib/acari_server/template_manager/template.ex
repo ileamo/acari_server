@@ -12,6 +12,7 @@ defmodule AcariServer.TemplateManager.Template do
     field :type, :string, default: "no"
     field :test_client_name, :string
     field :test_params, :string
+    field :export, :boolean, default: true
     field :zabbix_send, :boolean, default: false
     field :zabbix_key, :string
     belongs_to :script, AcariServer.ScriptManager.Script # TODO remove
@@ -37,7 +38,7 @@ defmodule AcariServer.TemplateManager.Template do
       :type,
       :test_client_name,
       :test_params,
-      :zabbix_send,
+      :export,
       :zabbix_key
     ])
     |> validate_required([:name, :description, :template])

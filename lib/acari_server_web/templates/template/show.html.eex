@@ -24,8 +24,8 @@
     </li>
 
     <li>
-      <strong>Посылать результат в Zabbix:</strong>
-      <%= @template.zabbix_send && "Да" || "Нет" %>
+      <strong>Выгрузка:</strong>
+      <%= @template.export && "Да" || "Нет" %>
     </li>
 
     <li>
