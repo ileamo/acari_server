@@ -25,7 +25,7 @@ defmodule AcariServerWeb.ExportLive do
         %{
           id: "templ-#{id}",
           type: :script,
-          title: "#{description} (#{name})",
+          title: "#{description || name}",
           name: name
         }
       end)
@@ -51,6 +51,20 @@ defmodule AcariServerWeb.ExportLive do
         title: "Адрес",
         key: :address,
         prio: 30
+      },
+      %{
+        id: "node-groups",
+        type: :node,
+        title: "Группы",
+        key: :groups,
+        prio: 40
+      },
+      %{
+        id: "node-params",
+        type: :node,
+        title: "Параметры",
+        key: :params,
+        prio: 50
       }
     ]
 
@@ -123,7 +137,7 @@ defmodule AcariServerWeb.ExportLive do
     tag_list =
       socket.assigns.right
       |> Enum.map(fn
-        %{name: name} -> name
+        #%{name: name} -> name
         %{title: title} -> title
       end)
 
@@ -137,6 +151,7 @@ defmodule AcariServerWeb.ExportLive do
           AcariServer.GroupManager.get_group!(socket.assigns.group_id)
           |> Map.get(:nodes)
       end
+      |> AcariServer.RepoRO.preload(:groups)
 
     value_list =
       nodes
@@ -150,7 +165,17 @@ defmodule AcariServerWeb.ExportLive do
             tun_state[name][:data]
 
           %{type: :node, key: key} ->
-            Map.get(node, key)
+            case key do
+              :groups -> node.groups |> Enum.map(fn %{name: name} -> name end) |> Enum.join(", ")
+
+            _ -> case Map.get(node, key) do
+              value when is_binary(value) or is_boolean(value) or is_nil(value) or is_number(value) -> value
+              value -> case Jason.encode(value, pretty: true) do
+                {:ok, res} -> res
+                _ -> inspect(value)
+              end
+            end
+          end
 
           %{type: :bogatka, key: key} ->
             (tun_state[key] || [])
