@@ -78,13 +78,13 @@ if (grp_oper) {
 
   let grp_oper_class = document.getElementById("grp-oper-class")
   if (grp_oper_class) {
-    grp_oper_class.addEventListener("click", selectElement, false);
+    grp_oper_class.addEventListener("change", selectElement, false);
     grp_oper_class.value = localStorage.getItem("grp_oper_class_id") || "nil";
   }
 
   let grp_oper_group = document.getElementById("grp-oper-group")
   if (grp_oper_group) {
-    grp_oper_group.addEventListener("click", selectElement, false);
+    grp_oper_group.addEventListener("change", selectElement, false);
     grp_oper_group.value = localStorage.getItem("grp_oper_group_id") || "false";
   }
 
@@ -242,7 +242,7 @@ if (grp_oper) {
         grp_oper_class = document.getElementById("grp-oper-class")
         if (grp_oper_class) {
           grp_oper_class.innerHTML = `${payload.class_list}`
-          grp_oper_class.addEventListener("click", selectElement, false);
+          grp_oper_class.addEventListener("change", selectElement, false);
           grp_oper_class.value = `${payload.class_id}`;
           localStorage.setItem("grp_oper_class_id", grp_oper_class.value)
         }
@@ -250,7 +250,7 @@ if (grp_oper) {
         grp_oper_script = document.getElementById("grp-oper-script-list")
         if (grp_oper_script) {
           grp_oper_script.innerHTML = `${payload.script_list}`
-          grp_oper_script.addEventListener("click", getScript, false);
+          grp_oper_script.addEventListener("change", getScript, false);
           grp_oper_script.value = localStorage.getItem("grp_oper_last_script");
           if (grp_oper_script.selectedIndex < 0) {
             grp_oper_script.selectedIndex = "0";
@@ -262,7 +262,7 @@ if (grp_oper) {
           grp_oper_script_multi.innerHTML = `${payload.script_list}`
 
           grp_oper_script_multi.setAttribute("size", Math.min(grp_oper_script_multi.length, 16));
-          grp_oper_script_multi.addEventListener("click", getScriptMulti, false);
+          grp_oper_script_multi.addEventListener("change", getScriptMulti, false);
           let selectedValues = JSON.parse(localStorage.getItem("grp_oper_last_script_multi"))
           if (selectedValues) {
             for (var i = 0; i < grp_oper_script_multi.options.length; i++) {
@@ -323,7 +323,8 @@ if (grp_oper) {
 
           function repeatReq() {
             let id = localStorage.getItem("grp_oper_last_script")
-            let r = confirm("Повторить скрипт " + id + " для оставшихся клиентов?")
+            let text = localStorage.getItem("grp_oper_last_script_text")
+            let r = confirm("Повторить скрипт '" + text + "' для оставшихся клиентов?")
             if (r) {
               channel.push('input', {
                 cmd: "repeat_script",
@@ -368,9 +369,12 @@ if (grp_oper) {
     let index = grp_oper_script.selectedIndex
     if (index >= -1) {
       let script_name
+      let script_text
       if (index >= 0) {
         script_name = grp_oper_script.options[index].value
+        script_text = grp_oper_script.options[index].text
         localStorage.setItem("grp_oper_last_script", script_name)
+        localStorage.setItem("grp_oper_last_script_text", script_text)
       }
       channel.push('input', {
         cmd: "get_script",
@@ -404,7 +408,8 @@ if (grp_oper) {
 
     function updateScript() {
       let id = localStorage.getItem("grp_oper_last_script")
-      let r = confirm(`Выполнить скрипт ${id} для группы?`)
+      let text = localStorage.getItem("grp_oper_last_script_text")
+      let r = confirm(`Выполнить скрипт '${text}' для группы?`)
       if (r) {
         document.querySelector("#go-script-field").innerText = "Wait ..."
         channel.push('input', {
