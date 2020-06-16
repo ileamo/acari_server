@@ -19,6 +19,7 @@ defmodule AcariServer.UserManager.User do
 
     has_many :groups_users, AcariServer.GroupUserAssociation.GroupUser
     has_many :filters, AcariServer.FilterManager.Filter
+    has_many :exports, AcariServer.ExportManager.Export
     has_many :client_comments, AcariServer.ClientCommentManager.ClientComment
     has_many :chat_messages, AcariServer.ChatManager.Chat
 

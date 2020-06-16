@@ -1,13 +1,14 @@
 <h2>Выгрузки</h2>
 
+<form phx-change="select_group_class">
 <div class="input-group mb-4">
   <div class="input-group-prepend">
     <label class="input-group-text">Группа</label>
   </div>
 
-  <select class="custom-select" phx-click="select_group">
+  <select class="custom-select" name="group">
     <%= for {id, name} <- @groups do %>
-      <option value="<%= id %>"  <%= if id == @group_id, do: "selected" %>>
+      <option value="<%= id %>" <%= if id == @group_id, do: "selected" %>>
         <%= name %>
       </option>
     <% end %>
@@ -19,14 +20,15 @@
     <label class="input-group-text">Класс</label>
   </div>
 
-  <select class="custom-select" phx-click="select_class">
+  <select class="custom-select" name="class">
     <%= for {id, name} <- @classes do %>
-      <option value="<%= id %>" ><%= name %></option>
+      <option value="<%= id %>" <%= if id == @class_id, do: "selected" %> ><%= name %></option>
     <% end %>
     <option disabled="disabled">─────────────</option>
-    <option value="nil">Все</option>
+    <option value="nil" <%= if "nil" == @class_id, do: "selected" %> >Все</option>
   </select>
 </div>
+</form>
 
 <div class="container">
   <div class="row">

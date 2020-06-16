@@ -1,25 +1,36 @@
 defmodule AcariServerWeb.ExportLive do
   use AcariServerWeb, :live_view
 
+  alias AcariServer.ExportManager
+  alias AcariServer.ExportManager.Export
+
   @impl true
   def mount(_params, %{"current_user_id" => user_id} = _session, socket) do
-    user = AcariServer.UserManager.get_user!(user_id, :clean)
+    user =
+      AcariServer.UserManager.get_user!(user_id, :clean)
+      |> AcariServer.RepoRO.preload(:exports)
+
+    current_profile =
+      user.exports
+      |> Enum.find(fn %{name: name} -> name == "current" end) || %{}
 
     groups =
       AcariServer.GroupManager.list_groups(user)
       |> Enum.map(fn %{id: id, name: name} -> {to_string(id), name} end)
       |> Enum.sort_by(fn {_, name} -> name end)
 
-    [{group_id, _} | _] = groups
+    group_id = get_selectable(Map.get(current_profile, :profile)["group_id"], groups)
 
     classes =
       AcariServer.ScriptManager.list_scripts()
-      |> Enum.map(fn %{id: id, name: name} -> {id, name} end)
+      |> Enum.map(fn %{id: id, name: name} -> {to_string(id), name} end)
       |> Enum.sort_by(fn {_, name} -> name end)
+
+    class_id = get_selectable(Map.get(current_profile, :profile)["class_id"], classes)
 
     left_scripts =
       (AcariServer.TemplateManager.list_templates("client") ++
-      AcariServer.TemplateManager.list_templates("zabbix"))
+         AcariServer.TemplateManager.list_templates("zabbix"))
       |> Enum.filter(fn %{export: x} -> x end)
       |> Enum.map(fn %{id: id, name: name, description: description} ->
         %{
@@ -81,6 +92,15 @@ defmodule AcariServerWeb.ExportLive do
 
     right = []
 
+    {left, right} =
+      Enum.reduce(
+        Map.get(current_profile, :profile)["right"] || [],
+        {left, right},
+        fn %{"id" => id}, {left, right} ->
+          from_to(left, right, id)
+        end
+      )
+
     type_dscr = [
       node: "Параметры клиентов",
       script: "Скрипты",
@@ -89,10 +109,12 @@ defmodule AcariServerWeb.ExportLive do
 
     {:ok,
      assign(socket,
-      user: user,
+       user: user,
+       current_profile: current_profile,
        type_descr: type_dscr,
        groups: groups,
        group_id: group_id,
+       class_id: class_id,
        classes: classes,
        left: left,
        left_groups: group_left(left),
@@ -102,8 +124,8 @@ defmodule AcariServerWeb.ExportLive do
   end
 
   @impl true
-  def handle_event("select_group", %{"value" => id}, socket) do
-    {:noreply, assign(socket, group_id: id, table: [])}
+  def handle_event("select_group_class", %{"group" => group_id, "class" => class_id}, socket) do
+    {:noreply, assign(socket, group_id: group_id, class_id: class_id, table: [])}
   end
 
   def handle_event("left", params, socket) do
@@ -137,10 +159,9 @@ defmodule AcariServerWeb.ExportLive do
     tag_list =
       socket.assigns.right
       |> Enum.map(fn
-        #%{name: name} -> name
+        # %{name: name} -> name
         %{title: title} -> title
       end)
-
 
     nodes =
       case socket.assigns.group_id do
@@ -156,8 +177,7 @@ defmodule AcariServerWeb.ExportLive do
     value_list =
       nodes
       |> Enum.map(fn %{name: tun_name} = node ->
-        tun_state =
-          AcariServer.Mnesia.get_tunnel_state(tun_name)
+        tun_state = AcariServer.Mnesia.get_tunnel_state(tun_name)
 
         socket.assigns.right
         |> Enum.map(fn
@@ -166,16 +186,22 @@ defmodule AcariServerWeb.ExportLive do
 
           %{type: :node, key: key} ->
             case key do
-              :groups -> node.groups |> Enum.map(fn %{name: name} -> name end) |> Enum.join(", ")
+              :groups ->
+                node.groups |> Enum.map(fn %{name: name} -> name end) |> Enum.join(", ")
 
-            _ -> case Map.get(node, key) do
-              value when is_binary(value) or is_boolean(value) or is_nil(value) or is_number(value) -> value
-              value -> case Jason.encode(value, pretty: true) do
-                {:ok, res} -> res
-                _ -> inspect(value)
-              end
+              _ ->
+                case Map.get(node, key) do
+                  value
+                  when is_binary(value) or is_boolean(value) or is_nil(value) or is_number(value) ->
+                    value
+
+                  value ->
+                    case Jason.encode(value, pretty: true) do
+                      {:ok, res} -> res
+                      _ -> inspect(value)
+                    end
+                end
             end
-          end
 
           %{type: :bogatka, key: key} ->
             (tun_state[key] || [])
@@ -189,13 +215,14 @@ defmodule AcariServerWeb.ExportLive do
             |> Enum.reject(&is_nil/1)
             |> Enum.join("\n")
 
-
           %{name: _} ->
             ""
         end)
       end)
 
     table = [tag_list | value_list]
+
+    save_current_profile(socket)
 
     {:noreply, assign(socket, table: table)}
   end
@@ -257,5 +284,33 @@ defmodule AcariServerWeb.ExportLive do
     left
     |> sort_left()
     |> Enum.group_by(fn %{type: type} -> type end)
+  end
+
+  def save_current_profile(socket) do
+    ass = socket.assigns
+    profile = %{class_id: ass.class_id, group_id: ass.group_id, right: ass.right}
+    attrs = %{user_id: ass.user.id, name: "current", profile: profile}
+
+    case ass.current_profile do
+      %Export{} = export -> ExportManager.update_export(export, attrs)
+      _ -> ExportManager.create_export(attrs)
+    end
+  end
+
+  def get_selectable("nil", _) do
+    "nil"
+  end
+
+  def get_selectable(id, select_list) do
+    if select_pair =
+         Enum.find(select_list, fn {select_id, _} ->
+           select_id == id
+         end) do
+      {select_id, _} = select_pair
+      select_id
+    else
+      [{select_id, _} | _] = select_list
+      select_id
+    end
   end
 end
