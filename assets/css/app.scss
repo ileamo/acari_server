@@ -17,6 +17,7 @@
 @import "~leaflet.fullscreen/Control.FullScreen";
 @import "~leaflet.markercluster/dist/MarkerCluster";
 @import "./markerClusterBogatka.css";
+@import "../node_modules/nprogress/nprogress.css";
 
 .leaflet-control-geosearch .results {
   width: 300px; }

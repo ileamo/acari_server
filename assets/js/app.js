@@ -29,6 +29,7 @@ import socket from "./socket"
 import {
   Socket
 } from "phoenix"
+import NProgress from "nprogress"
 import LiveSocket from "phoenix_live_view"
 
 
@@ -56,6 +57,10 @@ let liveSocket = new LiveSocket("/live", Socket, {
     _csrf_token: csrfToken
   }
 });
+
+NProgress.configure({ parent: '#mainPage' });
+window.addEventListener("phx:page-loading-start", info => NProgress.start())
+window.addEventListener("phx:page-loading-stop", info => NProgress.done())
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()
