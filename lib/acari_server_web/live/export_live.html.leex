@@ -30,7 +30,7 @@
 </div>
 </form>
 
-<div class="container">
+<div class="mx-3">
   <div class="row">
     <div class="col-4 p-0">
       <div class="left-export-live-pannel mr-1 p-2 h-100">
@@ -57,20 +57,40 @@
             <%= for %{id: id, title: title} = el <- @right do %>
             <div class="d-flex flex-row align-items-center justify-content-between">
               <div class="d-flex flex-row align-items-center">
-              <span class="pr-1" phx-click="move_up" phx-value-id="<%= id %>">
-                <i class="fas fa-arrow-up"></i>
-              </span>
-              <span class="pr-1" phx-click="move_down" phx-value-id="<%= id %>">
-                <i class="fas fa-arrow-down"></i>
-              </span>
-              <span phx-click="right" phx-value-id="<%= id %>"><%= title %></span>
+                <span class="pr-1" phx-click="move_up" phx-value-id="<%= id %>">
+                  <i class="fas fa-arrow-up"></i>
+                </span>
+                <span class="pr-1" phx-click="move_down" phx-value-id="<%= id %>">
+                  <i class="fas fa-arrow-down"></i>
+                </span>
+                <span phx-click="right" phx-value-id="<%= id %>"><%= title %></span>
               </div>
-              <span><input  class="form-control" type="text" name="filter[<%= id %>]"
-                            value="<%= el[:filter] %>" placeholder="Фильтр">
-              </span>
+              <div class="d-flex flex-row align-items-center justify-content-between">
+                <span>
+                  <select class="custom-select pl-0 pr-4" name="negative[<%= id %>]">
+                    <option value="true" <%= if "true" == el[:negative], do: "selected" %> ></option>
+                    <option value="not" <%= if "not" == el[:negative], do: "selected" %> >not</option>
+                  </select>
+                </span>
+                <span>
+                  <select class="custom-select pl-0 pr-4" name="oper[<%= id %>]">
+                    <option value="any" <%= if "any" == el[:oper], do: "selected" %> >any</option>
+                    <option value="match" <%= if "match" == el[:oper], do: "selected" %> >match</option>
+                    <option value="==" <%= if "==" == el[:oper], do: "selected" %> >==</option>
+                    <option value=">" <%= if ">" == el[:oper], do: "selected" %> >&gt</option>
+                    <option value=">=" <%= if ">=" == el[:oper], do: "selected" %> >&gt=</option>
+                    <option value="<" <%= if "<" == el[:oper], do: "selected" %> >&lt</option>
+                    <option value="<=" <%= if "<=" == el[:oper], do: "selected" %> >&lt=</option>
+                  </select>
+                </span>
+                <span>
+                  <input  class="form-control" type="text" name="filter[<%= id %>]"
+                              value="<%= el[:filter] %>">
+                </span>
+              </div>
             </div>
             <% end %>
-            <button class="btn btn-outline-secondary mt-3" type="submit">
+            <button class="btn btn-outline-secondary mt-3 float-right" type="submit">
               Предварительный просмотр
             </button>
           <% end %>

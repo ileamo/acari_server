@@ -97,7 +97,11 @@ defmodule AcariServerWeb.ExportLive do
         Map.get(current_profile, :profile)["right"] || [],
         {left, right},
         fn %{"id" => id} = el, {left, right} ->
-          from_to(left, right, id, %{filter: el["filter"]})
+          from_to(left, right, id, %{
+            filter: el["filter"],
+            negative: el["negative"],
+            oper: el["oper"]
+          })
         end
       )
 
@@ -155,11 +159,11 @@ defmodule AcariServerWeb.ExportLive do
     {:noreply, assign(socket, right: right, table: [])}
   end
 
-  def handle_event("filters", %{"_target" => ["filter", item]} = params, socket) do
+  def handle_event("filters", %{"_target" => [field, item]} = params, socket) do
     right =
       socket.assigns.right
       |> Enum.map(fn
-        %{id: ^item} = el -> Map.put(el, :filter, params["filter"][item])
+        %{id: ^item} = el -> Map.put(el, String.to_existing_atom(field), params[field][item])
         el -> el
       end)
 
@@ -242,6 +246,19 @@ defmodule AcariServerWeb.ExportLive do
             ""
         end)
       end)
+      |> Enum.filter(fn x ->
+        Enum.zip(ass.right, x)
+        |> Enum.reduce_while(true, fn
+          {%{oper: "match"} = el, val}, _ ->
+            match(val, el[:filter]) |> neg(el[:negative]) |> cont_halt()
+
+          {%{oper: oper} = el, val}, _ when oper in ["==", "<", "<=", ">", ">="] ->
+            num_cmp(oper, val, el[:filter]) |> neg(el[:negative]) |> cont_halt()
+
+          {el, _}, _ ->
+            neg(true, el[:negative]) |> cont_halt()
+        end)
+      end)
 
     table = [tag_list | value_list]
 
@@ -315,7 +332,7 @@ defmodule AcariServerWeb.ExportLive do
     |> Enum.group_by(fn %{type: type} -> type end)
   end
 
-  def save_current_profile(socket) do
+  defp save_current_profile(socket) do
     ass = socket.assigns
     profile = %{class_id: ass.class_id, group_id: ass.group_id, right: ass.right}
     attrs = %{user_id: ass.user.id, name: "current", profile: profile}
@@ -326,11 +343,11 @@ defmodule AcariServerWeb.ExportLive do
     end
   end
 
-  def get_selectable("nil", _) do
+  defp get_selectable("nil", _) do
     "nil"
   end
 
-  def get_selectable(id, select_list) do
+  defp get_selectable(id, select_list) do
     if select_pair =
          Enum.find(select_list, fn {select_id, _} ->
            select_id == id
@@ -340,6 +357,56 @@ defmodule AcariServerWeb.ExportLive do
     else
       [{select_id, _} | _] = select_list
       select_id
+    end
+  end
+
+  defp match(val, pattern) do
+    Wild.match?(normalize(val), normalize(pattern))
+  end
+
+  defp num_cmp(oper, val, pattern) do
+    with pattern when not is_nil(pattern) <- to_number(pattern),
+         val when not is_nil(val) <- to_number(val) do
+      case oper do
+        "==" -> val == pattern
+        ">" -> val > pattern
+        ">=" -> val >= pattern
+        "<" -> val < pattern
+        "<=" -> val <= pattern
+        _ -> false
+      end
+    else
+      _ -> false
+    end
+  end
+
+  defp to_number(str) when is_binary(str) do
+    str = String.trim(str)
+
+    case Integer.parse(str) do
+      {n, ""} ->
+        n
+
+      _ ->
+        case Float.parse(str) do
+          {n, ""} -> n
+          _ -> nil
+        end
+    end
+  end
+
+  defp to_number(_), do: nil
+
+  defp normalize(str) when is_binary(str), do: String.trim(str)
+  defp normalize(_), do: ""
+
+  defp neg(val, "not"), do: !val
+  defp neg(val, _), do: val
+
+  defp cont_halt(v) do
+    case v do
+      true -> {:cont, true}
+      _ -> {:halt, false}
     end
   end
 end
