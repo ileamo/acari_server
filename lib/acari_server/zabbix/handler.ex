@@ -41,6 +41,19 @@ defmodule AcariServer.Zabbix.Handler do
     )
   end
 
+  def wizard_clear_port(host, port) do
+    with %{} = map <- AcariServer.Mnesia.get_tunnel_state(host)[:wizard],
+         %{^port => sens} <-
+           Enum.group_by(map, fn {key, _} -> AcariServerWeb.TunnelView.get_arg(key) end) do
+      sens =
+        sens
+        |> Enum.map(fn {key, _} -> {key, nil} end)
+        |> Enum.into(%{})
+
+      AcariServer.Mnesia.update_tun_state(host, :wizard, sens)
+    end
+  end
+
   # API
   def handle(host, key, value) do
     GenServer.cast(__MODULE__, {:handle, host, key, value})

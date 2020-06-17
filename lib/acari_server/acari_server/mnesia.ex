@@ -334,7 +334,15 @@ defmodule AcariServer.Mnesia do
           state =
             record
             |> Rec.tun(:state)
-            |> Map.update(tag, data, fn old_data -> old_data |> Map.merge(data) end)
+            |> Map.update(tag, data, fn old_data ->
+              old_data
+              |> Map.merge(data)
+              |> Enum.reject(fn
+                {_, nil} -> true
+                _ -> false
+              end)
+              |> Enum.into(%{})
+            end)
 
           Mnesia.write(Rec.tun(record, state: state))
 
@@ -643,6 +651,7 @@ defmodule AcariServer.Mnesia do
           end)
 
           AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive[#{name}]", 1)
+          AcariServer.Zabbix.Handler.wizard_clear_port(tun, name)
 
           {num, _} =
             update_stat(:down_tun, fn
