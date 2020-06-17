@@ -78,9 +78,7 @@
                     <option value="match" <%= if "match" == el[:oper], do: "selected" %> >match</option>
                     <option value="==" <%= if "==" == el[:oper], do: "selected" %> >==</option>
                     <option value=">" <%= if ">" == el[:oper], do: "selected" %> >&gt</option>
-                    <option value=">=" <%= if ">=" == el[:oper], do: "selected" %> >&gt=</option>
                     <option value="<" <%= if "<" == el[:oper], do: "selected" %> >&lt</option>
-                    <option value="<=" <%= if "<=" == el[:oper], do: "selected" %> >&lt=</option>
                   </select>
                 </span>
                 <span>
@@ -90,6 +88,16 @@
               </div>
             </div>
             <% end %>
+            <div class="d-flex">
+              <div class="flex-grow-1"></div>
+              <div class="mt-2">
+                <select class="custom-select" name="andor">
+                  <option value="and" <%= if "and" == @andor, do: "selected" %> >AND</option>
+                  <option value="or" <%= if "or" == @andor, do: "selected" %> >OR</option>
+                </select>
+              </div>
+            </div>
+
             <button class="btn btn-outline-secondary mt-3 float-right" type="submit">
               Предварительный просмотр
             </button>

@@ -105,6 +105,8 @@ defmodule AcariServerWeb.ExportLive do
         end
       )
 
+    andor = Map.get(current_profile, :profile)["andor"] || "and"
+
     type_dscr = [
       node: "Параметры клиентов",
       script: "Скрипты",
@@ -123,6 +125,7 @@ defmodule AcariServerWeb.ExportLive do
        left: left,
        left_groups: group_left(left),
        right: right,
+       andor: andor,
        table: []
      )}
   end
@@ -159,6 +162,10 @@ defmodule AcariServerWeb.ExportLive do
     {:noreply, assign(socket, right: right, table: [])}
   end
 
+  def handle_event("filters", %{"_target" => ["andor"], "andor" => val}, socket) do
+    {:noreply, assign(socket, andor: val, table: [])}
+  end
+
   def handle_event("filters", %{"_target" => [field, item]} = params, socket) do
     right =
       socket.assigns.right
@@ -170,7 +177,7 @@ defmodule AcariServerWeb.ExportLive do
     {:noreply, assign(socket, right: right, table: [])}
   end
 
-  def handle_event("draw", params, socket) do
+  def handle_event("draw", _params, socket) do
     ass = socket.assigns
 
     tag_list =
@@ -250,13 +257,13 @@ defmodule AcariServerWeb.ExportLive do
         Enum.zip(ass.right, x)
         |> Enum.reduce_while(true, fn
           {%{oper: "match"} = el, val}, _ ->
-            match(val, el[:filter]) |> neg(el[:negative]) |> cont_halt()
+            match(val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
           {%{oper: oper} = el, val}, _ when oper in ["==", "<", "<=", ">", ">="] ->
-            num_cmp(oper, val, el[:filter]) |> neg(el[:negative]) |> cont_halt()
+            num_cmp(oper, val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
           {el, _}, _ ->
-            neg(true, el[:negative]) |> cont_halt()
+            neg(true, el[:negative]) |> cont_halt(ass.andor)
         end)
       end)
 
@@ -334,7 +341,14 @@ defmodule AcariServerWeb.ExportLive do
 
   defp save_current_profile(socket) do
     ass = socket.assigns
-    profile = %{class_id: ass.class_id, group_id: ass.group_id, right: ass.right}
+
+    profile = %{
+      class_id: ass.class_id,
+      group_id: ass.group_id,
+      andor: ass.andor,
+      right: ass.right
+    }
+
     attrs = %{user_id: ass.user.id, name: "current", profile: profile}
 
     case ass.current_profile do
@@ -403,7 +417,14 @@ defmodule AcariServerWeb.ExportLive do
   defp neg(val, "not"), do: !val
   defp neg(val, _), do: val
 
-  defp cont_halt(v) do
+  defp cont_halt(v, "or") do
+    case v do
+      true -> {:halt, true}
+      _ -> {:cont, false}
+    end
+  end
+
+  defp cont_halt(v, _) do
     case v do
       true -> {:cont, true}
       _ -> {:halt, false}
