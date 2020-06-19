@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <%= csrf_meta_tag() %>
+    <%= live_title_tag assigns[:page_title] || "Богатка", suffix: " · NSG" %>
+    <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@socket, "/css/qr_print_live.css") %>"/>
+    <script defer phx-track-static type="text/javascript"
+      src="<%= Routes.static_path(@socket, "/js/qr_print_live.js") %>">
+    </script>
+  </head>
+
+
+
+  <body>
+  <div class="qr-container">
+    <div class="qr-menu noprint">
+      <div>
+        <form phx-submit="draw">
+          <div class="row qr-pads">
+            <div class="column"><input type="text" name="cols" value="<%= @cols %>"> </div>
+            <div class="column" style="text-align: center">X</div>
+            <div class="column"><input type="text" name="rows" value="<%= @rows %>"> </div>
+          </div>
+
+          <%= for {t, n, v} <- [{"Верх", "top", @top},
+                                {"Низ", "bottom", @bottom},
+                                {"Лево", "left", @left},
+                                {"Право", "right", @right},
+                                {"Зазор", "gap", @gap}
+                              ] do %>
+          <div class="row qr-pads">
+            <div class="column"><%= t %></div>
+            <div class="column"><input type="text" name="<%= n %>" value="<%= v %>"> </div>
+            <div class="column">мм</div>
+          </div>
+          <%= end %>
+
+          <button  type="submit">
+            Применить
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="qr-body">
+      <qr-page size="A4" class="qr-print"
+        style="padding-top:<%= @top %>mm; padding-bottom:<%= @bottom %>mm; padding-left:<%= @left %>mm; padding-right:<%= @right %>mm;">
+        <div class="qr-labels"
+            style="grid-gap:<%= get_gap(@gap) %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
+          <%= for qr <- 1..24 do %>
+            <div class="qr-element">*** <%= qr %> ***</div>
+          <%= end %>
+        </div>
+      </qr-page>
+
+      <qr-page size="A4" class="qr-print"
+        style="padding-top:<%= @top %>mm; padding-bottom:<%= @bottom %>mm; padding-left:<%= @left %>mm; padding-right:<%= @right %>mm;">
+        <div class="qr-labels"
+            style="grid-gap:<%= get_gap(@gap) %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
+          <%= for qr <- 1..2 do %>
+            <div class="qr-element">*** <%= qr %> ***</div>
+          <%= end %>
+        </div>
+      </qr-page>
+    </div>
+
+  </div>
+  </body>
+</html>

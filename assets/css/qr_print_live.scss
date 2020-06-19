@@ -1,0 +1,118 @@
+/* This file is for your main application css. */
+@import "./phoenix.css";
+@import "../node_modules/nprogress/nprogress.css";
+/* LiveView specific classes for your customizations */
+body {
+  background: rgb(204, 204, 204);
+}
+
+qr-page {
+  background: white;
+  display: block;
+  margin-bottom: 0.5cm;
+  box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  qr-page-break-inside: avoid;
+  padding: 0;
+}
+
+qr-page[size="A4"] {
+  width: 21cm;
+  height: 296.5mm;
+}
+
+qr-page[size="A4"][layout="landscape"] {
+  width: 29.7cm;
+  height: 21cm;
+}
+
+qr-page[size="A3"] {
+  width: 29.7cm;
+  height: 42cm;
+}
+
+qr-page[size="A3"][layout="landscape"] {
+  width: 42cm;
+  height: 29.7cm;
+}
+
+qr-page[size="A5"] {
+  width: 14.8cm;
+  height: 21cm;
+}
+
+qr-page[size="A5"][layout="landscape"] {
+  width: 21cm;
+  height: 14.8cm;
+}
+
+.qr-container {
+  display: flex;
+  align-items: start;
+}
+
+.qr-menu {
+  width: 32rem;
+  flex: 0 0 32rem;
+  background: #eee;
+  box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-right: 2rem;
+}
+
+.qr-labels {
+  display: grid;
+  height: 100%;
+}
+
+.qr-pads {
+  display: flex;
+  align-items: center;
+}
+
+.qr-element {
+  border: 1px solid;
+  border-radius: 5px;
+}
+@media print {
+  @page {
+    size: auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    background-color: #FFFFFF;
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .qr-container * {
+    visibility: hidden;
+  }
+
+  .qr-body * {
+    visibility: visible;
+  }
+
+  .qr-body  {
+    left: 0;
+    top: 0;
+    position: absolute;
+  }
+
+  .qr-print * {
+    visibility: visible;
+  }
+
+  .noprint {
+    display: none;
+  }
+}

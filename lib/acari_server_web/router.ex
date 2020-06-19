@@ -141,6 +141,11 @@ defmodule AcariServerWeb.Router do
   end
 
   scope "/" do
+    pipe_through [:browser]
+    live "/qr_print/", AcariServerWeb.QRPrintLive
+  end
+
+  scope "/" do
     forward "/zbx", ReverseProxyPlug,
       upstream: &AcariServer.Zabbix.ZbxApi.zbx_get_api_url/0,
       error_callback: &__MODULE__.log_reverse_proxy_error/1

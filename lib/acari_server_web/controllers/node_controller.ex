@@ -185,7 +185,7 @@ defmodule AcariServerWeb.NodeController do
     conn
     |> put_root_layout(false)
     |> put_layout(false)
-    |> render("qr.html", clients_list: clients_list)
+    |> live_render(AcariServerWeb.QRPrintLive, session: %{"clients_list" => clients_list})
   end
 
   def exec_selected(conn, %{"clients_list" => ids, "operation" => "work-order"}) do
