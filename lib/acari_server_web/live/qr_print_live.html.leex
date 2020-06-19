@@ -36,7 +36,7 @@
             <div class="column"><input type="text" name="<%= n %>" value="<%= v %>"> </div>
             <div class="column">мм</div>
           </div>
-          <%= end %>
+          <% end %>
 
           <button  type="submit">
             Применить
@@ -46,25 +46,31 @@
     </div>
 
     <div class="qr-body">
-      <qr-page size="A4" class="qr-print"
-        style="padding-top:<%= @top %>mm; padding-bottom:<%= @bottom %>mm; padding-left:<%= @left %>mm; padding-right:<%= @right %>mm;">
-        <div class="qr-labels"
-            style="grid-gap:<%= get_gap(@gap) %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
-          <%= for qr <- 1..24 do %>
-            <div class="qr-element">*** <%= qr %> ***</div>
-          <%= end %>
-        </div>
-      </qr-page>
+
+      <%
+        qr_pages = @qr_list |> Enum.chunk_every(@qr_for_page, @qr_for_page)
+      %>
+
+      <%= for qr_list <- qr_pages do %>
+
 
       <qr-page size="A4" class="qr-print"
         style="padding-top:<%= @top %>mm; padding-bottom:<%= @bottom %>mm; padding-left:<%= @left %>mm; padding-right:<%= @right %>mm;">
         <div class="qr-labels"
-            style="grid-gap:<%= get_gap(@gap) %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
-          <%= for qr <- 1..2 do %>
-            <div class="qr-element">*** <%= qr %> ***</div>
-          <%= end %>
+            style="grid-gap:<%= @gap %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
+          <%= for %{name: name, qr_svg: qr_svg} <- qr_list do %>
+            <div class="qr-element">
+              <div><%= name %></div>
+              <svg width="<%= @svg_size %>mm" height="<%= @svg_size %>mm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <%= raw(qr_svg) %>
+              </svg>
+            </div>
+          <% end %>
         </div>
       </qr-page>
+
+      <% end %>
+
     </div>
 
   </div>

@@ -73,7 +73,9 @@ qr-page[size="A5"][layout="landscape"] {
 .qr-element {
   border: 1px solid;
   border-radius: 5px;
+  font-size: 3mm;
 }
+
 @media print {
   @page {
     size: auto;
