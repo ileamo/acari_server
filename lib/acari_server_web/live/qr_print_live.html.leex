@@ -31,12 +31,21 @@
                                 {"Право", "right", @right},
                                 {"Зазор", "gap", @gap}
                               ] do %>
-          <div class="row qr-pads">
-            <div class="column"><%= t %></div>
-            <div class="column"><input type="text" name="<%= n %>" value="<%= v %>"> </div>
-            <div class="column">мм</div>
-          </div>
+            <div class="row qr-pads">
+              <div class="column"><%= t %></div>
+              <div class="column"><input type="text" name="<%= n %>" value="<%= v %>"> </div>
+              <div class="column">мм</div>
+            </div>
           <% end %>
+          <div class="row qr-pads">
+            <div class="column">Масштаб</div>
+            <div class="column"><input type="text" name="scale" value="<%= @scale %>"> </div>
+            <div class="column">%</div>
+          </div>
+          <div style="display: flex; align-items: flex-start">
+            <% checked = if @text_up, do: "checked", else: "" %>
+            <div style="margin-right: 1rem;">Текст сверху</div> <input type="checkbox" name="text_up"  <%= checked %>>
+          </div>
 
           <button  type="submit">
             Применить
@@ -44,35 +53,39 @@
         </form>
       </div>
     </div>
+    <%= if @qr_list do %>
+      <div class="qr-body">
+        <%
+          qr_pages = @qr_list |> Enum.chunk_every(@qr_for_page, @qr_for_page)
+        %>
+        <%= for qr_list <- qr_pages do %>
+          <qr-page size="A4" class="qr-print"
+            style="padding-top:<%= @top %>mm; padding-bottom:<%= @bottom %>mm; padding-left:<%= @left %>mm; padding-right:<%= @right %>mm;">
+            <div class="qr-labels"
+                style="grid-gap:<%= @gap %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
+              <%= for %{name: name, qr_svg: qr_svg} <- qr_list do %>
+                <%
+                  svg_size = @svg_size * int(@scale) / 100
+                  svg_style = if @text_up, do: "",
+                    else: "grid-template-columns: 1fr #{svg_size}mm;"
+                %>
 
-    <div class="qr-body">
-
-      <%
-        qr_pages = @qr_list |> Enum.chunk_every(@qr_for_page, @qr_for_page)
-      %>
-
-      <%= for qr_list <- qr_pages do %>
-
-
-      <qr-page size="A4" class="qr-print"
-        style="padding-top:<%= @top %>mm; padding-bottom:<%= @bottom %>mm; padding-left:<%= @left %>mm; padding-right:<%= @right %>mm;">
-        <div class="qr-labels"
-            style="grid-gap:<%= @gap %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
-          <%= for %{name: name, qr_svg: qr_svg} <- qr_list do %>
-            <div class="qr-element">
-              <div><%= name %></div>
-              <svg width="<%= @svg_size %>mm" height="<%= @svg_size %>mm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <%= raw(qr_svg) %>
-              </svg>
+                <div class="qr-element" style="<%= svg_style %>">
+                  <div class="qr-label-header"><%= name %></div>
+                  <div class="qr-label-qr">
+                    <svg width="<%= svg_size %>mm" height="<%= svg_size %>mm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <%= raw(qr_svg) %>
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
             </div>
-          <% end %>
-        </div>
-      </qr-page>
-
-      <% end %>
-
-    </div>
-
+          </qr-page>
+        <% end %>
+      </div>
+    <% else %>
+      <h3>Подождите, идет генерация QR кодов (<%= length(@node_ids) %>)...</h3>
+    <% end %>
   </div>
   </body>
 </html>

@@ -67,15 +67,33 @@ qr-page[size="A5"][layout="landscape"] {
 
 .qr-pads {
   display: flex;
-  align-items: center;
+  align-items: baseline;
 }
 
 .qr-element {
+  display: grid;
   border: 1px solid;
   border-radius: 5px;
   font-size: 3mm;
+  overflow: hidden;
 }
 
+.qr-label-header {
+  overflow: hidden;
+  word-break:break-all;
+  padding-left: 1mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.qr-label-qr {
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 @media print {
   @page {
     size: auto;
@@ -104,7 +122,7 @@ qr-page[size="A5"][layout="landscape"] {
     visibility: visible;
   }
 
-  .qr-body  {
+  .qr-body {
     left: 0;
     top: 0;
     position: absolute;

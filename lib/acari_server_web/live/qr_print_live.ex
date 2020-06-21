@@ -3,12 +3,46 @@ defmodule AcariServerWeb.QRPrintLive do
 
   @impl true
   def mount(_params, %{"clients_list" => ids} = _session, socket) do
+    IO.puts("MOUNT")
+    node_ids = String.split(ids, ",")
+
+    socket =
+      assign(socket,
+        node_ids: node_ids,
+        qr_list: nil,
+        qr_num: 0,
+        top: "15",
+        bottom: "15",
+        left: "15",
+        right: "15",
+        gap: "1",
+        cols: "3",
+        rows: "8",
+        scale: "100",
+        text_up: nil,
+      )
+
+    ass = socket.assigns
+
+    send(self(), :after_mount)
+
+    {:ok,
+     assign(socket,
+       qr_for_page: int(ass.cols) * int(ass.rows),
+       svg_size: get_svg_size(ass)
+     )}
+  end
+
+  @impl true
+  def handle_info(:after_mount, socket) do
+    IO.puts("After MOUNT")
     url =
       AcariServer.SysConfigManager.get_conf_by_key("system.url.mobile") ||
         "http://localhost"
 
+
     qr_list =
-      String.split(ids, ",")
+      socket.assigns.node_ids
       |> Enum.filter(fn x ->
         case Integer.parse(x) do
           {_, ""} -> true
@@ -26,30 +60,12 @@ defmodule AcariServerWeb.QRPrintLive do
         }
       end)
 
-    socket =
-      assign(socket,
-        qr_list: qr_list,
-        qr_num: length(qr_list),
-        top: "15",
-        bottom: "15",
-        left: "15",
-        right: "15",
-        gap: "1",
-        cols: "3",
-        rows: "8"
-      )
-
-    ass = socket.assigns
-
-    {:ok,
-     assign(socket,
-       qr_for_page: int(ass.cols) * int(ass.rows),
-       svg_size: get_svg_size(ass)
-     )}
+    {:noreply, assign(socket, qr_list: qr_list)}
   end
 
   @impl true
   def handle_event("draw", params, socket) do
+    IO.inspect(params)
     socket = validate(socket, params)
     ass = socket.assigns
 
@@ -66,9 +82,17 @@ defmodule AcariServerWeb.QRPrintLive do
   end
 
   defp get_svg_size(ass) do
+    rows = int(ass.rows)
+    cols = int(ass.cols)
+    top = float(ass.top)
+    bottom = float(ass.bottom)
+    left = float(ass.left)
+    right = float(ass.right)
+    gap =   float(ass.gap)
+
     min(
-      (297 - float(ass.top) - float(ass.bottom)) / int(ass.rows) - 5,
-      (210 - float(ass.left) - float(ass.right)) / int(ass.cols) - 2
+      (297 - top - bottom - gap * (rows - 1) ) / rows,
+      (210 - left - right - gap * (cols - 1)) / cols
     )
   end
 
@@ -82,7 +106,9 @@ defmodule AcariServerWeb.QRPrintLive do
       float(ass, :right, params["right"]),
       float(ass, :gap, params["gap"]),
       int(ass, :cols, params["cols"]),
-      int(ass, :rows, params["rows"])
+      int(ass, :rows, params["rows"]),
+      int(ass, :scale, params["scale"]),
+      {:text_up, params["text_up"]}
     ]
 
     assign(socket, params)
