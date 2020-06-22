@@ -12,7 +12,7 @@ defmodule AcariServerWeb.ExportLive do
 
     current_profile =
       user.exports
-      |> Enum.find(fn %{name: name} -> name == "current" end) || %{}
+      |> Enum.find(fn %{name: name, type: type} -> name == "_current" and type == "export" end) || %{}
 
     groups =
       AcariServer.GroupManager.list_groups(user)
@@ -349,7 +349,7 @@ defmodule AcariServerWeb.ExportLive do
       right: ass.right
     }
 
-    attrs = %{user_id: ass.user.id, name: "current", profile: profile}
+    attrs = %{user_id: ass.user.id, name: "_current", type: "export", profile: profile}
 
     case ass.current_profile do
       %Export{} = export -> ExportManager.update_export(export, attrs)

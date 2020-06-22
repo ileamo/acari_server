@@ -1,25 +1,43 @@
 defmodule AcariServerWeb.QRPrintLive do
   use AcariServerWeb, :live_view
+  alias AcariServer.ExportManager
+  alias AcariServer.ExportManager.Export
 
   @impl true
-  def mount(_params, %{"clients_list" => ids} = _session, socket) do
+  def mount(_params, %{"current_user_id" => user_id, "clients_list" => ids} = _session, socket) do
     IO.puts("MOUNT")
+
+    user =
+      AcariServer.UserManager.get_user!(user_id, :clean)
+      |> AcariServer.RepoRO.preload(:exports)
+
+    current_profile =
+      user.exports
+      |> Enum.find(fn %{name: name, type: type} -> name == "_current" and type == "qr" end) ||
+        %{}
+
+    prof = current_profile.profile
+
+    IO.inspect(current_profile)
+
     node_ids = String.split(ids, ",")
 
     socket =
       assign(socket,
+        user: user,
+        current_profile: current_profile,
         node_ids: node_ids,
         qr_list: nil,
         qr_num: 0,
-        top: "15",
-        bottom: "15",
-        left: "15",
-        right: "15",
-        gap: "1",
-        cols: "3",
-        rows: "8",
-        scale: "100",
-        text_up: nil,
+        top: prof["top"] || "15",
+        bottom: prof["bottom"] || "15",
+        left: prof["left"] || "15",
+        right: prof["right"] || "15",
+        gap: prof["gap"] || "1",
+        cols: prof["cols"] || "3",
+        rows: prof["rows"] || "8",
+        scale: prof["scale"] || "100",
+        text_up: prof["text_up"] || nil
       )
 
     ass = socket.assigns
@@ -36,10 +54,10 @@ defmodule AcariServerWeb.QRPrintLive do
   @impl true
   def handle_info(:after_mount, socket) do
     IO.puts("After MOUNT")
+
     url =
       AcariServer.SysConfigManager.get_conf_by_key("system.url.mobile") ||
         "http://localhost"
-
 
     qr_list =
       socket.assigns.node_ids
@@ -67,6 +85,9 @@ defmodule AcariServerWeb.QRPrintLive do
   def handle_event("draw", params, socket) do
     IO.inspect(params)
     socket = validate(socket, params)
+
+    save_current_profile(socket)
+
     ass = socket.assigns
 
     {:noreply,
@@ -88,10 +109,10 @@ defmodule AcariServerWeb.QRPrintLive do
     bottom = float(ass.bottom)
     left = float(ass.left)
     right = float(ass.right)
-    gap =   float(ass.gap)
+    gap = float(ass.gap)
 
     min(
-      (297 - top - bottom - gap * (rows - 1) ) / rows,
+      (297 - top - bottom - gap * (rows - 1)) / rows,
       (210 - left - right - gap * (cols - 1)) / cols
     )
   end
@@ -142,5 +163,28 @@ defmodule AcariServerWeb.QRPrintLive do
        {n, ""} -> to_string(n)
        _ -> ass[tag] <> " "
      end}
+  end
+
+  defp save_current_profile(socket) do
+    ass = socket.assigns
+
+    profile = %{
+      top: ass.top,
+      bottom: ass.bottom,
+      left: ass.left,
+      right: ass.right,
+      gap: ass.gap,
+      cols: ass.cols,
+      rows: ass.rows,
+      scale: ass.scale,
+      text_up: ass.text_up
+    }
+
+    attrs = %{user_id: ass.user.id, name: "_current", type: "qr", profile: profile}
+
+    case ass.current_profile do
+      %Export{} = export -> ExportManager.update_export(export, attrs)
+      _ -> ExportManager.create_export(attrs)
+    end
   end
 end
