@@ -46,6 +46,10 @@
             <% checked = if @text_up, do: "checked", else: "" %>
             <div style="margin-right: 1rem;">Текст сверху</div> <input type="checkbox" name="text_up"  <%= checked %>>
           </div>
+          <div style="display: flex; align-items: flex-start">
+            <% checked = if @border, do: "checked", else: "" %>
+            <div style="margin-right: 1rem;">Рамка</div> <input type="checkbox" name="border"  <%= checked %>>
+          </div>
 
           <button  type="submit">
             Применить
@@ -79,9 +83,11 @@
                   svg_size = @svg_size * int(@scale) / 100
                   svg_style = if @text_up, do: "",
                     else: "grid-template-columns: 1fr #{svg_size}mm;"
+
+                  border = if @border, do: "border: 1px solid;", else: "margin: 1px;"
                 %>
 
-                <div class="qr-element" style="<%= svg_style %>">
+                <div class="qr-element" style="<%= svg_style %> <%= border %>">
                   <div class="qr-label-header"><%= name %></div>
                   <div class="qr-label-qr">
                     <svg width="<%= svg_size %>mm" height="<%= svg_size %>mm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">

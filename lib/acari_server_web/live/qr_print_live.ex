@@ -13,7 +13,7 @@ defmodule AcariServerWeb.QRPrintLive do
     current_profile =
       user.exports
       |> Enum.find(fn %{name: name, type: type} -> name == "_current" and type == "qr" end) ||
-        %{}
+        %{profile: %{}}
 
     prof = current_profile.profile
 
@@ -37,7 +37,8 @@ defmodule AcariServerWeb.QRPrintLive do
         cols: prof["cols"] || "3",
         rows: prof["rows"] || "8",
         scale: prof["scale"] || "100",
-        text_up: prof["text_up"] || nil
+        text_up: prof["text_up"] || nil,
+        border: prof["border"] || "on"
       )
 
     ass = socket.assigns
@@ -152,7 +153,8 @@ defmodule AcariServerWeb.QRPrintLive do
       int(ass, :cols, params["cols"]),
       int(ass, :rows, params["rows"]),
       int(ass, :scale, params["scale"]),
-      {:text_up, params["text_up"]}
+      {:text_up, params["text_up"]},
+      {:border, params["border"]}
     ]
 
     assign(socket, params)
@@ -204,7 +206,7 @@ defmodule AcariServerWeb.QRPrintLive do
       cols: ass.cols,
       rows: ass.rows,
       scale: ass.scale,
-      text_up: ass.text_up
+      border: ass.border
     }
 
     attrs = %{user_id: ass.user.id, name: name, type: "qr", profile: profile}
