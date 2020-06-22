@@ -5,7 +5,6 @@ defmodule AcariServerWeb.QRPrintLive do
 
   @impl true
   def mount(_params, %{"current_user_id" => user_id, "clients_list" => ids} = _session, socket) do
-    IO.puts("MOUNT")
 
     user =
       AcariServer.UserManager.get_user!(user_id, :clean)
@@ -18,7 +17,6 @@ defmodule AcariServerWeb.QRPrintLive do
 
     prof = current_profile.profile
 
-    IO.inspect(current_profile)
 
     node_ids = String.split(ids, ",")
 
@@ -26,6 +24,8 @@ defmodule AcariServerWeb.QRPrintLive do
       assign(socket,
         user: user,
         current_profile: current_profile,
+        save_prof: false,
+        save_err: "",
         node_ids: node_ids,
         qr_list: nil,
         qr_num: 0,
@@ -53,7 +53,6 @@ defmodule AcariServerWeb.QRPrintLive do
 
   @impl true
   def handle_info(:after_mount, socket) do
-    IO.puts("After MOUNT")
 
     url =
       AcariServer.SysConfigManager.get_conf_by_key("system.url.mobile") ||
@@ -82,19 +81,43 @@ defmodule AcariServerWeb.QRPrintLive do
   end
 
   @impl true
+  def handle_event("change", _params, socket) do
+    {:noreply, assign(socket, save_prof: false)}
+  end
+
   def handle_event("draw", params, socket) do
-    IO.inspect(params)
     socket = validate(socket, params)
 
-    save_current_profile(socket)
+    save_profile(socket, "_current")
 
     ass = socket.assigns
 
     {:noreply,
      assign(socket,
+       save_prof: true,
        qr_for_page: int(ass.cols) * int(ass.rows),
        svg_size: get_svg_size(ass)
      )}
+  end
+
+  def handle_event("save", %{"profile_name" => name}, socket) do
+
+    {status, err} =
+      case String.trim(name) do
+        "" ->
+          {true, "Задайте имя профиля"}
+
+        "_current" ->
+          {true, "Имя профиля не может быть _current"}
+
+        name ->
+          case get_profile(socket.assigns.user.id, name) do
+            %Export{} -> {true, "Профиль с таким именем уже существует"}
+            _ -> {false, nil}
+          end
+      end
+
+    {:noreply, assign(socket, save_prof: status, save_err: err)}
   end
 
   def handle_event(event, params, socket) do
@@ -165,7 +188,11 @@ defmodule AcariServerWeb.QRPrintLive do
      end}
   end
 
-  defp save_current_profile(socket) do
+  defp get_profile(user_id, name) do
+    ExportManager.get_export_by(user_id, "qr", name)
+  end
+
+  defp save_profile(socket, name) do
     ass = socket.assigns
 
     profile = %{
@@ -180,9 +207,9 @@ defmodule AcariServerWeb.QRPrintLive do
       text_up: ass.text_up
     }
 
-    attrs = %{user_id: ass.user.id, name: "_current", type: "qr", profile: profile}
+    attrs = %{user_id: ass.user.id, name: name, type: "qr", profile: profile}
 
-    case ass.current_profile do
+    case  get_profile(ass.user.id, name) do
       %Export{} = export -> ExportManager.update_export(export, attrs)
       _ -> ExportManager.create_export(attrs)
     end

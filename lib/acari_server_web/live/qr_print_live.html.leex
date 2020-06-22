@@ -51,6 +51,17 @@
             Применить
           </button>
         </form>
+
+        <%= if false && @save_prof do %>
+          <form phx-submit="save">
+            Сохранить профиль
+            <input type="text" name="profile_name" placeholder="Введите имя профиля">
+            <button  type="submit">
+              Сохранить
+            </button>
+          </form>
+        <% end %>
+        <p><%= @save_err %></p>
       </div>
     </div>
     <%= if @qr_list do %>

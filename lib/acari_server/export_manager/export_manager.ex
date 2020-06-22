@@ -18,14 +18,13 @@ defmodule AcariServer.ExportManager do
 
   """
   def list_exports do
-    Repo.all(Export)
+    RepoRO.all(Export)
   end
 
   def list_exports(user) do
-    Repo.all(Export)
+    RepoRO.all(Export)
     |> Enum.filter(fn %{user_id: user_id, common: common} -> common or user.id == user_id end)
   end
-
 
   @doc """
   Gets a single export.
@@ -41,7 +40,12 @@ defmodule AcariServer.ExportManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_export!(id), do: Repo.get!(Export, id)
+  def get_export!(id), do: RepoRO.get!(Export, id)
+
+  def get_export_by(user_id, type, name) do
+    Export
+    |> Repo.get_by(user_id: user_id, type: type, name: name)
+  end
 
   @doc """
   Creates a export.
