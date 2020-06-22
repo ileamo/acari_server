@@ -594,8 +594,9 @@ defmodule AcariServerWeb.GrpOperChannel do
             script
             |> Enum.map(fn
               {tag, %{data: data}} -> {tag, try_to_number(data)}
-              x -> x
+              _ -> nil
             end)
+            |> Enum.reject(&is_nil/1)
 
           lua_state =
             Sandbox.init()
