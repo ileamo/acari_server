@@ -64,7 +64,7 @@ defmodule TemplFunc do
   end
 
   defp include_templ(body, render) do
-    [_, templ_name, json] = Regex.run(~r/^\s*([^\s]+)\s+(.*)$/, body)
+    [_, templ_name, json] = Regex.run(~r/^\s*([^\s]+)\s+(.*)/, body)
 
     with %AcariServer.TemplateManager.Template{} = templ <-
            AcariServer.TemplateManager.get_template_by_name(templ_name) do
