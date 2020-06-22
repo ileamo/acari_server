@@ -46,15 +46,16 @@
             <% checked = if @text_up, do: "checked", else: "" %>
             <div style="margin-right: 1rem;">Текст сверху</div> <input type="checkbox" name="text_up"  <%= checked %>>
           </div>
-          <div style="display: flex; align-items: flex-start">
-            <% checked = if @border, do: "checked", else: "" %>
-            <div style="margin-right: 1rem;">Рамка</div> <input type="checkbox" name="border"  <%= checked %>>
-          </div>
-
-          <button  type="submit">
+          <button class="button" type="submit">
             Применить
           </button>
         </form>
+        <div style="display: flex; align-items: flex-start">
+          <% checked = if @border, do: "checked", else: "" %>
+          <div style="margin-right: 1rem;">Рамка</div>
+          <input phx-click="border" type="checkbox" <%= checked %>>
+        </div>
+
 
         <%= if false && @save_prof do %>
           <form phx-submit="save">
@@ -78,7 +79,7 @@
             style="padding-top:<%= @top %>mm; padding-bottom:<%= @bottom %>mm; padding-left:<%= @left %>mm; padding-right:<%= @right %>mm;">
             <div class="qr-labels"
                 style="grid-gap:<%= @gap %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
-              <%= for %{name: name, qr_svg: qr_svg} <- qr_list do %>
+              <%= for {%{name: name, qr_svg: qr_svg}, idx} <- qr_list do %>
                 <%
                   svg_size = @svg_size * int(@scale) / 100
                   svg_style = if @text_up, do: "",
@@ -87,7 +88,8 @@
                   border = if @border, do: "border: 1px solid;", else: "margin: 1px;"
                 %>
 
-                <div class="qr-element" style="<%= svg_style %> <%= border %>">
+                <div class="qr-element" phx-click="empty" phx-value-idx="<%= idx %>"
+                style="<%= svg_style %> <%= border %>">
                   <div class="qr-label-header"><%= name %></div>
                   <div class="qr-label-qr">
                     <svg width="<%= svg_size %>mm" height="<%= svg_size %>mm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">

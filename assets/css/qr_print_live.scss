@@ -6,6 +6,11 @@ body {
   background: rgb(204, 204, 204);
 }
 
+.button {
+  text-transform: none;
+    font-size: 1.5rem;
+}
+
 qr-page {
   background: white;
   display: block;
@@ -79,12 +84,11 @@ qr-page[size="A5"][layout="landscape"] {
 
 .qr-label-header {
   overflow: hidden;
-  word-break:break-all;
+  word-break: break-all;
   padding-left: 1mm;
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 .qr-label-qr {

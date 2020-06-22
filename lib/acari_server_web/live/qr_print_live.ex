@@ -3,9 +3,10 @@ defmodule AcariServerWeb.QRPrintLive do
   alias AcariServer.ExportManager
   alias AcariServer.ExportManager.Export
 
+  @empty_qr %{name: nil, qr_svg: nil}
+
   @impl true
   def mount(_params, %{"current_user_id" => user_id, "clients_list" => ids} = _session, socket) do
-
     user =
       AcariServer.UserManager.get_user!(user_id, :clean)
       |> AcariServer.RepoRO.preload(:exports)
@@ -17,7 +18,6 @@ defmodule AcariServerWeb.QRPrintLive do
 
     prof = current_profile.profile
 
-
     node_ids = String.split(ids, ",")
 
     socket =
@@ -28,7 +28,9 @@ defmodule AcariServerWeb.QRPrintLive do
         save_err: "",
         node_ids: node_ids,
         qr_list: nil,
+        qr_pages: nil,
         qr_num: 0,
+        qr_empty: [],
         top: prof["top"] || "15",
         bottom: prof["bottom"] || "15",
         left: prof["left"] || "15",
@@ -38,7 +40,7 @@ defmodule AcariServerWeb.QRPrintLive do
         rows: prof["rows"] || "8",
         scale: prof["scale"] || "100",
         text_up: prof["text_up"] || nil,
-        border: prof["border"] || "on"
+        border: "on"
       )
 
     ass = socket.assigns
@@ -54,7 +56,6 @@ defmodule AcariServerWeb.QRPrintLive do
 
   @impl true
   def handle_info(:after_mount, socket) do
-
     url =
       AcariServer.SysConfigManager.get_conf_by_key("system.url.mobile") ||
         "http://localhost"
@@ -77,6 +78,7 @@ defmodule AcariServerWeb.QRPrintLive do
           address: address
         }
       end)
+      |> Enum.with_index()
 
     {:noreply, assign(socket, qr_list: qr_list)}
   end
@@ -84,6 +86,38 @@ defmodule AcariServerWeb.QRPrintLive do
   @impl true
   def handle_event("change", _params, socket) do
     {:noreply, assign(socket, save_prof: false)}
+  end
+
+  def handle_event("empty", %{"idx" => idx}, socket) do
+    qr_empty = socket.assigns.qr_empty
+    idx = String.to_integer(idx)
+
+    qr_empty =
+      case idx in qr_empty do
+        true -> qr_empty |> Enum.reject(fn x -> x == idx end)
+        _ -> [idx | qr_empty] |> Enum.sort()
+      end
+
+    qr_list =
+      socket.assigns.qr_list
+      |> Enum.map(fn {x, _} -> x end)
+      |> Enum.reject(fn %{name: name} -> is_nil(name) end)
+
+    qr_list =
+      qr_empty
+      |> Enum.reduce(qr_list, fn idx, qr_list ->
+        qr_list |> List.insert_at(idx, @empty_qr)
+      end)
+
+    qr_list =
+      qr_list
+      |> Enum.with_index()
+
+    {:noreply, assign(socket, qr_empty: qr_empty, qr_list: qr_list)}
+  end
+
+  def handle_event("border", params, socket) do
+    {:noreply, assign(socket, border: params["value"])}
   end
 
   def handle_event("draw", params, socket) do
@@ -102,7 +136,6 @@ defmodule AcariServerWeb.QRPrintLive do
   end
 
   def handle_event("save", %{"profile_name" => name}, socket) do
-
     {status, err} =
       case String.trim(name) do
         "" ->
@@ -153,8 +186,7 @@ defmodule AcariServerWeb.QRPrintLive do
       int(ass, :cols, params["cols"]),
       int(ass, :rows, params["rows"]),
       int(ass, :scale, params["scale"]),
-      {:text_up, params["text_up"]},
-      {:border, params["border"]}
+      {:text_up, params["text_up"]}
     ]
 
     assign(socket, params)
@@ -205,13 +237,12 @@ defmodule AcariServerWeb.QRPrintLive do
       gap: ass.gap,
       cols: ass.cols,
       rows: ass.rows,
-      scale: ass.scale,
-      border: ass.border
+      scale: ass.scale
     }
 
     attrs = %{user_id: ass.user.id, name: name, type: "qr", profile: profile}
 
-    case  get_profile(ass.user.id, name) do
+    case get_profile(ass.user.id, name) do
       %Export{} = export -> ExportManager.update_export(export, attrs)
       _ -> ExportManager.create_export(attrs)
     end
