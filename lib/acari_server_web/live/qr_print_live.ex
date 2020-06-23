@@ -93,9 +93,9 @@ defmodule AcariServerWeb.QRPrintLive do
   end
 
   @impl true
-  def handle_event("change", %{"_target" => ["text_up"]} = params, socket) do
-    {:noreply, assign(socket, save_prof: false, text_up: params["textup"])}
-  end
+  # def handle_event("change", %{"_target" => ["text_up"]} = params, socket) do
+  #   {:noreply, assign(socket, save_prof: false, text_up: params["textup"])}
+  # end
 
   def handle_event("change", _params, socket) do
     {:noreply, assign(socket, save_prof: false)}

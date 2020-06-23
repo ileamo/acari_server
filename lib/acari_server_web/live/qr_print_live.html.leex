@@ -70,11 +70,11 @@
             <div class="column">%</div>
           </div>
           <div style="display: flex; align-items: flex-start">
-            <% checked = if @text_up, do: "checked", else: "" %>
-            <div style="margin-right: 1rem;">Текст сверху</div> <input type="checkbox" name="text_up"  <%= checked %>>
+            <div style="margin-right: 1rem;">Текст снизу</div>
+            <%= tag(:input, name: "text_up", type: "checkbox", checked: @text_up) %>
           </div>
           <div class="qr-apply">
-            <button class="button" type="submit">
+            <button class="button" type="submit" phx-disable-with="Ждите...">
               Применить
             </button>
             <span>
@@ -97,9 +97,8 @@
         <% end %>
 
         <div style="display: flex; align-items: flex-start">
-          <% checked = if @border, do: "checked", else: "" %>
           <div style="margin-right: 1rem;">Рамка</div>
-          <input phx-click="border" type="checkbox" <%= checked %>>
+          <%= tag(:input, phx_click: "border", type: "checkbox", checked: @border) %>
         </div>
 
 
@@ -126,12 +125,17 @@
 
                 <div class="qr-element" phx-click="empty" phx-value-idx="<%= idx %>"
                 style="<%= svg_style %> <%= border %>">
+                <%= if !@text_up do %>
                   <div class="qr-label-header"><%= name %></div>
+                <% end %>
                   <div class="qr-label-qr">
                     <svg width="<%= svg_size %>mm" height="<%= svg_size %>mm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                     <%= raw(qr_svg) %>
                     </svg>
                   </div>
+                  <%= if @text_up do %>
+                    <div class="qr-label-header"><%= name %></div>
+                  <% end %>
                 </div>
               <% end %>
             </div>
