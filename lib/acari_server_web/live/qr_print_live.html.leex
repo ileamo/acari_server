@@ -18,7 +18,34 @@
   <div class="qr-container">
     <div class="qr-menu noprint">
       <div>
-        <form phx-submit="draw">
+        <form phx-change="change_prof" style="margin-bottom: 0;">
+          <div style="display: flex;align-items: baseline;justify-content: space-between;">
+            <div> Профиль </div>
+            <div>
+              <%= if @prof_id != nil do %>
+                <i class="far fa-trash-alt" phx-click="delete_prof"></i>
+              <% end %>
+
+              <select name="prof">
+                <option value="nil">Выбрать</option>
+                <%= for %{id: id, name: name} <- @profiles do %>
+                  <option value="<%= id %>" <%= if id == @prof_id, do: "selected" %>><%= name %></option>
+                <% end %>
+              </select>
+            </div>
+          </div>
+        </form>
+
+        <%= if @delete_prof_ack do %>
+          <div> Удалить профиль? </div>
+            <div style="display: flex;align-items: baseline;justify-content: space-between;">
+              <button phx-click="delete_prof_no">Нет</button>
+              <button phx-click="delete_prof_yes" value="<%= @prof_id %>">Да</button>
+            </div>
+        <% end %>
+
+        <hr>
+        <form phx-submit="draw" phx-change="change">
           <div class="row qr-pads">
             <div class="column"><input type="text" name="cols" value="<%= @cols %>"> </div>
             <div class="column" style="text-align: center">X</div>
@@ -46,10 +73,29 @@
             <% checked = if @text_up, do: "checked", else: "" %>
             <div style="margin-right: 1rem;">Текст сверху</div> <input type="checkbox" name="text_up"  <%= checked %>>
           </div>
-          <button class="button" type="submit">
-            Применить
-          </button>
+          <div class="qr-apply">
+            <button class="button" type="submit">
+              Применить
+            </button>
+            <span>
+              <%= if @save_prof do %>
+                <i class="far fa-save" phx-click="save_prof_show"></i>
+              <% end %>
+            </span>
+          </div>
         </form>
+
+        <%= if @save_prof_show && @save_prof do %>
+          <form phx-submit="save">
+            <input type="text" name="profile_name" placeholder="Введите имя профиля"
+                    value="<%= @save_prof_name %>" style="margin-bottom: 0;">
+            <p style="margin-top: 0;"><%= @save_err %></p>
+            <button  type="submit">
+              Сохранить
+            </button>
+          </form>
+        <% end %>
+
         <div style="display: flex; align-items: flex-start">
           <% checked = if @border, do: "checked", else: "" %>
           <div style="margin-right: 1rem;">Рамка</div>
@@ -57,16 +103,6 @@
         </div>
 
 
-        <%= if false && @save_prof do %>
-          <form phx-submit="save">
-            Сохранить профиль
-            <input type="text" name="profile_name" placeholder="Введите имя профиля">
-            <button  type="submit">
-              Сохранить
-            </button>
-          </form>
-        <% end %>
-        <p><%= @save_err %></p>
       </div>
     </div>
     <%= if @qr_list do %>
@@ -100,6 +136,7 @@
               <% end %>
             </div>
           </qr-page>
+          <div class="noprint" style="margin: 2rem;"></div>
         <% end %>
       </div>
     <% else %>

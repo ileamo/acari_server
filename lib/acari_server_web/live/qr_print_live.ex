@@ -5,11 +5,14 @@ defmodule AcariServerWeb.QRPrintLive do
 
   @empty_qr %{name: nil, qr_svg: nil}
 
+
   @impl true
   def mount(_params, %{"current_user_id" => user_id, "clients_list" => ids} = _session, socket) do
     user =
       AcariServer.UserManager.get_user!(user_id, :clean)
       |> AcariServer.RepoRO.preload(:exports)
+
+    profiles = AcariServer.ExportManager.list_exports(:type, "qr")
 
     current_profile =
       user.exports
@@ -23,19 +26,25 @@ defmodule AcariServerWeb.QRPrintLive do
     socket =
       assign(socket,
         user: user,
+        profiles: profiles,
         current_profile: current_profile,
+        prof_id: nil,
+        delete_prof_ack: false,
         save_prof: false,
+        save_prof_show: false,
+        save_prof_ack: false,
+        save_prof_name: "",
         save_err: "",
         node_ids: node_ids,
         qr_list: nil,
         qr_pages: nil,
         qr_num: 0,
         qr_empty: [],
-        top: prof["top"] || "15",
-        bottom: prof["bottom"] || "15",
-        left: prof["left"] || "15",
-        right: prof["right"] || "15",
-        gap: prof["gap"] || "1",
+        top: prof["top"] || "8.1",
+        bottom: prof["bottom"] || "8.1",
+        left: prof["left"] || "13.3",
+        right: prof["right"] || "13.3",
+        gap: prof["gap"] || "0",
         cols: prof["cols"] || "3",
         rows: prof["rows"] || "8",
         scale: prof["scale"] || "100",
@@ -84,6 +93,10 @@ defmodule AcariServerWeb.QRPrintLive do
   end
 
   @impl true
+  def handle_event("change", %{"_target" => ["text_up"]} = params, socket) do
+    {:noreply, assign(socket, save_prof: false, text_up: params["textup"])}
+  end
+
   def handle_event("change", _params, socket) do
     {:noreply, assign(socket, save_prof: false)}
   end
@@ -120,6 +133,62 @@ defmodule AcariServerWeb.QRPrintLive do
     {:noreply, assign(socket, border: params["value"])}
   end
 
+  def handle_event("delete_prof", _, socket) do
+    {:noreply, assign(socket, delete_prof_ack: true)}
+  end
+
+  def handle_event("delete_prof_no", _, socket) do
+    {:noreply, assign(socket, delete_prof_ack: false)}
+  end
+
+  def handle_event("delete_prof_yes", %{"value" => prof_id}, socket) do
+    prof =
+      socket.assigns.profiles
+      |> Enum.find(fn %{id: id} -> id == String.to_integer(prof_id) end)
+
+    ExportManager.delete_export(prof)
+
+    {:noreply,
+     assign(socket,
+       delete_prof_ack: false,
+       profiles: AcariServer.ExportManager.list_exports(:type, "qr")
+     )}
+  end
+
+  def handle_event("change_prof", %{"prof" => "nil"}, socket) do
+    {:noreply, assign(socket, prof_id: nil)}
+  end
+
+  def handle_event("change_prof", %{"prof" => prof_id}, socket) do
+    prof_id = String.to_integer(prof_id)
+
+    prof =
+      (socket.assigns.profiles
+       |> Enum.find(fn %{id: id} -> id == prof_id end)).profile
+
+    socket =
+      assign(socket,
+        top: prof["top"] || "8.1",
+        bottom: prof["bottom"] || "8.1",
+        left: prof["left"] || "13.3",
+        right: prof["right"] || "13.3",
+        gap: prof["gap"] || "0",
+        cols: prof["cols"] || "3",
+        rows: prof["rows"] || "8",
+        scale: prof["scale"] || "100",
+        text_up: prof["text_up"] || nil
+      )
+
+    ass = socket.assigns
+
+    {:noreply,
+     assign(socket,
+       prof_id: prof_id,
+       qr_for_page: int(ass.cols) * int(ass.rows),
+       svg_size: get_svg_size(ass)
+     )}
+  end
+
   def handle_event("draw", params, socket) do
     socket = validate(socket, params)
 
@@ -130,28 +199,58 @@ defmodule AcariServerWeb.QRPrintLive do
     {:noreply,
      assign(socket,
        save_prof: true,
+       prof_id: nil,
        qr_for_page: int(ass.cols) * int(ass.rows),
        svg_size: get_svg_size(ass)
      )}
   end
 
+  def handle_event("save_prof_show", _params, socket) do
+    {:noreply, assign(socket, save_prof_show: true)}
+  end
+
   def handle_event("save", %{"profile_name" => name}, socket) do
-    {status, err} =
+    {show, ack, err} =
       case String.trim(name) do
         "" ->
-          {true, "Задайте имя профиля"}
+          {true, false, "Задайте имя профиля"}
 
         "_current" ->
-          {true, "Имя профиля не может быть _current"}
+          {true, false, "Имя профиля не может быть _current"}
 
         name ->
-          case get_profile(socket.assigns.user.id, name) do
-            %Export{} -> {true, "Профиль с таким именем уже существует"}
-            _ -> {false, nil}
+          case socket.assigns.save_prof_ack do
+            true ->
+              save_profile(socket, name)
+              {false, false, nil}
+
+            _ ->
+              case get_profile(name) do
+                %Export{} ->
+                  {true, true,
+                   "Профиль с таким именем уже существует. Нажите еще раз СОХРАНИТЬ для обновления"}
+
+                _ ->
+                  save_profile(socket, name)
+                  {false, false, nil}
+              end
           end
       end
 
-    {:noreply, assign(socket, save_prof: status, save_err: err)}
+    profiles =
+      case err do
+        nil -> AcariServer.ExportManager.list_exports(:type, "qr")
+        _ -> socket.assigns.profiles
+      end
+
+    {:noreply,
+     assign(socket,
+       save_prof_show: show,
+       save_prof_ack: ack,
+       save_err: err,
+       save_prof_name: name,
+       profiles: profiles
+     )}
   end
 
   def handle_event(event, params, socket) do
@@ -222,8 +321,8 @@ defmodule AcariServerWeb.QRPrintLive do
      end}
   end
 
-  defp get_profile(user_id, name) do
-    ExportManager.get_export_by(user_id, "qr", name)
+  defp get_profile(name, user_id \\ nil) do
+    ExportManager.get_export_by("qr", name, user_id)
   end
 
   defp save_profile(socket, name) do
@@ -237,12 +336,15 @@ defmodule AcariServerWeb.QRPrintLive do
       gap: ass.gap,
       cols: ass.cols,
       rows: ass.rows,
-      scale: ass.scale
+      scale: ass.scale,
+      text_up: ass.text_up
     }
 
     attrs = %{user_id: ass.user.id, name: name, type: "qr", profile: profile}
 
-    case get_profile(ass.user.id, name) do
+    user_id = (name == "_current" && nil) || ass.user.id
+
+    case get_profile(name, user_id) do
       %Export{} = export -> ExportManager.update_export(export, attrs)
       _ -> ExportManager.create_export(attrs)
     end

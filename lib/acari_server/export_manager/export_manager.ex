@@ -5,6 +5,7 @@ defmodule AcariServer.ExportManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.ExportManager.Export
 
@@ -26,6 +27,11 @@ defmodule AcariServer.ExportManager do
     |> Enum.filter(fn %{user_id: user_id, common: common} -> common or user.id == user_id end)
   end
 
+  def list_exports(:type, type) do
+    Repo.all(Export)
+    |> Enum.filter(fn %{type: t, name: name} -> t == type and name != "_current" end)
+  end
+
   @doc """
   Gets a single export.
 
@@ -42,7 +48,12 @@ defmodule AcariServer.ExportManager do
   """
   def get_export!(id), do: RepoRO.get!(Export, id)
 
-  def get_export_by(user_id, type, name) do
+  def get_export_by(type, name, nil) do
+    Export
+    |> Repo.get_by(type: type, name: name)
+  end
+
+  def get_export_by(type, name, user_id) do
     Export
     |> Repo.get_by(user_id: user_id, type: type, name: name)
   end
