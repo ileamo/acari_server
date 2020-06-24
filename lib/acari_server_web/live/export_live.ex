@@ -12,7 +12,10 @@ defmodule AcariServerWeb.ExportLive do
 
     current_profile =
       user.exports
-      |> Enum.find(fn %{name: name, type: type} -> name == "_current" and type == "export" end) || %{}
+      |> Enum.find(fn %{name: name, type: type} -> name == "_current" and type == "export" end) ||
+        %{}
+
+    profiles = AcariServer.ExportManager.list_exports(:type, "export")
 
     groups =
       AcariServer.GroupManager.list_groups(user)
@@ -117,6 +120,14 @@ defmodule AcariServerWeb.ExportLive do
      assign(socket,
        user: user,
        current_profile: current_profile,
+       profiles: profiles,
+       prof_id: nil,
+       delete_prof_ack: false,
+       save_prof: false,
+       save_prof_show: false,
+       save_prof_ack: false,
+       save_prof_name: "",
+       save_err: "",
        type_descr: type_dscr,
        groups: groups,
        group_id: group_id,
@@ -132,12 +143,22 @@ defmodule AcariServerWeb.ExportLive do
 
   @impl true
   def handle_event("select_group_class", %{"group" => group_id, "class" => class_id}, socket) do
-    {:noreply, assign(socket, group_id: group_id, class_id: class_id, table: [])}
+    {:noreply,
+     assign(socket, group_id: group_id, class_id: class_id, table: [], save_prof: false)}
   end
 
   def handle_event("left", params, socket) do
     {left, right} = left_to_right(socket.assigns, params["id"])
-    {:noreply, assign(socket, left: left, left_groups: group_left(left), right: right, table: [])}
+
+    {:noreply,
+     assign(socket,
+       left: left,
+       left_groups: group_left(left),
+       right: right,
+       table: [],
+       save_prof: false,
+       prof_id: nil
+     )}
   end
 
   def handle_event("right", params, socket) do
@@ -148,22 +169,24 @@ defmodule AcariServerWeb.ExportLive do
        left: left,
        left_groups: group_left(left),
        right: right,
-       table: []
+       table: [],
+       save_prof: false,
+       prof_id: nil
      )}
   end
 
   def handle_event("move_down", %{"id" => id}, socket) do
     right = move_down(socket.assigns.right, id)
-    {:noreply, assign(socket, right: right, table: [])}
+    {:noreply, assign(socket, right: right, table: [], save_prof: false, prof_id: nil)}
   end
 
   def handle_event("move_up", %{"id" => id}, socket) do
     right = move_up(socket.assigns.right, id)
-    {:noreply, assign(socket, right: right, table: [])}
+    {:noreply, assign(socket, right: right, table: [], save_prof: false, prof_id: nil)}
   end
 
   def handle_event("filters", %{"_target" => ["andor"], "andor" => val}, socket) do
-    {:noreply, assign(socket, andor: val, table: [])}
+    {:noreply, assign(socket, andor: val, table: [], save_prof: false, prof_id: nil)}
   end
 
   def handle_event("filters", %{"_target" => [field, item]} = params, socket) do
@@ -174,7 +197,76 @@ defmodule AcariServerWeb.ExportLive do
         el -> el
       end)
 
-    {:noreply, assign(socket, right: right, table: [])}
+    {:noreply, assign(socket, right: right, table: [], save_prof: false, prof_id: nil)}
+  end
+
+  def handle_event("delete_prof", _, socket) do
+    {:noreply, assign(socket, delete_prof_ack: true)}
+  end
+
+  def handle_event("delete_prof_no", _, socket) do
+    {:noreply, assign(socket, delete_prof_ack: false)}
+  end
+
+  def handle_event("delete_prof_yes", %{"value" => prof_id}, socket) do
+    prof =
+      socket.assigns.profiles
+      |> Enum.find(fn %{id: id} -> id == String.to_integer(prof_id) end)
+
+    ExportManager.delete_export(prof)
+
+    {:noreply,
+     assign(socket,
+       delete_prof_ack: false,
+       prof_id: nil,
+       profiles: AcariServer.ExportManager.list_exports(:type, "export")
+     )}
+  end
+
+  def handle_event("change_prof", %{"prof" => "nil"}, socket) do
+    {:noreply, assign(socket, prof_id: nil)}
+  end
+
+  def handle_event("change_prof", %{"prof" => prof_id}, socket) do
+    prof_id = String.to_integer(prof_id)
+
+    prof =
+      (socket.assigns.profiles
+       |> Enum.find(fn %{id: id} -> id == prof_id end)).profile
+
+    ass = socket.assigns
+
+    left = ass.left ++ ass.right
+
+    right = []
+
+    {left, right} =
+      Enum.reduce(
+        prof["right"] || [],
+        {left, right},
+        fn %{"id" => id} = el, {left, right} ->
+          from_to(left, right, id, %{
+            filter: el["filter"],
+            negative: el["negative"],
+            oper: el["oper"]
+          })
+        end
+      )
+
+    socket =
+      assign(socket,
+        class_id: get_selectable(prof["class_id"], ass.classes),
+        group_id: get_selectable(prof["group_id"], ass.groups),
+        andor: prof["andor"] || "and",
+        left: left,
+        left_groups: group_left(left),
+        right: right
+      )
+
+    {:noreply,
+     assign(socket,
+       prof_id: prof_id
+     )}
   end
 
   def handle_event("draw", _params, socket) do
@@ -269,14 +361,113 @@ defmodule AcariServerWeb.ExportLive do
 
     table = [tag_list | value_list]
 
-    save_current_profile(socket)
+    save_profile(socket, "_current")
 
-    {:noreply, assign(socket, table: table)}
+    {:noreply, assign(socket, table: table, save_prof: true, prof_id: nil)}
+  end
+
+  def handle_event("save_prof_show", _params, socket) do
+    {:noreply, assign(socket, save_prof_show: true)}
+  end
+
+  def handle_event("save", %{"profile_name" => name}, socket) do
+    {show, ack, err} =
+      case String.trim(name) do
+        "" ->
+          {true, false, "Задайте имя профиля"}
+
+        "_current" ->
+          {true, false, "Имя профиля не может быть _current"}
+
+        name ->
+          case socket.assigns.save_prof_ack do
+            true ->
+              save_profile(socket, name)
+              {false, false, nil}
+
+            _ ->
+              case get_profile(name) do
+                %Export{} ->
+                  {true, true,
+                   "Профиль с таким именем уже существует. Нажите еще раз СОХРАНИТЬ для обновления"}
+
+                _ ->
+                  save_profile(socket, name)
+                  {false, false, nil}
+              end
+          end
+      end
+
+    profiles =
+      case err do
+        nil -> AcariServer.ExportManager.list_exports(:type, "export")
+        _ -> socket.assigns.profiles
+      end
+
+    {:noreply,
+     assign(socket,
+       save_prof_show: show,
+       save_prof_ack: ack,
+       save_err: err,
+       save_prof_name: name,
+       profiles: profiles
+     )}
+  end
+
+  def handle_event("not_save", _, socket) do
+    {:noreply,
+     assign(socket,
+       save_prof_show: false,
+       save_prof_ack: false,
+       save_err: nil
+     )}
   end
 
   def handle_event(event, params, socket) do
     IO.inspect(event: event, params: params)
     {:noreply, socket}
+  end
+
+  defp get_profile(name, user_id \\ nil) do
+    ExportManager.get_export_by("export", name, user_id)
+  end
+
+  defp save_current_profile(socket) do
+    ass = socket.assigns
+
+    profile = %{
+      class_id: ass.class_id,
+      group_id: ass.group_id,
+      andor: ass.andor,
+      right: ass.right
+    }
+
+    attrs = %{user_id: ass.user.id, name: "_current", type: "export", profile: profile}
+
+    case ass.current_profile do
+      %Export{} = export -> ExportManager.update_export(export, attrs)
+      _ -> ExportManager.create_export(attrs)
+    end
+  end
+
+  defp save_profile(socket, name) do
+    ass = socket.assigns
+
+    profile = %{
+      class_id: ass.class_id,
+      group_id: ass.group_id,
+      andor: ass.andor,
+      right: ass.right
+    }
+
+    attrs = %{user_id: ass.user.id, name: name, type: "export", profile: profile}
+
+    user_id = (name == "_current" && nil) || ass.user.id
+
+    case get_profile(name, user_id) do
+      %Export{} = export -> ExportManager.update_export(export, attrs)
+      _ -> ExportManager.create_export(attrs)
+    end
   end
 
   defp left_to_right(assigns, id) do
@@ -337,24 +528,6 @@ defmodule AcariServerWeb.ExportLive do
     left
     |> sort_left()
     |> Enum.group_by(fn %{type: type} -> type end)
-  end
-
-  defp save_current_profile(socket) do
-    ass = socket.assigns
-
-    profile = %{
-      class_id: ass.class_id,
-      group_id: ass.group_id,
-      andor: ass.andor,
-      right: ass.right
-    }
-
-    attrs = %{user_id: ass.user.id, name: "_current", type: "export", profile: profile}
-
-    case ass.current_profile do
-      %Export{} = export -> ExportManager.update_export(export, attrs)
-      _ -> ExportManager.create_export(attrs)
-    end
   end
 
   defp get_selectable("nil", _) do

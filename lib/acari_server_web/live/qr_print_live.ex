@@ -5,7 +5,6 @@ defmodule AcariServerWeb.QRPrintLive do
 
   @empty_qr %{name: nil, qr_svg: nil}
 
-
   @impl true
   def mount(_params, %{"current_user_id" => user_id, "clients_list" => ids} = _session, socket) do
     user =
@@ -93,9 +92,9 @@ defmodule AcariServerWeb.QRPrintLive do
   end
 
   @impl true
-  # def handle_event("change", %{"_target" => ["text_up"]} = params, socket) do
-  #   {:noreply, assign(socket, save_prof: false, text_up: params["textup"])}
-  # end
+  def handle_event("change", %{"_target" => ["text_up"]} = params, socket) do
+    {:noreply, assign(socket, save_prof: false, text_up: params["textup"])}
+  end
 
   def handle_event("change", _params, socket) do
     {:noreply, assign(socket, save_prof: false)}
@@ -151,6 +150,7 @@ defmodule AcariServerWeb.QRPrintLive do
     {:noreply,
      assign(socket,
        delete_prof_ack: false,
+       prof_id: nil,
        profiles: AcariServer.ExportManager.list_exports(:type, "qr")
      )}
   end

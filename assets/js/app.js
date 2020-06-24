@@ -38,15 +38,13 @@ let Hooks = {}
 let export_table
 
 Hooks.ExportDraw = {
-  updated() {
-    console.log('updated')
+  beforeUpdate() {
     if (export_table) {
-      console.log('destroy')
       export_table.destroy()
     }
-    console.log('create')
+  },
+  updated() {
     export_table = $("#datatable-export").DataTable(datatable_params_export);
-
   }
 }
 
@@ -58,7 +56,9 @@ let liveSocket = new LiveSocket("/live", Socket, {
   }
 });
 
-NProgress.configure({ parent: '#mainPage' });
+NProgress.configure({
+  parent: '#mainPage'
+});
 window.addEventListener("phx:page-loading-start", info => NProgress.start())
 window.addEventListener("phx:page-loading-stop", info => NProgress.done())
 
