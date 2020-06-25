@@ -48,24 +48,36 @@ defmodule AcariServer.Scheduler.Api do
           id -> clients |> Enum.filter(fn %{script_id: sid} -> sid == id end)
         end
 
-      clients
-      |> Enum.reduce(%{}, fn client, allow_map ->
-        {allow_list, allow_map} =
-          case allow_map[client.script_id] do
-            nil ->
-              allow_list = get_allowed_template(client.script_id)
-              {allow_list, Map.put(allow_map, client.script_id, allow_list)}
+      case schedule.template.type do
+        "client" ->
+          clients
+          |> Enum.reduce(%{}, fn client, allow_map ->
+            {allow_list, allow_map} =
+              case allow_map[client.script_id] do
+                nil ->
+                  allow_list = get_allowed_template(client.script_id)
+                  {allow_list, Map.put(allow_map, client.script_id, allow_list)}
 
-            list ->
-              {list, allow_map}
-          end
+                list ->
+                  {list, allow_map}
+              end
 
-        if Enum.member?(allow_list, schedule.template_id) do
-          exec_script(schedule.template, client)
-        end
+            if Enum.member?(allow_list, schedule.template_id) do
+              AcariServer.Master.exec_script_on_peer(client.name, schedule.template.name)
+            end
 
-        allow_map
-      end)
+            allow_map
+          end)
+
+        "zabbix" ->
+          clients
+          |> Enum.each(fn client ->
+            AcariServer.Zabbix.ZbxApi.zbx_exec_api(client.name, schedule.template.name)
+          end)
+
+        _ ->
+          nil
+      end
     else
       _ -> Logger.error("Scheduler: No Schedule ##{shedule_id}")
     end

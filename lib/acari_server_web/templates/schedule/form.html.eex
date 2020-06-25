@@ -17,7 +17,9 @@
   <div class="form-group row">
     <%= label f, "Скрипт", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-4">
-      <% templ_id_pair_list = AcariServer.TemplateManager.templ_name_id_pairs_list() %>
+      <% templ_id_pair_list = AcariServer.TemplateManager.templ_name_id_pairs_list("client") ++
+                              AcariServer.TemplateManager.templ_name_id_pairs_list("zabbix")
+      %>
       <%= select f, :template_id, templ_id_pair_list, class: "custom-select" %>
       <%= error_tag f, :template_id %>
     </div>
