@@ -432,24 +432,6 @@ defmodule AcariServerWeb.ExportLive do
     ExportManager.get_export_by("export", name, user_id)
   end
 
-  defp save_current_profile(socket) do
-    ass = socket.assigns
-
-    profile = %{
-      class_id: ass.class_id,
-      group_id: ass.group_id,
-      andor: ass.andor,
-      right: ass.right
-    }
-
-    attrs = %{user_id: ass.user.id, name: "_current", type: "export", profile: profile}
-
-    case ass.current_profile do
-      %Export{} = export -> ExportManager.update_export(export, attrs)
-      _ -> ExportManager.create_export(attrs)
-    end
-  end
-
   defp save_profile(socket, name) do
     ass = socket.assigns
 

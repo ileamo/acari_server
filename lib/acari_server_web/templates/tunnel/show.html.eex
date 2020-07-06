@@ -46,6 +46,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
   <strong>Группы:</strong> <%= AcariServer.GroupManager.groups_list(@node) %>
 </h6>
 <h6><strong>Основной сервер:</strong> <%= tun.server %></h6>
+<h6><strong>Рестартов за сутки:</strong> <%= restarts_per_day(tun) %></h6>
 
 <hr/>
   <div id="node-monitor">

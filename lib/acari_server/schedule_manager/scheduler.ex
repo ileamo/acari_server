@@ -98,10 +98,6 @@ defmodule AcariServer.Scheduler.Api do
     end
   end
 
-  defp exec_script(template, client) do
-    AcariServer.Master.exec_script_on_peer(client.name, template.name)
-  end
-
   def add_job(schedule) do
     with {:ok, cron_expr} <- Crontab.CronExpression.Parser.parse(schedule.schedule) do
       Scheduler.add_job({cron_expr, {__MODULE__, :exec_script_on_schedule, [schedule.id]}})

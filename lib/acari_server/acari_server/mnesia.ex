@@ -335,8 +335,13 @@ defmodule AcariServer.Mnesia do
             record
             |> Rec.tun(:state)
             |> Map.update(tag, data, fn old_data ->
-              old_data
-              |> Map.merge(data)
+              merge =
+                case opts[:merge] do
+                  func when is_function(func) -> func
+                  _ -> &Map.merge/2
+                end
+
+              merge.(old_data, data)
               |> Enum.reject(fn
                 {_, nil} -> true
                 _ -> false

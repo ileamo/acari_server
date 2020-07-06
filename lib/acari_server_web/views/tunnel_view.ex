@@ -200,4 +200,15 @@ defmodule AcariServerWeb.TunnelView do
       _ -> nil
     end
   end
+
+  def restarts_per_day(tun) do
+    case tun[:client_restarts][:list] do
+      list when is_list(list) ->
+        ts = :os.system_time(:second)
+        length(list |> Enum.reject(fn x -> ts - x >= 60*60*24 end))
+
+      _ ->
+        "Нет данных"
+    end
+  end
 end
