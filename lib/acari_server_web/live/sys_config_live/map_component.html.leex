@@ -1,0 +1,39 @@
+<div class="mb-2 mt-3">
+  <div class="form-inline row mb-0">
+    <div class="col-3"
+      phx-click="descr" phx-target="<%= @myself %>"><%= @name %></div>
+    <button class="btn btn-outline-secondary ml-3" phx-click="show_map" phx-target="<%= @myself %>" phx-value-key="<%= @key %>">
+      <%= if @show_map do %>
+        Скрыть
+      <% else %>
+        Настроить
+      <% end %>
+    </button>
+  </div>
+  <div class="pb-<%= @descr_pb %> text-muted" phx-click="descr_off" phx-target="<%= @myself %>">
+    <%= @descr %>
+  </div>
+
+  <%= if @show_map do %>
+    <form phx-submit="new" phx-target="<%= @myself %>">
+      <div class="d-flex justify-content-end mt-2">
+        <label class="col-form-label"
+          phx-click="descr" phx-target="<%= @myself %>">
+          Добавить новую переменную
+        </label>
+        <div class="mx-2">
+          <input class="form-control" type="text" name="new_global"
+            phx-target="<%= @myself %>"
+            placeholder="Введите значение"/>
+        </div>
+
+        <button class="btn btn-outline-secondary" phx-target="<%= @myself %>" type="submit">
+          +
+        </button>
+
+      </div>
+    </form>
+    <%= inspect(@value) %>
+  <% end %>
+
+</div>

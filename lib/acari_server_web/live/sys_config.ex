@@ -12,7 +12,8 @@ defmodule AcariServer.SysConfig do
            descr: "",
            description: assigns.config.description,
            descr_pb: 0,
-           select: assigns.config[:select]
+           select: assigns.config[:select],
+           show_map: false
          )}
       end
 

@@ -30,6 +30,12 @@ defmodule AcariServer.SysConfigManager.Schema do
         name: "URL",
         description: "URL для доступа к серверу Богатка с мобильных устройств",
         type: :string
+        },
+      %{
+        key: "global",
+        name: "Глобальные переменные",
+        description: "Список глобальных переменных, используемых в шаблонах и фильтрах",
+        type: :map
         }
     ]
     |> Enum.uniq_by(fn %{key: key} -> key end)

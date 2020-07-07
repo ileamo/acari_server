@@ -21,6 +21,15 @@ defmodule AcariServerWeb.SysConfigLive do
       |> Enum.into(%{})
 
     Schema.get()
-    |> Enum.map(fn sch = %{key: key} -> sch |> Map.put(:value, sysconfig[key]) end)
+    |> Enum.map(fn
+      sch = %{type: :map, key: key} -> sch |> Map.put(:value, get_map(sysconfig, key))
+      sch = %{key: key} -> sch |> Map.put(:value, sysconfig[key])
+    end)
+  end
+
+  defp get_map(sysconfig, key) do
+    sysconfig
+    |> Enum.filter(fn {k, _} -> String.match?(k, ~r/^#{key}\..+/) end)
+    |> Enum.into(%{})
   end
 end
