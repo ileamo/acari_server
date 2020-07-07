@@ -69,6 +69,10 @@
             <div class="column"><input type="text" name="scale" value="<%= @scale %>"> </div>
             <div class="column">%</div>
           </div>
+          <div style="display: flex; align-items: baseline;">
+            <div style="margin-right: 1rem;">Текст</div>
+            <%= tag(:input, name: "text", type: "text", value: @text) %>
+          </div>
           <div style="display: flex; align-items: flex-start">
             <div style="margin-right: 1rem;">Текст снизу</div>
             <%= tag(:input, name: "text_up", type: "checkbox", checked: @text_up) %>
@@ -116,6 +120,7 @@
                 style="grid-gap:<%= @gap %>mm;grid-template-columns: repeat(<%= @cols %>, 1fr);grid-template-rows: repeat(<%= @rows %>, 1fr);">
               <%= for {%{name: name, qr_svg: qr_svg}, idx} <- qr_list do %>
                 <%
+                  text = "<div>#{name}</div>#{@text}"
                   svg_size = @svg_size * int(@scale) / 100
                   svg_style = if @text_up, do: "",
                     else: "grid-template-columns: 1fr #{svg_size}mm;"
@@ -126,7 +131,7 @@
                 <div class="qr-element" phx-click="empty" phx-value-idx="<%= idx %>"
                 style="<%= svg_style %> <%= border %>">
                 <%= if !@text_up do %>
-                  <div class="qr-label-header"><%= name %></div>
+                  <div class="qr-label-header"><%= raw(text) %></div>
                 <% end %>
                   <div class="qr-label-qr">
                     <svg width="<%= svg_size %>mm" height="<%= svg_size %>mm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -134,7 +139,7 @@
                     </svg>
                   </div>
                   <%= if @text_up do %>
-                    <div class="qr-label-header"><%= name %></div>
+                    <div class="qr-label-header"><%= raw(text) %></div>
                   <% end %>
                 </div>
               <% end %>

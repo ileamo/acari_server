@@ -47,6 +47,7 @@ defmodule AcariServerWeb.QRPrintLive do
         cols: prof["cols"] || "3",
         rows: prof["rows"] || "8",
         scale: prof["scale"] || "100",
+        text: prof["text"] || "",
         text_up: prof["text_up"] || nil,
         border: "on"
       )
@@ -176,6 +177,7 @@ defmodule AcariServerWeb.QRPrintLive do
         cols: prof["cols"] || "3",
         rows: prof["rows"] || "8",
         scale: prof["scale"] || "100",
+        text: prof["text"] || "",
         text_up: prof["text_up"] || nil
       )
 
@@ -285,6 +287,7 @@ defmodule AcariServerWeb.QRPrintLive do
       int(ass, :cols, params["cols"]),
       int(ass, :rows, params["rows"]),
       int(ass, :scale, params["scale"]),
+      {:text, params["text"]},
       {:text_up, params["text_up"]}
     ]
 
@@ -337,6 +340,7 @@ defmodule AcariServerWeb.QRPrintLive do
       cols: ass.cols,
       rows: ass.rows,
       scale: ass.scale,
+      text: ass.text,
       text_up: ass.text_up
     }
 
