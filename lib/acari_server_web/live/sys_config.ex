@@ -13,7 +13,10 @@ defmodule AcariServer.SysConfig do
            description: assigns.config.description,
            descr_pb: 0,
            select: assigns.config[:select],
-           show_map: false
+           show_map: false,
+           delete_list: [],
+           name_error: "",
+           new_value: ""
          )}
       end
 

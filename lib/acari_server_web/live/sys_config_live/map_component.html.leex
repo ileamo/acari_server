@@ -15,25 +15,67 @@
   </div>
 
   <%= if @show_map do %>
+  <div class="border border-info rounded p-1 my-2">
     <form phx-submit="new" phx-target="<%= @myself %>">
-      <div class="d-flex justify-content-end mt-2">
+      <div class="d-flex justify-content-end my-2">
         <label class="col-form-label"
           phx-click="descr" phx-target="<%= @myself %>">
           Добавить новую переменную
         </label>
         <div class="mx-2">
           <input class="form-control" type="text" name="new_global"
-            phx-target="<%= @myself %>"
+            phx-target="<%= @myself %>" value="<%= @new_value %>"
             placeholder="Введите значение"/>
         </div>
-
         <button class="btn btn-outline-secondary" phx-target="<%= @myself %>" type="submit">
-          +
+          <i class="fas fa-plus"></i>
         </button>
 
       </div>
     </form>
-    <%= inspect(@value) %>
+
+    <%= if @name_error != "" do %>
+      <div class="text-right text-danger mb-2">
+        <%= @name_error %>
+      </div>
+    <% end %>
+
+    <%= if @delete_list != [] do %>
+      <div class="d-flex justify-content-end my-1">
+        <button class="btn btn-outline-secondary" phx-click="undelete" phx-target="<%= @myself %>">
+          Восстановить последнюю удаленную
+        </button>
+      </div>
+    <%= end %>
+
+    <form phx-submit="save" phx-target="<%= @myself %>">
+      <%= if map_size(@value) == 0 do %>
+        <div class="text-right">Нет параметров</div>
+      <% else %>
+        <%= for {name,value} <- @value  do %>
+          <div class="form-group row mb-1">
+            <label class="col-sm-3 offset-sm-1 col-form-label"><%= name %></label>
+            <div class="col-sm-8 d-flex">
+              <input class="form-control" type="text" name="<%= name %>" value="<%= value %>"
+                phx-target="<%= @myself %>" phx-blur="input_blur" phx-value-name="<%= name %>"
+                placeholder="Введите значение"/>
+                <button type="button" class="btn btn-outline-secondary ml-2"
+                    phx-click="delete" phx-target="<%= @myself %>" phx-value-name="<%= name %>">
+                  <i class="far fa-trash-alt "></i>
+                </button>
+
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+        <div class="d-flex justify-content-end mt-1">
+          <button class="btn btn-outline-secondary"
+                phx-target="<%= @myself %>" type="submit">
+            Сохранить
+          </button>
+        </div>
+    </form>
+  </div>
   <% end %>
 
 </div>

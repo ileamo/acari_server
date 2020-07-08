@@ -39,8 +39,8 @@ defmodule AcariServer.SysConfigManager do
 
   def get_conf_by_key(key) do
     case Repo.get_by(SysConfig, key: key) do
-        %{value: value} -> value
-        _ -> nil
+      %{value: value} -> value
+      _ -> nil
     end
   end
 
@@ -103,6 +103,16 @@ defmodule AcariServer.SysConfigManager do
   """
   def delete_sys_config(%SysConfig{} = sys_config) do
     Repo.delete(sys_config)
+  end
+
+  def delete_sys_config_by_key(key) do
+    case Repo.get_by(SysConfig, key: key) do
+      %SysConfig{} = sys_config ->
+        Repo.delete(sys_config)
+
+      _ ->
+        nil
+    end
   end
 
   @doc """
