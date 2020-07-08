@@ -617,6 +617,10 @@ defmodule AcariServerWeb.GrpOperChannel do
                 _ -> false
               end)
             )
+            |> Sandbox.set!(
+              "global",
+              AcariServer.SysConfigManager.get_sysconfigs_by_prefix("global", trim_prefix: true)
+              )
 
           case Sandbox.eval(lua_state, "return (#{filter_str})") do
             {:ok, res} ->

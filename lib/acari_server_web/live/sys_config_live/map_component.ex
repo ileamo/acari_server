@@ -9,7 +9,7 @@ defmodule AcariServerWeb.SysConfigLive.MapComponent do
     {:noreply, assign(socket, show_map: !socket.assigns.show_map)}
   end
 
-  def handle_event("new", %{"new_global" => name} = params, socket) do
+  def handle_event("new", %{"new_global" => name}, socket) do
     ass =
       case String.trim(name) do
         "" ->
@@ -82,12 +82,9 @@ defmodule AcariServerWeb.SysConfigLive.MapComponent do
       })
     end)
 
-    sysconfig =
-      SysConfigManager.list_sysconfigs()
-      |> Enum.filter(fn %{key: k} -> String.match?(k, ~r/^#{socket.assigns.key}\..+/) end)
-      |> Enum.map(fn %{key: key, value: value} -> {key, value} end)
-      |> Enum.into(%{})
+    sysconfig = SysConfigManager.get_sysconfigs_by_prefix(socket.assigns.key)
 
+  
     {:noreply, assign(socket, value: sysconfig, delete_list: [], new_value: "", name_error: "")}
   end
 

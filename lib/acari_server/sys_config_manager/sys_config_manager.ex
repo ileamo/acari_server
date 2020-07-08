@@ -44,6 +44,15 @@ defmodule AcariServer.SysConfigManager do
     end
   end
 
+  def get_sysconfigs_by_prefix(prefix, opts \\ []) do
+    list_sysconfigs()
+    |> Enum.filter(fn %{key: k} -> String.match?(k, ~r/^#{prefix}\..+/) end)
+    |> Enum.map(fn %{key: key, value: value} ->
+      key = if opts[:trim_prefix], do: String.replace_prefix(key, "#{prefix}.", ""), else: key
+      {key, value} end)
+    |> Enum.into(%{})
+  end
+
   @doc """
   Creates a sys_config.
 

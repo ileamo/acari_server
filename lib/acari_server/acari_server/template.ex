@@ -269,6 +269,8 @@ defmodule AcariServer.Template do
 
     %{
       "id" => client.name,
+      "global" =>
+        AcariServer.SysConfigManager.get_sysconfigs_by_prefix("global", trim_prefix: true),
       "class" => %{
         "name" => class.name,
         "description" => class.description
@@ -309,6 +311,8 @@ defmodule AcariServer.Template do
 
         %{
           "id" => client_name,
+          "global" =>
+            AcariServer.SysConfigManager.get_sysconfigs_by_prefix("global", trim_prefix: true),
           "class" => %{
             "name" => class.name,
             "description" => class.description
