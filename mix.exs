@@ -53,7 +53,7 @@ defmodule AcariServer.MixProject do
 
   defp elixirc_paths(_),
     do: [
-      # "acari_lib",
+      "acari_lib",
       "lib"
     ]
 
@@ -96,7 +96,7 @@ defmodule AcariServer.MixProject do
       {:navigation_history, "~> 0.3"},
       {:eqrcode, "~> 0.1.7"},
       {:benchee, "~> 1.0", only: :dev},
-      {:acari, git: "https://github.com/ileamo/acari.git"},
+      #{:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
       {:tunctl, git: "https://github.com/ileamo/tunctl.git"},
       {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"},

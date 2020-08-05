@@ -93,6 +93,18 @@ defmodule AcariServer.TemplateManager do
     end
   end
 
+  def terminal_list(tun_name) do
+    with node <- AcariServer.NodeManager.get_node_with_class(tun_name, :terminals),
+         script when is_map(script) <- node |> Map.get(:script),
+         templ when is_list(templ) <- script |> Map.get(:terminals) do
+      templ
+      |> Enum.map(fn %{name: name, description: descr} -> {descr, name} end)
+      |> Enum.sort()
+    else
+      _ -> []
+    end
+  end
+
   def srv_script_list(tun_name) do
     with node <- AcariServer.NodeManager.get_node_with_class(tun_name, :local),
          class when is_map(class) <- node |> Map.get(:script),

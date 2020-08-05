@@ -201,6 +201,15 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
       <button id="start_xterm">Подключиться к клиенту</button>
       <div id="acari-xterm"></div>
     <% end %>
+
+    <% terminal_list = AcariServer.TemplateManager.terminal_list(@name) %>
+    <%= for {descr, script_name} <- terminal_list do %>
+      <button class="start-xterm-client" id="<%= script_name %>"><%= descr %></button>
+      <div id="acari-xterm-<%= script_name %>"></div>
+    <% end %>
+
+
+
   </div>
 
 

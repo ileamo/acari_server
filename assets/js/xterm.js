@@ -32,6 +32,52 @@ let term_parms = {
   }
 }
 
+
+let xterm_client = document.getElementsByClassName("start-xterm-client")
+for (var i = 0; i < xterm_client.length; i++) {
+  xterm_client[i].addEventListener("click", startClientXterm, false)
+}
+let terms = {}
+let channels = {}
+
+function startClientXterm(el) {
+  let id = el.target.id
+  console.log(id)
+
+  if (terms[id]) {
+    console.log("Already started")
+    terms[id].destroy()
+    terms[id] = false
+    channels[id].leave()
+    // document.getElementById("start_xterm").firstChild.data = "Подключиться к клиенту";
+  } else {
+    // document.getElementById("start_xterm").firstChild.data = "Отключить терминал";
+    let acari_xterm = document.getElementById('acari-xterm-'+id);
+    if (acari_xterm) {
+      channels[id] = socket.channel("terminal:"+id, {
+        pathname: window.location.pathname
+      })
+      channels[id].join()
+      channels[id].on('output', ({
+        output
+      }) => terms[id].write(Base64.decode(output))) // From the Channel
+
+      terms[id] = new Terminal(term_parms);
+
+      terms[id].open(acari_xterm);
+      terms[id].on('data', (data) => channels[id].push('input', {
+        input: Base64.encode(data)
+      })) // To the Channel
+
+    }
+  }
+}
+
+
+
+
+
+
 let start_xterm = document.getElementById("start_xterm")
 
 let term
@@ -40,7 +86,8 @@ if (start_xterm) {
   start_xterm.addEventListener("click", startXterm, false);
 }
 
-function startXterm() {
+function startXterm(el) {
+  console.log(el.target.id)
   if (term) {
     console.log("Already started")
     term.destroy()
