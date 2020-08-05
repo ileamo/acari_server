@@ -28,6 +28,11 @@
     <%= templates_list(@script) |> text_to_html() %>
   </li>
 
+  <li>
+    <strong>Терминалы:</strong>
+    <%= terminals_list(@script) |> text_to_html() %>
+  </li>
+
 
 
   <% {_var, error} = AcariServer.Template.get_json(@script.definition)

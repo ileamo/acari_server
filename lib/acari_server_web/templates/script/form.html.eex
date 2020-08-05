@@ -49,6 +49,17 @@
     </div>
   </div>
 
+  <div class="form-group row">
+    <%= label f, "Терминалы", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <%= multiple_select f, :terminals_list, templ_name_id_pairs_list("xterm"),
+          selected: term_id_list(assigns[:script]),
+          class: "form-control",
+          size: min(length(templ_id_pair_list), 16) %>
+      <%= error_tag f, :terminals %>
+    </div>
+  </div>
+
   <div class="form-group">
     <%= label f, "Определения параметров", class: "control-label" %>
     <%= textarea f, :definition, class: "form-control text-monospace", rows: "6" %>

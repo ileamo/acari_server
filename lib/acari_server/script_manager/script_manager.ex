@@ -51,6 +51,7 @@ defmodule AcariServer.ScriptManager do
     |> RepoRO.preload(:local)
     |> RepoRO.preload(:remote)
     |> RepoRO.preload(:templates)
+    |> RepoRO.preload(:terminals)
   end
 
   def get_script(id) do

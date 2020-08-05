@@ -54,6 +54,7 @@ defmodule AcariServer.TemplateManager do
     {"Текст", "text"},
     {"Вставка", "include"},
     {"Системный", "system"},
+    {"Терминал", "xterm"},
     {"Нет", "no"}
   ]
 
