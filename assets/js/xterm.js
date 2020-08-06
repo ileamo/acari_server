@@ -39,19 +39,20 @@ for (var i = 0; i < xterm_client.length; i++) {
 }
 let terms = {}
 let channels = {}
+let names = {}
 
 function startClientXterm(el) {
   let id = el.target.id
-  console.log(id)
 
   if (terms[id]) {
     console.log("Already started")
     terms[id].destroy()
     terms[id] = false
     channels[id].leave()
-    // document.getElementById("start_xterm").firstChild.data = "Подключиться к клиенту";
+    el.target.firstChild.data = names[id];
   } else {
-    // document.getElementById("start_xterm").firstChild.data = "Отключить терминал";
+    names[id] = el.target.firstChild.data
+    el.target.firstChild.data = "Отключить " + names[id];
     let acari_xterm = document.getElementById('acari-xterm-'+id);
     if (acari_xterm) {
       channels[id] = socket.channel("terminal:"+id, {

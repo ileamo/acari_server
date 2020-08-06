@@ -53,19 +53,19 @@ defmodule AcariServerWeb.TerminalChannel do
 
   def join("terminal:" <> term_id, payload, socket) do
     with [_, tun_name] when is_binary(tun_name) <- Regex.run(~r|/([^/]+)$|, payload["pathname"]),
-         node when not is_nil(node) <- AcariServer.Mnesia.get_main_server(tun_name)#,
-         #dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(tun_name)
+         node when not is_nil(node) <- AcariServer.Mnesia.get_main_server(tun_name),
+         dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(tun_name),
+         {script, _} = AcariServer.SFX.create_script_from_template(tun_name, term_id, %{})
          do
       with {:ok, terminal} <-
              Terminal.start_child(node, %{
                output_pid: self(),
                tun_name: tun_name,
-               # command: 'ssh root@#{dstaddr} -o StrictHostKeyChecking=no',
-               command: '/bin/bash',
+               command: 'ssh root@#{dstaddr} -o StrictHostKeyChecking=no',
+               #command: 'ssh root@84.253.109.156 -o StrictHostKeyChecking=no',
+               #command: '/bin/bash',
                init_send:
-                 "stty echo\n" <>
-                   "echo connect to #{term_id}\n" <>
-                   "ls\n"
+                 "\nstty echo\n" <> script
              }) do
         Process.link(terminal)
         {:ok, assign(socket, :terminal, terminal)}
