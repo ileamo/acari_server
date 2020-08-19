@@ -570,115 +570,119 @@ defmodule AcariServerWeb.GrpOperChannel do
     end
   end
 
-  defp node_filter(node_list, filter_str, socket, opts \\ []) do
+  def node_filter(node_list, filter_str, socket \\ nil, opts \\ []) do
     filter_str = if to_string(filter_str) |> String.trim() == "", do: "true", else: filter_str
 
     push_filter_error(socket, "")
 
-    enum_func =
-      case opts[:filter_show] do
-        true -> :map
-        _ -> :filter
-      end
+    if filter_str == "true" do
+      node_list
+    else
+      enum_func =
+        case opts[:filter_show] do
+          true -> :map
+          _ -> :filter
+        end
 
-    try do
-      apply(Enum, enum_func, [
-        node_list,
-        fn node ->
-          {_state, script} =
-            (AcariServer.Mnesia.get_tunnel_state(node.name) || [])
-            |> Enum.split_with(fn {k, _} -> is_atom(k) end)
+      try do
+        apply(Enum, enum_func, [
+          node_list,
+          fn node ->
+            {_state, script} =
+              (AcariServer.Mnesia.get_tunnel_state(node.name) || [])
+              |> Enum.split_with(fn {k, _} -> is_atom(k) end)
 
-          script =
-            script
-            |> Enum.map(fn
-              {tag, %{data: data}} -> {tag, try_to_number(data)}
-              _ -> nil
-            end)
-            |> Enum.reject(&is_nil/1)
-
-          lua_state =
-            Sandbox.init()
-            |> Sandbox.let_elixir_eval!("match", &match/2)
-            |> Sandbox.let_elixir_eval!("vercmp", &vercmp/2)
-            |> Sandbox.set!("script", script)
-            |> Sandbox.set!(
-              "client",
-              node
-              |> Map.from_struct()
+            script =
+              script
               |> Enum.map(fn
-                p = {:id, _} ->
-                  p
-
-                p = {:name, _} ->
-                  p
-
-                p = {:description, _} ->
-                  p
-
-                p = {:params, _} ->
-                  p
-
-                p = {:lock, _} ->
-                  p
-
-                p = {:latitude, _} ->
-                  p
-
-                p = {:longitude, _} ->
-                  p
-
-                {:groups, groups_list} ->
-                  {:groups,
-                   groups_list
-                   |> Enum.map(fn %{id: id} -> {id, true} end)}
-
-                _ ->
-                  nil
+                {tag, %{data: data}} -> {tag, try_to_number(data)}
+                _ -> nil
               end)
               |> Enum.reject(&is_nil/1)
-            )
-            |> Sandbox.set!(
-              "global",
-              AcariServer.SysConfigManager.get_sysconfigs_by_prefix("global", trim_prefix: true)
-            )
 
-          case Sandbox.eval(lua_state, "return (#{filter_str})") do
-            {:ok, res} ->
-              case opts[:filter_show] do
-                true -> node |> Map.put(:filter_show, inspect(res, pretty: true))
-                _ -> res
-              end
+            lua_state =
+              Sandbox.init()
+              |> Sandbox.let_elixir_eval!("match", &match/2)
+              |> Sandbox.let_elixir_eval!("vercmp", &vercmp/2)
+              |> Sandbox.set!("script", script)
+              |> Sandbox.set!(
+                "client",
+                node
+                |> Map.from_struct()
+                |> Enum.map(fn
+                  p = {:id, _} ->
+                    p
 
-            {:error, res} ->
-              res = AcariServer.Template.humanize_lua_err(res)
+                  p = {:name, _} ->
+                    p
 
-              # case res do
-              #   {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
-              #     Enum.join(list)
-              #
-              #   {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
-              #     "#{a} #{inspect(s)}"
-              #
-              #   {:lua_error, {t, a, b}, _} when is_atom(t) ->
-              #     "#{t} #{inspect(a)} #{inspect(b)}"
-              #
-              #   res ->
-              #     inspect(res)
-              # end
+                  p = {:description, _} ->
+                    p
 
-              raise(res)
+                  p = {:params, _} ->
+                    p
+
+                  p = {:lock, _} ->
+                    p
+
+                  p = {:latitude, _} ->
+                    p
+
+                  p = {:longitude, _} ->
+                    p
+
+                  {:groups, groups_list} ->
+                    {:groups,
+                     groups_list
+                     |> Enum.map(fn %{id: id} -> {id, true} end)}
+
+                  _ ->
+                    nil
+                end)
+                |> Enum.reject(&is_nil/1)
+              )
+              |> Sandbox.set!(
+                "global",
+                AcariServer.SysConfigManager.get_sysconfigs_by_prefix("global", trim_prefix: true)
+              )
+
+            case Sandbox.eval(lua_state, "return (#{filter_str})") do
+              {:ok, res} ->
+                case opts[:filter_show] do
+                  true -> node |> Map.put(:filter_show, inspect(res, pretty: true))
+                  _ -> res
+                end
+
+              {:error, res} ->
+                res = AcariServer.Template.humanize_lua_err(res)
+
+                # case res do
+                #   {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
+                #     Enum.join(list)
+                #
+                #   {:badmatch, {:error, [{_line, :luerl_scan, {a, s}}], []}} when is_atom(a) ->
+                #     "#{a} #{inspect(s)}"
+                #
+                #   {:lua_error, {t, a, b}, _} when is_atom(t) ->
+                #     "#{t} #{inspect(a)} #{inspect(b)}"
+                #
+                #   res ->
+                #     inspect(res)
+                # end
+
+                raise(res)
+            end
           end
-        end
-      ])
-    rescue
-      e in RuntimeError ->
-        push_filter_error(socket, e.message)
-        node_list
+        ])
+      rescue
+        e in RuntimeError ->
+          push_filter_error(socket, e.message)
+          []
 
-      value ->
-        push_filter_error(socket, inspect(value))
-        node_list
+        value ->
+          push_filter_error(socket, inspect(value))
+          []
+      end
     end
   end
 
@@ -711,6 +715,8 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   defp vercmp(_, _), do: nil
+
+  defp push_filter_error(nil, _), do: nil
 
   defp push_filter_error(socket, data) do
     push(socket, "output", %{

@@ -27,6 +27,11 @@
     <%= class_name(@schedule) %>
   </li>
 
+  <li>
+    <strong>Фильтр:</strong>
+    <%= @schedule.filter %>
+  </li>
+
 
 
 </ul>

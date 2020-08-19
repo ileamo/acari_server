@@ -9,6 +9,7 @@
       <th>Расписание</th>
       <th>Группа</th>
       <th>Класс</th>
+      <th>Фильтр</th>
 
       <th scope="col" class="not-export-col">Действия</th>
 
@@ -22,6 +23,7 @@
       <td><%= schedule.schedule %></td>
       <td><%= group_name(schedule) %></td>
       <td><%= class_name(schedule) %></td>
+      <td><%= schedule.filter %></td>
 
       <td>
         <%= link to: Routes.schedule_path(@conn, :edit, schedule),

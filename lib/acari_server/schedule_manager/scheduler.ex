@@ -48,6 +48,10 @@ defmodule AcariServer.Scheduler.Api do
           id -> clients |> Enum.filter(fn %{script_id: sid} -> sid == id end)
         end
 
+      # Lua filter
+
+      clients = AcariServerWeb.GrpOperChannel.node_filter(clients, schedule.filter)
+
       case schedule.template.type do
         "client" ->
           clients

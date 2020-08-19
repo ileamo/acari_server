@@ -3,11 +3,12 @@ defmodule AcariServer.ScheduleManager.Schedule do
   import Ecto.Changeset
 
   schema "schedules" do
-    field :schedule, :string
-    field :description, :string
+    field :schedule, :string, default: ""
+    field :description, :string, default: ""
     belongs_to :template, AcariServer.TemplateManager.Template
     belongs_to :group, AcariServer.GroupManager.Group
     belongs_to :script, AcariServer.ScriptManager.Script
+    field :filter, :string, default: ""
 
     timestamps()
   end
@@ -15,7 +16,7 @@ defmodule AcariServer.ScheduleManager.Schedule do
   @doc false
   def changeset(schedule, attrs) do
     schedule
-    |> cast(attrs, [:schedule, :description, :template_id, :group_id, :script_id])
+    |> cast(attrs, [:schedule, :description, :template_id, :group_id, :script_id, :filter])
     |> validate_required([:schedule])
     |> validate_change(:schedule, &validate_schedule/2)
     |> foreign_key_constraint(:template_id)

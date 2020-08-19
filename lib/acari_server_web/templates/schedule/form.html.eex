@@ -47,6 +47,31 @@
     </div>
   </div>
 
+  <div class="form-group row">
+    <%= label f, "Фильтр", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <% filters_list = AcariServer.FilterManager.list_filrers(@current_user)
+                    |> Enum.map(fn %{description: d, filter: f} ->
+                      f = String.trim(f)
+                      {"#{d}: #{f}", f} end)
+                    |> Enum.sort()
+          schedule = assigns[:schedule]
+
+         filters_list = if !schedule || Enum.find(filters_list,
+              fn {_, f} -> f ==  schedule.filter end) do
+           filters_list
+         else
+           [{schedule.filter, schedule.filter} | filters_list]
+         end
+
+         filters_list = [{"true", "true"} | filters_list]
+      %>
+
+      <%= select f, :filter, filters_list, class: "custom-select" %>
+      <%= error_tag f, :filter %>
+    </div>
+  </div>
+
 
 
 
