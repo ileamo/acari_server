@@ -7,7 +7,6 @@ defmodule AcariServerWeb.GrpOperChannel do
   end
 
   def handle_in("input", params, socket) do
-
     case params["cmd"] do
       "select" ->
         nodes =
@@ -607,20 +606,42 @@ defmodule AcariServerWeb.GrpOperChannel do
               "client",
               node
               |> Map.from_struct()
-              |> Enum.filter(fn
-                {:name, _} -> true
-                {:description, _} -> true
-                {:params, _} -> true
-                {:lock, _} -> true
-                {:latitude, _} -> true
-                {:longitude, _} -> true
-                _ -> false
+              |> Enum.map(fn
+                p = {:id, _} ->
+                  p
+
+                p = {:name, _} ->
+                  p
+
+                p = {:description, _} ->
+                  p
+
+                p = {:params, _} ->
+                  p
+
+                p = {:lock, _} ->
+                  p
+
+                p = {:latitude, _} ->
+                  p
+
+                p = {:longitude, _} ->
+                  p
+
+                {:groups, groups_list} ->
+                  {:groups,
+                   groups_list
+                   |> Enum.map(fn %{id: id} -> {id, true} end)}
+
+                _ ->
+                  nil
               end)
+              |> Enum.reject(&is_nil/1)
             )
             |> Sandbox.set!(
               "global",
               AcariServer.SysConfigManager.get_sysconfigs_by_prefix("global", trim_prefix: true)
-              )
+            )
 
           case Sandbox.eval(lua_state, "return (#{filter_str})") do
             {:ok, res} ->
@@ -631,6 +652,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
             {:error, res} ->
               res = AcariServer.Template.humanize_lua_err(res)
+
               # case res do
               #   {:badmatch, {:error, [{_line, :luerl_parse, list}], []}} when is_list(list) ->
               #     Enum.join(list)

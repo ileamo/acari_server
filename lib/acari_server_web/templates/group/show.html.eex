@@ -3,6 +3,11 @@
 <ul>
 
   <li>
+    <strong>ID:</strong>
+    <%= @group.id %>
+  </li>
+
+  <li>
     <strong>Имя:</strong>
     <%= @group.name %>
   </li>
