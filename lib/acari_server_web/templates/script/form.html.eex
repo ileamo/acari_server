@@ -89,6 +89,6 @@
   </div> -->
 
   <div>
-    <%= submit "Сохранить" %>
+    <%= submit "Сохранить", class: "btn btn-outline-secondary" %>
   </div>
 <% end %>

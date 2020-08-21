@@ -25,6 +25,6 @@
 
 
   <div>
-    <%= submit "Cохранить" %>
+    <%= submit "Cохранить", class: "btn btn-outline-secondary" %>
   </div>
 <% end %>
