@@ -2,7 +2,8 @@ defmodule AcariServer.UserManager.Guardian do
   use Guardian, otp_app: :acari_server
 
   alias AcariServer.UserManager
-  #alias AcariServer.Mnesia
+
+  # alias AcariServer.Mnesia
 
   def subject_for_token(%{user: user}, _claims) do
     {:ok, to_string(user.id)}
@@ -26,7 +27,7 @@ defmodule AcariServer.UserManager.Guardian do
   end
 
   def on_verify(claims, _token, _options) do
-#    Mnesia.update_session_activity(claims["jti"])
+    #    Mnesia.update_session_activity(claims["jti"])
     {:ok, claims}
   end
 
@@ -35,7 +36,7 @@ defmodule AcariServer.UserManager.Guardian do
   end
 
   def on_revoke(claims, _token, _options) do
-#    Mnesia.delete_session(claims["jti"])
+    #    Mnesia.delete_session(claims["jti"])
     {:ok, claims}
   end
 end

@@ -30,6 +30,10 @@ defmodule AcariServerWeb.Router do
     plug :put_root_layout, {AcariServerWeb.LayoutView, :root}
   end
 
+  pipeline :api_auth do
+    plug AcariServer.UserManager.APIPipeline
+  end
+
   # We use ensure_auth to fail if there is no one logged in
   pipeline :ensure_auth do
     plug Guardian.Plug.EnsureAuthenticated
@@ -117,6 +121,13 @@ defmodule AcariServerWeb.Router do
     pipe_through(:api)
     post("/", AutoconfController, :index)
     get "/nodes_num", AuxController, :nodes_num
+    post "/sign_in", BogatkaController, :sign_in
+  end
+
+  scope "/api", AcariServerWeb.Api, as: :api do
+    pipe_through([:api, :api_auth])
+    post "/bogatka", BogatkaController, :bogatka
+    post "/sign_out", BogatkaController, :sign_out
   end
 
   # Enables LiveDashboard only for development

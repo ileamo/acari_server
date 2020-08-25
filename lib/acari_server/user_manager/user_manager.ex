@@ -49,6 +49,11 @@ defmodule AcariServer.UserManager do
     |> RepoRO.preload(:groups_users)
   end
 
+  def get_user_by_name(name) do
+    User
+    |> RepoRO.get_by(username: name)
+  end
+
   def get_username_by_id(id) do
     case User |> RepoRO.get(id) do
       %{username: u} -> u
