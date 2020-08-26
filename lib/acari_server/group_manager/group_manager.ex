@@ -72,6 +72,12 @@ defmodule AcariServer.GroupManager do
     |> RepoRO.get!(id)
   end
 
+  def get_group_by_name(name) do
+    Group
+    |> RepoRO.get_by(name: name)
+    |> RepoRO.preload(:nodes)
+  end
+
   @doc """
   Creates a group.
 
