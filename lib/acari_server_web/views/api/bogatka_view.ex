@@ -14,15 +14,16 @@ defmodule AcariServerWeb.Api.BogatkaView do
     }
   end
 
-  def render("api_error.json", reason) do
+  def render("api_error.json", %{payload: payload}) do
     %{
-      error: reason
+      error: payload
     }
   end
 
-  def render("api_result.json", %{result: result}) do
+  def render("api_result.json", %{payload: payload}) do
     %{
-      result: result
+      result: payload
     }
   end
+
 end

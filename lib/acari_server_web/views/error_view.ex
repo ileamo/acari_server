@@ -13,4 +13,11 @@ defmodule AcariServerWeb.ErrorView do
   def template_not_found(template, _assigns) do
     Phoenix.Controller.status_message_from_template(template)
   end
+
+  ###
+  def render("500.json", %{reason: reason, stack: stack}) do
+    %{
+      error: %{message: "Internal Server Error", data: "#{inspect(reason)} #{inspect(stack)}"}
+    }
+  end
 end
