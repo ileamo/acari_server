@@ -44,14 +44,19 @@ defmodule AcariServerWeb.Api.BogatkaController do
   end
 
   def bogatka(conn, %{"method" => "get.clients_list"}) do
-    render(conn, "api_error.json", payload: %{message: "Bad params", data: "Must be parameter 'group' with group id, name or true for all groups"})
+    render(conn, "api_error.json",
+      payload: %{
+        message: "Bad params",
+        data: "Must be parameter 'group' with group id, name or true for all groups"
+      }
+    )
   end
 
   # Get.metric
   def bogatka(
         conn,
         params = %{
-          "method" => "get.metric",
+          "method" => "get.metrics",
           "params" => %{"clients" => client}
         }
       )
@@ -62,7 +67,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
   def bogatka(
         conn,
         params = %{
-          "method" => "get.metric",
+          "method" => "get.metrics",
           "params" => %{"metrics" => metric}
         }
       )
@@ -71,7 +76,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
   end
 
   def bogatka(conn, %{
-        "method" => "get.metric",
+        "method" => "get.metrics",
         "params" => %{"clients" => clients_list, "metrics" => metrics_list}
       })
       when is_list(clients_list) and is_list(metrics_list) do
@@ -79,7 +84,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
   end
 
   def bogatka(conn, %{
-        "method" => "get.metric",
+        "method" => "get.metrics",
         "params" => %{"group" => group, "metrics" => metrics_list}
       })
       when is_list(metrics_list) do
@@ -93,7 +98,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
   def bogatka(
         conn,
         params = %{
-          "method" => "get.metric"
+          "method" => "get.metrics"
         }
       ) do
     IO.inspect(params)
@@ -113,11 +118,16 @@ defmodule AcariServerWeb.Api.BogatkaController do
       %{
         client: id,
         metrics:
-          AcariServer.Mnesia.get_tunnel_state(id)
-          |> Enum.filter(fn {metric_id, _} -> Enum.member?(metrics_list, metric_id) end)
-          |> Enum.map(fn {id, map} ->
-            %{name: id, data: map[:data], timestamp: map[:timestamp]}
-          end)
+          (AcariServer.Mnesia.get_tunnel_state(id)
+           |> Enum.filter(fn {metric_id, _} -> Enum.member?(metrics_list, metric_id) end)
+           |> Enum.map(fn {id, map} ->
+             %{name: id, data: map[:data], timestamp: map[:timestamp], source: "script"}
+           end)) ++
+            (AcariServer.Mnesia.get_zabbix(id)
+             |> Enum.filter(fn %{key: key} -> Enum.member?(metrics_list, key) end)
+             |> Enum.map(fn %{key: key, value: value, timestamp: timestamp} ->
+               %{name: key, data: value, timestamp: timestamp, source: "zabbix"}
+             end))
       }
     end)
   end
