@@ -27,31 +27,10 @@ defmodule AcariServerWeb.Api.BogatkaController do
     render(conn, "api_result.json", %{result: "OK"})
   end
 
-  def bogatka(conn, %{"method" => "get.clients_list", "params" => %{"group" => name}}) do
-    case AcariServer.GroupManager.get_group_by_name(name) do
-      group = %AcariServer.GroupManager.Group{} ->
-        clients_list =
-          group
-          |> Map.get(:nodes)
-          |> Enum.map(fn client ->
-            %{
-              name: client.name,
-              description: client.description,
-              address: client.address,
-              lock: client.lock
-            }
-          end)
-
-        render(conn, "api_result.json", %{payload: %{clients_list: clients_list, group: name}})
-
-      _ ->
-        render(conn, "api_error.json", payload: %{message: "no such group", data: name})
-    end
-  end
-
-  def bogatka(conn, %{"method" => "get.clients_list"}) do
+  # Get.clients_list
+  def bogatka(conn, %{"method" => "get.clients_list", "params" => %{"group" => group}}) do
     clients_list =
-      AcariServer.NodeManager.list_nodes()
+      get_clients_from_group(group)
       |> Enum.map(fn client ->
         %{
           name: client.name,
@@ -64,13 +43,100 @@ defmodule AcariServerWeb.Api.BogatkaController do
     render(conn, "api_result.json", %{payload: %{clients_list: clients_list}})
   end
 
-  def bogatka(conn, %{"method" => "get.client", "params" => %{"id" => id}}) do
-    tun = AcariServer.Mnesia.get_tunnel_state(id)
-    # links_state = AcariServer.Mnesia.get_link_list_for_tunnel(id)
-    render(conn, "api_result.json", %{payload: tun})
+  def bogatka(conn, %{"method" => "get.clients_list"}) do
+    render(conn, "api_error.json", payload: %{message: "Bad params", data: "Must be parameter 'group' with group id, name or true for all groups"})
   end
 
+  # Get.metric
+  def bogatka(
+        conn,
+        params = %{
+          "method" => "get.metric",
+          "params" => %{"clients" => client}
+        }
+      )
+      when is_binary(client) do
+    bogatka(conn, params |> put_in(["params", "clients"], [client]))
+  end
+
+  def bogatka(
+        conn,
+        params = %{
+          "method" => "get.metric",
+          "params" => %{"metrics" => metric}
+        }
+      )
+      when is_binary(metric) do
+    bogatka(conn, params |> put_in(["params", "metrics"], [metric]))
+  end
+
+  def bogatka(conn, %{
+        "method" => "get.metric",
+        "params" => %{"clients" => clients_list, "metrics" => metrics_list}
+      })
+      when is_list(clients_list) and is_list(metrics_list) do
+    render(conn, "api_result.json", %{payload: get_metric(clients_list, metrics_list)})
+  end
+
+  def bogatka(conn, %{
+        "method" => "get.metric",
+        "params" => %{"group" => group, "metrics" => metrics_list}
+      })
+      when is_list(metrics_list) do
+    clients_list =
+      get_clients_from_group(group)
+      |> Enum.map(fn %{name: name} -> name end)
+
+    render(conn, "api_result.json", %{payload: get_metric(clients_list, metrics_list)})
+  end
+
+  def bogatka(
+        conn,
+        params = %{
+          "method" => "get.metric"
+        }
+      ) do
+    IO.inspect(params)
+    render(conn, "api_error.json", payload: %{message: "Bad params", data: params})
+  end
+
+  # default
   def bogatka(conn, params) do
-    render(conn, "api_error.json", payload: %{message: "bad request", data: params})
+    IO.inspect(params)
+    render(conn, "api_error.json", payload: %{message: "Bad request", data: params})
+  end
+
+  # Functions
+  def get_metric(clients_list, metrics_list) do
+    clients_list
+    |> Enum.map(fn id ->
+      %{
+        client: id,
+        metrics:
+          AcariServer.Mnesia.get_tunnel_state(id)
+          |> Enum.filter(fn {metric_id, _} -> Enum.member?(metrics_list, metric_id) end)
+          |> Enum.map(fn {id, map} ->
+            %{name: id, data: map[:data], timestamp: map[:timestamp]}
+          end)
+      }
+    end)
+  end
+
+  defp get_clients_from_group(group) do
+    case group do
+      true ->
+        AcariServer.NodeManager.list_nodes()
+
+      _ ->
+        case group do
+          name when is_binary(name) -> AcariServer.GroupManager.get_group_by_name(name)
+          id when is_integer(id) -> AcariServer.GroupManager.get_group_with_nodes(id)
+          _ -> nil
+        end
+        |> case do
+          %AcariServer.GroupManager.Group{nodes: client_list} -> client_list
+          _ -> []
+        end
+    end
   end
 end
