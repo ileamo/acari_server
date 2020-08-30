@@ -275,4 +275,18 @@ defmodule AcariServer.NodeManager do
     |> select(fragment("count(*)"))
     |> RepoRO.one()
   end
+
+  def lock_unlock(name) when is_binary(name) do
+    lock_unlock(get_node_by_name(name))
+  end
+
+  def lock_unlock(node = %Node{}) do
+    node_params = %{"lock" => true, "groups_list" => false}
+    {:ok, node} = update_node(node, node_params)
+    AcariServer.Master.delete_tunnel(node.name)
+    node_params = %{"lock" => false, "groups_list" => false}
+    {:ok, _} = update_node(node, node_params)
+  end
+
+  def lock_unlock(_), do: nil
 end

@@ -26,6 +26,23 @@ defmodule AcariServer.Scheduler.Api do
     AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_active_key(), to_string(active))
   end
 
+  def purge_status_messages() do
+    cts = :os.system_time(:microsecond)
+    hours = AcariServer.SysConfigManager.get_conf_by_key("system.client_status.ttl") || ""
+
+    hours =
+      case Integer.parse(String.trim(hours)) do
+        {n, ""} -> n
+        _ -> 0
+      end
+
+    if hours > 0 do
+      AcariServer.Mnesia.get_client_status()
+      |> Enum.filter(fn %{timestamp: ts} -> cts - ts > hours * 60 * 60 * 1_000_000 end)
+      |> Enum.each(fn %{name: name} -> AcariServer.NodeManager.lock_unlock(name) end)
+    end
+  end
+
   def exec_script_on_schedule(shedule_id) do
     with %AcariServer.ScheduleManager.Schedule{} = schedule <-
            AcariServer.ScheduleManager.get_schedule(shedule_id) do

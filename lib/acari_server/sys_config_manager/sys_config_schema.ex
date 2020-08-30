@@ -32,6 +32,12 @@ defmodule AcariServer.SysConfigManager.Schema do
         type: :string
         },
       %{
+        key: "system.client_status.ttl",
+        name: "Время неактивности клиента",
+        description: "Через сколько часов неактивности перезапускать клиента",
+        type: :string
+        },
+      %{
         key: "global",
         name: "Глобальные переменные",
         description: "Список глобальных переменных, используемых в шаблонах и фильтрах",
