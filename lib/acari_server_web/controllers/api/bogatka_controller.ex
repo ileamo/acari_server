@@ -80,7 +80,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
         "params" => %{"clients" => clients_list, "metrics" => metrics_list}
       })
       when is_list(clients_list) and is_list(metrics_list) do
-    render(conn, "api_result.json", %{payload: get_metric(clients_list, metrics_list)})
+    render(conn, "api_result.json", %{payload: get_metrics(clients_list, metrics_list)})
   end
 
   def bogatka(conn, %{
@@ -92,7 +92,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
       get_clients_from_group(group)
       |> Enum.map(fn %{name: name} -> name end)
 
-    render(conn, "api_result.json", %{payload: get_metric(clients_list, metrics_list)})
+    render(conn, "api_result.json", %{payload: get_metrics(clients_list, metrics_list)})
   end
 
   def bogatka(
@@ -112,13 +112,14 @@ defmodule AcariServerWeb.Api.BogatkaController do
   end
 
   # Functions
-  def get_metric(clients_list, metrics_list) do
+  def get_metrics(clients_list, metrics_list) do
     clients_list
+    |> Enum.uniq()
     |> Enum.map(fn id ->
       %{
         client: id,
         metrics:
-          (AcariServer.Mnesia.get_tunnel_state(id)
+          ((AcariServer.Mnesia.get_tunnel_state(id) || [])
            |> Enum.filter(fn {metric_id, _} -> Enum.member?(metrics_list, metric_id) end)
            |> Enum.map(fn {id, map} ->
              %{name: id, data: map[:data], timestamp: map[:timestamp], source: "script"}
