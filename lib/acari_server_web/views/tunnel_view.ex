@@ -208,7 +208,7 @@ defmodule AcariServerWeb.TunnelView do
         length(list |> Enum.reject(fn x -> ts - x >= 60*60*24 end))
 
       _ ->
-        "Нет данных"
+        ""
     end
   end
 end

@@ -94,6 +94,12 @@ defmodule AcariServerWeb.ExportLive do
         type: :bogatka,
         title: "Сообщения ИИ",
         key: :wizard
+      },
+      %{
+        id: "bogatka_system_restart",
+        type: :bogatka,
+        title: "Рестартов за сутки",
+        key: :system
       }
     ]
 
@@ -343,6 +349,9 @@ defmodule AcariServerWeb.ExportLive do
                     end
                 end
             end
+
+          %{type: :bogatka, id: "bogatka_system_restart"} ->
+            AcariServerWeb.TunnelView.restarts_per_day(tun_state)
 
           %{type: :bogatka, key: :wizard} ->
             (tun_state[:wizard] || [])
