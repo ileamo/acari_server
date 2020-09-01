@@ -103,6 +103,7 @@
                 <span>
                   <select class="custom-select pl-0 pr-4" name="oper[<%= id %>]">
                     <option value="any" <%= if "any" == el[:oper], do: "selected" %> >any</option>
+                    <option value="exists" <%= if "exists" == el[:oper], do: "selected" %> >exists</option>
                     <option value="match" <%= if "match" == el[:oper], do: "selected" %> >match</option>
                     <option value="==" <%= if "==" == el[:oper], do: "selected" %> >==</option>
                     <option value=">" <%= if ">" == el[:oper], do: "selected" %> >&gt</option>

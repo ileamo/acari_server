@@ -79,6 +79,12 @@ defmodule AcariServerWeb.ExportLive do
         title: "Параметры",
         key: :params,
         prio: 50
+      },
+      %{
+        id: "node-comment",
+        type: :node,
+        title: "Комментарии",
+        prio: 60
       }
     ]
 
@@ -86,7 +92,7 @@ defmodule AcariServerWeb.ExportLive do
       %{
         id: "bogatka_wizard",
         type: :bogatka,
-        title: "Обнаруженные ошибки",
+        title: "Сообщения ИИ",
         key: :wizard
       }
     ]
@@ -110,10 +116,10 @@ defmodule AcariServerWeb.ExportLive do
 
     andor = Map.get(current_profile, :profile)["andor"] || "and"
 
-    type_dscr = [
+    type_descr = [
       node: "Параметры клиентов",
       script: "Скрипты",
-      bogatka: "ИИ Богатка"
+      bogatka: "Разное"
     ]
 
     {:ok,
@@ -128,7 +134,7 @@ defmodule AcariServerWeb.ExportLive do
        save_prof_ack: false,
        save_prof_name: "",
        save_err: "",
-       type_descr: type_dscr,
+       type_descr: type_descr,
        groups: groups,
        group_id: group_id,
        class_id: class_id,
@@ -310,6 +316,15 @@ defmodule AcariServerWeb.ExportLive do
           %{type: :script, name: name} ->
             tun_state[name][:data]
 
+          %{type: :node, id: "node-comment"} ->
+            node = node |> AcariServer.RepoRO.preload(client_comments: :user)
+
+            node.client_comments
+            |> Enum.map(fn %{comment: comment, user: %{username: username}} ->
+              "#{username}: #{comment}"
+            end)
+            |> Enum.join("\n")
+
           %{type: :node, key: key} ->
             case key do
               :groups ->
@@ -329,8 +344,8 @@ defmodule AcariServerWeb.ExportLive do
                 end
             end
 
-          %{type: :bogatka, key: key} ->
-            (tun_state[key] || [])
+          %{type: :bogatka, key: :wizard} ->
+            (tun_state[:wizard] || [])
             |> Enum.map(fn
               {"errormsg[" <> port, %{value: value}} ->
                 "#{String.slice(port, 0..-2)}: #{value}"
@@ -341,13 +356,17 @@ defmodule AcariServerWeb.ExportLive do
             |> Enum.reject(&is_nil/1)
             |> Enum.join("\n")
 
-          %{name: _} ->
+          element ->
+            IO.inspect(element)
             ""
         end)
       end)
       |> Enum.filter(fn x ->
         Enum.zip(ass.right, x)
         |> Enum.reduce_while(true, fn
+          {%{oper: "exists"} = el, val}, _ ->
+            (normalize(val) != "") |> neg(el[:negative]) |> cont_halt(ass.andor)
+
           {%{oper: "match"} = el, val}, _ ->
             match(val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
