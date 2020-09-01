@@ -57,17 +57,6 @@ defmodule AcariServerWeb.Api.BogatkaController do
         conn,
         params = %{
           "method" => "get.metrics",
-          "params" => %{"clients" => client}
-        }
-      )
-      when is_binary(client) do
-    bogatka(conn, params |> put_in(["params", "clients"], [client]))
-  end
-
-  def bogatka(
-        conn,
-        params = %{
-          "method" => "get.metrics",
           "params" => %{"metrics" => metric}
         }
       )
@@ -77,21 +66,10 @@ defmodule AcariServerWeb.Api.BogatkaController do
 
   def bogatka(conn, %{
         "method" => "get.metrics",
-        "params" => %{"clients" => clients_list, "metrics" => metrics_list}
-      })
-      when is_list(clients_list) and is_list(metrics_list) do
-    render(conn, "api_result.json", %{payload: get_metrics(clients_list, metrics_list)})
-  end
-
-  def bogatka(conn, %{
-        "method" => "get.metrics",
-        "params" => %{"group" => group, "metrics" => metrics_list}
+        "params" => %{"metrics" => metrics_list} = params
       })
       when is_list(metrics_list) do
-    clients_list =
-      get_clients_from_group(group)
-      |> Enum.map(fn %{name: name} -> name end)
-
+    clients_list = get_clients_list(params)
     render(conn, "api_result.json", %{payload: get_metrics(clients_list, metrics_list)})
   end
 
@@ -101,8 +79,18 @@ defmodule AcariServerWeb.Api.BogatkaController do
           "method" => "get.metrics"
         }
       ) do
-    IO.inspect(params)
     render(conn, "api_error.json", payload: %{message: "Bad params", data: params})
+  end
+
+  def bogatka(
+        conn,
+        %{
+          "method" => "get.ai_notes",
+          "params" => params
+        }
+      ) do
+    clients_list = get_clients_list(params)
+    render(conn, "api_result.json", %{payload: get_ai_notes(clients_list)})
   end
 
   # default
@@ -112,7 +100,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
   end
 
   # Functions
-  def get_metrics(clients_list, metrics_list) do
+  defp get_metrics(clients_list, metrics_list) do
     clients_list
     |> Enum.uniq()
     |> Enum.map(fn id ->
@@ -132,6 +120,37 @@ defmodule AcariServerWeb.Api.BogatkaController do
       }
     end)
   end
+
+  defp get_ai_notes(clients_list) do
+    clients_list
+    |> Enum.uniq()
+    |> Enum.map(fn id ->
+      %{
+        client: id,
+        ai_notes: (AcariServer.Mnesia.get_tunnel_state(id)[:wizard] || [])
+        |> Enum.map(fn
+              {"errormsg[" <> port, %{value: value}} ->
+                %{port: String.slice(port, 0..-2), message: value}
+
+              _ ->
+                nil
+            end)
+            |> Enum.reject(&is_nil/1)
+
+        #|> inspect()
+      }
+    end)
+  end
+
+  defp get_clients_list(%{"clients" => client}) when is_binary(client), do: [client]
+  defp get_clients_list(%{"clients" => client}) when is_list(client), do: client
+
+  defp get_clients_list(%{"group" => group}) do
+    get_clients_from_group(group)
+    |> Enum.map(fn %{name: name} -> name end)
+  end
+
+  defp get_clients_list(_), do: []
 
   defp get_clients_from_group(group) do
     case group do
