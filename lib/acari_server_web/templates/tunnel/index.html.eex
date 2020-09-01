@@ -44,7 +44,9 @@
       <th scope="col">Link UP</th>
       <th scope="col">Link DOWN</th>
       <th scope="col">N</th>
-      <th scope="col" class="not-export-col">----</th>
+      <th scope="col" class="not-export-col"></th>
+      <th scope="col" class="not-export-col"></th>
+      <th scope="col" class="not-export-col"></th>
 
     </tr>
   </thead>
@@ -72,21 +74,23 @@
       <td><%= tunnel[:links_down] %></td>
       <td><%= tunnel[:links_number] %></td>
       <td>
-        <%= render AcariServerWeb.NodeView, "client_comments.html",
-              current_user: @current_user, node: tunnel %>
-
         <%= if !tunnel.node.lock do %>
             <%= link to: Routes.node_path(@conn, :lock_unlock, tunnel.node),
                      data: [confirm: "Перезапустить клиента"] do %>
               <i class="fas fa-recycle mx-1"></i>
             <% end %>
         <% end %>
-
-          <%= if err = is_errormsg(tunnel[:name]) do %>
-            <span class="text-danger" data-toggle="tooltip" data-html="true" title="<div class='text-left'><%= err %></div>">
-              <i class="fas fa-exclamation ml-1"></i>
-            </span>
-          <% end %>
+      </td>
+      <td>
+        <%= render AcariServerWeb.NodeView, "client_comments.html",
+        current_user: @current_user, node: tunnel %>
+      </td>
+      <td>
+        <%= if err = is_errormsg(tunnel[:name]) do %>
+          <span class="text-danger" data-toggle="tooltip" data-html="true" title="<div class='text-left'><%= err %></div>">
+            <i class="fas fa-exclamation ml-1"></i>
+          </span>
+        <% end %>
       </td>
     </tr>
 <% end %>

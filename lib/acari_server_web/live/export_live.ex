@@ -374,7 +374,7 @@ defmodule AcariServerWeb.ExportLive do
         Enum.zip(ass.right, x)
         |> Enum.reduce_while(true, fn
           {%{oper: "exists"} = el, val}, _ ->
-            (normalize(val) != "") |> neg(el[:negative]) |> cont_halt(ass.andor)
+          exists(val) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
           {%{oper: "match"} = el, val}, _ ->
             match(val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
@@ -556,6 +556,11 @@ defmodule AcariServerWeb.ExportLive do
       select_id
     end
   end
+
+  defp exists(nil), do: false
+  defp exists(val) when is_binary(val), do:  String.trim(val) != ""
+  defp exists(_), do: true
+
 
   defp match(val, pattern) do
     Wild.match?(normalize(val), normalize(pattern))
