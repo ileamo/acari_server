@@ -324,6 +324,37 @@ defmodule AcariServer.Mnesia do
     end
   end
 
+  def update_tun_opt(name, path, update_fn) do
+    Mnesia.transaction(fn ->
+      case Mnesia.wread({:tun, name}) do
+        [] ->
+          Logger.error("#{name}: Can't update tun opt, No such tunnel")
+
+        [record] ->
+          opt = Rec.tun(record, :opt) || %{}
+          path = Enum.map(path, &Access.key(&1, %{}))
+          {_, opt} = get_and_update_in(opt, path, &{&1, update_fn.(&1)})
+          Mnesia.write(Rec.tun(record, opt: opt))
+      end
+    end)
+  end
+
+  def get_tun_opt(name) do
+    case Mnesia.dirty_read(:tun, name) do
+      [] -> nil
+      [record] -> Rec.tun(record, :opt) || %{}
+    end
+  end
+
+  defp update_tun_opt_alive(name, status) do
+    ct = fn _ -> :erlang.system_time(:second) end
+    case status do
+      true -> update_tun_opt(name, [:last_up], ct)
+      false -> update_tun_opt(name, [:last_down], ct)
+    end
+  end
+
+
   def update_tun_state(name, tag, data, opts \\ []) do
     Mnesia.transaction(fn ->
       case Mnesia.wread({:tun, name}) do
@@ -669,6 +700,7 @@ defmodule AcariServer.Mnesia do
             end)
 
           AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 1)
+          update_tun_opt_alive(tun, true)
           update_active_tun_chart(num)
 
           if get_main_server(tun) == node() do
@@ -691,6 +723,7 @@ defmodule AcariServer.Mnesia do
               end)
 
             AcariServer.Zabbix.ZbxApi.zbx_send(tun, "alive", 0)
+            update_tun_opt_alive(tun, false)
             update_active_tun_chart(num)
           end
 

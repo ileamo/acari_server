@@ -66,6 +66,7 @@ defmodule AcariServer.Master do
     Mnesia.add_tunnel(
       name: tun_name,
       server_id: node(),
+      opt: %{created: :erlang.system_time(:second)},
       state: %{},
       srv_state: %{}
     )
