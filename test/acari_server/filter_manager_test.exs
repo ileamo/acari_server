@@ -19,9 +19,9 @@ defmodule AcariServer.FilterManagerTest do
       filter
     end
 
-    test "list_filrers/0 returns all filrers" do
+    test "list_filters/0 returns all filrers" do
       filter = filter_fixture()
-      assert FilterManager.list_filrers() == [filter]
+      assert FilterManager.list_filters() == [filter]
     end
 
     test "get_filter!/1 returns the filter with given id" do

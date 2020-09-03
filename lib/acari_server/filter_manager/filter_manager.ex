@@ -5,6 +5,7 @@ defmodule AcariServer.FilterManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.FilterManager.Filter
 
@@ -13,17 +14,17 @@ defmodule AcariServer.FilterManager do
 
   ## Examples
 
-      iex> list_filrers()
+      iex> list_filters()
       [%Filter{}, ...]
 
   """
-  def list_filrers() do
-    Repo.all(Filter)
+  def list_filters() do
+    RepoRO.all(Filter)
     |> Repo.preload(:user)
   end
 
-  def list_filrers(user) do
-    Repo.all(Filter)
+  def list_filters(user) do
+    RepoRO.all(Filter)
     |> Enum.filter(fn %{user_id: user_id, common: common} -> common or user.id == user_id end)
   end
 
@@ -42,12 +43,12 @@ defmodule AcariServer.FilterManager do
 
   """
   def get_filter!(id) do
-    Repo.get!(Filter, id)
-    |> Repo.preload(:user)
+    RepoRO.get!(Filter, id)
+    |> RepoRO.preload(:user)
   end
 
   def get_filter_wo_user!(id) do
-    Repo.get!(Filter, id)
+    RepoRO.get!(Filter, id)
   end
 
   @doc """

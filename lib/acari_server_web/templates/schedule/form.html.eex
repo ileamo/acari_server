@@ -50,7 +50,7 @@
   <div class="form-group row">
     <%= label f, "Фильтр", class: "col-sm-2 col-form-label" %>
     <div class="col-sm-10">
-      <% filters_list = AcariServer.FilterManager.list_filrers(@current_user)
+      <% filters_list = AcariServer.FilterManager.list_filters(@current_user)
                     |> Enum.map(fn %{description: d, filter: f} ->
                       f = String.trim(f)
                       {"#{d}: #{f}", f} end)

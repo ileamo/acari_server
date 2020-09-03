@@ -20,9 +20,13 @@ defmodule AcariServer.AuditManager do
   end
 
   def create_audit(attrs \\ %{}) do
-    %Audit{}
-    |> Audit.changeset(attrs)
-    |> Repo.insert()
+    try do
+      %Audit{}
+      |> Audit.changeset(attrs)
+      |> Repo.insert()
+    rescue
+      _ -> nil
+    end
   end
 
   def delete_audit(%Audit{} = audit) do
@@ -44,7 +48,7 @@ defmodule AcariServer.AuditManager do
     "group" => "Группа",
     "schedule" => "Планировщик",
     "template" => "Шаблон",
-    "auth" => "Аутентификация",
+    "auth" => "Аутентификация"
   }
 
   @operation_descr %{

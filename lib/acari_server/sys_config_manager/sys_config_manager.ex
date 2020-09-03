@@ -5,6 +5,7 @@ defmodule AcariServer.SysConfigManager do
 
   import Ecto.Query, warn: false
   alias AcariServer.Repo
+  alias AcariServer.RepoRO
 
   alias AcariServer.SysConfigManager.SysConfig
 
@@ -18,7 +19,7 @@ defmodule AcariServer.SysConfigManager do
 
   """
   def list_sysconfigs do
-    Repo.all(SysConfig)
+    RepoRO.all(SysConfig)
   end
 
   @doc """
@@ -35,10 +36,10 @@ defmodule AcariServer.SysConfigManager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_sys_config!(id), do: Repo.get!(SysConfig, id)
+  def get_sys_config!(id), do: RepoRO.get!(SysConfig, id)
 
   def get_conf_by_key(key) do
-    case Repo.get_by(SysConfig, key: key) do
+    case RepoRO.get_by(SysConfig, key: key) do
       %{value: value} -> value
       _ -> nil
     end

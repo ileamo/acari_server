@@ -62,7 +62,7 @@
           type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         </button>
         <div class="dropdown-menu" id="grp-oper-filter-list" style="max-width:400px;">
-          <% filters = AcariServer.FilterManager.list_filrers(@current_user)
+          <% filters = AcariServer.FilterManager.list_filters(@current_user)
                         |> Enum.sort_by(fn %{description: d, filter: f, common: c} ->
                           "#{c && "1" || "0"}#{is_binary(d) && String.trim(d) || ""}#{f}" end)
           %>

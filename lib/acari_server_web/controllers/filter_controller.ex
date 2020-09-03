@@ -18,13 +18,13 @@ defmodule AcariServerWeb.FilterController do
   end
 
   def index(%{assigns: %{current_user: %{is_admin: true}}} = conn, _params) do
-    filrers = FilterManager.list_filrers()
+    filrers = FilterManager.list_filters()
     render(conn, "index.html", filrers: filrers)
   end
 
   def index(%{assigns: %{current_user: %{id: user_id}}} = conn, _params) do
     filrers =
-      FilterManager.list_filrers()
+      FilterManager.list_filters()
       |> Enum.filter(fn %{user_id: id} -> id == user_id end)
 
     render(conn, "index.html", filrers: filrers)
