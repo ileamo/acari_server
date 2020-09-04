@@ -114,15 +114,24 @@ defmodule AcariServerWeb.Api.BogatkaController do
           ((AcariServer.Mnesia.get_tunnel_state(id) || [])
            |> Enum.filter(fn {metric_id, _} -> Enum.member?(metrics_list, metric_id) end)
            |> Enum.map(fn {id, map} ->
-             %{name: id, data: map[:data], timestamp: map[:timestamp], source: "script"}
+             %{name: id, data: map[:data] |> try_json(), timestamp: map[:timestamp], source: "script"}
            end)) ++
             (AcariServer.Mnesia.get_zabbix(id)
              |> Enum.filter(fn %{key: key} -> Enum.member?(metrics_list, key) end)
              |> Enum.map(fn %{key: key, value: value, timestamp: timestamp} ->
-               %{name: key, data: value, timestamp: timestamp, source: "zabbix"}
+               %{name: key, data: value |> try_json(), timestamp: timestamp, source: "zabbix"}
              end))
       }
     end)
+  end
+
+  defp try_json(str) do
+    case Jason.decode(str)
+    |> IO.inspect()
+    do
+      {:ok, map} -> map
+      _ -> str
+    end
   end
 
   defp get_ai_notes(clients_list) do
