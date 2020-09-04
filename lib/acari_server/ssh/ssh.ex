@@ -15,7 +15,7 @@ defmodule AcariServer.SSH do
     true
   end
 
-  def shell(username, peer) do
+  def shell(username, _peer) do
     spawn_link(__MODULE__, :on_shell, [username])
 
     # IEx.start([])

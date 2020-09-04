@@ -64,7 +64,9 @@ defmodule AcariServer.AuditManager do
     "logout" => "Выход",
     "logerr" => "Неудачный вход",
     "client_script" => "Выполнение скрипта",
-    "server_script" => "Выполнение скрипта на сервере"
+    "server_script" => "Выполнение скрипта на сервере",
+    "signin" => "Авторизация API",
+    "signin_err" => "Неудачная авторизация API"
   }
 
   def create_audit_log(conn, object, operation, params \\ %{}) do

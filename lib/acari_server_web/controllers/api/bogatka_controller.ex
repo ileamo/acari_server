@@ -1,23 +1,28 @@
 defmodule AcariServerWeb.Api.BogatkaController do
   use AcariServerWeb, :controller
   alias AcariServer.UserManager.Guardian
+  alias AcariServer.AuditManager
 
   def sign_in(conn, %{"username" => username, "password" => password}) do
     case AcariServer.UserManager.authenticate_user(username, password) do
-      {:ok, user} ->
+      {:ok, user = %{is_admin: true}} ->
         {:ok, jwt, _claims} =
           Guardian.encode_and_sign(
             %{
               user: user
             },
             %{},
-            ttl: {60 * 24 * 365, :minute}
+            ttl: {60, :minute}
           )
 
-        render(conn, "auth.json", %{username: user.username, jwt: jwt})
+        conn
+        |> AuditManager.create_audit_log({"auth", username}, "signin")
+        |> render("auth.json", %{username: user.username, jwt: jwt})
 
-      {:error, reason} ->
-        render(conn, "api_error.json", %{payload: %{message: reason}})
+      _ ->
+        conn
+        |> AuditManager.create_audit_log({"auth", username}, "signin_err")
+        |> render("api_error.json", %{payload: %{message: :invalid_credentials}})
     end
   end
 
@@ -95,7 +100,6 @@ defmodule AcariServerWeb.Api.BogatkaController do
 
   # default
   def bogatka(conn, params) do
-    IO.inspect(params)
     render(conn, "api_error.json", payload: %{message: "Bad request", data: params})
   end
 
@@ -127,17 +131,16 @@ defmodule AcariServerWeb.Api.BogatkaController do
     |> Enum.map(fn id ->
       %{
         client: id,
-        ai_notes: (AcariServer.Mnesia.get_tunnel_state(id)[:wizard] || [])
-        |> Enum.map(fn
-              {"errormsg[" <> port, %{value: value}} ->
-                %{port: String.slice(port, 0..-2), message: value}
+        ai_notes:
+          (AcariServer.Mnesia.get_tunnel_state(id)[:wizard] || [])
+          |> Enum.map(fn
+            {"errormsg[" <> port, %{value: value}} ->
+              %{port: String.slice(port, 0..-2), message: value}
 
-              _ ->
-                nil
-            end)
-            |> Enum.reject(&is_nil/1)
-
-        #|> inspect()
+            _ ->
+              nil
+          end)
+          |> Enum.reject(&is_nil/1)
       }
     end)
   end
