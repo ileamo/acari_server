@@ -186,8 +186,14 @@ defmodule AcariServer.Master do
   end
 
   def set_script(tun_name, script_id, data) do
-    data = %{timestamp: :os.system_time(:second), data: data}
-    AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
+    case String.trim(data) do
+      "" ->
+        nil
+
+      _ ->
+        data = %{timestamp: :os.system_time(:second), data: data}
+        AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
+    end
   end
 
   def exec_local_script(tun_name, template \\ :local) do
