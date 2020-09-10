@@ -3,7 +3,7 @@ defmodule AcariServerWeb.SysConfigLive.MapComponent do
   alias AcariServer.SysConfigManager
 
   require AcariServer.SysConfig
-  AcariServer.SysConfig.component_common()
+  AcariServer.SysConfig.component_common(%{show_map: false})
 
   def handle_event("show_map", _params, socket) do
     {:noreply, assign(socket, show_map: !socket.assigns.show_map)}
@@ -84,12 +84,18 @@ defmodule AcariServerWeb.SysConfigLive.MapComponent do
 
     sysconfig = SysConfigManager.get_sysconfigs_by_prefix(socket.assigns.key)
 
-  
+
     {:noreply, assign(socket, value: sysconfig, delete_list: [], new_value: "", name_error: "")}
   end
 
   def handle_event(event, params, socket) do
-    IO.inspect({event, params, socket.assigns})
     {:noreply, socket}
+  end
+
+  def show_vars(value) do
+    case Jason.encode(value) do
+      {:ok, json} -> json
+      _ -> inspect(value)
+    end
   end
 end

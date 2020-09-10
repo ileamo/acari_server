@@ -1,23 +1,28 @@
 defmodule AcariServer.SysConfig do
-  defmacro component_common do
+  defmacro component_common(
+             component_assigns \\ Macro.escape(%{}),
+             func \\ quote(do: fn x -> x end)
+           ) do
     quote do
       @impl true
       def update(assigns, socket) do
-        {:ok,
-         assign(socket,
-           key: assigns.id,
-           name: assigns.config.name,
-           value: assigns.config.value,
-           color: "dark",
-           descr: "",
-           description: assigns.config.description,
-           descr_pb: 0,
-           select: assigns.config[:select],
-           show_map: false,
-           delete_list: [],
-           name_error: "",
-           new_value: ""
-         )}
+        assigns =
+          %{
+            key: assigns.id,
+            name: assigns.config.name,
+            value: assigns.config.value |> unquote(func).(),
+            color: "dark",
+            descr: "",
+            description: assigns.config.description,
+            descr_pb: 0,
+            select: assigns.config[:select],
+            delete_list: [],
+            name_error: "",
+            new_value: ""
+          }
+          |> Map.merge(unquote(component_assigns))
+
+        {:ok, assign(socket, assigns)}
       end
 
       @impl true

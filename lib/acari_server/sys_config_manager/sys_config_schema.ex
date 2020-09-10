@@ -42,6 +42,12 @@ defmodule AcariServer.SysConfigManager.Schema do
         name: "Глобальные переменные",
         description: "Список глобальных переменных, используемых в шаблонах и фильтрах",
         type: :map
+        },
+      %{
+        key: "system.exports.sensor_list",
+        name: "Датчики для выгрузки",
+        description: "Список ключей датчиков, которые можно выгружать",
+        type: :list
         }
     ]
     |> Enum.uniq_by(fn %{key: key} -> key end)

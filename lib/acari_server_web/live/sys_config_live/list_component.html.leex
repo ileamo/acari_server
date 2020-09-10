@@ -2,8 +2,8 @@
   <div class="form-inline row mb-0 d-flex flex-nowrap">
     <div class="col-3"
       phx-click="descr" phx-target="<%= @myself %>"><%= @name %></div>
-    <button class="btn btn-outline-secondary ml-3" phx-click="show_map" phx-target="<%= @myself %>" phx-value-key="<%= @key %>">
-      <%= if @show_map do %>
+    <button class="btn btn-outline-secondary ml-3" phx-click="show_list" phx-target="<%= @myself %>" phx-value-key="<%= @key %>">
+      <%= if @show_list do %>
         Скрыть
       <% else %>
         Настроить
@@ -17,18 +17,18 @@
     <%= @descr %>
   </div>
 
-  <%= if @show_map do %>
+  <%= if @show_list do %>
   <div class="border border-info rounded p-1 my-2">
     <form phx-submit="new" phx-target="<%= @myself %>">
       <div class="d-flex justify-content-end my-2">
         <label class="col-form-label"
           phx-click="descr" phx-target="<%= @myself %>">
-          Добавить новую переменную
+          Добавить элемент списка
         </label>
         <div class="mx-2">
           <input class="form-control" type="text" name="new_global"
             phx-target="<%= @myself %>" value="<%= @new_value %>"
-            placeholder="Введите имя"/>
+            placeholder="Введите значение"/>
         </div>
         <button class="btn btn-outline-secondary" phx-target="<%= @myself %>" type="submit">
           <i class="fas fa-plus"></i>
@@ -52,13 +52,10 @@
     <% end %>
 
     <form phx-submit="save" phx-target="<%= @myself %>">
-      <%= if map_size(@value) == 0 do %>
-        <div class="text-right">Нет параметров</div>
-      <% else %>
-        <%= for {name,value} <- @value  do %>
+        <%= for {value, name} <- @value |> Enum.with_index do %>
           <div class="form-group row mb-1">
-            <label class="col-sm-3 offset-sm-1 col-form-label"><%= name %></label>
-            <div class="col-sm-8 d-flex">
+            <label class="col-sm-2 offset-sm-1 col-form-label"></label>
+            <div class="col-sm-9 d-flex">
               <input class="form-control" type="text" name="<%= name %>" value="<%= value %>"
                 phx-target="<%= @myself %>" phx-blur="input_blur" phx-value-name="<%= name %>"
                 placeholder="Введите значение"/>
@@ -70,7 +67,6 @@
             </div>
           </div>
         <% end %>
-      <% end %>
         <div class="d-flex justify-content-end mt-1">
           <button class="btn btn-outline-secondary"
                 phx-target="<%= @myself %>" type="submit">
