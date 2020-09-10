@@ -127,7 +127,6 @@ defmodule AcariServerWeb.Api.BogatkaController do
 
   defp try_json(str) do
     case Jason.decode(str)
-    |> IO.inspect()
     do
       {:ok, map} -> map
       _ -> str
