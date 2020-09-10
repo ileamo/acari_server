@@ -9,20 +9,20 @@ defmodule AcariServerWeb.SysConfigLive.ListComponent do
     &decode_value/1
   )
 
-  defp decode_value(val) when is_binary(val) do
+  def decode_value(val) when is_binary(val) do
     case Jason.decode(val) do
       {:ok, list} when is_list(list) -> list |> Enum.sort()
       _ -> []
     end
   end
 
-  defp decode_value(_), do: []
+  def decode_value(_), do: []
 
   def handle_event("show_list", _params, socket) do
     {:noreply, assign(socket, show_list: !socket.assigns.show_list)}
   end
 
-  def handle_event("new", %{"new_global" => val}, socket) do
+  def handle_event("new", %{"new_element" => val}, socket) do
     {:noreply, assign(socket, value: [val | socket.assigns.value])}
   end
 
@@ -66,7 +66,7 @@ defmodule AcariServerWeb.SysConfigLive.ListComponent do
     {:noreply, assign(socket, value: decode_value(value))}
   end
 
-  def handle_event(event, params, socket) do
+  def handle_event(event, _params, socket) do
     {:noreply, socket}
   end
 

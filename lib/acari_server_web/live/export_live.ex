@@ -44,6 +44,18 @@ defmodule AcariServerWeb.ExportLive do
         }
       end)
 
+    left_sensors =
+      AcariServer.SysConfigManager.get_conf_by_key("system.exports.sensor_list")
+      |> AcariServerWeb.SysConfigLive.ListComponent.decode_value()
+      |> Enum.map(fn sensor_name ->
+        %{
+          id: sensor_name,
+          type: :sensor,
+          title: sensor_name,
+          name: sensor_name
+        }
+      end)
+
     left_node = [
       %{
         id: "node-name",
@@ -103,7 +115,7 @@ defmodule AcariServerWeb.ExportLive do
       }
     ]
 
-    left = left_node ++ left_scripts ++ left_bogatka
+    left = left_node ++ left_scripts ++ left_sensors ++ left_bogatka
 
     right = []
 
@@ -125,6 +137,7 @@ defmodule AcariServerWeb.ExportLive do
     type_descr = [
       node: "Параметры клиентов",
       script: "Скрипты",
+      sensor: "Датчики",
       bogatka: "Разное"
     ]
 
@@ -322,6 +335,9 @@ defmodule AcariServerWeb.ExportLive do
           %{type: :script, name: name} ->
             tun_state[name][:data]
 
+          %{type: :sensor, name: name} ->
+            AcariServer.Mnesia.get_zabbix(tun_name, name)
+
           %{type: :node, id: "node-comment"} ->
             node = node |> AcariServer.RepoRO.preload(client_comments: :user)
 
@@ -374,7 +390,7 @@ defmodule AcariServerWeb.ExportLive do
         Enum.zip(ass.right, x)
         |> Enum.reduce_while(true, fn
           {%{oper: "exists"} = el, val}, _ ->
-          exists(val) |> neg(el[:negative]) |> cont_halt(ass.andor)
+            exists(val) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
           {%{oper: "match"} = el, val}, _ ->
             match(val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
@@ -558,9 +574,8 @@ defmodule AcariServerWeb.ExportLive do
   end
 
   defp exists(nil), do: false
-  defp exists(val) when is_binary(val), do:  String.trim(val) != ""
+  defp exists(val) when is_binary(val), do: String.trim(val) != ""
   defp exists(_), do: true
-
 
   defp match(val, pattern) do
     Wild.match?(normalize(val), normalize(pattern))

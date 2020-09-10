@@ -348,12 +348,12 @@ defmodule AcariServer.Mnesia do
 
   defp update_tun_opt_alive(name, status) do
     ct = fn _ -> :erlang.system_time(:second) end
+
     case status do
       true -> update_tun_opt(name, [:last_up], ct)
       false -> update_tun_opt(name, [:last_down], ct)
     end
   end
-
 
   def update_tun_state(name, tag, data, opts \\ []) do
     Mnesia.transaction(fn ->
@@ -1029,6 +1029,14 @@ defmodule AcariServer.Mnesia do
     Mnesia.transaction(fn ->
       Mnesia.write(Rec.zabbix(id: id, host: host, key: key, value: value, timestamp: ts))
     end)
+  end
+
+  def get_zabbix(host, key) do
+    case Mnesia.dirty_read({:zabbix, {host, key}}) do
+      [rec] -> Rec.zabbix(rec, :value)
+      _ -> nil
+    end
+
   end
 
   def get_zabbix(host) do
