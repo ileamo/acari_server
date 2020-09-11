@@ -301,6 +301,13 @@ defmodule AcariServer.Mnesia do
     purge_stat()
   end
 
+  def is_tunnel(name) do
+    case Mnesia.dirty_read(:tun, name) do
+      [] -> false
+      _ -> true
+    end
+  end
+
   def get_tunnels_num() do
     case Mnesia.table_info(:tun, :size) do
       n when is_number(n) -> n

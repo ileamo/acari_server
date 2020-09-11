@@ -83,7 +83,8 @@ defmodule AcariServer.Scheduler.Api do
                   {list, allow_map}
               end
 
-            if Enum.member?(allow_list, schedule.template_id) do
+            if AcariServer.Mnesia.is_tunnel(client.name) and
+                 Enum.member?(allow_list, schedule.template_id) do
               AcariServer.Master.exec_script_on_peer(client.name, schedule.template.name)
             end
 
