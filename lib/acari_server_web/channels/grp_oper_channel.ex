@@ -329,6 +329,7 @@ defmodule AcariServerWeb.GrpOperChannel do
         group_id ->
           AcariServer.GroupManager.get_group!(group_id)
           |> Map.get(:nodes)
+          |> AcariServer.RepoRO.preload(:groups)
       end
       |> Enum.reject(fn %{lock: lock} -> lock end)
 
