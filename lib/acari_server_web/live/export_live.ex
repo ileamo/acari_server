@@ -396,7 +396,7 @@ defmodule AcariServerWeb.ExportLive do
             match(val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
           {%{oper: oper} = el, val}, _ when oper in ["==", "<", "<=", ">", ">="] ->
-            num_cmp(oper, val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
+            cmp(oper, val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
           {el, _}, _ ->
             neg(true, el[:negative]) |> cont_halt(ass.andor)
@@ -581,18 +581,30 @@ defmodule AcariServerWeb.ExportLive do
     Wild.match?(normalize(val), normalize(pattern))
   end
 
-  defp num_cmp(oper, val, pattern) do
+  defp cmp(oper, val, pattern) do
     with pattern when not is_nil(pattern) <- to_number(pattern),
          val when not is_nil(val) <- to_number(val) do
-      case oper do
-        "==" -> val == pattern
-        ">" -> val > pattern
-        ">=" -> val >= pattern
-        "<" -> val < pattern
-        "<=" -> val <= pattern
-        _ -> false
-      end
+      cmp_(oper, val, pattern)
     else
+      _ ->
+        val = normalize(val)
+        pattern = normalize(pattern)
+
+        if val == "" or pattern == "" do
+          false
+        else
+          cmp_(oper, val, pattern)
+        end
+    end
+  end
+
+  defp cmp_(oper, val, pattern) do
+    case oper do
+      "==" -> val == pattern
+      ">" -> val > pattern
+      ">=" -> val >= pattern
+      "<" -> val < pattern
+      "<=" -> val <= pattern
       _ -> false
     end
   end
