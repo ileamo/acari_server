@@ -398,6 +398,9 @@ defmodule AcariServerWeb.ExportLive do
           {%{oper: oper} = el, val}, _ when oper in ["==", "<", "<=", ">", ">="] ->
             cmp(oper, val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
 
+          {%{oper: oper} = el, val}, _ when oper in ["time_diff_gt", "time_diff_lt"] ->
+            time_diff(oper, val, el[:filter]) |> neg(el[:negative]) |> cont_halt(ass.andor)
+
           {el, _}, _ ->
             neg(true, el[:negative]) |> cont_halt(ass.andor)
         end)
@@ -579,6 +582,38 @@ defmodule AcariServerWeb.ExportLive do
 
   defp match(val, pattern) do
     Wild.match?(normalize(val), normalize(pattern))
+  end
+
+  def time_diff(oper, val, pattern) do
+    with {:ok, datetime} <- NaiveDateTime.from_iso8601(normalize(val)),
+         {:ok, duration} <- get_duration(pattern),
+         {:ok, current_datetime} = AcariServer.naive_localtime() do
+      diff = NaiveDateTime.diff(current_datetime, datetime)
+
+      case oper do
+        "time_diff_gt" -> diff > duration
+        "time_diff_lt" -> diff < duration
+      end
+    else
+      _ -> false
+    end
+  end
+
+  defp get_duration(pattern) do
+    case Regex.run(~r"^(\d+)([smhd]?)$", normalize(pattern)) do
+      [_, val, unit] ->
+        {:ok,
+         String.to_integer(val) *
+           case unit do
+             "d" -> 60 * 60 * 24
+             "h" -> 60 * 60
+             "m" -> 60
+             _ -> 1
+           end}
+
+      _ ->
+        :error
+    end
   end
 
   defp cmp(oper, val, pattern) do

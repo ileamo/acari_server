@@ -15,6 +15,13 @@ defmodule AcariServer do
     |> (fn {:ok, tm} -> NaiveDateTime.to_string(tm) end).()
   end
 
+  def naive_localtime() do
+    NaiveDateTime.utc_now()
+    |> NaiveDateTime.to_erl()
+    |> :erlang.universaltime_to_localtime()
+    |> NaiveDateTime.from_erl()
+  end
+
   def get_local_date(system_time) do
     {{y, mn, d}, {h, m, s}} = :calendar.system_time_to_local_time(system_time, :second)
 
