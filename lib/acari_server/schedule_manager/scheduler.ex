@@ -38,7 +38,10 @@ defmodule AcariServer.Scheduler.Api do
 
     if hours > 0 do
       AcariServer.Mnesia.get_client_status()
-      |> Enum.filter(fn %{timestamp: ts} -> cts - ts > hours * 60 * 60 * 1_000_000 end)
+      |> Enum.filter(fn
+        %{timestamp: ts, opts: %{level: 1}} -> cts - ts > hours * 60 * 60 * 1_000_000
+        _ -> false
+      end)
       |> Enum.each(fn %{name: name} -> AcariServer.NodeManager.lock_unlock(name) end)
     end
   end
