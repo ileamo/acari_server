@@ -90,6 +90,7 @@ defmodule AcariServer.MixProject do
       {:zabbix,  git: "https://github.com/ileamo/zabbix.git"},
       {:zabbix_sender, "~> 1.0.0"},
       {:bbmustache, "~> 1.8"},
+      {:highlander, "~> 0.2"},
       {:tzdata, "~> 1.0.3"},
       {:quantum, "~> 3.0"},
       {:timex, "~> 3.0"},

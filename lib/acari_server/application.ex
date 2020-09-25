@@ -13,7 +13,6 @@ defmodule AcariServer.Application do
       AcariServer.RepoManager,
       AcariServer.Repo,
       AcariServer.RepoRO,
-
       AcariServerWeb.Telemetry,
 
       # Start the endpoint when the application starts
@@ -31,8 +30,7 @@ defmodule AcariServer.Application do
       AcariServer.Zabbix.Sup,
       AcariServer.Sup,
       {Task.Supervisor, name: AcariServer.TaskSup},
-
-      AcariServer.Scheduler
+      {Highlander, AcariServer.Scheduler}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

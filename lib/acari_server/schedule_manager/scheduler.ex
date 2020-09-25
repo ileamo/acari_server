@@ -21,6 +21,7 @@ defmodule AcariServer.Scheduler.Api do
   alias AcariServer.Scheduler
 
   def send_clients_number_to_zabbix() do
+    IO.inspect("QUANTUM 1")
     {num, active} = AcariServer.Mnesia.get_clients_number()
     AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_number_key(), to_string(num))
     AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_active_key(), to_string(active))
