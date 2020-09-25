@@ -2,6 +2,8 @@ defmodule AcariServer.Scheduler do
   use Quantum,
     otp_app: :acari_server
 
+  require Logger
+
   def init(config) do
     Task.start(__MODULE__, :init_task, [self()])
 
@@ -10,6 +12,7 @@ defmodule AcariServer.Scheduler do
 
   def init_task(_master_pid) do
     Process.sleep(1_000)
+    Logger.info("QUANTUM INIT")
     AcariServer.Scheduler.Api.update_script_jobs()
   end
 end
@@ -21,7 +24,6 @@ defmodule AcariServer.Scheduler.Api do
   alias AcariServer.Scheduler
 
   def send_clients_number_to_zabbix() do
-    IO.inspect("QUANTUM 1")
     {num, active} = AcariServer.Mnesia.get_clients_number()
     AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_number_key(), to_string(num))
     AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_active_key(), to_string(active))

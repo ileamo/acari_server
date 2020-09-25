@@ -41,7 +41,7 @@ config :acari,
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :acari_server, AcariServer.Scheduler,
-  debug_logging: true,
+  debug_logging: false,
   run_strategy: Quantum.RunStrategy.Local,
   timezone: "Europe/Moscow",
   jobs: [
