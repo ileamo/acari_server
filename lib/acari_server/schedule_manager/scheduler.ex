@@ -1,5 +1,5 @@
 defmodule AcariServer.Scheduler do
-  use Quantum.Scheduler,
+  use Quantum,
     otp_app: :acari_server
 
   def init(config) do

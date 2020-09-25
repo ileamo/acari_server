@@ -4,7 +4,7 @@ defmodule AcariServer.MixProject do
   def project do
     [
       app: :acari_server,
-      version: "1.3.6-pre2",
+      version: "1.3.6",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -90,7 +90,8 @@ defmodule AcariServer.MixProject do
       {:zabbix,  git: "https://github.com/ileamo/zabbix.git"},
       {:zabbix_sender, "~> 1.0.0"},
       {:bbmustache, "~> 1.8"},
-      {:quantum, "~> 2.3"},
+      {:tzdata, "~> 1.0.3"},
+      {:quantum, "~> 3.0"},
       {:timex, "~> 3.0"},
       {:wild, "~> 1.0.0"},
       {:navigation_history, "~> 0.3"},

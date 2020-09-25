@@ -38,9 +38,10 @@ config :acari_server, AcariServerWeb.Gettext, default_locale: "ru"
 config :acari,
   server: true
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 config :acari_server, AcariServer.Scheduler,
-  debug_logging: false,
-  global: true,
+  debug_logging: true,
   timezone: "Europe/Moscow",
   jobs: [
     # Every minute
