@@ -111,7 +111,7 @@ defmodule AcariServer.ScriptManager do
   """
   def delete_script(%Script{} = script) do
     res = Repo.delete_wait(script)
-    AcariServer.Scheduler.Api.update_script_jobs()
+    AcariServer.Scheduler.Api.quantum_apply(:update_script_jobs)
     res
   end
 
