@@ -72,7 +72,7 @@ defmodule AcariServer.ScheduleManager do
 
     case res do
       {:ok, schedule} ->
-        AcariServer.Scheduler.Api.add_job(schedule)
+        AcariServer.Scheduler.Api.quantum_apply(:add_job, [schedule])
         res
 
       _ ->
@@ -100,7 +100,7 @@ defmodule AcariServer.ScheduleManager do
 
     case res do
       {:ok, updated_schedule} ->
-        AcariServer.Scheduler.Api.update_job(updated_schedule)
+        AcariServer.Scheduler.Api.quantum_apply(:update_job, [updated_schedule])
 
         res
 
@@ -123,7 +123,7 @@ defmodule AcariServer.ScheduleManager do
   """
   def delete_schedule(%Schedule{} = schedule) do
     res = Repo.delete(schedule)
-    AcariServer.Scheduler.Api.update_script_jobs()
+    AcariServer.Scheduler.Api.quantum_apply(:update_script_jobs)
     res
   end
 
