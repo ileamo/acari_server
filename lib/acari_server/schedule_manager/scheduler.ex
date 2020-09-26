@@ -180,4 +180,13 @@ defmodule AcariServer.Scheduler.Api do
     |> Enum.reject(fn %{id: id} -> Enum.member?(job_id_list, id) end)
     |> Enum.each(fn sched -> add_job(sched) end)
   end
+
+  def quantum_apply(func, params) do
+    with pid when is_pid(pid) <- :global.whereis_name({Highlander, AcariServer.Scheduler}),
+         node when is_atom(node) <- :erlang.node(pid) do
+      Node.spawn(node, AcariServer.Scheduler.Api, func, params)
+    else
+      _ -> Logger.error("Can't config sneduler")
+    end
+  end
 end
