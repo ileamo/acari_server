@@ -14,13 +14,15 @@ defmodule AcariServer.Hs do
   end
 
   def init({sock, :tcp}) do
+    Process.send_after(self(), :hs_tmo, 60_000)
     {:ok, sock}
   end
 
   @impl true
   def handle_continue(:init, sock) do
-    case :ssl.handshake(sock) do
+    case :ssl.handshake(sock, 60_000) do
       {:ok, sslsock} ->
+        Process.send_after(self(), :hs_tmo, 60_000)
         {:noreply, %{sslsocket: sslsock}}
 
       {:error, err} ->
@@ -33,6 +35,11 @@ defmodule AcariServer.Hs do
   end
 
   @impl true
+  def handle_info(:hs_tmo, state) do
+    Logger.error("Client handshake timeout")
+    {:stop, :shutdown, state}
+  end
+
   def handle_info({:ssl, sslsocket, frame}, state) do
     handle_request(:ssl, sslsocket, frame)
     {:stop, :shutdown, state}
