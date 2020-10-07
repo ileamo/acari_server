@@ -17,6 +17,7 @@ defmodule AcariServer.Zabbix.Server do
   @impl true
   def init(listen_sock) do
     {:ok, sock} = :gen_tcp.accept(listen_sock)
+    Process.send_after(self(), :timeout, 60_000)
     {:ok, %State{socket: sock, rest: ""}}
   end
 
@@ -37,6 +38,11 @@ defmodule AcariServer.Zabbix.Server do
       _ ->
         {:noreply, %{state | rest: packet}}
     end
+  end
+
+  def handle_info(:timeout, state) do
+    Logger.error("ZBX server timeout")
+    {:stop, :shutdown, state}
   end
 
   def handle_info({:tcp_closed, _socket}, state) do
