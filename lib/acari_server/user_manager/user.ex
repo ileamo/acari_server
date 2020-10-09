@@ -4,6 +4,7 @@ defmodule AcariServer.UserManager.User do
 
   schema "users" do
     field :is_admin, :boolean, default: false
+    field :api, :boolean, default: false
     field :password_hash, :string
     field :username, :string
     field :description, :string
@@ -29,7 +30,7 @@ defmodule AcariServer.UserManager.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :description, :password, :rpt_psw, :is_admin])
+    |> cast(attrs, [:username, :description, :password, :rpt_psw, :is_admin, :api])
     |> validate_required([:username])
     |> validate_length(:username, min: 3, max: 32)
     |> validate_length(:password, min: 5, max: 32)

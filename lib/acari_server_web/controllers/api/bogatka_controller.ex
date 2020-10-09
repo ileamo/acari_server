@@ -5,7 +5,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
 
   def sign_in(conn, %{"username" => username, "password" => password}) do
     case AcariServer.UserManager.authenticate_user(username, password) do
-      {:ok, user = %{is_admin: true}} ->
+      {:ok, user = %{api: true}} ->
         {:ok, jwt, _claims} =
           Guardian.encode_and_sign(
             %{

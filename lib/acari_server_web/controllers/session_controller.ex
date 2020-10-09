@@ -45,6 +45,10 @@ defmodule AcariServerWeb.SessionController do
     |> redirect(to: "/login")
   end
 
+  defp login_reply({:ok, %{api: true}}, conn, username) do
+    login_reply({:error, :only_api}, conn, username)
+  end
+
   defp login_reply({:ok, user}, conn, username) do
     Logger.info("User #{username} logged in")
 

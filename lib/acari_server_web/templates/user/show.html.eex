@@ -18,6 +18,11 @@
   </li>
 
   <li>
+    <strong>API:</strong>
+    <%= @user.api %>
+  </li>
+
+  <li>
     <strong>Админ:</strong>
     <%= @user.is_admin %>
   </li>
