@@ -66,7 +66,7 @@ defmodule AcariServerWeb.SysConfigLive.ListComponent do
     {:noreply, assign(socket, value: decode_value(value))}
   end
 
-  def handle_event(event, _params, socket) do
+  def handle_event(_event, _params, socket) do
     {:noreply, socket}
   end
 

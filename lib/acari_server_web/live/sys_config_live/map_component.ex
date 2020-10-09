@@ -88,7 +88,7 @@ defmodule AcariServerWeb.SysConfigLive.MapComponent do
     {:noreply, assign(socket, value: sysconfig, delete_list: [], new_value: "", name_error: "")}
   end
 
-  def handle_event(event, params, socket) do
+  def handle_event(_event, _params, socket) do
     {:noreply, socket}
   end
 
