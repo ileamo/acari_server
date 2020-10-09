@@ -7,12 +7,15 @@ defmodule AcariServerWeb.TerminalChannel do
     with [_, tun_name] when is_binary(tun_name) <- Regex.run(~r|/([^/]+)$|, payload["pathname"]),
          node when not is_nil(node) <- AcariServer.Mnesia.get_main_server(tun_name),
          dstaddr when is_binary(dstaddr) <- AcariServer.Master.get_dstaddr(tun_name) do
+           rows = payload["rows"] || "24"
+           cols = payload["cols"] || "80"
       with {:ok, terminal} <-
              Terminal.start_child(node, %{
                output_pid: self(),
                tun_name: tun_name,
+               #command: '/bin/bash',
                command: 'ssh root@#{dstaddr} -o StrictHostKeyChecking=no',
-               init_send: "stty echo\n"
+               init_send: "stty echo\nstty rows #{rows} cols #{cols}\n"
              }) do
         Process.link(terminal)
         {:ok, assign(socket, :terminal, terminal)}
@@ -28,7 +31,9 @@ defmodule AcariServerWeb.TerminalChannel do
     end
   end
 
-  def join("terminal:2", _payload, socket) do
+  def join("terminal:2", payload, socket) do
+    rows = payload["rows"] || "40"
+    cols = payload["cols"] || "80"
     with username when is_binary(username) <-
            AcariServer.UserManager.get_username_by_id(socket.assigns.current_user_id),
          {:ok, terminal} <-
@@ -37,7 +42,7 @@ defmodule AcariServerWeb.TerminalChannel do
              tun_name: AcariServer.Mnesia.get_server_name_by_system_name(node()),
              command: '/bin/bash',
              init_send:
-               "stty echo\nstty rows 40\n" <>
+               "stty echo\nstty rows #{rows} cols #{cols}\n" <>
                  "screen -d -R -h 4096 -s /bin/bash -S #{username}\n"
            }) do
       Process.link(terminal)

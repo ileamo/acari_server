@@ -56,11 +56,11 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           <span class="navbar-brand">Состояние соединений</span>
         </div>
         <div class="navbar">
-            <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
+            <button class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
               href="#nm-links-state" role="button" aria-expanded="true" aria-controls="nm-links-state">
               Скрыть/Показать
             </button>
-            <button id="nm-get-links-state" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+            <button id="nm-get-links-state" class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2">
               Обновить
             </button>
         </div>
@@ -90,11 +90,11 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           </li>
         </ul>
         <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
+          <button class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
             href="#nm-script-field" role="button" aria-expanded="false" aria-controls="nm-script-field">
             Скрыть/Показать
           </button>
-            <button id="nm-update-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+            <button id="nm-update-script" class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2">
               Выполнить
             </button>
         </div>
@@ -122,11 +122,11 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           </li>
         </ul>
         <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
+          <button class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
             href="#nm-srv-script-field-collapse" role="button" aria-expanded="false" aria-controls="nm-srv-script-field-collapse">
             Скрыть/Показать
           </button>
-            <button id="nm-update-srv-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+            <button id="nm-update-srv-script" class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2">
               Выполнить
             </button>
         </div>
@@ -162,12 +162,12 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           </li>
         </ul>
         <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
+          <button class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
             href="#nm-zbx-script-field" role="button" aria-expanded="false"
             aria-controls="nm-zbx-script-field">
             Скрыть/Показать
           </button>
-            <button id="nm-update-zbx-script" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+            <button id="nm-update-zbx-script" class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2">
               Выполнить
             </button>
         </div>
@@ -184,11 +184,11 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
           <span class="navbar-brand">Датчики</span>
         </div>
         <div class="navbar">
-          <button class="btn btn-outline-primary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
+          <button class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2 mr-2"  data-toggle="collapse"
             href="#nm-sensors" role="button" aria-expanded="false" aria-controls="nm-sensors">
             Скрыть/Показать
           </button>
-          <button id="nm-get-sensors" class="btn btn-outline-primary btn-sm navbar-text py-1 px-2">
+          <button id="nm-get-sensors" class="btn btn-outline-secondary btn-sm navbar-text py-1 px-2">
             Обновить
           </button>
         </div>
@@ -196,16 +196,34 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
     <div class="collapse" id="nm-sensors"><%=get_sensors_html(@name)%></div>
     <hr/>
 
+    <div class="d-flex flex-row align-items-baseline justify-content-between">
+      <h5>Терминалы</h5>
+      <div class="d-flex flex-row align-items-center justify-content-right ml-3">
+        <span class="mr-1">Rows:</span>
+        <span class="mr-2">
+          <input id="nm-term-rows" class="form-control" type="number" name="rows" value="25">
+        </span>
+        <span class="mr-1">Cols:</span>
+        <span class="mr-2">
+          <input id="nm-term-cols" class="form-control" type="number" name="cols" value="80">
+        </span>
+        <span class="mr-1">Font:</span>
+        <span>
+          <input id="nm-term-font-size" class="form-control" type="number" name="font" value="17">
+        </span>
+      </div>
+    </div>
+
     <%= if  @current_user.is_admin or
           AcariServer.UserManager.get_user_node_rights(@current_user, @node.id) == "rw" do %>
-      <button id="start_xterm">Подключиться к клиенту</button>
-      <div id="acari-xterm"></div>
+      <button class="btn btn-outline-secondary mt-3" id="start_xterm">Подключиться к клиенту</button>
+      <div id="acari-xterm" style="width:500px;"></div>
     <% end %>
 
     <% terminal_list = AcariServer.TemplateManager.terminal_list(@name) %>
     <%= for {descr, script_name} <- terminal_list do %>
-      <button class="start-xterm-client mt-3" id="<%= script_name %>"><%= descr %></button>
-      <div id="acari-xterm-<%= script_name %>"></div>
+      <button class="btn btn-outline-secondary start-xterm-client mt-2" id="<%= script_name %>"><%= descr %></button>
+      <div id="acari-xterm-<%= script_name %>" style="width:500px;"></div>
     <% end %>
 
 
