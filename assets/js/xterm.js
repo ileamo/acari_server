@@ -53,6 +53,7 @@ function startClientXterm(el) {
   } else {
     names[id] = el.target.firstChild.data
     el.target.firstChild.data = "Отключить " + names[id];
+    term_restart_warning.innerText = ""
     let acari_xterm = document.getElementById('acari-xterm-' + id);
     if (acari_xterm) {
       channels[id] = socket.channel("terminal:" + id, {
@@ -101,6 +102,7 @@ function startXterm(el) {
     document.getElementById("start_xterm").firstChild.data = "Подключиться к клиенту";
   } else {
     document.getElementById("start_xterm").firstChild.data = "Отключить терминал";
+    term_restart_warning.innerText = ""
     let acari_xterm = document.getElementById('acari-xterm');
     if (acari_xterm) {
       channel = socket.channel("terminal:1", {
@@ -148,7 +150,7 @@ function startServXterm() {
   let sterm
   channel = socket.channel("terminal:2", {
     pathname: window.location.pathname,
-    rows: localStorage.getItem("xtermRows") || 24,
+    rows: localStorage.getItem("xtermRows") || 40,
     cols: localStorage.getItem("xtermCols") || 80
   })
   channel.join()
@@ -169,10 +171,59 @@ function startServXterm() {
   ) // To the Channel
 }
 
+//term sizes
+
+let term_restart_warning = document.getElementById("nm-term-restart-warning")
+let set_term_restart_warning = function() {
+  term_restart_warning.innerText = "Чтобы применить новые размеры, переподключите терминал"
+}
+
+
+let term_rows = document.getElementById("nm-term-rows")
+if (term_rows) {
+  term_rows.value = localStorage.getItem("termRows") || 24
+  term_rows.addEventListener("change", termRows, false);
+
+  function termRows(e) {
+    if (e.target.value) {
+      localStorage.setItem("termRows", e.target.value)
+      set_term_restart_warning()
+    }
+  }
+}
+
+let term_cols = document.getElementById("nm-term-cols")
+if (term_cols) {
+  term_cols.value = localStorage.getItem("termCols") || 80
+  term_cols.addEventListener("change", termCols, false);
+
+  function termCols(e) {
+    if (e.target.value) {
+      localStorage.setItem("termCols", e.target.value)
+      set_term_restart_warning()
+    }
+  }
+}
+
+let term_font_size = document.getElementById("nm-term-font-size")
+if (term_font_size) {
+  term_font_size.value = localStorage.getItem("termFontSize") || 17
+  term_font_size.addEventListener("change", termFontSize, false);
+
+  function termFontSize(e) {
+    if (e.target.value) {
+      localStorage.setItem("termFontSize", e.target.value)
+      set_term_restart_warning()
+    }
+  }
+}
+
+
+
 //xterm sizes
 let xterm_rows = document.getElementById("xterm-rows")
 if (xterm_rows) {
-  xterm_rows.value = localStorage.getItem("xtermRows") || 24
+  xterm_rows.value = localStorage.getItem("xtermRows") || 40
   xterm_rows.addEventListener("change", xtermRows, false);
 
   function xtermRows(e) {

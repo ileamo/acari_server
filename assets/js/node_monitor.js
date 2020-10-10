@@ -178,42 +178,6 @@ if (node_monitor) {
     })
   }
 
-  let term_rows = document.getElementById("nm-term-rows")
-  if (term_rows) {
-    term_rows.value = localStorage.getItem("termRows") || 24
-    term_rows.addEventListener("change", termRows, false);
-
-    function termRows(e) {
-      if (e.target.value) {
-        localStorage.setItem("termRows", e.target.value)
-      }
-    }
-  }
-
-  let term_cols = document.getElementById("nm-term-cols")
-  if (term_cols) {
-    term_cols.value = localStorage.getItem("termCols") || 80
-    term_cols.addEventListener("change", termCols, false);
-
-    function termCols(e) {
-      if (e.target.value) {
-        localStorage.setItem("termCols", e.target.value)
-      }
-    }
-  }
-
-  let term_font_size = document.getElementById("nm-term-font-size")
-  if (term_font_size) {
-    term_font_size.value = localStorage.getItem("termFontSize") || 17
-    term_font_size.addEventListener("change", termFontSize, false);
-
-    function termFontSize(e) {
-      if (e.target.value) {
-        localStorage.setItem("termFontSize", e.target.value)
-      }
-    }
-  }
-
   $('#link-state-proto-info').on('show.bs.modal', stateProtoInfoModal)
 
   function stateProtoInfoModal(event) {

@@ -15,7 +15,7 @@ defmodule AcariServerWeb.TerminalChannel do
                tun_name: tun_name,
                #command: '/bin/bash',
                command: 'ssh root@#{dstaddr} -o StrictHostKeyChecking=no',
-               init_send: "stty echo\nstty rows #{rows} cols #{cols}\n"
+               init_send: "stty echo rows #{rows} cols #{cols}\n\n"
              }) do
         Process.link(terminal)
         {:ok, assign(socket, :terminal, terminal)}
