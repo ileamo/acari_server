@@ -112,6 +112,7 @@ defmodule AcariServer.Mnesia do
     end
 
     update_servers_list(servers_db, true)
+    purge_zabbix()
   end
 
   # server
@@ -298,6 +299,7 @@ defmodule AcariServer.Mnesia do
       Mnesia.delete({:tun, name})
     end)
 
+    delete_zabbix(name)
     purge_stat()
   end
 
@@ -1034,7 +1036,9 @@ defmodule AcariServer.Mnesia do
     ts = :os.system_time(:second)
 
     Mnesia.transaction(fn ->
-      Mnesia.write(Rec.zabbix(id: id, host: host, key: key, value: value, timestamp: ts))
+      if Mnesia.wread({:tun, host}) != [] do
+        Mnesia.write(Rec.zabbix(id: id, host: host, key: key, value: value, timestamp: ts))
+      end
     end)
   end
 
@@ -1043,11 +1047,55 @@ defmodule AcariServer.Mnesia do
       [rec] -> Rec.zabbix(rec, :value)
       _ -> nil
     end
-
   end
 
   def get_zabbix(host) do
     match(:zabbix, %{host: host})
+  end
+
+  defp delete_zabbix(host) do
+    Mnesia.transaction(fn ->
+      Mnesia.foldl(
+        fn rec, _ ->
+          tun = Rec.zabbix(rec, :host)
+
+          if tun == host do
+            Mnesia.delete_object(rec)
+          end
+
+          nil
+        end,
+        nil,
+        :zabbix
+      )
+    end)
+  end
+
+  defp purge_zabbix() do
+    Mnesia.transaction(fn ->
+      active_tun =
+        Mnesia.foldl(
+          fn rec, acc ->
+            Map.put(acc, Rec.tun(rec, :name), true)
+          end,
+          %{},
+          :tun
+        )
+
+      Mnesia.foldl(
+        fn rec, _ ->
+          tun = Rec.zabbix(rec, :host)
+
+          if !active_tun[tun] do
+            Mnesia.delete_object(rec)
+          end
+
+          nil
+        end,
+        nil,
+        :zabbix
+      )
+    end)
   end
 
   def update_zbx_hostgroup(zbx_hostgroup_list) do
