@@ -1,6 +1,8 @@
 defmodule AcariServer.NodeMonitor do
   use GenServer
 
+  alias AcariServer.Mnesia
+
   def start_link(params) do
     GenServer.start_link(__MODULE__, params)
   end
@@ -14,7 +16,7 @@ defmodule AcariServer.NodeMonitor do
   def handle_cast({:input, %{"input" => id} = params}, %{tun_name: tun_name} = state) do
     case id do
       "links_state" ->
-        links_state = AcariServer.Mnesia.get_link_list_for_tunnel(tun_name)
+        links_state = Mnesia.get_link_list_for_tunnel(tun_name)
 
         ls_html =
           Phoenix.View.render_to_string(AcariServerWeb.TunnelView, "links_state.html",
@@ -68,10 +70,16 @@ defmodule AcariServer.NodeMonitor do
         put_data(
           self(),
           "srv_script",
-          srv_script_to_string(
-            params["script"],
-            AcariServer.Mnesia.get_tunnel_srv_state(tun_name)[params["script"]]
-          ),
+          case Mnesia.is_tunnel(tun_name) do
+            false ->
+              "Не в работе"
+
+            _ ->
+              srv_script_to_string(
+                params["script"],
+                Mnesia.get_tunnel_srv_state(tun_name)[params["script"]]
+              )
+          end,
           get_templ_descr_by_name(params["script"])
         )
 
@@ -90,13 +98,17 @@ defmodule AcariServer.NodeMonitor do
   # functions
 
   defp handle_get_script(tun_name, script_name, script_type) do
+
     put_data(
       self(),
       script_type,
-      script_to_string(
-        script_name,
-        AcariServer.Mnesia.get_tunnel_state(tun_name)[script_name]
-      ),
+      case Mnesia.get_tunnel_state(tun_name) do
+        tunnel_state = %{in_work: true} ->
+          script_to_string(script_name, tunnel_state[script_name])
+
+        _ ->
+          "Не в работе"
+      end,
       get_templ_descr_by_name(script_name)
     )
   end
@@ -110,19 +122,30 @@ defmodule AcariServer.NodeMonitor do
              template.rights,
              state.rights
            ) do
-      AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag, script_type)
+      case Mnesia.is_tunnel(tun_name) do
+        false ->
+          put_data(
+            self(),
+            script_type,
+            "Не в работе",
+            get_templ_descr_by_name(script_name)
+          )
 
-      case script_type do
-        "zbx_script" -> AcariServer.Zabbix.ZbxApi.zbx_exec_api(tun_name, tag)
-        _ -> AcariServer.Master.exec_script_on_peer(tun_name, tag)
+        _ ->
+          AcariServer.NodeMonitorAgent.callback(self(), tun_name, tag, script_type)
+
+          case script_type do
+            "zbx_script" -> AcariServer.Zabbix.ZbxApi.zbx_exec_api(tun_name, tag)
+            _ -> AcariServer.Master.exec_script_on_peer(tun_name, tag)
+          end
+
+          AcariServer.AuditManager.create_audit_log(
+            state,
+            {:tunnel, tun_name},
+            "client_script",
+            %{"template_name" => tag}
+          )
       end
-
-      AcariServer.AuditManager.create_audit_log(
-        state,
-        {:tunnel, tun_name},
-        "client_script",
-        %{"template_name" => tag}
-      )
     else
       :no_rights ->
         no_rights_for_script(script_type, script_name)

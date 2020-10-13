@@ -186,13 +186,13 @@ defmodule AcariServer.Master do
   end
 
   def set_script(tun_name, script_id, data) do
+    fdata = %{timestamp: :os.system_time(:second), data: data}
     case String.trim(data) do
       "" ->
-        nil
+        AcariServer.NodeMonitorAgent.event(tun_name, script_id |> to_string, fdata)
 
       _ ->
-        data = %{timestamp: :os.system_time(:second), data: data}
-        AcariServer.Mnesia.update_tun_script(tun_name, script_id, data)
+        AcariServer.Mnesia.update_tun_script(tun_name, script_id, fdata)
     end
   end
 
