@@ -468,7 +468,8 @@ defmodule AcariServer.Mnesia do
             server:
               record
               |> Rec.tun(:server_id)
-              |> get_server_name_by_system_name()
+              |> get_server_name_by_system_name(),
+            in_work: true
           })
 
         _ ->
@@ -477,7 +478,8 @@ defmodule AcariServer.Mnesia do
             name: name,
             description: node.description,
             address: node.address,
-            server: nil
+            server: nil,
+            in_work: false
           }
       end
     else

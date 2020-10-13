@@ -427,9 +427,15 @@ defmodule AcariServerWeb.GrpOperChannel do
       nodes
       |> Enum.map(fn %{id: id, name: tun_name, description: descr, address: address} ->
         {ts, data, reqv_ts} =
-          case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
-            %{timestamp: ts, data: data} = state -> {ts, data, state[:reqv_ts] || 0}
-            state -> {0, "нет данных", state[:reqv_ts] || 0}
+          case AcariServer.Mnesia.get_tunnel_state(tun_name) do
+            tunnel_state = %{in_work: true} ->
+              case tunnel_state[tag] do
+                %{timestamp: ts, data: data} = state -> {ts, data, state[:reqv_ts] || 0}
+                state -> {0, "Нет данных", state[:reqv_ts] || 0}
+              end
+
+            _ ->
+              {0, "Не в работе", 0}
           end
 
         %{
@@ -488,9 +494,15 @@ defmodule AcariServerWeb.GrpOperChannel do
         tag_data_list =
           (tag_list || [])
           |> Enum.map(fn tag ->
-            case AcariServer.Mnesia.get_tunnel_state(tun_name)[tag] do
-              %{data: data} -> {tag, data}
-              _ -> {tag, "нет данных"}
+            case AcariServer.Mnesia.get_tunnel_state(tun_name) do
+              tunnel_state = %{in_work: true} ->
+                case tunnel_state[tag] do
+                  %{data: data} -> {tag, data}
+                  _ -> {tag, "Нет данных"}
+                end
+
+              _ ->
+                {tag, "Не в работе"}
             end
           end)
 
