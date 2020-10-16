@@ -37,7 +37,7 @@ FROM alpine:3.11.2
 
 RUN apk --no-cache update && apk --no-cache upgrade && \
 apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
-libcap libcap-dev iproute2 openssh-client su-exec screen iputils
+libcap libcap-dev iproute2 openssh-client su-exec screen iputils busybox-suid
 
 RUN adduser -D docker
 ARG CWD=/opt/app
@@ -72,6 +72,8 @@ RUN  chown -R docker:docker /home/docker/.ssh
 RUN  chmod 0600 /home/docker/.ssh/id_rsa
 RUN  chmod 0644 /home/docker/.ssh/id_rsa.pub
 RUN  chown -R docker:docker /opt/app
+
+RUN echo "root:docker" | chpasswd
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
