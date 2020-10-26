@@ -22,14 +22,14 @@ if (osm) {
   const customId = "custom"
 
 
-  let mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaWxlYW1vIiwiYSI6ImNqeDRwMDF6djAxZ2I0NW82aWY0cnRyNmkifQ.KHGb6ZXaBpVWPsFJb3f5IQ', {
+  let mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaWxlYW1vIiwiYSI6ImNqeDRwMDF6djAxZ2I0NW82aWY0cnRyNmkifQ.KHGb6ZXaBpVWPsFJb3f5IQ', {
+    tileSize: 512,
     maxZoom: 18,
+    zoomOffset: -1,
     mymapindex: mapboxId,
     errorTileUrl: '/images/bogatka-o.png',
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-      'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    id: 'mapbox.streets'
+    attribution: '© <a href="https://www.mapbox.com/feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    id: 'mapbox/streets-v11'
   })
 
   let openstreetmap = L.tileLayer(
@@ -56,8 +56,8 @@ if (osm) {
   const mymap = L.map('osm').setView([prevPos.lat, prevPos.lng], 13);
 
   var baseLayers = {
-    "Mapbox": mapbox,
     "OpenStreetMap": openstreetmap,
+    "Mapbox": mapbox,
     "Satellite": satellite
   };
 
@@ -78,15 +78,15 @@ if (osm) {
   if (custom && localStorage.getItem("mapProvider") == customId) {
     custom.addTo(mymap);
     localStorage.setItem("mapProvider", customId)
-  } else if (localStorage.getItem("mapProvider") == osmId) {
-    openstreetmap.addTo(mymap);
-    localStorage.setItem("mapProvider", osmId)
+  } else if (localStorage.getItem("mapProvider") == mapboxId) {
+    mapbox.addTo(mymap);
+    localStorage.setItem("mapProvider", mapboxId)
   } else if (localStorage.getItem("mapProvider") == satelliteId) {
     satellite.addTo(mymap);
     localStorage.setItem("mapProvider", satelliteId)
   } else {
-    mapbox.addTo(mymap);
-    localStorage.setItem("mapProvider", mapboxId)
+    openstreetmap.addTo(mymap);
+    localStorage.setItem("mapProvider", osmId)
   }
 
   mymap.on('baselayerchange', function(e) {
