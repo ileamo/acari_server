@@ -1,7 +1,26 @@
 FROM bitwalker/alpine-elixir-phoenix:1.10.2 AS build
 RUN apk --no-cache update && apk --no-cache upgrade && \
-apk --no-cache add openssl autoconf automake libtool nasm zlib-dev
+apk --no-cache add openssl autoconf automake libtool nasm zlib-dev rust cargo
 
+# Setup Rust
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.47.0
+
+RUN set -eux; \
+    url="https://static.rust-lang.org/rustup/archive/1.22.1/x86_64-unknown-linux-musl/rustup-init"; \
+    wget "$url"; \
+    echo "cee31c6f72b953c6293fd5d40142c7d61aa85db2a5ea81b3519fe1b492148dc9 *rustup-init" | sha256sum -c -; \
+    chmod +x rustup-init; \
+    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host x86_64-unknown-linux-musl; \
+    rm rustup-init; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version;
+
+# Start compile Bogatka
 WORKDIR /build
 
 COPY mix.exs .
@@ -13,6 +32,7 @@ ENV MIX_ENV prod
 RUN mix deps.get  --only prod
 
 COPY lib lib
+COPY native native
 #COPY test test
 COPY config config
 COPY rel rel

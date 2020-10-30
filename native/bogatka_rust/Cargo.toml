@@ -1,0 +1,13 @@
+[package]
+name = "bogatka_rust"
+version = "0.1.0"
+authors = []
+edition = "2018"
+
+[lib]
+name = "bogatka_rust"
+path = "src/lib.rs"
+crate-type = ["dylib"]
+
+[dependencies]
+rustler = "0.22.0-rc.0"

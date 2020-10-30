@@ -7,9 +7,10 @@ defmodule AcariServer.MixProject do
       version: "1.3.7-pre2",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:phoenix, :gettext, :rustler] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      rustler_crates: [bogatka_rust: [mode: if(Mix.env() == :prod, do: :release, else: :debug)]],
       deps: deps(),
       releases: [
         bogatka: [
@@ -100,6 +101,7 @@ defmodule AcariServer.MixProject do
       {:benchee, "~> 1.0", only: :dev},
       {:recon, "~> 2.5"},
       {:ex_crypto, "~> 0.10.0"},
+      {:rustler, "~> 0.22-rc"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
       {:tunctl, git: "https://github.com/ileamo/tunctl.git"},
