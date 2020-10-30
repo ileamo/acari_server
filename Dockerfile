@@ -8,6 +8,7 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     PATH=/usr/local/cargo/bin:$PATH \
     RUST_VERSION=1.47.0
 
+
 RUN set -eux; \
     url="https://static.rust-lang.org/rustup/archive/1.22.1/x86_64-unknown-linux-musl/rustup-init"; \
     wget "$url"; \
@@ -49,6 +50,7 @@ RUN mix phx.digest
 
 RUN rm priv/cert/* && mix phx.gen.cert
 
+ENV RUSTFLAGS="-C target-feature=-crt-static"
 RUN mix release bogatka_docker
 
 
