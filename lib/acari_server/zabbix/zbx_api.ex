@@ -246,6 +246,11 @@ defmodule AcariServer.Zabbix.ZbxApi do
     zabbix_sender(state)
   end
 
+  def handle_info(mes, state) do
+    Logger.error("ZabbixAPI: unknown handle_info message: #{inspect(mes)}")
+    {:noreply, state}
+  end
+
   # ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██
   # ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██
   # █████   ██    ██ ██ ██  ██ ██         ██    ██ ██    ██ ██ ██  ██
@@ -844,13 +849,10 @@ defmodule AcariServer.Zabbix.ZbxApi do
       ZabbixSender.Protocol.encode_request(sender.value_list, nil)
       |> ZabbixSender.Serializer.serialize()
 
-    case ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port) do
-      {:ok, _response} -> :ok
-      res -> Logger.error("zabbix_sender: #{inspect(res)}")
-    end
+    zabbix_sender_send(request, state.zbx_snd_host, state.zbx_snd_port)
 
     if state.zbx_snd_host_2 do
-      ZabbixSender.send(request, state.zbx_snd_host_2, state.zbx_snd_port_2)
+      zabbix_sender_send(request, state.zbx_snd_host_2, state.zbx_snd_port_2)
     end
 
     # with {:ok, response} <- ZabbixSender.send(request, state.zbx_snd_host, state.zbx_snd_port),
@@ -868,6 +870,28 @@ defmodule AcariServer.Zabbix.ZbxApi do
     # end
 
     {:noreply, %State{state | sender: %Sender{}}}
+  end
+
+  @zabbix_sender_timeout 5_000
+  defp zabbix_sender_send(request, host, port) do
+    task =
+      Task.Supervisor.async_nolink(AcariServer.TaskSup, ZabbixSender, :send, [request, host, port])
+
+    # task = Task.Supervisor.async_nolink(AcariServer.TaskSup, fn -> Process.exit(self(), :kill) end)
+
+    case Task.yield(task, @zabbix_sender_timeout) || Task.shutdown(task) do
+      {:ok, {:ok, _response}} ->
+        :ok
+
+      {:ok, res} ->
+        Logger.error("zabbix_sender: #{inspect(res)}")
+
+      nil ->
+        Logger.warn("zabbix_sender: failed to get a result in #{@zabbix_sender_timeout}ms")
+
+      res ->
+        Logger.error("zabbix_sender: #{inspect(res)}")
+    end
   end
 
   #  █████  ██████  ██
