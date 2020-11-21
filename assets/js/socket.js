@@ -180,7 +180,14 @@ channel.on('about_system', function(payload) {
 
 channel.join()
   .receive("ok", resp => {
-    console.log("Joined successfully", resp)
+    //console.log("Joined successfully", resp)
+    if (resp.alert) {
+      $('#navbar-warning')
+      .removeClass('d-none')
+      .attr({
+        title: resp.alert
+      });
+    }
     if (localStorage.showUsersChat != 'show') {
       channel.push('get_chat_msgs', {
         id: localStorage.getItem("chat_msg_id"),

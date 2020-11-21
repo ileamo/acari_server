@@ -9,7 +9,27 @@ defmodule AcariServerWeb.RoomChannel do
   def join("room:lobby", _message, socket) do
     user = AcariServer.UserManager.get_user(socket.assigns[:current_user_id])
     send(self(), :after_join)
-    {:ok, assign(socket, :user, user) |> assign(:conn, socket.assigns[:conn])}
+
+    session_count =
+      with token when is_binary(token) <- socket.assigns[:conn]["guardian_default_token"],
+           sessions when is_list(sessions) <- get_sessions() do
+        sessions
+        |> Enum.filter(fn
+          %{conn: %{"guardian_default_token" => t}} -> t == token
+          _ -> false
+        end)
+        |> length()
+      else
+        _ -> 0
+      end
+
+    resp =
+      case session_count do
+        0 -> %{}
+        n -> %{alert: "Сессия уже открыта в других вкладках/окнах(#{n}). При одновременной работе в нескольких вкладках возможны проблемы с отображением содержимого страниц."}
+      end
+
+    {:ok, resp, assign(socket, :user, user) |> assign(:conn, socket.assigns[:conn])}
   end
 
   def join("room:" <> _private_room_id, _params, _socket) do

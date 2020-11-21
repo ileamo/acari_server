@@ -36,6 +36,10 @@
       </a>
 
       <div class="navbar-nav px-3 d-flex flex-wrap">
+        <span class="d-none navbar-text pr-3 text-warning" id = "navbar-warning"
+              data-toggle="tooltip" data-html="true" title="zzz" >
+          <i class="fas fa-exclamation"></i>
+        </span>
         <span class="d-none d-md-block navbar-text pr-3">
           <%= AcariServer.Mnesia.get_server_name_by_system_name(node()) %>
           <i class="fas fa-server"></i>
@@ -287,7 +291,8 @@
 
       window.acari_server_conn = {
         remote_ip: "<%= :inet.ntoa(@conn.remote_ip) |> to_string() %>",
-        user_agent: "<%= @conn.req_headers |> Enum.into(%{}) |> Map.get("user-agent") %>"
+        user_agent: "<%= @conn.req_headers |> Enum.into(%{}) |> Map.get("user-agent") %>",
+        guardian_default_token: "<%= @conn.private.guardian_default_token %>"
       }
     </script>
 
