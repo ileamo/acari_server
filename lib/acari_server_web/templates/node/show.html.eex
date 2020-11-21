@@ -3,14 +3,15 @@
   <h2 class="d-inline">Параметры клиента</h2>
 
   <span class="d-inline ml-2 <%=color%>">
-    <%= link to: Routes.node_path(@conn, :toggle_lock, @node, lock: !@node.lock),
-              class: color, data: [confirm: confirm] do %>
+    <%= link to: Routes.node_path(@conn, :toggle_lock, @node,
+            lock: !@node.lock, redirect_to: @conn.request_path),
+          class: color, data: [confirm: confirm] do %>
       <i class="fas fa-toggle-<%= text %> mx-1"></i>
     <% end %>
   </span>
   <%= if !@node.lock do %>
     <span class="d-inline">
-      <%= link to: Routes.node_path(@conn, :lock_unlock, @node),
+      <%= link to: Routes.node_path(@conn, :lock_unlock, @node, redirect_to: @conn.request_path),
                data: [confirm: "Перезапустить клиента"] do %>
         <i class="fas fa-recycle mx-1"></i>
       <% end %>

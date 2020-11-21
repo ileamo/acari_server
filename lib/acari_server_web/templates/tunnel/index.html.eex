@@ -75,7 +75,7 @@
       <td><%= tunnel[:links_number] %></td>
       <td>
         <%= if !tunnel.node.lock do %>
-            <%= link to: Routes.node_path(@conn, :lock_unlock, tunnel.node),
+            <%= link to: Routes.node_path(@conn, :lock_unlock, tunnel.node, redirect_to: @conn.request_path),
                      data: [confirm: "Перезапустить клиента"] do %>
               <i class="fas fa-recycle mx-1"></i>
             <% end %>

@@ -138,16 +138,16 @@ defmodule AcariServerWeb.NodeController do
     node
   end
 
-  def delete(conn, %{"id" => id}) do
+  def delete(conn, params = %{"id" => id}) do
     node = delete_node_and_tunnel(id)
 
     conn
     |> AuditManager.create_audit_log(node, "delete")
     |> put_flash(:info, "Клиент удален.")
-    |> redirect_to_index_or_client_grp()
+    |> redirect(to: params["redirect_to"])
   end
 
-  def toggle_lock(conn, %{"id" => id, "lock" => lock}) do
+  def toggle_lock(conn, %{"id" => id, "lock" => lock, "redirect_to" => redirect_to}) do
     node = NodeManager.get_node_rw!(id)
     node_params = %{"lock" => lock, "groups_list" => false}
     {:ok, node} = NodeManager.update_node(node, node_params)
@@ -161,10 +161,10 @@ defmodule AcariServerWeb.NodeController do
     conn
     |> AuditManager.create_audit_log(node, if(node.lock, do: "lock", else: "unlock"), node_params)
     |> put_flash(:info, "Клиент #{node.name} #{if node.lock, do: "за", else: "раз"}блокирован.")
-    |> redirect(to: NavigationHistory.last_path(conn, 1))
+    |> redirect(to: redirect_to)
   end
 
-  def lock_unlock(conn, %{"id" => id}) do
+  def lock_unlock(conn, %{"id" => id, "redirect_to" => redirect_to}) do
     node = NodeManager.get_node_rw!(id)
     NodeManager.lock_unlock(node)
 
@@ -173,7 +173,7 @@ defmodule AcariServerWeb.NodeController do
     conn
     |> AuditManager.create_audit_log(node, "lock_unlock")
     |> put_flash(:info, "Клиент #{node.name} перезапущен")
-    |> redirect(to: NavigationHistory.last_path(conn, 1))
+    |> redirect(to: redirect_to)
   end
 
   def qr(conn, %{"clients_list" => clients_list}) do
@@ -229,17 +229,7 @@ defmodule AcariServerWeb.NodeController do
       end)
       |> Enum.into(%{})
     )
-    |> redirect_to_index_or_client_grp()
-  end
-
-  def redirect_to_index_or_client_grp(conn) do
-    conn
-    |> redirect(
-      to:
-        NavigationHistory.last_paths(conn)
-        |> Enum.find(fn x -> String.match?(x, ~r{/nodes/grp/\d+}) end) ||
-          Routes.node_path(conn, :index)
-    )
+    |> redirect(to: params["redirect_to"])
   end
 
   def client_comment_del(%{assigns: %{current_user: %{is_admin: true}}} = conn, %{"id" => id}) do
@@ -297,7 +287,7 @@ defmodule AcariServerWeb.NodeController do
       end
     end
     |> sleep_before_response()
-    |> redirect(to: NavigationHistory.last_path(conn))
+    |> redirect(to: params["redirect_to"])
   end
 
   defp sleep_before_response(conn) do
