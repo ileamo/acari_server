@@ -73,13 +73,14 @@ class="my-3" style="height:480px; max-width:640px"></div>
 <% bg_disabled = AcariServer.UserManager.get_disabled(@current_user, @node.id)
 %>
 
+<div>
+  <span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node),
+              class: bg_disabled %></span>
+  |
+  <span><%= link "Клонировать", to: Routes.node_path(@conn, :new, node_id: @node.id),
+              class: bg_disabled %></span>
+  |
+  <span><%= link "Мониторить", to: Routes.tunnel_path(@conn, :show, @node.name) %></span>
+</div>
 
-<span><%= link "Редактировать", to: Routes.node_path(@conn, :edit, @node),
-            class: bg_disabled %></span>
-|
-<span><%= link "Клонировать", to: Routes.node_path(@conn, :new, node_id: @node.id),
-            class: bg_disabled %></span>
-|
-<span><%= link "Мониторить", to: Routes.tunnel_path(@conn, :show, @node.name) %></span>
-|
-<span><%= link "К списку", to: redirect_path(@conn) %></span>
+<%= links_to_groups_list(@conn, @node.groups) %>

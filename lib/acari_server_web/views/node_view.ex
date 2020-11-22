@@ -23,10 +23,17 @@ defmodule AcariServerWeb.NodeView do
     |> Enum.join(", ")
   end
 
-  def redirect_path(conn) do
-    NavigationHistory.last_paths(conn)
-    |> Enum.find(fn x -> String.match?(x, ~r{^/nodes($|/grp/\d+$)}) end) ||
-      Routes.node_path(conn, :index)
+  def links_to_groups_list(conn, groups) do
+    case groups do
+      [_ | _] ->
+        groups
+        |> Enum.map(fn group ->
+          link(group.name, to: Routes.node_path(conn, :client_grp, group), class: "mr-3")
+        end)
+
+      _ ->
+        link("К списку клиентов", to: Routes.node_path(conn, :index))
+    end
   end
 
   def lock_state(node) do
@@ -46,29 +53,34 @@ defmodule AcariServerWeb.NodeView do
           _ -> "_" <> name
         end
       end)
-      |> Enum.sort_by(fn {_name, list = [{name1,_} | _]} -> {-length(list), name1} end)
+      |> Enum.sort_by(fn {_name, list = [{name1, _} | _]} -> {-length(list), name1} end)
 
-      max = gr |> Enum.max_by(fn {_, list} -> length(list) end)
+    max =
+      gr
+      |> Enum.max_by(fn {_, list} -> length(list) end)
       |> elem(1)
       |> length()
 
-    cols = case max do
-      1 -> 1
-      2 -> 2
-      3 -> 3
-      4 -> 4
-      5 -> 3
-      6 -> 3
-      _ -> 4
-    end
+    cols =
+      case max do
+        1 -> 1
+        2 -> 2
+        3 -> 3
+        4 -> 4
+        5 -> 3
+        6 -> 3
+        _ -> 4
+      end
 
-    rows = gr
-    |> Enum.map(fn {_, x} ->
-      x
+    rows =
+      gr
+      |> Enum.map(fn {_, x} ->
+        x
+        |> Enum.chunk_every(cols, cols, List.duplicate(nil, cols - 1))
+      end)
+      |> List.flatten()
       |> Enum.chunk_every(cols, cols, List.duplicate(nil, cols - 1))
-    end)
-    |> List.flatten()
-    |> Enum.chunk_every(cols, cols, List.duplicate(nil, cols - 1))
+
     {cols, rows}
   end
 end

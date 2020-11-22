@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.node_path(@conn, :update, @node)) %>
 
-<span><%= link "К списку", to: redirect_path(@conn)%></span>
+<%= links_to_groups_list(@conn, @node.groups) %>
