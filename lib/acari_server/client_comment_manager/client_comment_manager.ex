@@ -105,7 +105,7 @@ defmodule AcariServer.ClientCommentManager do
 
   import Phoenix.HTML, only: [sigil_E: 2, safe_to_string: 1]
 
-  def parse_comments(comments_list, user) do
+  def parse_comments(comments_list, user, redirect_to) do
     case comments_list do
       [_ | _] = comments ->
 
@@ -137,7 +137,7 @@ defmodule AcariServer.ClientCommentManager do
               <%= username |> html_escape() %>:</strong>
               <%= if user.is_admin do %>
                 <a data-confirm='Вы уверены, что хотите удалить комментарий пользователя <%= username %>?'
-                  href='/client_comment/del/<%= id %>'>
+                  href='/client_comment/del/<%= id %>?redirect_to=<%= redirect_to %>'>
                   <i class='far fa-trash-alt mx-1'></i>
                 </a>
               <% end %>

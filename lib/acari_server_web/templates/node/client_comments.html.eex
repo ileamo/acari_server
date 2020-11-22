@@ -1,7 +1,7 @@
 <%= if @node do %>
   <%
     {is_com?, short, list, user_comment, comment_id} =
-    AcariServer.ClientCommentManager.parse_comments(@node.client_comments, @current_user)
+    AcariServer.ClientCommentManager.parse_comments(@node.client_comments, @current_user, @redirect_to)
   %>
   <%= link to: "#", data: [ toggle: "modal",
                             target: "#client-comments",

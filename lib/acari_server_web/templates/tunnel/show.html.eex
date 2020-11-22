@@ -18,7 +18,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
 
 
         <%= render AcariServerWeb.NodeView, "client_comments.html",
-              current_user: @current_user, node: @node %>
+              current_user: @current_user, node: @node, redirect_to: @conn.request_path %>
       </span>
 
     </div>

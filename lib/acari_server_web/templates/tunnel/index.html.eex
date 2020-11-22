@@ -83,7 +83,7 @@
       </td>
       <td>
         <%= render AcariServerWeb.NodeView, "client_comments.html",
-        current_user: @current_user, node: tunnel %>
+        current_user: @current_user, node: tunnel, redirect_to: @conn.request_path %>
       </td>
       <td>
         <%= if err = is_errormsg(tunnel[:name]) do %>

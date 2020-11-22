@@ -19,7 +19,7 @@
   <% end %>
   <span>
     <%= render AcariServerWeb.NodeView, "client_comments.html",
-          current_user: @current_user, node: @node %>
+          current_user: @current_user, node: @node, redirect_to: @conn.request_path %>
   </span>
 </div>
 
