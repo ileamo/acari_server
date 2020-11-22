@@ -188,10 +188,17 @@ defmodule AcariServerWeb.TunnelView do
     end)
   end
 
-  def redirect_path(conn) do
-    NavigationHistory.last_paths(conn)
-    |> Enum.find(fn x -> String.match?(x, ~r{^/tunnels($|/\d+$)}) end) ||
-      Routes.node_path(conn, :index)
+  def links_to_groups_list(conn, groups) do
+    case groups do
+      [_ | _] ->
+        groups
+        |> Enum.map(fn group ->
+          link(group.name, to: Routes.tunnel_path(conn, :grp, group), class: "mr-2")
+        end)
+
+      _ ->
+        link("<NONE>", to: Routes.tunnel_path(conn, :index))
+    end
   end
 
   def get_arg(key) do

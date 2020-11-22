@@ -28,8 +28,6 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
     <%= link "Конфигурация клиента", to: Routes.node_path(@conn, :show, tun.id),
           role: "button",
           class: "nav-link py-1 px-2 mr-2" %>
-    <%= link "К списку", to: redirect_path(@conn),
-          class: "nav-link py-1 px-2" %>
     </div>
 </nav>
 <%= if tun && links_state do %>
@@ -43,7 +41,7 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
   <% end %>
 </h6>
 <h6>
-  <strong>Группы:</strong> <%= AcariServer.GroupManager.groups_list(@node) %>
+  <strong>Группы:</strong> <%= links_to_groups_list(@conn, @node.groups) %>
 </h6>
 <h6><strong>Основной сервер:</strong> <%= tun.server %></h6>
 <h6><strong>Рестартов за сутки:</strong> <%= restarts_per_day(tun) %></h6>
