@@ -112,9 +112,20 @@ defmodule AcariServerWeb.Api.BogatkaController do
         client: id,
         metrics:
           ((AcariServer.Mnesia.get_tunnel_state(id) || [])
-           |> Enum.filter(fn {metric_id, _} -> Enum.member?(metrics_list, metric_id) end)
+           |> Enum.filter(fn
+             {metric_id, %{data: data}} when is_binary(data) ->
+               Enum.member?(metrics_list, metric_id)
+
+             _ ->
+               false
+           end)
            |> Enum.map(fn {id, map} ->
-             %{name: id, data: map[:data] |> try_json(), timestamp: map[:timestamp], source: "script"}
+             %{
+               name: id,
+               data: map[:data] |> try_json(),
+               timestamp: map[:timestamp],
+               source: "script"
+             }
            end)) ++
             (AcariServer.Mnesia.get_zabbix(id)
              |> Enum.filter(fn %{key: key} -> Enum.member?(metrics_list, key) end)
@@ -126,8 +137,7 @@ defmodule AcariServerWeb.Api.BogatkaController do
   end
 
   defp try_json(str) do
-    case Jason.decode(str)
-    do
+    case Jason.decode(str) do
       {:ok, map} -> map
       _ -> str
     end
