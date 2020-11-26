@@ -2,6 +2,25 @@ import socket from './socket'
 
 let grp_oper = document.getElementById('grp-oper');
 if (grp_oper) {
+  let params = new Map([
+    ["grp_oper_show_only", localStorage.getItem("grp_oper_show_only")],
+    ["grp_oper_filter", localStorage.getItem("grp_oper_filter")],
+    ["grp_oper_class_id", localStorage.getItem("grp_oper_class_id")],
+    ["grp_oper_group_id", localStorage.getItem("grp_oper_group_id")],
+    ["grp_oper_script_type", localStorage.getItem("grp_oper_script_type")],
+    ["grp_oper_last_script", localStorage.getItem("grp_oper_last_script")],
+    ["grp_oper_last_script_text", localStorage.getItem("grp_oper_last_script_text")],
+    ["grp_oper_last_script_multi", localStorage.getItem("grp_oper_last_script_multi")],
+  ])
+
+  function paramsSet(k, v) {
+    params.set(k, v);
+    for (var [key, value] of params.entries()) {
+      localStorage.setItem(key, value)
+    }
+  }
+
+
   let grp_oper_script;
   let grp_oper_script_multi = document.getElementById("grp-oper-script-list-multi")
   let grp_oper_script_div = document.getElementById("grp-oper-script-div")
@@ -27,7 +46,7 @@ if (grp_oper) {
   let grp_oper_show_only = document.getElementById("grp-oper-show-only")
   let grp_oper_show_only_button = document.getElementById("grp-oper-show-only-button")
   if (grp_oper_show_only) {
-    let show_only = localStorage.getItem("grp_oper_show_only") == "true"
+    let show_only = params.get("grp_oper_show_only") == "true"
     grp_oper_show_only.checked = show_only;
     grp_oper_script_div.hidden = show_only;
     grp_oper_script_multi.hidden = !show_only;
@@ -36,7 +55,7 @@ if (grp_oper) {
 
     function showOnly() {
       let checked = this.checked
-      localStorage.setItem("grp_oper_show_only", checked)
+      paramsSet("grp_oper_show_only", checked)
       if (checked) {
         grp_oper_script_multi.hidden = false
         grp_oper_script_div.hidden = true
@@ -79,13 +98,13 @@ if (grp_oper) {
   let grp_oper_class = document.getElementById("grp-oper-class")
   if (grp_oper_class) {
     grp_oper_class.addEventListener("change", selectElement, false);
-    grp_oper_class.value = localStorage.getItem("grp_oper_class_id") || "nil";
+    grp_oper_class.value = params.get("grp_oper_class_id") || "nil";
   }
 
   let grp_oper_group = document.getElementById("grp-oper-group")
   if (grp_oper_group) {
     grp_oper_group.addEventListener("change", selectElement, false);
-    grp_oper_group.value = localStorage.getItem("grp_oper_group_id") || "false";
+    grp_oper_group.value = params.get("grp_oper_group_id") || "false";
   }
 
   let grp_oper_filter = document.getElementById("grp-oper-filter")
@@ -93,7 +112,7 @@ if (grp_oper) {
   if (grp_oper_filter && grp_oper_filter_text) {
     grp_oper_filter.addEventListener("click", selectElementFilter, false);
     grp_oper_filter_text.addEventListener("input", inputFilterText, false);
-    let filter_sav = localStorage.getItem("grp_oper_filter")
+    let filter_sav = params.get("grp_oper_filter")
     grp_oper_filter_text.value = filter_sav === null && "" || filter_sav
   }
 
@@ -125,7 +144,7 @@ if (grp_oper) {
     grp_oper_server_script.addEventListener("click", selectElementScriptType, false);
     grp_oper_zabbix_script.addEventListener("click", selectElementScriptType, false);
 
-    let script_type = localStorage.getItem("grp_oper_script_type") || "client"
+    let script_type = params.get("grp_oper_script_type") || "client"
     if (script_type == "zabbix") {
       grp_oper_zabbix_script.checked = true;
       grp_oper_server_script.checked = false;
@@ -160,18 +179,18 @@ if (grp_oper) {
     clearInterval(filter_blinking);
     filter_blinking = false;
     let filter = grp_oper_filter_text.value
-    localStorage.setItem("grp_oper_filter", filter)
+    paramsSet("grp_oper_filter", filter)
     channel.push('input', {
       cmd: "get_filter",
-      group_id: localStorage.getItem("grp_oper_group_id"),
-      class_id: localStorage.getItem("grp_oper_class_id"),
+      group_id: params.get("grp_oper_group_id"),
+      class_id: params.get("grp_oper_class_id"),
       filter: filter
     })
   }
 
   function filterClean() {
     grp_oper_filter_text.value = "";
-    localStorage.setItem("grp_oper_filter", "")
+    paramsSet("grp_oper_filter", "")
 
     if (!filter_blinking) {
       filter_blinking = setInterval(blinker, 1000);
@@ -180,7 +199,7 @@ if (grp_oper) {
 
   function filterList() {
     grp_oper_filter_text.value = this.id;
-    localStorage.setItem("grp_oper_filter", this.id)
+    paramsSet("grp_oper_filter", this.id)
 
     if (!filter_blinking) {
       filter_blinking = setInterval(blinker, 1000);
@@ -199,10 +218,10 @@ if (grp_oper) {
     let group_id = group_selected_index && group_selected_index.value || "false"
     let filter = grp_oper_filter_text.value
     let script_type = $('#grp-oper-radio input:radio:checked').val()
-    localStorage.setItem("grp_oper_class_id", class_id)
-    localStorage.setItem("grp_oper_group_id", group_id)
-    localStorage.setItem("grp_oper_filter", filter)
-    localStorage.setItem("grp_oper_script_type", script_type)
+    paramsSet("grp_oper_class_id", class_id)
+    paramsSet("grp_oper_group_id", group_id)
+    paramsSet("grp_oper_filter", filter)
+    paramsSet("grp_oper_script_type", script_type)
     if (script_type == "server") {
       grp_oper_show_only_button.hidden = true;
     } else {
@@ -215,7 +234,7 @@ if (grp_oper) {
       group_id: group_id,
       filter: filter,
       script_type: script_type,
-      show_only: localStorage.getItem("grp_oper_show_only")
+      show_only: params.get("grp_oper_show_only")
     })
 
   }
@@ -244,14 +263,14 @@ if (grp_oper) {
           grp_oper_class.innerHTML = `${payload.class_list}`
           grp_oper_class.addEventListener("change", selectElement, false);
           grp_oper_class.value = `${payload.class_id}`;
-          localStorage.setItem("grp_oper_class_id", grp_oper_class.value)
+          paramsSet("grp_oper_class_id", grp_oper_class.value)
         }
 
         grp_oper_script = document.getElementById("grp-oper-script-list")
         if (grp_oper_script) {
           grp_oper_script.innerHTML = `${payload.script_list}`
           grp_oper_script.addEventListener("change", getScript, false);
-          grp_oper_script.value = localStorage.getItem("grp_oper_last_script");
+          grp_oper_script.value = params.get("grp_oper_last_script");
           if (grp_oper_script.selectedIndex < 0) {
             grp_oper_script.selectedIndex = "0";
           }
@@ -263,7 +282,7 @@ if (grp_oper) {
 
           grp_oper_script_multi.setAttribute("size", Math.min(grp_oper_script_multi.length, 16));
           grp_oper_script_multi.addEventListener("change", getScriptMulti, false);
-          let selectedValues = JSON.parse(localStorage.getItem("grp_oper_last_script_multi"))
+          let selectedValues = JSON.parse(params.get("grp_oper_last_script_multi"))
           if (selectedValues) {
             for (var i = 0; i < grp_oper_script_multi.options.length; i++) {
               grp_oper_script_multi.options[i].selected =
@@ -271,7 +290,7 @@ if (grp_oper) {
             }
           }
         }
-        if (localStorage.getItem("grp_oper_show_only") == "true") {
+        if (params.get("grp_oper_show_only") == "true") {
           getScriptMulti(false)
         } else {
           getScript()
@@ -293,7 +312,7 @@ if (grp_oper) {
         let table
         if (!payload.opt) {
           $("#datatable-filter").DataTable(datatable_params_wo_find);
-        } else if (localStorage.getItem("grp_oper_script_type") == "server") {
+        } else if (params.get("grp_oper_script_type") == "server") {
           $("#datatable-srv").DataTable(datatable_params_wo_find);
         } else {
           table = $("#datatable").DataTable(datatable_params_wo_find);
@@ -322,17 +341,17 @@ if (grp_oper) {
           go_repeat.addEventListener("click", repeatReq, false);
 
           function repeatReq() {
-            let id = localStorage.getItem("grp_oper_last_script")
-            let text = localStorage.getItem("grp_oper_last_script_text")
+            let id = params.get("grp_oper_last_script")
+            let text = params.get("grp_oper_last_script_text")
             let r = confirm("Повторить скрипт '" + text + "' для оставшихся клиентов?")
             if (r) {
               channel.push('input', {
                 cmd: "repeat_script",
                 template_name: id,
-                group_id: localStorage.getItem("grp_oper_group_id"),
-                class_id: localStorage.getItem("grp_oper_class_id"),
-                filter: localStorage.getItem("grp_oper_filter"),
-                script_type: localStorage.getItem("grp_oper_script_type")
+                group_id: params.get("grp_oper_group_id"),
+                class_id: params.get("grp_oper_class_id"),
+                filter: params.get("grp_oper_filter"),
+                script_type: params.get("grp_oper_script_type")
               })
             }
           }
@@ -373,15 +392,15 @@ if (grp_oper) {
       if (index >= 0) {
         script_name = grp_oper_script.options[index].value
         script_text = grp_oper_script.options[index].text
-        localStorage.setItem("grp_oper_last_script", script_name)
-        localStorage.setItem("grp_oper_last_script_text", script_text)
+        paramsSet("grp_oper_last_script", script_name)
+        paramsSet("grp_oper_last_script_text", script_text)
       }
       channel.push('input', {
         cmd: "get_script",
-        group_id: localStorage.getItem("grp_oper_group_id"),
-        class_id: localStorage.getItem("grp_oper_class_id"),
-        filter: localStorage.getItem("grp_oper_filter"),
-        script_type: localStorage.getItem("grp_oper_script_type"),
+        group_id: params.get("grp_oper_group_id"),
+        class_id: params.get("grp_oper_class_id"),
+        filter: params.get("grp_oper_filter"),
+        script_type: params.get("grp_oper_script_type"),
         template_name: script_name
       })
     } else {
@@ -391,13 +410,13 @@ if (grp_oper) {
   }
 
   function getLastScript() {
-    let id = localStorage.getItem("grp_oper_last_script")
+    let id = params.get("grp_oper_last_script")
     channel.push('input', {
       cmd: "get_script",
-      group_id: localStorage.getItem("grp_oper_group_id"),
-      class_id: localStorage.getItem("grp_oper_class_id"),
-      filter: localStorage.getItem("grp_oper_filter"),
-      script_type: localStorage.getItem("grp_oper_script_type"),
+      group_id: params.get("grp_oper_group_id"),
+      class_id: params.get("grp_oper_class_id"),
+      filter: params.get("grp_oper_filter"),
+      script_type: params.get("grp_oper_script_type"),
       template_name: id
     })
   }
@@ -407,18 +426,18 @@ if (grp_oper) {
     grp_oper_update_scriprt.addEventListener("click", updateScript, false);
 
     function updateScript() {
-      let id = localStorage.getItem("grp_oper_last_script")
-      let text = localStorage.getItem("grp_oper_last_script_text")
+      let id = params.get("grp_oper_last_script")
+      let text = params.get("grp_oper_last_script_text")
       let r = confirm(`Выполнить скрипт '${text}' для группы?`)
       if (r) {
         document.querySelector("#go-script-field").innerText = "Wait ..."
         channel.push('input', {
           cmd: "script",
           template_name: id,
-          group_id: localStorage.getItem("grp_oper_group_id"),
-          class_id: localStorage.getItem("grp_oper_class_id"),
-          filter: localStorage.getItem("grp_oper_filter"),
-          script_type: localStorage.getItem("grp_oper_script_type")
+          group_id: params.get("grp_oper_group_id"),
+          class_id: params.get("grp_oper_class_id"),
+          filter: params.get("grp_oper_filter"),
+          script_type: params.get("grp_oper_script_type")
         })
         grp_oper_show_all.checked = false
         showAll()
@@ -432,25 +451,25 @@ if (grp_oper) {
       selectedValues.push(grp_oper_script_multi.selectedOptions[i].value);
     }
     if (save) {
-      localStorage.setItem("grp_oper_last_script_multi", JSON.stringify(selectedValues))
+      paramsSet("grp_oper_last_script_multi", JSON.stringify(selectedValues))
     }
     channel.push('input', {
       cmd: "get_script_multi",
       template_name_list: selectedValues,
-      group_id: localStorage.getItem("grp_oper_group_id"),
-      class_id: localStorage.getItem("grp_oper_class_id"),
-      filter: localStorage.getItem("grp_oper_filter")
+      group_id: params.get("grp_oper_group_id"),
+      class_id: params.get("grp_oper_class_id"),
+      filter: params.get("grp_oper_filter")
     })
   }
 
   function getLastScriptMulti() {
-    let selectedValues = JSON.parse(localStorage.getItem("grp_oper_last_script_multi"))
+    let selectedValues = JSON.parse(params.get("grp_oper_last_script_multi"))
     channel.push('input', {
       cmd: "get_script_multi",
       template_name_list: selectedValues,
-      group_id: localStorage.getItem("grp_oper_group_id"),
-      class_id: localStorage.getItem("grp_oper_class_id"),
-      filter: localStorage.getItem("grp_oper_filter")
+      group_id: params.get("grp_oper_group_id"),
+      class_id: params.get("grp_oper_class_id"),
+      filter: params.get("grp_oper_filter")
     })
   }
 
@@ -463,9 +482,9 @@ if (grp_oper) {
       if (r) {
         channel.push('input', {
           cmd: "create_group",
-          group_id: localStorage.getItem("grp_oper_group_id"),
-          class_id: localStorage.getItem("grp_oper_class_id"),
-          filter: localStorage.getItem("grp_oper_filter")
+          group_id: params.get("grp_oper_group_id"),
+          class_id: params.get("grp_oper_class_id"),
+          filter: params.get("grp_oper_filter")
         })
       }
     }
