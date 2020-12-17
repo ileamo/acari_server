@@ -631,7 +631,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
          [%{"groupid" => hostgroup_id}] <- get_main_group() do
       group_list =
         node
-        |> AcariServer.Repo.preload(:groups)
+        |> AcariServer.RepoRO.preload(:groups)
         |> Map.get(:groups)
         |> Enum.map(fn %{name: name} -> @group_prefix <> name end)
         |> Mnesia.get_zbx_hostgroup_id_list()

@@ -4,6 +4,7 @@ defmodule AcariServer.RepoManager do
   alias AcariServer.Mnesia
   require Logger
   @reconnect_timeout 5_000
+  @reconnect_ro_timeout 1 * 60 * 1_000
 
   defmodule State do
     defstruct rw: %{pid: nil},
@@ -23,8 +24,29 @@ defmodule AcariServer.RepoManager do
     rw_db_list = host_port_csv_to_repo_config(conf[:rw])
     ro_db_list = host_port_csv_to_repo_config(conf[:ro])
 
-    {rw_pid, rw_host_port} = get_db_rw(rw_db_list)
-    {ro_pid, ro_host_port} = get_db_ro(ro_db_list)
+    {rw_pid, rw_host_port} =
+      case get_db_rw(rw_db_list) do
+        res = {pid, _} when is_pid(pid) ->
+          res
+
+        _ ->
+          Process.send_after(self(), {:connect_db, :rw}, @reconnect_timeout)
+          {nil, nil}
+      end
+
+    {ro_pid, ro_host_port} =
+      case get_db_ro(ro_db_list) do
+        res = {pid, host_port} when is_pid(pid) ->
+          if(host_port != ro_db_list |> Enum.at(0)) do
+            Process.send_after(self(), {:connect_db, :ro}, @reconnect_ro_timeout)
+          end
+
+          res
+
+        _ ->
+          Process.send_after(self(), {:connect_db, :ro}, @reconnect_timeout)
+          {nil, nil}
+      end
 
     {:ok,
      %State{
@@ -63,7 +85,7 @@ defmodule AcariServer.RepoManager do
         AcariServer.RepoRO.stop()
 
         if(host_port != state.ro[:db_list] |> Enum.at(0)) do
-          Process.send_after(self(), {:connect_db, :ro}, 1 * 60 * 1000)
+          Process.send_after(self(), {:connect_db, :ro}, @reconnect_ro_timeout)
         end
 
       _ ->
