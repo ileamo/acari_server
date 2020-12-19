@@ -29,7 +29,7 @@ defmodule AcariServer.Scheduler.Api do
     AcariServer.Zabbix.ZbxApi.zbx_send_master(ZbxConst.client_active_key(), to_string(active))
   end
 
-  def purge_status_messages() do
+  def purge_status_messages_0() do
     cts = :os.system_time(:microsecond)
     hours = AcariServer.SysConfigManager.get_conf_by_key("system.client_status.ttl") || ""
 
@@ -43,6 +43,26 @@ defmodule AcariServer.Scheduler.Api do
       AcariServer.Mnesia.get_client_status()
       |> Enum.filter(fn
         %{timestamp: ts, opts: %{level: 1}} -> cts - ts > hours * 60 * 60 * 1_000_000
+        _ -> false
+      end)
+      |> Enum.each(fn %{name: name} -> AcariServer.NodeManager.lock_unlock(name) end)
+    end
+  end
+
+  def purge_status_messages() do
+    cts = :os.system_time(:second)
+    hours = AcariServer.SysConfigManager.get_conf_by_key("system.client_status.ttl") || ""
+
+    hours =
+      case Integer.parse(String.trim(hours)) do
+        {n, ""} -> n
+        _ -> 0
+      end
+
+    if hours > 0 do
+      AcariServer.Mnesia.match(:tun)
+      |> Enum.filter(fn
+        %{opt: %{last_up: up, last_down: down}} when down > up and cts - down > hours -> true
         _ -> false
       end)
       |> Enum.each(fn %{name: name} -> AcariServer.NodeManager.lock_unlock(name) end)

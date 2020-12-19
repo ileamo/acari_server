@@ -47,7 +47,7 @@ config :acari_server, AcariServer.Scheduler,
   jobs: [
     # Every minute
     {"* * * * *", {AcariServer.Scheduler.Api, :send_clients_number_to_zabbix, []}},
-    {"17 * * * *", {AcariServer.Scheduler.Api, :purge_status_messages, []}}
+    {"* * * * *", {AcariServer.Scheduler.Api, :purge_status_messages, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom
