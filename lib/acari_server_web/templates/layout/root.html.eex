@@ -30,7 +30,7 @@
       <a class="d-none d-md-block navbar-brand text-center" href="#">
         <%= if conf = AcariServer.SysConfigManager.get_conf_by_key("layout.navbar.banner") do %>
           <!-- <i class="fas fa-paw text-s econdary"></i> -->
-            <span><%= conf %></span>
+            <span><%= raw(conf) %></span>
           <!-- <i class="fas fa-paw text-secondary"></i> -->
         <% end %>
       </a>
