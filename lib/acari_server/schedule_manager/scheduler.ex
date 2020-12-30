@@ -5,15 +5,26 @@ defmodule AcariServer.Scheduler do
   require Logger
 
   def init(config) do
-    Task.start(__MODULE__, :init_task, [self()])
+    Task.start(__MODULE__, :init_task, [])
 
     config
   end
 
-  def init_task(_master_pid) do
-    Process.sleep(1_000)
-    Logger.info("QUANTUM INIT")
-    AcariServer.Scheduler.Api.update_script_jobs()
+  def init_task(count \\ 0) do
+    Process.sleep(1000)
+
+    case Process.whereis(AcariServer.Scheduler.JobBroadcaster) do
+      pid when is_pid(pid) ->
+        AcariServer.Scheduler.Api.update_script_jobs()
+        Logger.info("QUANTUM INIT\n#{inspect(jobs(), pretty: true)}")
+
+      _ ->
+        if count < 3600 do
+          init_task(count + 1)
+        else
+          Logger.error("Can't start scheduler")
+        end
+    end
   end
 end
 
@@ -42,8 +53,11 @@ defmodule AcariServer.Scheduler.Api do
     if hours > 0 do
       AcariServer.Mnesia.match(:tun)
       |> Enum.filter(fn
-        %{opt: %{last_up: up, last_down: down}} when down > up and cts - down > hours * 60 * 60 -> true
-        _ -> false
+        %{opt: %{last_up: up, last_down: down}} when down > up and cts - down > hours * 60 * 60 ->
+          true
+
+        _ ->
+          false
       end)
       |> Enum.each(fn %{name: name} -> AcariServer.NodeManager.lock_unlock(name) end)
     end
