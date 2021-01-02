@@ -223,7 +223,7 @@ $('#usersChat').on('hide.bs.collapse', function() {
 
 $('#usersChat').on('show.bs.collapse', function() {
   localStorage.showUsersChat = 'show'
-  channel.push('init_chat');
+  channel.push('init_chat', {});
   msg_list.innerHTML = ""
   $('#chatMessage').addClass('d-none')
   msg_list_popup.innerHTML = ""
@@ -236,7 +236,7 @@ $('#usersChat').collapse(localStorage.showUsersChat || 'hide')
 let about_system_menus = document.getElementsByClassName("about-system-menu")
 for (var i = 0; i < about_system_menus.length; i++) {
   about_system_menus[i].addEventListener("click", function(event) {
-    channel.push('get_about_system');
+    channel.push('get_about_system', {});
   })
 }
 
