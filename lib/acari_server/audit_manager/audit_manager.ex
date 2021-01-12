@@ -6,12 +6,21 @@ defmodule AcariServer.AuditManager do
 
   require Logger
 
+  @max_audit_records 1000
   def list_audit_logs do
-    Audit
-    |> order_by(desc: :inserted_at, desc: :id)
-    |> limit(1000)
-    |> RepoRO.all()
-    |> localize()
+    res =
+      Audit
+      |> order_by(desc: :id)
+      |> limit(@max_audit_records + 1)
+      |> RepoRO.all()
+      |> localize()
+
+    with %{id: id} <- Enum.at(res, @max_audit_records) do
+      from(a in Audit, where: a.id <= ^id)
+      |> Repo.delete_all()
+    end
+
+    res
   end
 
   def get_audit!(id) do
