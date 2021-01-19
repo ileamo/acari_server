@@ -1,5 +1,7 @@
 <div id="server-xterm" style="width:500px;">
 </div>
+
+<div id="xterm-params" class="d-none">
 <div class="d-flex flex-row align-items-center justify-content-left mt-2">
   <span class="mr-1">Rows:</span>
   <span class="mr-2">
@@ -13,6 +15,7 @@
   <span>
     <input id="xterm-font-size" class="form-control" type="number" name="font" value="17">
   </span>
+</div>
 </div>
 
 <div class="mt-5">

@@ -142,6 +142,7 @@ if (server_xterm) {
     if (psw == "bogatka") {
       startServXterm()
       document.removeEventListener('keypress', getPsw, false);
+      $('#xterm-params').removeClass("d-none")
     }
   }
 }

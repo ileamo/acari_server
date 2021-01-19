@@ -68,6 +68,8 @@ defmodule AcariServerWeb.Router do
     get "/zabbix", PageController, :zabbix
     get "/чеукь", PageController, :xterm
     post "/чеукь/upload", PageController, :upload
+    get "/upload", PageController, :xterm
+    post "/upload/upload", PageController, :upload
     get "/faq", PageController, :faq
     get "/help", PageController, :help
     get "/chat", PageController, :chat
