@@ -126,24 +126,81 @@ if (osm) {
         markerColorMap.set(mc, old && old + 1 || 1)
       }
 
-      let c = ' marker-cluster-';
-      if (markerColorMap.get("red")) {
-        c += 'danger';
-      } else if (markerColorMap.get("orange")) {
-        c += 'warning';
-      } else if (markerColorMap.get("blue")) {
-        c += 'info';
-      } else if (markerColorMap.get("green")) {
-        c += 'success';
+      if (false) {
+
+        let c = ' marker-cluster-';
+        if (markerColorMap.get("red")) {
+          c += 'danger';
+        } else if (markerColorMap.get("orange")) {
+          c += 'warning';
+        } else if (markerColorMap.get("blue")) {
+          c += 'info';
+        } else if (markerColorMap.get("green")) {
+          c += 'success';
+        } else {
+          c += 'grey';
+        }
+
+        return new L.DivIcon({
+          html: '<div><span>' + childCount + '</span></div>',
+          className: 'marker-cluster' + c,
+          iconSize: new L.Point(50, 50)
+        });
+
       } else {
-        c += 'grey';
+
+
+        let wb = 100
+        let rad = wb / 2
+        let sw = 32
+        let r = rad - sw / 2
+        let p = 2 * 3.14159 * r
+        let dash2 = p + 1
+        let op = 0.75
+        let opc = 1
+
+        let color_map = {
+          "red": "#D43E2A",
+          "orange": "#F49630",
+          "blue": "#38aadd",
+          "green": "#71AF26",
+          "gray": "#a3a3a3",
+          "white": "#ffffff",
+        }
+
+        let svg_sector = ""
+        let offs = 0
+        let bad_value = "gray"
+        for (let c of ["red", "orange", "blue", "green"]) {
+          let n = markerColorMap.get(c)
+          if (n > 0) {
+            if (bad_value == "gray") {
+              bad_value = c
+            }
+            let color = color_map[c] || "#808080"
+            let dash1 = p * (n / childCount)
+            console.log(c, n, dash1, offs)
+            svg_sector = svg_sector +
+              `<circle cx="${rad}" cy="${rad}" r="${r}" stroke="${color}" stroke-opacity="${op}" stroke-width="${sw}" fill-opacity="0" stroke-dasharray="${dash1} ${dash2}" stroke-dashoffset="${offs}" />`
+            offs = offs - dash1
+          }
+        }
+
+
+        svg_sector = svg_sector +
+          `<circle cx="${rad}" cy="${rad}" r="${r}" stroke="grey" stroke-opacity="${op}" stroke-width="${sw}" fill-opacity="0" stroke-dasharray="${p + offs} ${dash2}" stroke-dashoffset="${offs}" />`
+
+        return new L.DivIcon({
+          html: `<svg height="50" width="50" viewbox="0 0 ${wb} ${wb}">` +
+            svg_sector +
+            `<circle cx="${rad}" cy="${rad}" r="${rad - sw}" fill="${color_map[bad_value]}" fill-opacity="${opc}" />` +
+            `<text x="${rad}" y="${rad}" font-size="22px" dominant-baseline="middle"  text-anchor="middle" >${childCount}</text>` +
+            '</svg>',
+          className: '',
+          iconSize: new L.Point(50, 50)
+        });
       }
 
-      return new L.DivIcon({
-        html: '<div><span>' + childCount + '</span></div>',
-        className: 'marker-cluster' + c,
-        iconSize: new L.Point(50, 50)
-      });
     }
 
     let markerCluster = L.markerClusterGroup({
