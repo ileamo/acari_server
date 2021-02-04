@@ -45,6 +45,10 @@ defmodule AcariServerWeb.MapController do
       nodes
       |> Enum.reject(fn %{lock: lock} -> lock end)
       |> AcariServer.Mnesia.get_tunnel_list()
+      |> Enum.filter(fn
+        %{alert: _} -> true
+        _ -> false
+      end)
       |> Enum.map(fn
         %{latitude: lat, longitude: lng, name: name, description: descr} = node ->
           %{
