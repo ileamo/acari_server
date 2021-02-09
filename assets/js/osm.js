@@ -90,7 +90,6 @@ if (osm) {
   }
 
   mymap.on('baselayerchange', function(e) {
-    console.log(e.layer.options.mymapindex);
     localStorage.setItem("mapProvider", e.layer.options.mymapindex)
   });
 
@@ -149,7 +148,6 @@ if (osm) {
 
       } else {
 
-
         let wb = 100
         let rad = wb / 2
         let sw = 32
@@ -179,7 +177,6 @@ if (osm) {
             }
             let color = color_map[c] || "#808080"
             let dash1 = p * (n / childCount)
-            console.log(c, n, dash1, offs)
             svg_sector = svg_sector +
               `<circle cx="${rad}" cy="${rad}" r="${r}" stroke="${color}" stroke-opacity="${op}" stroke-width="${sw}" fill-opacity="0" stroke-dasharray="${dash1} ${dash2}" stroke-dashoffset="${offs}" />`
             offs = offs - dash1
@@ -187,8 +184,12 @@ if (osm) {
         }
 
 
+        let d = p + offs
+        if (d < 0) {
+          d = 0
+        }
         svg_sector = svg_sector +
-          `<circle cx="${rad}" cy="${rad}" r="${r}" stroke="grey" stroke-opacity="${op}" stroke-width="${sw}" fill-opacity="0" stroke-dasharray="${p + offs} ${dash2}" stroke-dashoffset="${offs}" />`
+          `<circle cx="${rad}" cy="${rad}" r="${r}" stroke="grey" stroke-opacity="${op}" stroke-width="${sw}" fill-opacity="0" stroke-dasharray="${d} ${dash2}" stroke-dashoffset="${offs}" />`
 
         return new L.DivIcon({
           html: `<svg height="50" width="50" viewbox="0 0 ${wb} ${wb}">` +
