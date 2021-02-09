@@ -19,6 +19,7 @@ defmodule AcariServerWeb.GrpOperChannel do
 
             id ->
               AcariServer.GroupManager.get_group!(id).nodes
+              |> AcariServer.RepoRO.preload(:groups)
           end
 
         id_name =

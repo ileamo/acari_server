@@ -240,13 +240,15 @@ if (grp_oper) {
   }
   selectElement();
 
+  let last_filter_err = ""
   channel.on('output', payload => {
-    //console.log("grp_oper get:", payload.id);
+    //console.log("grp_oper get:", payload.id, payload);
     switch (payload.id) {
       case "filter_error":
         let grp_oper_filter_error = document.getElementById("grp-oper-filter-error")
         if (grp_oper_filter_error) {
-          grp_oper_filter_error.innerText = `${payload.data}`
+          last_filter_err = `${payload.data}`
+          grp_oper_filter_error.innerText = last_filter_err
         }
         break;
 
@@ -290,10 +292,14 @@ if (grp_oper) {
             }
           }
         }
-        if (params.get("grp_oper_show_only") == "true") {
-          getScriptMulti(false)
-        } else {
-          getScript()
+
+        if (!last_filter_err) {
+
+          if (params.get("grp_oper_show_only") == "true") {
+            getScriptMulti(false)
+          } else {
+            getScript()
+          }
         }
 
         break;
