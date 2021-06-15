@@ -15,20 +15,30 @@ config :acari_server, AcariServerWeb.Endpoint,
   https: [
     port: 50443,
     keyfile: "/etc/ssl/bogatka/ssl.key",
-    #cacertfile: "/etc/ssl/acari/chain.pem",
+    # cacertfile: "/etc/ssl/acari/chain.pem",
     certfile: "/etc/ssl/bogatka/ssl.crt",
-    cipher_suite: :strong,
-    #versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
+    cipher_suite: :strong
+    # versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
   ],
 
-  #This is critical for ensuring web-sockets properly authorize.
+  # This is critical for ensuring web-sockets properly authorize.
   url: [host: "localhost", port: 50443],
   check_origin: false,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   root: ".",
-  #debug_errors: true,
+  # debug_errors: true,
   version: Application.spec(:acari_server, :vsn)
+
+config :acari_server, AcariServerWeb.EndpointPub,
+  https: [
+    port: 50444,
+    keyfile: "/etc/ssl/bogatka/ssl.key",
+    # cacertfile: "/etc/ssl/acari/chain.pem",
+    certfile: "/etc/ssl/bogatka/ssl.crt",
+    cipher_suite: :strong
+    # versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
+  ]
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -38,4 +48,4 @@ config :acari_server, AcariServer.Listener,
   keyfile: "priv/cert/selfsigned_key.pem",
   certfile: "priv/cert/selfsigned.pem"
 
-#import_config "docker.secret.exs"
+# import_config "docker.secret.exs"

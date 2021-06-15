@@ -28,6 +28,15 @@ config :acari_server, AcariServerWeb.Endpoint,
     ]
   ]
 
+config :acari_server, AcariServerWeb.EndpointPub,
+  https: [
+    port: 4444,
+    keyfile: "priv/cert/selfsigned_key.pem",
+    certfile: "priv/cert/selfsigned.pem",
+    cipher_suite: :strong
+    # versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
+  ]
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
@@ -79,8 +88,8 @@ config :acari_server, AcariServer.Repo,
   port: 5432
 
 config :acari_server, AcariServer.RepoManager,
-  rw: "localhost:5432",
-  ro: "localhost:5432"
+  rw: "localhost:5432,localhost:5433",
+  ro: "localhost:5433,localhost:5432"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 
@@ -96,9 +105,8 @@ config :acari_server, :zabbix,
   zbx_api_url: "https://Admin:zabbix@localhost:10443",
   zbx_api_url_2: "http://Admin:zabbix@localhost:12080",
   zbx_snd_host: "localhost",
-  zbx_snd_host_2: "localhost",
+  #  zbx_snd_host_2: "localhost",
   zbx_snd_port_2: 12051
-
 
 config :acari_server, :openstreetmap,
   # provider_url: nil
