@@ -5,7 +5,6 @@ defmodule AcariServerWeb.SessionController do
   alias AcariServer.{UserManager, UserManager.User, UserManager.Guardian}
   alias AcariServer.AuditManager
 
-
   def new(conn, _params) do
     changeset = UserManager.change_user(%User{})
     maybe_user = Guardian.Plug.current_resource(conn)
@@ -37,7 +36,7 @@ defmodule AcariServerWeb.SessionController do
         Access.key(:username)
       ])
 
-      Logger.info("User #{username} logged out")
+    Logger.info("User #{username} logged out")
 
     conn
     |> AuditManager.create_audit_log({"auth", username}, "logout")
@@ -51,7 +50,6 @@ defmodule AcariServerWeb.SessionController do
 
   defp login_reply({:ok, user}, conn, username) do
     Logger.info("User #{username} logged in")
-
 
     conn
     |> AuditManager.create_audit_log({"auth", username}, "login")

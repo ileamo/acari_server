@@ -1,0 +1,28 @@
+<h2>Смена пароля</h2>
+<%= form_for @changeset, Routes.user_path(@conn, :update_pswd, @user), fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Упс, что-то пошло не так! См. сообщения под формами ввода.</p>
+    </div>
+  <% end %>
+
+  <div class="form-group row">
+    <%= label f, "Пароль", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <%= password_input f, :password, class: "form-control" %>
+      <%= error_tag f, :password %>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <%= label f, "Повторить", class: "col-sm-2 col-form-label" %>
+    <div class="col-sm-10">
+      <%= password_input f, :rpt_psw, class: "form-control" %>
+      <%= error_tag f, :rpt_psw %>
+    </div>
+  </div>
+
+   <div class="form-group">
+    <%= submit "Сохранить", class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

@@ -109,5 +109,5 @@ docker run -t \
 #acari-client /usr/sbin/sshd
 
 # Подключение сервера к внешней сети
-# docker network create -d macvlan --subnet=10.0.0.0/8 --gateway=10.2.10.1 -o parent=eth0 acari-network-mac
+#docker network create -d macvlan --subnet=10.0.0.0/8 --gateway=10.2.10.1 -o parent=eth0 acari-network-mac
 #docker network connect acari-network-mac acari-server --ip 10.2.10.10

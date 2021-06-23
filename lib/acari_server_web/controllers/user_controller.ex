@@ -50,6 +50,12 @@ defmodule AcariServerWeb.UserController do
     render(conn, "edit.html", user: user, changeset: changeset)
   end
 
+  def pswd(conn, %{"id" => id}) do
+    user = UserManager.get_user!(id)
+    changeset = UserManager.change_user(user)
+    render(conn, "pswd.html", user: user, changeset: changeset)
+  end
+
   def update(conn, %{"id" => id, "user" => user_params} = params) do
     rights = params["rights"] || %{}
     user = UserManager.get_user!(id, :rw)
@@ -67,6 +73,26 @@ defmodule AcariServerWeb.UserController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", user: user, changeset: changeset, rights: rights)
+    end
+  end
+
+  def update_pswd(conn, %{"id" => id, "user" => user_params} = params) do
+    rights = params["rights"] || %{}
+    user = UserManager.get_user!(id, :rw)
+
+    case UserManager.update_user(user, user_params, rights) do
+      {:ok, user} ->
+        conn
+        |> AuditManager.create_audit_log(
+          user,
+          "update",
+          user_params |> modify(rights)
+        )
+        |> put_flash(:info, "Пароль изменен.")
+        |> redirect(to: NavigationHistory.last_path(conn, 1, default: "/"))
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, "pswd.html", user: user, changeset: changeset, rights: rights)
     end
   end
 

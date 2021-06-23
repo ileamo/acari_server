@@ -84,6 +84,8 @@ defmodule AcariServerWeb.Router do
 
     resources "/users", UserController
     get "/users/:id/rw", UserController, :show_rw
+    get "/users/:id/pswd", UserController, :pswd
+    put "/users/:id/pswd", UserController, :update_pswd
     resources "/groups", GroupController
     get "/groups/:id/oper", GroupController, :oper
     resources "/nodes", NodeController
@@ -114,9 +116,6 @@ defmodule AcariServerWeb.Router do
     get "/secret", PageController, :secret
 
     live "/live", PageLive
-
-
-
   end
 
   scope "/api", AcariServerWeb.Api, as: :api do
