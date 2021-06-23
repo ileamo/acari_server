@@ -254,6 +254,26 @@ defmodule AcariServer.UserManager do
     end
   end
 
+  def is_current_user(
+        %{assigns: %{current_user: %{id: current_user_id}}, params: %{"id" => user_id}} = conn,
+        _opts
+      ) do
+    with {user_id, ""} <- Integer.parse(user_id),
+         true <- user_id == current_user_id do
+      conn
+    else
+      _ -> no_current_user(conn)
+    end
+  end
+
+  def is_current_user(conn, _opts) do
+    no_current_user(conn)
+  end
+
+  defp no_current_user(conn) do
+    no_auth(conn, "Вы не можете редактировать другого пользователя")
+  end
+
   def no_auth(conn, mes) do
     conn
     |> Phoenix.Controller.redirect(

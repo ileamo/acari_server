@@ -6,8 +6,9 @@ defmodule AcariServerWeb.UserController do
   alias AcariServer.UserManager.User
   alias AcariServer.AuditManager
 
-  import AcariServer.UserManager, only: [is_admin: 2]
-  plug :is_admin
+  import AcariServer.UserManager, only: [is_admin: 2, is_current_user: 2]
+  plug :is_admin when not (action in [:pswd, :update_pswd])
+  plug :is_current_user when action in [:pswd, :update_pswd]
 
   def index(conn, _params) do
     users = UserManager.list_users()
