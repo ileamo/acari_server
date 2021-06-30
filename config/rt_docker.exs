@@ -46,3 +46,7 @@ config :acari_server, :zabbix,
   zbx_snd_port_2: AcariServer.system_get_integer_env("ZBX_SND_PORT_2")
 
 config :acari_server, :openstreetmap, provider_url: System.get_env("MAP_PROVIDER_URL")
+
+config :acari_server, AcariServerWeb.Endpoint,
+  secret_key_base: AcariServer.Application.random_string(64),
+  live_view: [signing_salt: AcariServer.Application.random_string(32)]

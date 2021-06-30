@@ -67,4 +67,8 @@ defmodule AcariServer.Application do
   def get_secret_key() do
     :ets.lookup_element(:secret, :guardian_secret_key, 2)
   end
+
+  def random_string(length) do
+    :crypto.strong_rand_bytes(length) |> Base.encode64(padding: false) |> binary_part(0, length)
+  end
 end

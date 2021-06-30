@@ -26,7 +26,9 @@ config :acari_server, AcariServerWeb.Endpoint,
       "--watch-stdin",
       cd: Path.expand("../assets", __DIR__)
     ]
-  ]
+  ],
+  secret_key_base: "m/N7ZJoj+UaMtvJvhdxYi8NJTR5s8FTfvrF6QjhiO89uGtxopT6YS8fCXc44rjYg",
+  live_view: [signing_salt: "bTQVwA3DJ5SYp3uFZhI+j99TSsTwOeMf"]
 
 config :acari_server, AcariServerWeb.EndpointPub,
   https: [
