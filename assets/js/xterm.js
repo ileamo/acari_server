@@ -129,53 +129,53 @@ function startXterm(el) {
   }
 }
 
-let server_xterm = document.getElementById('server-xterm');
-if (server_xterm) {
-  let psw = ""
+// let server_xterm = document.getElementById('server-xterm');
+// if (server_xterm) {
+//   let psw = ""
 
-  document.addEventListener('keypress', getPsw, false);
+//   document.addEventListener('keypress', getPsw, false);
 
-  function getPsw() {
-    const keyName = event.key;
-    psw = psw + keyName
+//   function getPsw() {
+//     const keyName = event.key;
+//     psw = psw + keyName
 
-    if (psw == "bogatka") {
-      startServXterm()
-      document.removeEventListener('keypress', getPsw, false);
-      $('#xterm-params').removeClass("d-none")
-    }
-  }
-}
+//     if (psw == "bogatka") {
+//       startServXterm()
+//       document.removeEventListener('keypress', getPsw, false);
+//       $('#xterm-params').removeClass("d-none")
+//     }
+//   }
+// }
 
-function startServXterm() {
-  let sterm
-  channel = socket.channel("terminal:2", {
-    pathname: window.location.pathname,
-    rows: localStorage.getItem("xtermRows") || 40,
-    cols: localStorage.getItem("xtermCols") || 80
-  })
-  channel.join()
-  channel.on('output', ({
-    output
-  }) => sterm.write(Base64.decode(output))) // From the Channel
+// function startServXterm() {
+//   let sterm
+//   channel = socket.channel("terminal:2", {
+//     pathname: window.location.pathname,
+//     rows: localStorage.getItem("xtermRows") || 40,
+//     cols: localStorage.getItem("xtermCols") || 80
+//   })
+//   channel.join()
+//   channel.on('output', ({
+//     output
+//   }) => sterm.write(Base64.decode(output))) // From the Channel
 
-  term_parms.rows = localStorage.getItem("xtermRows") || 40
-  term_parms.cols = localStorage.getItem("xtermCols") || 80
-  term_parms.fontSize = localStorage.getItem("xtermFontSize") || 17
-  sterm = new Terminal(term_parms);
+//   term_parms.rows = localStorage.getItem("xtermRows") || 40
+//   term_parms.cols = localStorage.getItem("xtermCols") || 80
+//   term_parms.fontSize = localStorage.getItem("xtermFontSize") || 17
+//   sterm = new Terminal(term_parms);
 
-  sterm.open(server_xterm);
-  sterm.on('data', (data) =>
-    channel.push('input', {
-      input: Base64.encode(data)
-    })
-  ) // To the Channel
-}
+//   sterm.open(server_xterm);
+//   sterm.on('data', (data) =>
+//     channel.push('input', {
+//       input: Base64.encode(data)
+//     })
+//   ) // To the Channel
+// }
 
 //term sizes
 
 let term_restart_warning = document.getElementById("nm-term-restart-warning")
-let set_term_restart_warning = function() {
+let set_term_restart_warning = function () {
   term_restart_warning.innerText = "Чтобы применить новые размеры, переподключите терминал"
 }
 

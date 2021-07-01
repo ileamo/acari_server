@@ -227,8 +227,8 @@ links_state = AcariServer.Mnesia.get_link_list_for_tunnel(@name)
     <% end %>
 
     <%= for {descr, script_name} <- terminal_list do %>
-      <button class="btn btn-outline-secondary start-xterm-client mt-2" id="<%= script_name %>"><%= descr %></button>
-      <div id="acari-xterm-<%= script_name %>" style="width:500px;"></div>
+      <button class="btn btn-outline-secondary start-xterm-client mt-2" id="3:<%= script_name %>"><%= descr %></button>
+      <div id="acari-xterm-3:<%= script_name %>" style="width:500px;"></div>
     <% end %>
 
 
