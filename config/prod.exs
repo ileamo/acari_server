@@ -38,7 +38,8 @@ config :acari_server, AcariServerWeb.EndpointPub,
     certfile: "/etc/ssl/bogatka/ssl.crt",
     cipher_suite: :strong
     # versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]
-  ]
+  ],
+  server: true
 
 # Do not print debug messages in production
 config :logger, level: :info
