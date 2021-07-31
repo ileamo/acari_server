@@ -27,8 +27,8 @@ config :acari_server, AcariServer.Repo,
   port: System.get_env("DB_PORT")
 
 config :acari_server, AcariServer.RepoManager,
-  rw: "10.0.10.10:55432,10.0.10.10:51432",
-  ro: "10.0.10.10:51432,10.0.10.10:55432"
+  rw: "localhost:5432",
+  ro: "localhost:5432"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 
@@ -45,3 +45,7 @@ config :acari_server, :zabbix,
   zbx_snd_port: System.get_env("ZBX_SND_PORT")
 
 config :acari_server, :openstreetmap, provider_url: System.get_env("MAP_PROVIDER_URL")
+
+config :acari_server, AcariServerWeb.Endpoint,
+  secret_key_base: AcariServer.Application.random_string(64),
+  live_view: [signing_salt: AcariServer.Application.random_string(32)]
