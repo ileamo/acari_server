@@ -33,11 +33,11 @@ RUN mix release bogatka_docker
 
 
 ### Minimal run-time image
-FROM alpine:3.13.4
+FROM alpine:3.14
 
 RUN apk --no-cache update && apk --no-cache upgrade && \
     apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
-    libcap libcap-dev iproute2 openssh-client su-exec screen iputils busybox-suid
+    libcap libcap-dev iproute2 openssh-client su-exec screen iputils busybox-suid bird bird-openrc
 
 RUN adduser -D docker
 ARG CWD=/opt/app
