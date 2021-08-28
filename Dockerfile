@@ -1,6 +1,6 @@
-FROM bitwalker/alpine-elixir-phoenix:1.10.3 AS build
+FROM bitwalker/alpine-elixir-phoenix:1.11.4 AS build
 RUN apk --no-cache update && apk --no-cache upgrade && \
-apk --no-cache add openssl autoconf automake libtool nasm zlib-dev
+    apk --no-cache add openssl autoconf automake libtool nasm zlib-dev
 
 WORKDIR /build
 
@@ -33,11 +33,11 @@ RUN mix release bogatka_docker
 
 
 ### Minimal run-time image
-FROM alpine:3.11.6
+FROM alpine:3.13.4
 
 RUN apk --no-cache update && apk --no-cache upgrade && \
-apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
-libcap libcap-dev iproute2 openssh-client su-exec screen iputils busybox-suid
+    apk --no-cache add openssl ncurses-libs bash ca-certificates zabbix-utils libstdc++ \
+    libcap libcap-dev iproute2 openssh-client su-exec screen iputils busybox-suid
 
 RUN adduser -D docker
 ARG CWD=/opt/app
