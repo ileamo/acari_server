@@ -259,15 +259,27 @@ defmodule AcariServer.Zabbix.ZbxApi do
 
   defp get_main_group() do
     case zbx_post("hostgroup.get", %{output: ["name"], filter: %{name: [@main_group]}}) do
-      {:ok, list} -> list
-      _ -> []
+      {:ok, list = [%{"groupid" => _}]} ->
+        list
+
+      _ ->
+        case zbx_post("hostgroup.create", %{name: @main_group}) do
+          {:ok, %{"groupids" => [_]}} -> get_main_group()
+          res -> res
+        end
     end
   end
 
   defp get_main_usrgroup() do
     case zbx_post("usergroup.get", %{output: ["name"], filter: %{name: [@main_group]}}) do
-      {:ok, list} -> list
-      _ -> []
+      {:ok, list = [%{"usrgrpid" => _}]} ->
+        list
+
+      _ ->
+        case zbx_post("usergroup.create", %{name: @main_group}) do
+          {:ok, %{"usrgrpids" => [_]}} -> get_main_usrgroup()
+          res -> res
+        end
     end
   end
 

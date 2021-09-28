@@ -105,7 +105,7 @@ config :acari_server, AcariServer.TCPListener, port: 50020
 config :acari_server, :zabbix,
   zbx_ext_url: "https://localhost:12443",
   zbx_api_url: "https://Admin:zabbix@localhost:10443",
-  zbx_api_url_2: "http://Admin:zabbix@localhost:12080",
+  # zbx_api_url_2: "http://Admin:zabbix@localhost:12080",
   zbx_snd_host: "localhost",
   #  zbx_snd_host_2: "localhost",
   zbx_snd_port_2: 12051
