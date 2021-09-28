@@ -288,9 +288,33 @@ defmodule AcariServer.Zabbix.ZbxApi do
            "template.get",
            %{output: ["extend"], filter: %{host: [@main_template]}}
          ) do
-      {:ok, list} -> list
-      _ -> []
+      {:ok, list = [%{"templateid" => _}]} ->
+        list
+
+      _ ->
+        case import_template() do
+          {:ok, true} -> get_template_id()
+          res -> res
+        end
     end
+  end
+
+  defp import_template() do
+    zbx_post(
+      "configuration.import",
+      %{
+        format: "json",
+        rules: %{
+          templates: %{createMissing: true, updateExisting: true},
+          templateDashboards: %{createMissing: true, updateExisting: true},
+          applications: %{createMissing: true},
+          items: %{createMissing: true, updateExisting: true},
+          graphs: %{createMissing: true, updateExisting: true},
+          triggers: %{createMissing: true, updateExisting: true}
+        },
+        source: AcariServer.Zabbix.Import.template()
+      }
+    )
   end
 
   defp get_bg_groups() do
