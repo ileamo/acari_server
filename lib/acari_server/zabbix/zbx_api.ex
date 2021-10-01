@@ -307,7 +307,7 @@ defmodule AcariServer.Zabbix.ZbxApi do
         rules: %{
           templates: %{createMissing: true, updateExisting: true},
           templateDashboards: %{createMissing: true, updateExisting: true},
-          applications: %{createMissing: true},
+          #applications: %{createMissing: true},
           items: %{createMissing: true, updateExisting: true},
           graphs: %{createMissing: true, updateExisting: true},
           triggers: %{createMissing: true, updateExisting: true}
