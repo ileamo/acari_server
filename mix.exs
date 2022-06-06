@@ -3,7 +3,7 @@ defmodule AcariServer.MixProject do
   def project do
     [
       app: :acari_server,
-      version: "1.3.11-pre3",
+      version: "1.3.11",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -101,6 +101,7 @@ defmodule AcariServer.MixProject do
       {:ex_crypto, "~> 0.10.0"},
       {:acari, git: "https://github.com/ileamo/acari.git"},
       # {:procket, git: "https://github.com/msantos/procket.git", branch: "master", override: true},
+      # {:procket, git: "https://github.com/ileamo/procket.git", branch: "master", override: true},
       {:tunctl, git: "https://github.com/ileamo/tunctl.git"},
       {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"},
       {:swarm, git: "https://github.com/ileamo/swarm.git", override: true},

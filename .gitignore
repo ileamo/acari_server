@@ -45,3 +45,4 @@ npm-debug.log
 /log/
 /acari_lib
 #/priv/.ssh/
+/.vscode/
