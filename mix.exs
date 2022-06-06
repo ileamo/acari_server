@@ -1,6 +1,5 @@
 defmodule AcariServer.MixProject do
   use Mix.Project
-
   def project do
     [
       app: :acari_server,
