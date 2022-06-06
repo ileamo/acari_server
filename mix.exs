@@ -1,5 +1,6 @@
 defmodule AcariServer.MixProject do
   use Mix.Project
+
   def project do
     [
       app: :acari_server,
@@ -105,7 +106,7 @@ defmodule AcariServer.MixProject do
       {:tunctl, git: "https://github.com/ileamo/tunctl.git"},
       {:gen_icmp, git: "https://github.com/ileamo/gen_icmp.git"},
       {:swarm, git: "https://github.com/ileamo/swarm.git", override: true},
-      {:hackney, "~> 1.17", override: true},
+      {:hackney, "~> 1.17", override: true}
     ]
   end
 
