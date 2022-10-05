@@ -92,7 +92,7 @@ defmodule AcariServer.MixProject do
       {:bbmustache, "~> 1.8"},
       {:highlander, "~> 0.2"},
       {:tzdata, "~> 1.0.3"},
-      {:quantum, "~> 3.0"},
+      {:quantum, "~> 3.4.0"},
       {:timex, "~> 3.0"},
       {:wild, "~> 1.0.0"},
       {:navigation_history, "~> 0.3"},
