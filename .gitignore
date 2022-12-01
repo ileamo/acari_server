@@ -46,3 +46,4 @@ npm-debug.log
 /acari_lib
 #/priv/.ssh/
 /.vscode/
+/.elixir_ls/
