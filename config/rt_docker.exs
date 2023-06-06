@@ -36,6 +36,7 @@ config :acari_server, :zabbix,
   zbx_api_url: System.get_env("ZBX_API_URL"),
   zbx_snd_host: System.get_env("ZBX_SND_HOST"),
   zbx_snd_port: AcariServer.system_get_integer_env("ZBX_SND_PORT"),
+  zbx_listen_port: AcariServer.system_get_integer_env("ZBX_LISTEN_PORT"),
   zbx_api_url_2: System.get_env("ZBX_API_URL_2"),
   zbx_snd_host_2: System.get_env("ZBX_SND_HOST_2"),
   zbx_snd_port_2: AcariServer.system_get_integer_env("ZBX_SND_PORT_2")
@@ -48,6 +49,7 @@ config :acari_server, AcariServerWeb.Endpoint,
 
 bg_http_port = AcariServer.system_get_integer_env("BG_HTTP_PORT") || 50080
 bg_https_port = AcariServer.system_get_integer_env("BG_HTTPS_PORT") || 50443
+
 bg_api_port = AcariServer.system_get_integer_env("BG_API_PORT") || 50444
 bg_tls_port = AcariServer.system_get_integer_env("BG_TLS_PORT") || 50019
 bg_tcp_port = AcariServer.system_get_integer_env("BG_TCP_PORT") || 50020
