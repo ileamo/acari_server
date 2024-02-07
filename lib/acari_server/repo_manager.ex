@@ -131,9 +131,7 @@ defmodule AcariServer.RepoManager do
     config = repo_state.config
 
     Logger.error(
-      "DB #{config[:hostname]}:#{config[:port]} down: #{
-        reason |> Map.get(:message) || inspect(reason)
-      }"
+      "DB #{config[:hostname]}:#{config[:port]} down: #{reason |> Map.get(:message) || inspect(reason)}"
     )
 
     Process.send_after(self(), {:connect_db, repo_type}, @reconnect_timeout)

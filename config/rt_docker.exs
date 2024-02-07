@@ -26,7 +26,8 @@ config :acari_server, AcariServer.Repo,
 
 config :acari_server, AcariServer.RepoManager,
   rw: System.get_env("DB_HOSTS_RW"),
-  ro: System.get_env("DB_HOSTS_RO")
+  ro: System.get_env("DB_HOSTS_RO"),
+  password: System.get_env("DB_PASSWORD") || "postgres"
 
 config :acari_server, AcariServer, allow_unconfigured: false
 

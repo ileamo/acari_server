@@ -6,20 +6,30 @@ defmodule AcariServer.RepoRO do
 
   @params [
     username: "postgres",
-    password: "postgres",
     database: "bogatka",
     pool_size: 10,
     telemetry_prefix: [:bogatka, :bd_ro]
-
   ]
 
   def init(:runtime, config) do
-    {:ok, config |> Keyword.merge(@params)}
+    {:ok,
+     config
+     |> Keyword.merge(@params)
+     |> Keyword.merge(
+       password: Application.get_env(:acari_server, AcariServer.RepoManager)[:password]
+     )}
   end
 
   def init(_type, config) do
     host_port = AcariServer.RepoManager.get_db_config(:ro)
-    {:ok, config |> Keyword.merge(@params) |> Keyword.merge(host_port)}
+
+    {:ok,
+     config
+     |> Keyword.merge(@params)
+     |> Keyword.merge(host_port)
+     |> Keyword.merge(
+       password: Application.get_env(:acari_server, AcariServer.RepoManager)[:password]
+     )}
   end
 
   def get_wait(schema, id) do
